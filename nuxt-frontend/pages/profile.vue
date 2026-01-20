@@ -7,46 +7,52 @@
       <div class="profile-layout">
         <!-- 左侧边栏 (Unified Deep Glass) -->
         <aside class="profile-sidebar">
-           <!-- 返回首页悬浮按钮 -->
-          <div class="back-home-wrapper" @click="handleBackHome">
-            <div class="back-home-btn">
+          <!-- Sidebar Header: Back + User Identity -->
+          <div class="sidebar-header">
+            <!-- Back Button -->
+            <div class="back-home-btn" @click="handleBackHome">
               <el-icon class="arrow-icon-left"><ArrowLeft /></el-icon>
               <span>返回首页</span>
             </div>
-          </div>
 
-          <!-- 用户基本信息 -->
-          <div class="user-card">
-            <!-- 加载状态：骨架屏 -->
-            <div v-if="userStore.loading" class="user-avatar-section user-avatar-section--loading">
-              <div class="avatar-skeleton-large"></div>
-              <div class="user-basic-info">
-                <div class="nickname-skeleton"></div>
-                <div class="uid-skeleton"></div>
+            <!-- User Hero Card -->
+            <div class="user-hero-card">
+              <!-- Loading Skeleton -->
+              <div v-if="userStore.loading" class="user-hero-loading">
+                <div class="avatar-skeleton"></div>
+                <div class="info-skeleton">
+                   <div class="line-1"></div>
+                   <div class="line-2"></div>
+                </div>
+              </div>
+              
+              <!-- Real User Info -->
+              <div v-else class="user-hero-content">
+                <div class="avatar-wrapper">
+                  <img 
+                    :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
+                    class="user-avatar"
+                  />
+                  <div class="status-dot"></div>
+                </div>
+                <div class="user-info">
+                  <h3 class="user-nickname">{{ userStore.user?.nickname || 'FANTULA User' }}</h3>
+                  <div class="user-id-badge">
+                    <span>UID: {{ userStore.user?.uid || '---' }}</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <!-- 已加载：真实头像 -->
-            <div v-else class="user-avatar-section">
-              <img 
-                :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
-                :alt="userStore.user?.nickname || '用户头像'"
-                class="user-avatar-large"
-              />
-              <div class="user-basic-info">
-                <h3 class="user-nickname">{{ userStore.user?.nickname || '用户' }}</h3>
-                <p class="user-uid">UID: {{ userStore.user?.uid || userStore.user?.id?.slice(0,8) || '---' }}</p>
-              </div>
-            </div>
           </div>
 
-          <!-- 菜单列表 - 分组 -->
+          <!-- Navigation Menu -->
           <nav class="sidebar-menu">
             <div 
               v-for="group in menuGroups" 
               :key="group.key"
               class="menu-group"
             >
-              <div class="menu-group-label">{{ group.label }}</div>
+              <div v-if="group.label" class="menu-group-label">{{ group.label }}</div>
               <div 
                 v-for="item in group.items" 
                 :key="item.key"
@@ -60,12 +66,13 @@
                    </el-icon>
                 </div>
                 <span class="menu-text">{{ item?.label }}</span>
-                <span v-if="item?.badge" class="menu-badge">{{ item.badge }}</span>
+                <!-- Active Indicator Glow (Visual Only) -->
+                <div v-if="isMenuItemActive(item)" class="active-glow"></div>
               </div>
             </div>
           </nav>
 
-          <!-- 退出登录按钮 (Bottom aligned via margin-top: auto) -->
+          <!-- Footer Actions -->
           <div class="sidebar-footer">
             <button class="logout-btn" @click="handleLogoutClick">
               <el-icon><SwitchButton /></el-icon>
@@ -124,29 +131,17 @@ const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
 
-// 侧边栏菜单项 - 分组结构
+// 侧边栏菜单项 - 扁平化 (保留所有功能，去除分组标题)
 const menuGroups = [
   {
-    key: 'core',
-    label: '核心功能',
+    key: 'main',
+    label: '', //留空不显示标题
     items: [
       { key: 'profile', label: '个人中心', icon: User, to: '/profile' },
       { key: 'wallet', label: '我的额度', icon: Wallet, to: '/profile/wallet' },
       { key: 'orders', label: '我的订单', icon: List, to: '/profile/orders' },
-    ]
-  },
-  {
-    key: 'shop',
-    label: '商城服务',
-    items: [
       { key: 'exchange', label: '兑换中心', icon: Ticket, to: '/profile/exchange' },
       { key: 'favorites', label: '我的收藏', icon: Star, to: '/profile/favorites' },
-    ]
-  },
-  {
-    key: 'more',
-    label: '更多',
-    items: [
       { key: 'referral', label: '返现推广', icon: Share, to: '/profile/referral' },
       { key: 'tickets', label: '我的工单', icon: Service, to: '/profile/tickets' },
       { key: 'messages', label: '我的消息', icon: Bell, to: '/profile/messages' },
@@ -156,10 +151,20 @@ const menuGroups = [
 
 // 手动控制高亮逻辑
 const isMenuItemActive = (item: any) => {
+    const path = route.path
+    
+    // 1. 个人中心首页 (精确匹配)
     if (item.key === 'profile') {
-        return route.path === '/profile'
+        return path === '/profile'
     } 
-    return route.path.startsWith(item.to)
+    
+    // 2. 订单特殊处理: 订单列表(/profile/orders) 和 订单详情(/profile/order/xxx) 都高亮“我的订单”
+    if (item.key === 'orders') {
+        return path.startsWith('/profile/orders') || path.startsWith('/profile/order/')
+    }
+
+    // 3. 其他默认前缀匹配
+    return path.startsWith(item.to)
 }
 
 const handleMenuClick = (item: any) => {
@@ -222,312 +227,296 @@ onMounted(() => {
   overflow: hidden;
 }
 
+/* --- Layout Container --- */
 .profile-layout {
   display: flex;
-  gap: 24px;
+  gap: 32px; /* Increased from 24px for better separation */
   width: 100%;
-  height: 100%; /* Fill container */
-  max-width: 1200px;
+  height: 100%;
+  max-width: 1300px; /* Slightly wider to accommodate gap */
   align-items: stretch;
 }
 
-/* --- Left Sidebar: Deep Glass Panel --- */
+/* --- Left Sidebar: Obsidian Glass Panel --- */
 .profile-sidebar {
   width: 280px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  height: 100%; /* Full height */
-  overflow-y: auto; /* Allow sidebar scroll if needed */
+  gap: 32px; /* Relaxed gap between sections */
+  padding: 32px 24px 48px;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 10;
   
-  /* Unified Deep Glass Background */
-  background: rgba(15, 23, 42, 0.85); 
+  /* Obsidian Glass (Deepened) */
+  background: rgba(10, 15, 30, 0.85); 
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  
+  /* Enhanced 3D Depth */
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.3), 
+    10px 0 40px -10px rgba(0, 0, 0, 0.5); 
+    
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.profile-sidebar::-webkit-scrollbar {
-  width: 0; /* Hide sidebar scrollbar */
-}
+.profile-sidebar::-webkit-scrollbar { width: 0; }
 
-/* Back Button */
-.back-home-wrapper {
-  margin-bottom: 8px;
+/* Sidebar Header Group */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; 
   flex-shrink: 0;
 }
 
+/* Back Button (Restored to Visible Button) */
 .back-home-btn {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px; /* Consistent with menu */
+  height: 48px; /* Taller, clickable area */
   width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  background: rgba(255, 255, 255, 0.05); 
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  
+  background: rgba(255, 255, 255, 0.03); /* Visible bg */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  
   color: #94A3B8;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .back-home-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08); /* Brighter hover */
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px); /* Consistent hover effect */
 }
-
 .arrow-icon-left { font-size: 16px; }
 
-/* User Card */
-.user-card {
-  padding: 10px 0 20px 0;
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  margin-bottom: 8px;
+/* User Hero Card (Refined) */
+.user-hero-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  transition: transform 0.3s;
+}
+
+.user-hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* User Hero Content */
+.user-hero-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Increased gap */
+}
+
+.avatar-wrapper {
+  position: relative;
   flex-shrink: 0;
 }
 
-.user-avatar-large {
-  width: 72px;
-  height: 72px;
+.user-avatar {
+  width: 56px; /* Slightly larger */
+  height: 56px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  display: block;
+}
+
+.status-dot {
+  position: absolute; bottom: 0; right: 0; width: 14px; height: 14px;
+  background: #22C55E; border: 2px solid #1E293B; border-radius: 50%;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0; /* Constraints flex item */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px; /* Space between name and badge */
 }
 
 .user-nickname {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px; /* Optimised size */
+  font-weight: 700;
   color: #fff;
-  margin-bottom: 4px;
+  line-height: 1.2;
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  margin: 0;
 }
 
-.user-uid {
-  font-size: 12px;
-  color: #64748B;
-  font-family: 'Monaco', monospace;
+.user-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.05);
+  max-width: 100%;
 }
 
-/* 个人中心头像骨架屏 */
-.user-avatar-section--loading {
-  pointer-events: none;
+.user-id-badge span {
+  font-size: 11px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  color: #94A3B8;
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* Enforce single line */
 }
 
-.avatar-skeleton-large {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite;
-  margin-bottom: 12px;
-}
-
-.nickname-skeleton {
-  width: 80px;
-  height: 16px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite;
-  margin-bottom: 8px;
-}
-
-.uid-skeleton {
-  width: 60px;
-  height: 12px;
-  border-radius: 4px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+/* Loading Skeletons */
+.user-hero-loading { display: flex; align-items: center; gap: 16px; }
+.avatar-skeleton { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.05); animation: pulse 1.5s infinite; }
+.info-skeleton { flex: 1; }
+.info-skeleton .line-1 { width: 90px; height: 18px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 8px; }
+.info-skeleton .line-2 { width: 60px; height: 14px; background: rgba(255,255,255,0.03); border-radius: 4px; }
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
 /* Sidebar Menu */
 .sidebar-menu {
-  flex: 1; /* Take remaining space */
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto; /* Scrollable menu if too long */
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; /* Increased from 8px for looser feel */
+  padding-top: 12px;
+  overflow-y: auto;
 }
 
-.sidebar-menu::-webkit-scrollbar {
-    width: 0;
-}
-
-/* Menu Group */
-.menu-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.menu-group:not(:last-child) {
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.menu-group-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748B;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 4px 18px 8px;
-}
-
+/* Menu Item: Pill Shape + Deepened Effects */
 .menu-item {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 14px 18px; 
-  border-radius: 12px;
+  padding: 16px 20px; /* Increased vertical padding to 16px */
+  border-radius: 16px; /* More rounded */
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring */
   color: #94A3B8;
-  text-decoration: none !important;
-  font-size: 16px;
   font-weight: 500;
-  flex-shrink: 0;
+  font-size: 15px;
+  text-decoration: none !important;
+  overflow: hidden;
+  border: 1px solid transparent; /* Prepare for border */
 }
 
+/* Hover State - Deepened */
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #E2E8F0;
-  transform: translateX(4px); 
+  background: rgba(255, 255, 255, 0.08); /* Brighter hover */
+  color: #F8FAFC;
+  transform: translateX(6px); /* More movement */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Lift effect */
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Active State */
+/* Active State: Neon Pill */
 .menu-item.active {
-  background: rgba(249, 115, 22, 0.15); 
+  /* Strong Neon Gradient */
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.05) 100%);
   color: #FB923C; 
-  font-weight: 600;
-  box-shadow: none; 
-  border-left: 3px solid #F97316; 
-  padding-left: 15px; 
+  font-weight: 700;
+  
+  /* Deepened Glow */
+  box-shadow: 
+    inset 0 0 0 1px rgba(249, 115, 22, 0.3), /* Sharp inner border */
+    0 0 20px rgba(249, 115, 22, 0.15); /* Outer glow */
+    
+  transform: translateX(0); /* Reset move */
+  padding-left: 20px; /* Reset padding diff */
 }
 
 .menu-item.active .menu-icon {
-  color: #FB923C; 
+  color: #FB923C;
   opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.6)); /* Stronger icon glow */
+  transform: scale(1.1); /* Pop icon */
 }
 
 .menu-item:hover .menu-icon {
   opacity: 1;
+  color: #E2E8F0;
 }
 
 .icon-wrapper {
-  width: 20px;
-  height: 20px;
-  margin-right: 14px; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 24px; height: 24px;
+  margin-right: 16px; /* Increased gap from 12px */
+  display: flex; align-items: center; justify-content: center;
 }
+.menu-icon { font-size: 19px; opacity: 0.7; transition: all 0.3s; color: inherit; }
 
-.menu-icon {
-  font-size: 18px; 
-  opacity: 0.6;
-  transition: all 0.2s;
-  color: inherit; 
-}
-
-.sidebar-footer {
-  flex-shrink: 0;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  justify-content: center; 
+/* Footer & Logout */
+.sidebar-footer { 
+  padding-top: 24px; 
+  margin-top: auto; /* Push to bottom of flex container */
+  /* Remove border top for cleaner look? User wants separation "more obvious". 
+     Maybe keeping the border is good, or using a gap. 
+     User said "move up a bit". 
+     The padding-bottom on .profile-sidebar handles the "lift".
+  */
+  border-top: 1px solid rgba(255,255,255,0.06); 
 }
 
 .logout-btn {
   width: 100%;
-  max-width: 200px; 
-  padding: 10px 16px; 
-  background: rgba(239, 68, 68, 0.1);
-  color: #EF4444;
+  padding: 16px 20px; /* Match menu padding */
+  background: rgba(239, 68, 68, 0.05); /* Slight tint by default */
+  color: #F87171;
   border: 1px solid rgba(239, 68, 68, 0.1);
-  border-radius: 100px; 
-  font-size: 14px;
+  border-radius: 16px; /* Match menu radius */
+  font-size: 15px; font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 16px; /* Match menu gap */
   transition: all 0.2s;
-  margin: 0 auto;
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.3);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
-/* --- Right Main Content: Sheer Glass Frame --- */
+/* --- Right Main Content --- */
 .profile-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  height: 100%; /* Full Height */
-  overflow: hidden; /* No scroll on main container */
+  flex: 1; min-width: 0; display: flex; height: 100%;
 }
-
 .profile-content-frame {
-  width: 100%;
-  height: 100%; /* Full Height */
-  
-  /* Unified Sheer Glass */
-  background: rgba(30, 41, 59, 0.3); 
-  backdrop-filter: blur(16px);
+  width: 100%; height: 100%; border-radius: 24px; overflow: hidden;
+  background: rgba(30, 41, 59, 0.3); backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  overflow: hidden; /* Clip internal content */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  
-  display: flex;
-  flex-direction: column;
-  position: relative; /* For absolute children if any */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* 响应式适配 */
+/* Responsive */
 @media (max-width: 900px) {
-  .profile-page {
-    height: auto;
-    overflow-y: auto;
-  }
-  .profile-container {
-    height: auto;
-    padding: 10px;
-  }
-  .profile-layout {
-    flex-direction: column;
-    height: auto;
-  }
-  
-  .profile-sidebar {
-    width: 100%;
-    height: auto;
-  }
-  
-  .profile-content-frame {
-    height: 600px; /* Fallback height for mobile */
-    min-height: 600px;
-  }
+  .profile-layout { flex-direction: column; }
+  .profile-sidebar { width: 100%; height: auto; padding: 16px; }
+  .user-hero-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .profile-content-frame { min-height: 500px; }
 }
 </style>

@@ -219,60 +219,71 @@ async function handleConfirm() {
 .step-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .step-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .step-badge {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
   color: #64748B;
-  transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
 }
+
 .step-badge.active {
-  background: var(--primary-blue);
+  background: linear-gradient(135deg, var(--primary-blue), #2563eb);
   color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  transform: scale(1.1);
 }
+
 .step-badge.done {
-  background: #10B981;
-  color: #fff;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 .step-line {
   width: 40px;
   height: 2px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
   transition: all 0.3s;
 }
 .step-line.done {
   background: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
 .step-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: #fff;
   margin: 0;
   text-align: center;
+  letter-spacing: -0.5px;
 }
 
 .step-desc {
   font-size: 13px;
-  color: #64748B;
+  color: #94A3B8;
   margin: 0;
   text-align: center;
 }
@@ -283,39 +294,65 @@ async function handleConfirm() {
 }
 
 .send-code-btn {
-  padding: 0 16px;
+  padding: 0 20px;
   white-space: nowrap;
-  background: var(--primary-blue);
+  
+  /* Gradient Pill */
+  background: linear-gradient(90deg, #F59E0B, #EA580C); 
   border: none;
   border-radius: 12px;
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  height: 46px;
-  transition: all 0.2s;
+  height: 48px; /* Match input height roughly */
+  
+  /* Flashy Effects */
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.send-code-btn:hover { background: var(--active-orange); }
+
+.send-code-btn:hover { 
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  filter: brightness(1.1);
+}
+
+.send-code-btn:active {
+  transform: scale(0.98);
+}
+
 .send-code-btn:disabled { 
-  background: rgba(255, 255, 255, 0.1); 
-  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.08); 
+  color: #64748B;
   cursor: not-allowed; 
+  box-shadow: none;
+  transform: none;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .info-box {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 14px 16px;
-  background: rgba(59, 130, 246, 0.1);
+  gap: 12px;
+  padding: 16px;
+  
+  /* Glass Info Box */
+  background: rgba(59, 130, 246, 0.08);
   border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 12px;
+  border-radius: 14px;
+  
   font-size: 13px;
-  color: #94A3B8;
+  color: #CBD5E1;
   line-height: 1.5;
+  box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.05);
 }
 
 .info-icon {
-  font-size: 16px;
+  font-size: 18px;
   flex-shrink: 0;
+  filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4));
 }
+
 </style>

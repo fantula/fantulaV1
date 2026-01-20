@@ -123,10 +123,11 @@ async function testR2Connection(
                 details: { status: response.status }
             }
         } else if (response.status === 403) {
+            const text = await response.text()
             return {
                 success: false,
-                message: '权限不足，请检查 Access Key 和 Secret Key 是否正确，以及是否有 Bucket 访问权限。',
-                details: { status: response.status }
+                message: `权限拒绝 (403). 请截图发我: ${text}`,
+                details: { status: response.status, body: text }
             }
         } else {
             const text = await response.text()
@@ -168,7 +169,7 @@ Deno.serve(async (req) => {
         const token = authHeader.replace('Bearer ', '')
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
         if (authError || !user) {
-            throw new Error('无效的 Token')
+            throw new Error(`无效的 Token: ${authError?.message || 'User missing'}`)
         }
 
         // 2. 验证是否为后台管理员
@@ -183,20 +184,41 @@ Deno.serve(async (req) => {
             throw new Error('权限不足：只允许后台管理员测试连接')
         }
 
-        // 3. 读取 R2 配置
-        const { data: settingsData, error: settingsError } = await supabaseAdmin
-            .from('system_settings')
-            .select('key, value')
-            .in('key', ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET_NAME'])
+        // 3. 读取 R2 配置 (优先从 Body 读取，支持测试未保存的配置)
+        let config: Record<string, string> = {}
 
-        if (settingsError || !settingsData) {
-            throw new Error('读取系统配置失败')
+        try {
+            const body = await req.json()
+            if (body && typeof body === 'object') {
+                config = body
+            }
+        } catch (e) {
+            // Body may be empty or invalid json, ignore
         }
 
-        const config: Record<string, string> = {}
-        settingsData.forEach((item: any) => {
-            config[item.key] = item.value
-        })
+        // 如果 Body 中缺少关键配置，则尝试从数据库读取
+        if (!config.R2_ACCOUNT_ID || !config.R2_ACCESS_KEY_ID || !config.R2_SECRET_ACCESS_KEY || !config.R2_BUCKET_NAME) {
+            const { data: settingsData, error: settingsError } = await supabaseAdmin
+                .from('system_settings')
+                .select('key, value')
+                .in('key', ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET_NAME'])
+
+            if (!settingsError && settingsData) {
+                const dbConfig: Record<string, string> = {}
+                settingsData.forEach((item: any) => {
+                    dbConfig[item.key] = item.value
+                })
+                // Merge: Body overrides DB, or DB fills missing Body
+                config = { ...dbConfig, ...config }
+            }
+        }
+
+        // [自动去空格] 防止复制粘贴时的意外空格导致 403
+        for (const key in config) {
+            if (typeof config[key] === 'string') {
+                config[key] = config[key].trim()
+            }
+        }
 
         // 4. 验证配置完整性
         const missingFields: string[] = []

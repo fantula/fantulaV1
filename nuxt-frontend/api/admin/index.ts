@@ -62,3 +62,6 @@ export { adminRechargeApi, type RechargeTier } from './recharge'
 
 // 共享规格管理
 export { adminSharedSkuApi, type SharedSkuGroup } from './shared-sku'
+
+// 工单管理
+export { adminTicketApi, type AdminTicket, type TicketMessage } from './ticket'

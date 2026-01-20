@@ -305,8 +305,12 @@ onMounted(loadData)
 
 <style scoped>
 .order-detail-page {
-  min-height: 100vh;
-  padding-bottom: 100px; /* 增加底部内边距，防止被操作栏遮挡 */
+  /* Fix scroll issue: Use fixed height + internal scroll */
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  
+  padding-bottom: 100px; /* Space for fixed actions bar */
   background: #0f172a;
   color: #f8fafc;
   font-family: 'Inter', sans-serif;

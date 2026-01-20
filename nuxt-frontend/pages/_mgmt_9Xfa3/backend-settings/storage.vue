@@ -140,38 +140,43 @@ const testConnection = async () => {
   testResult.value = null
   
   try {
-    const { getAdminAuthToken } = await import('@/utils/supabase-admin')
-    const token = await getAdminAuthToken()
-    
-    if (!token) {
-      testResult.value = { success: false, message: '请先登录后台管理员账号' }
-      return
-    }
+    const { callEdgeFunction } = await import('@/utils/supabase')
+    const { getAdminAuthToken } = await import('@/utils/supabase-admin') // Import Admin Auth
+    const token = await getAdminAuthToken() // Get Admin Token
 
-    const { EDGE_FUNCTIONS_URL } = await import('@/utils/supabase')
-    // Note: Assuming existing test-r2-connection function exists or logic is compatible
-    // If not, we might need to update this URL or logic. 
-    // The previous file used 'http://127.0.0.1:54321/functions/v1/test-r2-connection'
-    // I will use EDGE_FUNCTIONS_URL if possible, or fallback.
-    // Given user env is Mac local, EDGE_FUNCTIONS_URL likely points to local.
-    
-    const response = await fetch(`${EDGE_FUNCTIONS_URL}/test-r2-connection`, {
+    // 使用 callEdgeFunction 统一处理认证和请求
+    const { data, error } = await callEdgeFunction('test-r2-connection', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+      body: {
+        R2_ACCOUNT_ID: form.R2_ACCOUNT_ID,
+        R2_ACCESS_KEY_ID: form.R2_ACCESS_KEY_ID,
+        R2_SECRET_ACCESS_KEY: form.R2_SECRET_ACCESS_KEY,
+        R2_BUCKET_NAME: form.R2_BUCKET_NAME
+      },
+      requireAuth: true,
+      token: token || undefined // Pass the admin token
     })
 
-    const result = await response.json()
-    testResult.value = {
-      success: result.success,
-      message: result.message
+    if (error) {
+       // If callEdgeFunction returns error, it's a string
+       testResult.value = {
+         success: false,
+         message: error
+       }
+    } else {
+       // If success, data is the response from function.
+       // Function returns { success: boolean, message: string }
+       testResult.value = {
+         success: data.success,
+         message: data.message || (data.success ? '连接成功' : '未知错误')
+       }
     }
+
   } catch (e: any) {
+    console.error('Test connection exception:', e)
     testResult.value = {
       success: false,
-      message: '测试请求失败: ' + (e.message || '网络错误')
+      message: '前端异常: ' + (e.message || '未知错误')
     }
   } finally {
     testing.value = false

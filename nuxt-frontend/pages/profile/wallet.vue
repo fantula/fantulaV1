@@ -1,102 +1,121 @@
 <template>
   <div class="wallet-page">
-    <!-- Quota Master Card -->
-    <div class="asset-master-card">
-      <div class="card-bg"></div>
-      <div class="card-content">
-        <div class="card-header">
-          <div class="header-left">
-            <span class="card-label">我的额度</span>
-            <div class="card-tag">My Quota</div>
+    <!-- 1. Aurora Hero Card: The Asset Core -->
+    <div class="asset-hero-card">
+      <div class="hero-aurora-bg"></div>
+      
+      <div class="hero-content">
+        <!-- Top Row: Label & Info -->
+        <div class="hero-header">
+          <div class="header-main">
+            <div class="card-icon-wrapper">
+              <el-icon><Wallet /></el-icon>
+            </div>
+            <div class="header-text">
+              <span class="card-label">我的额度</span>
+              <div class="card-tag">My Quota</div>
+            </div>
           </div>
-          <!-- Info Tooltip -->
+          
           <el-tooltip
             content="凡图拉额度仅用于平台内服务使用，不可提现或转让"
             placement="top"
             effect="dark"
           >
-            <div class="info-icon">
+            <div class="info-btn">
               <el-icon><Warning /></el-icon>
             </div>
           </el-tooltip>
         </div>
         
-        <div class="balance-container">
-          <span class="amount-integer">{{ balanceInteger }}</span>
-          <span class="amount-decimal">.{{ balanceDecimal }}</span>
-          <span class="unit-suffix">点</span>
+        <!-- Middle: Balance Display -->
+        <div class="balance-display">
+          <div class="balance-number">
+            <span class="amount-integer">{{ balanceInteger }}</span>
+            <span class="amount-decimal">.{{ balanceDecimal }}</span>
+          </div>
+          <div class="balance-unit">点</div>
         </div>
 
-        <div class="card-actions">
-          <button class="action-btn" @click="showRechargeModal = true">
+        <!-- Bottom: Action (Neon Pill) -->
+        <div class="hero-footer">
+          <button class="neon-action-btn" @click="showRechargeModal = true">
             <el-icon><Lightning /></el-icon>
-            <span>购买额度</span>
+            <span>立即充值</span>
+            <div class="btn-glow"></div>
           </button>
         </div>
       </div>
+      
+      <!-- Decorative Background Icon -->
+      <el-icon class="card-bg-icon"><Wallet /></el-icon>
     </div>
 
-    <!-- Transaction Ledger -->
-    <div class="ledger-container">
+    <!-- 2. Transaction Stream: The Glass Ledger -->
+    <div class="ledger-section">
       <div class="ledger-header">
-        <h3 class="ledger-title">额度变动</h3>
+        <h3 class="section-title">额度流水</h3>
         
-        <!-- Tabs -->
-        <div class="ledger-tabs">
+        <!-- Floating Pill Tabs -->
+        <div class="glass-pill-tabs">
           <div 
-            class="tab-item" 
+            class="pill-tab" 
             :class="{ active: activeTab === 'all' }"
             @click="activeTab = 'all'"
           >全部</div>
           <div 
-            class="tab-item" 
+            class="pill-tab income" 
             :class="{ active: activeTab === 'income' }"
             @click="activeTab = 'income'"
           >获取</div>
           <div 
-            class="tab-item" 
+            class="pill-tab expense" 
             :class="{ active: activeTab === 'expense' }"
             @click="activeTab = 'expense'"
           >消耗</div>
         </div>
       </div>
 
-      <!-- Scrollable List -->
-      <div class="ledger-list-wrapper">
-        <div v-if="loading" class="loading-state">
+      <!-- Glass List -->
+      <div class="ledger-stream">
+        <div v-if="loading" class="stream-loading">
            <el-skeleton animated :rows="3" />
         </div>
 
-        <div v-else-if="filteredTransactions.length === 0" class="empty-state">
-           <div class="empty-icon-wrapper">
-             <el-icon><Wallet /></el-icon>
+        <div v-else-if="filteredTransactions.length === 0" class="stream-empty">
+           <div class="empty-bubble">
+             <el-icon><Document /></el-icon>
            </div>
            <span>暂无{{ activeTab === 'all' ? '' : activeTab === 'income' ? '获取' : '消耗' }}记录</span>
         </div>
 
-        <div v-else class="transaction-list">
-          <div 
-            v-for="item in filteredTransactions" 
-            :key="item.id" 
-            class="transaction-row"
-          >
-            <!-- Icon -->
-            <div class="t-icon-box" :class="getTypeClass(item.amount)">
-              <el-icon v-if="item.amount > 0"><Top /></el-icon>
-              <el-icon v-else><Bottom /></el-icon>
-            </div>
+        <div v-else class="stream-list">
+          <transition-group name="list-fade">
+            <div 
+              v-for="(item, index) in filteredTransactions" 
+              :key="item.id" 
+              class="glass-stream-item"
+              :style="{ animationDelay: `${index * 0.05}s` }"
+            >
+              <!-- Icon -->
+              <div class="stream-icon-box" :class="getTypeClass(item.amount)">
+                <el-icon v-if="item.amount > 0"><Top /></el-icon>
+                <el-icon v-else><Bottom /></el-icon>
+              </div>
 
-            <!-- Info -->
-            <div class="t-info">
-              <div class="t-desc">{{ item.description || item.type }}</div>
-              <div class="t-date">{{ formatDate(item.created_at) }}</div>
-            </div>
+              <!-- Content -->
+              <div class="stream-content">
+                <div class="stream-title">{{ item.description || item.type }}</div>
+                <div class="stream-date">{{ formatDate(item.created_at) }}</div>
+              </div>
 
-            <!-- Amount -->
-            <div class="t-amount" :class="getTypeClass(item.amount)">
-              {{ item.amount > 0 ? '+' : '' }}{{ formatAmount(item.amount) }} <span class="t-unit">点</span>
+              <!-- Amount -->
+              <div class="stream-amount" :class="getTypeClass(item.amount)">
+                {{ item.amount > 0 ? '+' : '' }}{{ formatAmount(item.amount) }}
+                <span class="stream-unit">点</span>
+              </div>
             </div>
-          </div>
+          </transition-group>
         </div>
       </div>
     </div>
@@ -116,7 +135,7 @@ import { useRoute, useRouter } from 'vue-router'
 import WalletRechargeModal from '@/components/WalletRechargeModal.vue'
 import { authApi } from '@/api/auth'
 import { useUserStore } from '@/stores/user'
-import { Lightning, Top, Bottom, Wallet, Warning } from '@element-plus/icons-vue'
+import { Lightning, Top, Bottom, Wallet, Warning, Document } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const route = useRoute()
@@ -151,7 +170,7 @@ const fetchWallet = async () => {
         transactions.value = res.data.transactions || []
     }
   } finally {
-    loading.value = false
+    setTimeout(() => { loading.value = false }, 300) // Small delay for smooth transition
   }
 }
 
@@ -191,325 +210,206 @@ onMounted(async () => {
 .wallet-page {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   height: 100%;
-  animation: fadeIn 0.4s ease-out;
+  padding-bottom: 20px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Asset Master Card --- */
-.asset-master-card {
+/* --- 1. Asset Hero Card (Aurora) --- */
+.asset-hero-card {
   position: relative;
+  width: 100%;
+  height: 240px;
   border-radius: 24px;
   overflow: hidden;
-  padding: 32px 40px;
-  color: #fff;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #0F172A; /* Fallback */
 }
 
-/* Background Texture - Deep Obsidian */
-.card-bg {
+.asset-hero-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Aurora Background */
+.hero-aurora-bg {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #0F172A 0%, #020617 100%);
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.25), transparent 40%),
+              radial-gradient(circle at 90% 90%, rgba(249, 115, 22, 0.15), transparent 40%),
+              linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 15, 30, 0.98) 100%);
   z-index: 1;
 }
 
-/* Optional subtle glow */
-.card-bg::before {
-  content: '';
-  position: absolute;
-  top: -50%; right: -20%;
-  width: 80%; height: 200%;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.05), transparent 70%);
-  pointer-events: none;
-}
-
-.card-content {
+.hero-content {
   position: relative;
   z-index: 2;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  padding: 32px 40px;
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Spread content */
-  width: 100%;
-  margin-bottom: 20px;
+/* Header */
+.hero-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.header-main { display: flex; align-items: center; gap: 16px; }
+
+.card-icon-wrapper {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #60A5FA;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.header-text { display: flex; flex-direction: column; gap: 4px; }
+.card-label { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+.card-tag { 
+  font-size: 12px; font-family: 'Outfit', sans-serif; 
+  color: #94A3B8; letter-spacing: 0.5px; text-transform: uppercase; 
 }
 
-.info-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
+.info-btn {
+  width: 32px; height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.4);
   cursor: help;
   transition: all 0.2s;
 }
+.info-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-.info-icon:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  transform: scale(1.1);
-}
+/* Balance */
+.balance-display { display: flex; align-items: baseline; gap: 8px; margin-top: auto; margin-bottom: 20px; }
+.balance-number { font-family: 'Outfit', sans-serif; color: #fff; line-height: 1; }
+.amount-integer { font-size: 64px; font-weight: 700; letter-spacing: -2px; }
+.amount-decimal { font-size: 36px; font-weight: 500; color: #94A3B8; }
+.balance-unit { font-size: 18px; font-weight: 600; color: #F59E0B; margin-left: 4px; }
 
-.card-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #94A3B8; /* Slate 400 */
-}
+/* Action Footer */
+.hero-footer { display: flex; justify-content: flex-end; }
 
-.card-tag {
-  font-size: 11px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: 500;
-  color: #CBD5E1; /* Slate 300 */
-}
-
-.balance-container {
-  display: flex;
-  align-items: baseline;
-  margin-bottom: 32px;
-}
-
-.amount-integer {
-  font-size: 64px; /* Larger */
-  font-weight: 700;
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: -1px;
-  color: #fff;
-  line-height: 1;
-}
-
-.amount-decimal {
-  font-size: 32px;
-  font-weight: 600;
-  color: #94A3B8; /* Dimmed */
-  font-family: 'Outfit', sans-serif;
-}
-
-.unit-suffix {
-  font-size: 20px;
-  font-weight: 500;
-  margin-left: 8px;
-  color: #F97316; /* Orange Accent */
-  /* Alignment Fix: Match baseline with proper line-height or margin */
-  /* Since items are baseline aligned, adjusting opacity or weight might help visuals */
-  /* '点' usually sits slightly higher than numerals visually, so margin-bottom isn't needed if baseline is true */
-}
-
-/* Action Button - Blue Default -> Orange Active */
-.action-btn {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); /* Blue Default */
-  border: none;
-  border-radius: 100px;
-  padding: 12px 48px; /* Standard padding */
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
+.neon-action-btn {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(90deg, #F59E0B, #EA580C);
+  border: none; border-radius: 100px;
+  color: #fff; font-size: 16px; font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.1);
-}
-
-.action-btn:hover {
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); /* Orange Hover */
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.2), 0 4px 6px -2px rgba(249, 115, 22, 0.1);
-}
-
-.action-btn:active {
-  background: #C2410C;
-  transform: translateY(0);
-}
-
-/* --- Transaction Ledger --- */
-.ledger-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  /* Sheer Dark Glass */
-  background: rgba(15, 23, 42, 0.6); 
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
   overflow: hidden;
-  min-height: 400px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+}
+
+.neon-action-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(234, 88, 12, 0.5);
+  background: linear-gradient(90deg, #FBBF24, #F97316);
+}
+
+.card-bg-icon {
+  position: absolute; right: -20px; bottom: -40px;
+  font-size: 200px; opacity: 0.03;
+  transform: rotate(-15deg);
+  pointer-events: none;
+  color: #fff;
+}
+
+/* --- 2. Ledger Stream (Glass List) --- */
+.ledger-section {
+  display: flex; flex-direction: column; gap: 20px; flex: 1; overflow: hidden;
 }
 
 .ledger-header {
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 8px;
 }
+.section-title { font-size: 16px; font-weight: 600; color: #E2E8F0; margin: 0; }
 
-.ledger-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #E2E8F0;
-}
-
-/* Tabs - Blue/Orange Logic */
-.ledger-tabs {
-  display: flex;
+/* Glass Pill Tabs */
+.glass-pill-tabs {
+  display: flex; gap: 8px;
   background: rgba(0, 0, 0, 0.2);
-  padding: 4px;
-  border-radius: 12px;
-  gap: 4px;
+  padding: 4px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-.tab-item {
-  padding: 6px 18px;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #64748B; /* Inactive Slate */
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 500;
+.pill-tab {
+  padding: 6px 20px;
+  border-radius: 100px;
+  font-size: 13px; font-weight: 500;
+  color: #64748B; cursor: pointer;
+  transition: all 0.3s;
 }
 
-.tab-item:hover {
-  color: #94A3B8;
+.pill-tab.active { background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.pill-tab.income.active { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+.pill-tab.expense.active { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
+
+/* Stream List */
+.ledger-stream {
+  flex: 1; overflow-y: auto; padding: 4px; /* Space for shadows */
 }
 
-.tab-item.active {
-  background: rgba(249, 115, 22, 0.15); /* Orange bg */
-  color: #F97316; /* Orange text */
-  font-weight: 600;
-}
-
-/* List Wrapper */
-.ledger-list-wrapper {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-}
-
-.ledger-list-wrapper::-webkit-scrollbar { width: 6px; }
-.ledger-list-wrapper::-webkit-scrollbar-track { background: transparent; }
-.ledger-list-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-
-/* Transaction Row */
-.transaction-row {
-  display: flex;
-  align-items: center;
-  padding: 16px;
+/* Glass Stream Item */
+.glass-stream-item {
+  display: flex; align-items: center;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 16px;
-  margin-bottom: 8px;
-  transition: all 0.2s;
-  border: 1px solid transparent;
+  transition: all 0.3s ease;
 }
 
-.transaction-row:hover {
-  background: rgba(255, 255, 255, 0.03);
-  transform: translateX(4px);
+.glass-stream-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px) scale(1.005);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.t-icon-box {
-  width: 42px;
-  height: 42px;
+.stream-icon-box {
+  width: 40px; height: 40px;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 16px;
-  flex-shrink: 0;
-  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-right: 16px;
 }
+.stream-icon-box.income { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+.stream-icon-box.expense { background: rgba(255, 255, 255, 0.05); color: #94A3B8; }
 
-.t-icon-box.income {
-  background: rgba(249, 115, 22, 0.15); /* Orange bg */
-  color: #F97316;
-}
+.stream-content { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.stream-title { font-size: 15px; font-weight: 500; color: #F1F5F9; }
+.stream-date { font-size: 12px; color: #64748B; font-family: 'Monaco', monospace; }
 
-.t-icon-box.expense {
-  background: rgba(148, 163, 184, 0.1); /* Slate bg */
-  color: #94A3B8;
-}
-
-.t-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.t-desc {
-  font-size: 15px;
-  color: #F1F5F9;
-  font-weight: 500;
-}
-
-.t-date {
-  font-size: 12px;
-  color: #64748B;
-}
-
-.t-amount {
-  font-family: 'Monaco', monospace;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.t-amount.income { color: #F97316; } /* Orange */
-.t-amount.expense { color: #94A3B8; } /* Slate */
-
-.t-unit {
-  font-size: 12px;
-  font-weight: normal;
-  margin-left: 2px;
-  opacity: 0.8;
-}
+.stream-amount { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600; }
+.stream-amount.income { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+.stream-amount.expense { color: #94A3B8; }
+.stream-unit { font-size: 12px; font-weight: 500; opacity: 0.6; margin-left: 2px; }
 
 /* Empty & Loading */
-.loading-state { padding: 20px; }
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 0;
-  color: #475569;
+.stream-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 80px 0; color: #64748B;
+}
+.empty-bubble {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.02);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; color: #334155; margin-bottom: 16px;
 }
 
-.empty-icon-wrapper {
-  width: 60px;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  margin-bottom: 16px;
-  color: #64748B;
-}
+/* Animations */
+.list-fade-enter-active, .list-fade-leave-active { transition: all 0.4s ease; }
+.list-fade-enter-from { opacity: 0; transform: translateY(10px); }
+.list-fade-leave-to { opacity: 0; }
+
+.ledger-stream::-webkit-scrollbar { width: 0px; } /* Clean scroll */
 </style>

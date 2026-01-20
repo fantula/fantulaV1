@@ -4,5 +4,5 @@
 
 <script setup lang="ts">
 import CdkListByType from '@/components/admin/cdk/CdkListByType.vue'
-definePageMeta({ title: '激活码管理' })
+definePageMeta({ title: '兑换码管理' })
 </script>

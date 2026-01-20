@@ -69,31 +69,42 @@ const handleClose = () => {
 </script>
 
 <style scoped>
-/* Overlay */
+/* Overlay: Deep Blur */
 .base-modal-overlay {
   position: fixed;
   z-index: 2000;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Container */
+/* Container: Premium Glass Box */
 .base-modal-container {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  /* Rich Deep Glass */
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  
+  /* 3D Glass Borders */
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 32px;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1), /* Top Highlight */
+    inset 0 0 20px rgba(0,0,0,0.2), /* Inner Depth */
+    0 25px 60px -12px rgba(0, 0, 0, 0.8), /* Deep Drop Shadow */
+    0 0 0 1px rgba(0,0,0,0.4); /* Sharp Outer Edge */
+    
+  border-radius: 28px;
   padding: 32px;
-  box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   max-height: 90vh;
   overflow-y: auto;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Header */
@@ -101,93 +112,111 @@ const handleClose = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 2;
 }
 
 .base-modal-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #fff;
   margin: 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  background: linear-gradient(to right, #fff, #94A3B8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .base-modal-close {
-  background: none;
-  border: none;
-  font-size: 24px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 50%;
+  width: 32px; height: 32px;
+  font-size: 20px;
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
   padding: 0;
-  line-height: 1;
 }
 .base-modal-close:hover {
+  background: rgba(255,255,255,0.15);
   color: #fff;
+  transform: rotate(90deg);
 }
 
 /* Body */
 .base-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 20px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 2;
 }
 
 /* Actions */
 .base-modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 16px;
+  position: relative;
+  z-index: 2;
 }
 
 .base-modal-cancel {
-  padding: 10px 24px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.03);
   color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 .base-modal-cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .base-modal-confirm {
-  padding: 10px 24px;
-  background: linear-gradient(135deg, var(--primary-blue), #2563eb);
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #3B82F6, #2563eb);
   color: #fff;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .base-modal-confirm:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
 }
+.base-modal-confirm:active { transform: scale(0.98); }
+
 .base-modal-confirm:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
-  background: #475569;
+  background: #334155;
 }
 
-/* Transition */
+/* Transition: Pop In with Scale */
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 .modal-enter-active .base-modal-container,
 .modal-leave-active .base-modal-container {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
 }
 
 .modal-enter-from,
@@ -197,12 +226,12 @@ const handleClose = () => {
 .modal-enter-from .base-modal-container,
 .modal-leave-to .base-modal-container {
   opacity: 0;
-  transform: scale(0.92);
+  transform: scale(0.9) translateY(20px);
 }
 </style>
 
 <style>
-/* Global form styles for use inside BaseModal */
+/* Global Glass Form Styles */
 .base-modal-body .form-group {
   display: flex;
   flex-direction: column;
@@ -211,36 +240,52 @@ const handleClose = () => {
 
 .base-modal-body .form-label {
   font-size: 14px;
-  font-weight: 500;
-  color: #94A3B8;
+  font-weight: 600;
+  color: #CBD5E1;
+  margin-left: 4px;
 }
 
 .base-modal-body .form-input {
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  
+  /* Glass Input */
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  
   color: #fff;
   font-size: 15px;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   width: 100%;
   box-sizing: border-box;
 }
 
 .base-modal-body .form-input:focus {
-  border-color: var(--primary-blue);
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #3B82F6;
+  background: rgba(0, 0, 0, 0.5);
+  /* Neon Glow */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 0 20px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.base-modal-body .form-input:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: #64748B;
+  border-color: transparent;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .base-modal-body .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 .base-modal-body .form-tip {
   font-size: 12px;
   color: #64748B;
-  margin-top: 4px;
+  margin-top: 6px;
+  margin-left: 4px;
 }
 </style>

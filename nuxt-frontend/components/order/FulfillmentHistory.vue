@@ -6,7 +6,7 @@
       <span class="count">{{ records.length }} 条</span>
     </div>
     
-    <div class="history-timeline">
+    <div class="history-timeline scroll-container">
       <div 
         v-for="record in records" 
         :key="record.id" 
@@ -128,6 +128,18 @@ defineExpose({ refresh: fetchHistory })
 .history-timeline {
   padding: 16px 24px;
 }
+
+.scroll-container {
+  max-height: 400px;
+  overflow-y: auto;
+  overscroll-behavior: contain; /* Prevent chaining scroll to parent */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar */
+.scroll-container::-webkit-scrollbar { width: 4px; }
+.scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.scroll-container::-webkit-scrollbar-track { background: transparent; }
 
 .timeline-item {
   position: relative;

@@ -72,7 +72,7 @@
             <el-select v-model="row.product_type" size="small" placeholder="选择类型" style="width: 100%;" :disabled="readOnly">
               <el-option label="虚拟充值" value="virtual" />
               <el-option label="账号合租" value="shared_account" />
-              <el-option label="激活码" value="one_time_cdk" />
+              <el-option label="兑换码" value="one_time_cdk" />
             </el-select>
           </template>
         </el-table-column>

@@ -2,7 +2,6 @@
   <div class="tickets-section">
     <div class="section-header">
       <h2 class="section-title">我的工单</h2>
-      <button class="apply-btn" @click="showTicketApplyModal = true">+ 申请工单</button>
     </div>
     <div class="tickets-tabs">
       <div 
@@ -51,7 +50,7 @@
       </div>
     </div>
   </div>
-  <TicketApplyModal v-if="showTicketApplyModal" @close="showTicketApplyModal = false" />
+
 
   <!-- 查看工单详情弹窗 -->
   <div v-if="showViewModal" class="modal-mask" @click.self="showViewModal = false">
@@ -100,8 +99,11 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import TicketApplyModal from '@/components/TicketApplyModal.vue'
-import { http } from '@/utils/request'
+// TicketApplyModal removed from here (moved to Order Actions)
+import { ticketApi } from '@/api/client/ticket'
+import { useBizFormat } from '@/composables/common/useBizFormat'
+
+const { formatDate } = useBizFormat()
 
 // 标签页数据
 const tabs = [
@@ -111,66 +113,41 @@ const tabs = [
 ]
 
 const activeTab = ref('all')
-const selectTab = (key: string) => { activeTab.value = key }
-
+const loading = ref(false)
 const tickets = ref<any[]>([])
+
+const selectTab = (key: string) => { 
+  activeTab.value = key 
+  // Optional: re-fetch or just filter locally. Local filter is better for UX if list is small.
+  // But if paginated, need refetch. Let's assume pagination might be needed later but for now local filter.
+}
+
 const fetchTickets = async () => {
-  let data: any[] = []
+  loading.value = true
   try {
-    const res = await http.get('/work/list')
-    if (res && res.data && res.data.length > 0) {
-      data = res.data
+    const res = await ticketApi.getList()
+    if (res.success && res.data) {
+      tickets.value = res.data.map((t: any) => ({
+        id: t.id,
+        // Short content preview from first message could be better, but we used title/content in create
+        // Actually the 'content' in list RPC was returning first message content? 
+        // We stored 'title' in tickets table. Let's use that + last message.
+        content: t.title, // Display Title as main text
+        time: formatDate(t.created_at),
+        orderId: t.orders?.order_no || '未知',
+        status: t.status,
+        statusText: t.status === 'processing' ? '处理中' : '已解决',
+        statusClass: t.status === 'processing' ? 'processing' : 'resolved',
+        lastMessage: t.last_message || ''
+      }))
     }
   } catch (e) {
-    console.error('Fetch tickets failed, using mock data', e)
+    console.error('Fetch tickets failed', e)
+  } finally {
+    loading.value = false
   }
-
-  if (data.length === 0) {
-    // Mock Data
-    data = [
-      {
-        id: 1001,
-        content: '购买的 Netflix 账号密码错误，无法登录，请协助重置密码。尝试了多次都不行。',
-        time: '2023-12-14 10:30',
-        orderId: 'ORD-20231214-002',
-        status: 'resolved',
-        statusText: '已解决',
-        statusClass: 'resolved',
-        replies: [
-           { sender: 'user', content: '购买的 Netflix 账号密码错误，无法登录，请协助重置密码。尝试了多次都不行。', time: '2023-12-14 10:30' },
-           { sender: 'admin', content: '您好，已为您重置密码，新密码为: Fantula2024!，请尝试重新登录。', time: '2023-12-14 11:00' },
-           { sender: 'user', content: '可以了，谢谢！', time: '2023-12-14 11:30' }
-        ]
-      },
-      {
-        id: 1002,
-        content: '申请退款：我不小心买错了商品，原本想买年付的，结果点成了月付，请问可以补差价升级吗？',
-        time: '2023-12-15 09:15',
-        orderId: 'ORD-20231215-001',
-        status: 'processing',
-        statusText: '处理中',
-        statusClass: 'processing',
-        replies: [
-           { sender: 'user', content: '申请退款：我不小心买错了商品，原本想买年付的，结果点成了月付，请问可以补差价升级吗？', time: '2023-12-15 09:15' },
-           { sender: 'admin', content: '您好，请先提供一下您的订单截图，我们核实后会为您办理补差价升级。', time: '2023-12-15 09:45' }
-        ]
-      },
-      {
-        id: 1003,
-        content: '账号显示过期了，但我才买了两天，请检查一下是什么情况',
-        time: '2023-12-12 16:45',
-        orderId: 'ORD-20231210-003',
-        status: 'processing',
-        statusText: '处理中',
-        statusClass: 'processing',
-        replies: [
-          { sender: 'user', content: '账号显示过期了，但我才买了两天，请检查一下是什么情况', time: '2023-12-12 16:45' }
-        ]
-      }
-    ]
-  }
-  tickets.value = data
 }
+
 onMounted(fetchTickets)
 
 const filteredTickets = computed(() => {
@@ -178,37 +155,69 @@ const filteredTickets = computed(() => {
   return tickets.value.filter(ticket => ticket.status === activeTab.value)
 })
 
-const showTicketApplyModal = ref(false)
+// const showTicketApplyModal = ref(false) // Removed
 const showViewModal = ref(false)
 const showReplyModal = ref(false)
 const currentTicket = ref<any>(null)
 const replyContent = ref('')
+const replying = ref(false)
 
-const openViewModal = (ticket: any) => {
-  currentTicket.value = ticket
+const loadDetail = async (ticketId: string) => {
+   const res = await ticketApi.getDetail(ticketId)
+   if (res.success) {
+      const data = res.data
+      currentTicket.value = {
+         id: data.id,
+         orderId: data.orders?.order_no,
+         status: data.status,
+         statusText: data.status === 'processing' ? '处理中' : '已解决',
+         time: formatDate(data.created_at),
+         replies: data.replies.map((r: any) => ({
+            sender: r.sender, // 'user' | 'admin'
+            content: r.content,
+            attachments: r.attachments,
+            time: formatDate(r.time)
+         }))
+      }
+   }
+}
+
+const openViewModal = async (ticket: any) => {
+  await loadDetail(ticket.id)
   showViewModal.value = true
 }
 
-const openReplyModal = (ticket: any) => {
-  currentTicket.value = ticket
+const openReplyModal = async (ticket: any) => {
+  if (!currentTicket.value || currentTicket.value.id !== ticket.id) {
+     await loadDetail(ticket.id)
+  }
   replyContent.value = ''
   showReplyModal.value = true
 }
 
-const submitReply = () => {
+const submitReply = async () => {
   if (!replyContent.value.trim()) return
-  if (currentTicket.value) {
-    // Ensure replies array exists
-    if (!currentTicket.value.replies) currentTicket.value.replies = []
-    
-    currentTicket.value.replies.push({
-      sender: 'user',
-      content: replyContent.value,
-      time: new Date().toLocaleString() // Simple timestamp
-    })
-    // Also mock update main status if needed, but keeping simple
+  replying.value = true
+  try {
+    const res = await ticketApi.reply(currentTicket.value.id, replyContent.value)
+    if (res.success) {
+       // Refresh details
+       await loadDetail(currentTicket.value.id)
+       replyContent.value = ''
+       // If view modal is open, it updates automatically.
+       // If only reply modal was open, maybe close it? Or keep it open for chat feel?
+       // Let's close reply modal but ensure view modal has latest.
+       showReplyModal.value = false
+       if (!showViewModal.value) {
+          // If we replied from list (via "Add Reply"), maybe open View to see chat?
+          showViewModal.value = true
+       }
+    } else {
+       alert('回复失败')
+    }
+  } finally {
+    replying.value = false
   }
-  showReplyModal.value = false
 }
 </script>
 

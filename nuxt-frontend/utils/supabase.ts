@@ -51,9 +51,10 @@ export async function callEdgeFunction<T = any>(
         body?: any
         params?: Record<string, string>
         requireAuth?: boolean
+        token?: string // Allow passing custom token (e.g. Admin Token)
     } = {}
 ): Promise<{ data: T | null; error: string | null }> {
-    const { method = 'POST', body, params, requireAuth = true } = options
+    const { method = 'POST', body, params, requireAuth = true, token: customToken } = options
 
     try {
         const headers: Record<string, string> = {
@@ -62,7 +63,8 @@ export async function callEdgeFunction<T = any>(
 
         // 如果需要认证，添加 Authorization header
         if (requireAuth) {
-            const token = await getAuthToken()
+            // 优先使用传入的 token，否则获取当前客户端 token
+            const token = customToken || await getAuthToken()
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`
             }
@@ -84,7 +86,7 @@ export async function callEdgeFunction<T = any>(
         const data = await response.json()
 
         if (!response.ok) {
-            return { data: null, error: data.error || `HTTP ${response.status}` }
+            return { data: null, error: data.error || data.message || `HTTP ${response.status}` }
         }
 
         return { data, error: null }

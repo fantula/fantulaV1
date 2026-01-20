@@ -17,7 +17,7 @@ export const PRODUCT_TYPES = {
         icon: 'UserFilled'
     },
     one_time_cdk: {
-        label: '激活码/卡密',
+        label: '兑换码',
         color: 'warning',
         icon: 'Key'
     }
