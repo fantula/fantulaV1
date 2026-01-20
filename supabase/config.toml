@@ -173,7 +173,7 @@ password_requirements = ""
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+email_sent = 100
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
@@ -210,17 +210,22 @@ otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
-# Use a production-ready SMTP server - Configured for Brevo
+# Use a production-ready SMTP server - Configured for Resend
 [auth.email.smtp]
 enabled = true
-host = "smtp-relay.brevo.com"
+host = "smtp.resend.com"
 port = 587
-user = "8f1a28001@smtp-brevo.com"
-pass = "xsmtpsib-f72245ab018d3c2a4a7fa1bd3ccd12e8c2e39ff38378c7e4c3120ed72a0a6060-sQWhZpp45BsUr8z2"
-admin_email = "fantula@fantula.cn"
+user = "resend"
+pass = "env(SUPABASE_AUTH_SMTP_PASS)"
+admin_email = "noreply@fantula.com"
 sender_name = "Fantula"
 
-# Uncomment to customize email template
+# Configuration for Magic Link (Login with Email)
+[auth.email.template.magic_link]
+subject = "Fantula 登录验证码"
+content_path = "./supabase/templates/magic_link.html"
+
+# Uncommon to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"

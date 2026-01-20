@@ -1,0 +1,17 @@
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment variables (Sensitive!)
+.env
+.env.*
+!.env.example
+
+# Node modules
+node_modules/
+npm-debug.log
+
+# Supabase
+supabase/.temp/
+supabase/functions/*/deno.d/
