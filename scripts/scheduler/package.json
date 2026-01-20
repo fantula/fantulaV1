@@ -1,0 +1,16 @@
+{
+  "name": "fantula-scheduler",
+  "version": "1.0.0",
+  "description": "定时任务服务 - 预订单清理等",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3",
+    "express": "^4.18.2",
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1"
+  }
+}

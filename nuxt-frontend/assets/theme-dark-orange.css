@@ -1,0 +1,981 @@
+/* 方案 B-2：暗夜极光 (theme-dark.css) - 蓝橙配色版 (精修全站) */
+
+/* =========================================
+   1. 全局背景与基础设定
+   ========================================= */
+html,
+body,
+#__nuxt,
+.app-wrapper,
+.home-page {
+    background-color: #0F172A !important;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+
+    /* 复合背景：深蓝底色 + 科技网格 + 顶部冷光 + 底部暖光 */
+    background-image:
+        /* 细微网格 - 营造秩序感 */
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+
+        /* 顶部 - 科技蓝光晕 (更柔和宽广) */
+        radial-gradient(ellipse at 20% 0%, rgba(14, 165, 233, 0.25) 0%, transparent 60%),
+
+        /* 底部 - 活力橙光晕 (呼应操作) */
+        radial-gradient(ellipse at 80% 100%, rgba(249, 115, 22, 0.2) 0%, transparent 60%) !important;
+
+    background-size: 40px 40px, 40px 40px, 120% 80%, 120% 80% !important;
+    background-attachment: fixed !important;
+    color: #E2E8F0 !important;
+    min-height: 100vh;
+}
+
+/* 消除浏览器默认滚动条，使用自定义样式 (可选) */
+::-webkit-scrollbar {
+    width: 8px;
+    background: #0F172A;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+
+/* =========================================
+   2. 核心容器通用样式 (Glassmorphism Pro)
+   ========================================= */
+.goods-card,
+.category-item,
+.banner-container,
+.service-modal-content,
+.bg-white {
+    /* 核心玻璃质感：深色半透明 + 高斯模糊 */
+    background: rgba(30, 41, 59, 0.65) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+
+    /* 极细微的内发光边框 - 提升精致度 */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+
+    border-radius: 16px !important;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1) !important;
+}
+
+
+/* =========================================
+   3. 导航栏 (Header)
+   ========================================= */
+.app-header {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    height: 70px !important;
+    /* 稍微增高 */
+}
+
+/* Logo 文字 */
+.logo-text {
+    color: #F1F5F9 !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+}
+
+/* 导航链接 */
+.nav-btn {
+    color: #CBD5E1 !important;
+    /* Slate 300 */
+    font-weight: 600 !important;
+}
+
+.nav-btn:hover {
+    color: #38BDF8 !important;
+    /* Sky 400 */
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+/* 搜索框 */
+.search-box {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 99px !important;
+}
+
+.search-input {
+    color: #F8FAFC !important;
+}
+
+
+/* =========================================
+   4. 轮播图 (Banner)
+   ========================================= */
+.banner-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    /* 给 Banner 增加一个发光底座效果 */
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Banner 悬浮增强 */
+.banner-container:hover {
+    transform: translateY(-5px);
+    filter: drop-shadow(0 20px 40px rgba(14, 165, 233, 0.15));
+}
+
+/* 指示器优化 */
+:deep(.el-carousel__button) {
+    background-color: #F8FAFC !important;
+    opacity: 0.4;
+    height: 4px;
+    border-radius: 4px;
+}
+
+:deep(.is-active .el-carousel__button) {
+    background: #F97316 !important;
+    /* 确保是统一的橙色 */
+    opacity: 1;
+    width: 24px;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
+    /* 增加一点光晕 */
+}
+
+
+/* =========================================
+   5. 分类导航 (Category)
+   ========================================= */
+.category-nav {
+    margin-top: -10px !important;
+    margin-bottom: 30px !important;
+}
+
+.category-item {
+    background: rgba(30, 41, 59, 0.5) !important;
+    color: #94A3B8 !important;
+    border-radius: 12px !important;
+    height: 44px !important;
+    font-size: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.category-item:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #E2E8F0 !important;
+    transform: translateY(-2px);
+}
+
+/* 激活状态：统一使用主题橙色渐变，保持全站一致 */
+.category-item.active {
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+    /* 改为橙色，呼应商品 */
+    border: none !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4) !important;
+}
+
+
+/* =========================================
+   6. 商品卡片 (Goods Card) - 核心展示区
+   ========================================= */
+/* 卡片整体 */
+/* 统一的高亮色变量 (方便维护) */
+/* 这里直接使用 CSS 变量可能更好，但为了保持现有风格，直接硬编码 */
+/* 主题橙: #F97316 */
+/* 主题蓝: #38BDF8 */
+
+/* =========================================
+   6. 商品卡片 (Goods Card) - 核心展示区
+   ========================================= */
+/* 卡片整体 */
+.goods-card {
+    background: rgba(30, 41, 59, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    overflow: hidden !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 悬浮交互：统一使用主题橙色光晕 */
+.goods-card:hover {
+    transform: translateY(-8px) scale(1.01) !important;
+    border-color: rgba(249, 115, 22, 0.5) !important;
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(249, 115, 22, 0.3),
+        /* 内圈清晰橙线 */
+        0 0 20px rgba(249, 115, 22, 0.2) !important;
+    /* 外圈柔和光晕 */
+}
+
+/* Badge 标签：设计为丝带或发光标签 */
+.badge-label {
+    top: 12px !important;
+    left: -4px !important;
+    /* 悬挂式 */
+    border-radius: 0 12px 12px 0 !important;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3) !important;
+    font-size: 12px !important;
+    padding: 4px 12px !important;
+    z-index: 10;
+}
+
+/* 推荐标签特化 */
+.badge-label.bg-recommend {
+    background: linear-gradient(90deg, #F97316, #EA580C) !important;
+}
+
+/* 图片容器：优化为展示四方图 */
+.goods-image-container {
+    background: transparent !important;
+    /* 去掉容器背景，专注展示图片 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 24px !important;
+    /* 增加内边距，让图片居中 */
+    height: 220px !important;
+    /* 稍微增高以容纳正方形图片 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.goods-image {
+    width: 160px !important;
+    /* 固定正方形尺寸 */
+    height: 160px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    /* 图片圆角 */
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    /* 图片描边 */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 悬浮时图片动效：放大 + 边框高亮 */
+.goods-card:hover .goods-image {
+    transform: scale(1.05) !important;
+    border-color: #F97316 !important;
+    /* 悬浮时描边变橙 */
+    box-shadow: 0 12px 24px rgba(249, 115, 22, 0.15) !important;
+}
+
+/* 内容区域 */
+.goods-card-content {
+    padding: 16px 20px 24px !important;
+    background: transparent !important;
+}
+
+/* 标题 */
+.goods-title {
+    color: #F8FAFC !important;
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+    height: 24px;
+    /* 限制一行 */
+    line-height: 24px;
+}
+
+.goods-card:hover .goods-title {
+    color: #38BDF8 !important;
+    /* 悬浮变蓝 */
+}
+
+/* 价格行 */
+.goods-price-row {
+    margin-bottom: 16px !important;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.goods-price-row .currency {
+    color: #FB923C !important;
+    font-size: 14px !important;
+    margin-right: 2px;
+}
+
+.goods-price-row .price-val {
+    color: #FB923C !important;
+    font-size: 28px !important;
+    /* 加大价格数字 */
+    font-weight: 800 !important;
+    font-family: 'DIN Alternate', 'Arial', sans-serif !important;
+    /* 更好的数字字体 */
+    letter-spacing: -1px;
+    text-shadow: 0 0 15px rgba(251, 146, 60, 0.3);
+    /* 橙色辉光 */
+}
+
+.goods-price-row .price-unit {
+    color: #64748B !important;
+    font-size: 12px !important;
+}
+
+/* 购买按钮 */
+.select-btn {
+    background: linear-gradient(90deg, #F97316 0%, #EA580C 100%) !important;
+    /* 默认就是橙色，强调购买 */
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    height: 40px !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease !important;
+}
+
+/* 按钮扫光动画 */
+.select-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.5s;
+}
+
+.goods-card:hover .select-btn::after {
+    left: 100%;
+    /* 鼠标滑过卡片时，按钮闪过一道光 */
+}
+
+.goods-card:hover .select-btn {
+    background: linear-gradient(90deg, #FB923C 0%, #F97316 100%) !important;
+    /* 悬浮变更亮 */
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   7. 关于我们 (About Us)
+   ========================================= */
+.about-section {
+    background: transparent !important;
+    box-shadow: none !important;
+    margin-top: 40px !important;
+    padding-bottom: 40px !important;
+}
+
+.about-title {
+    color: #F8FAFC !important;
+    font-size: 32px !important;
+    font-weight: 800 !important;
+    /* 故障风阴影：蓝左橙右 */
+    text-shadow: -2px 0 0 rgba(14, 165, 233, 0.6), 2px 0 0 rgba(249, 115, 22, 0.6) !important;
+}
+
+.about-subtitle {
+    color: #94A3B8 !important;
+    letter-spacing: 2px !important;
+}
+
+.about-card {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.about-card:hover {
+    border-color: #38BDF8 !important;
+    /* 悬浮变蓝边框 */
+    background: rgba(14, 165, 233, 0.05) !important;
+    transform: translateY(-5px);
+}
+
+.about-card-title {
+    color: #E2E8F0 !important;
+    font-weight: 600 !important;
+}
+
+.about-icon img {
+    filter: brightness(0) invert(1) !important;
+    /* 纯白图标 */
+    opacity: 0.8;
+}
+
+.about-card:hover .about-icon img {
+    filter: drop-shadow(0 0 5px #38BDF8) brightness(0) invert(1) !important;
+    /* 图标发光 */
+    opacity: 1;
+}
+
+
+/* =========================================
+   8. 页脚 (Footer)
+   ========================================= */
+.app-footer,
+.footer-bg,
+.footer-root {
+    background: #020617 !important;
+    /* 几乎纯黑 */
+    border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: #64748B !important;
+}
+
+/* 标题带一个小色块装饰 */
+.footer-title {
+    color: #F8FAFC !important;
+    position: relative;
+    padding-left: 12px;
+}
+
+.footer-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    height: 16px;
+    width: 4px;
+    background: #F97316;
+    /* 橙色装饰条 */
+    border-radius: 2px;
+}
+
+.footer-underline {
+    display: none !important;
+    /* 隐藏原有的下划线，用左侧边条代替 */
+}
+
+.footer-item {
+    font-size: 14px !important;
+    color: #94A3B8 !important;
+    transition: color 0.2s;
+}
+
+.footer-item:hover,
+.footer-link:hover {
+    color: #38BDF8 !important;
+    /* 悬浮变蓝 */
+}
+
+/* 调试条 (Optional) */
+.home-page::before {
+    display: none !important;
+    /* 定稿样式隐藏调试条 */
+}
+
+
+/* 1. 全局背景：星云 + 网格 + 蓝橙光气 */
+html,
+body,
+#__nuxt,
+.app-wrapper,
+.home-page {
+    /* 基础深色 */
+    background-color: #0F172A !important;
+
+    background-image:
+        /* 科技网格 */
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+
+        /* 顶部流光 (Blue - 科技/冷静) */
+        radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.2) 0%, transparent 50%),
+
+        /* 底部流光 (Orange - 活力/热情) */
+        radial-gradient(circle at 90% 90%, rgba(249, 115, 22, 0.15) 0%, transparent 50%) !important;
+
+    background-size: 50px 50px, 50px 50px, 100% 100%, 100% 100% !important;
+    background-attachment: fixed !important;
+    color: #E2E8F0 !important;
+    min-height: 100vh;
+}
+
+/* 2. 容器与卡片：更强的玻璃质感 */
+.goods-card,
+.category-item,
+.banner-container,
+.service-modal-content,
+.login-modal-content,
+.bg-white {
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    /* 悬浮阴影带一点橙色倾向 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.goods-card:hover {
+    border-color: rgba(249, 115, 22, 0.3) !important;
+    /* 橙色边框 */
+    box-shadow: 0 10px 30px -5px rgba(249, 115, 22, 0.1) !important;
+}
+
+/* 3. 配色重点：蓝橙互补 */
+
+/* 标题 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title,
+.goods-title,
+.cat-label {
+    color: #F1F5F9 !important;
+}
+
+p,
+.desc,
+.goods-price-row .price-unit,
+.stat-label {
+    color: #94A3B8 !important;
+}
+
+/* 价格/重点数据：使用活力橙 (Orange) */
+.goods-price-row,
+.goods-price-row .currency,
+.goods-price-row .price-val {
+    color: #FB923C !important;
+    /* Orange 400 */
+    text-shadow: 0 0 10px rgba(251, 146, 60, 0.3);
+}
+
+.stat-item.rating .stat-value {
+    color: #FB923C !important;
+}
+
+/* 导航栏 */
+.app-header {
+    background: rgba(15, 23, 42, 0.7) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.logo-text,
+.nav-btn {
+    color: #E2E8F0 !important;
+}
+
+.nav-btn:hover {
+    color: #38BDF8 !important;
+    /* Blue Hover */
+}
+
+/* 搜索框 */
+.search-box {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.search-input {
+    color: #E2E8F0 !important;
+}
+
+/* 分类导航：蓝橙渐变激活态 */
+.category-item {
+    background: rgba(30, 41, 59, 0.5) !important;
+    color: #94A3B8 !important;
+}
+
+.category-item.active {
+    /* 蓝橙渐变 */
+    background: linear-gradient(135deg, #0EA5E9 0%, #F97316 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4) !important;
+    border: none !important;
+}
+
+/* 按钮：保持蓝色主调，稳重一点，但在 hovered 时可以带橙色光 */
+.login-btn,
+.select-btn {
+    background: linear-gradient(90deg, #0EA5E9 0%, #2563EB 100%) !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 99px !important;
+    /* 全圆角，更现代 */
+    padding: 0 24px !important;
+    /* 增加宽度 */
+    height: 38px !important;
+    line-height: 38px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 扫光动画 */
+.login-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: 0.5s;
+}
+
+.login-btn:hover::before {
+    left: 100%;
+}
+
+.login-btn:hover {
+    background: linear-gradient(90deg, #F97316 0%, #EA580C 100%) !important;
+    /* 悬浮由蓝变橙 */
+    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.5) !important;
+    transform: translateY(-2px);
+}
+
+.goods-card:hover .select-btn {
+    background: linear-gradient(90deg, #F97316 0%, #EA580C 100%) !important;
+    /* 悬浮时变橙色，强调购买 */
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.4) !important;
+}
+
+/* 页脚 */
+.app-footer,
+.footer-bg,
+.footer-root {
+    background: rgba(11, 17, 32, 0.8) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0 !important;
+}
+
+.footer-title {
+    color: #F8FAFC !important;
+}
+
+.footer-item {
+    color: #94A3B8 !important;
+}
+
+/* 关于我们模块 */
+/* =========================================
+   7. 关于我们 (About Us)
+   ========================================= */
+.about-section {
+    background: transparent !important;
+    box-shadow: none !important;
+    margin-top: 60px !important;
+    /* 增加间距 */
+    padding-bottom: 60px !important;
+}
+
+.about-title {
+    color: #F8FAFC !important;
+    font-size: 36px !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 16px !important;
+    /* 故障风阴影增强 */
+    text-shadow: -3px 0 0 rgba(14, 165, 233, 0.6), 3px 0 0 rgba(249, 115, 22, 0.6) !important;
+}
+
+.about-subtitle {
+    color: #94A3B8 !important;
+    font-size: 16px !important;
+    letter-spacing: 4px !important;
+    /* 增加字间距，更高级 */
+    text-transform: uppercase;
+    margin-bottom: 48px !important;
+    opacity: 0.8;
+}
+
+.about-cards {
+    gap: 32px !important;
+    /* 卡片间距 */
+}
+
+.about-card {
+    background: rgba(30, 41, 59, 0.4) !important;
+    /* 更透 */
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 20px !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.about-card:hover {
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    /* 悬浮变蓝边框 */
+    background: rgba(30, 41, 59, 0.8) !important;
+    /* 变实 */
+    transform: translateY(-10px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.about-card-title {
+    color: #E2E8F0 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin-top: 12px !important;
+}
+
+.about-card-desc {
+    color: #64748B !important;
+    font-size: 14px !important;
+    margin-top: 8px !important;
+}
+
+.about-icon {
+    background: rgba(255, 255, 255, 0.05);
+    /* 图标增加底座 */
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+}
+
+.about-icon img {
+    filter: brightness(0) invert(1) !important;
+    /* 纯白图标 */
+    opacity: 0.7;
+    width: 32px !important;
+    height: 32px !important;
+}
+
+.about-card:hover .about-icon {
+    background: rgba(14, 165, 233, 0.2);
+    /* 悬浮图标底座变蓝 */
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+}
+
+.about-card:hover .about-icon img {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* 查看更多按钮优化 */
+.about-more-btn {
+    margin-top: 20px !important;
+    width: 200px !important;
+    height: 50px !important;
+    background: transparent !important;
+    /* 默认透明 */
+    border: 1px solid rgba(249, 115, 22, 0.5) !important;
+    /* 橙色边框 */
+    color: #FB923C !important;
+    /* 橙色文字 */
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    border-radius: 99px !important;
+    letter-spacing: 1px;
+    transition: all 0.3s !important;
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.1) !important;
+}
+
+.about-more-btn:hover {
+    background: linear-gradient(90deg, #F97316 0%, #EA580C 100%) !important;
+    /* 悬浮变实心橙 */
+    color: #FFFFFF !important;
+    border-color: transparent !important;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.4) !important;
+}
+
+/* 调试条 */
+/* =========================================
+   9. 登录/注册弹窗优化 (Login Modal)
+   ========================================= */
+.login-modal {
+    background: rgba(30, 41, 59, 0.95) !important;
+    /* 深色背景 */
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 28px !important;
+    /* 更大的圆角 */
+    height: auto !important;
+    /* 高度自适应，不再固定824px */
+    padding-bottom: 32px !important;
+    max-height: 90vh !important;
+    width: 420px !important;
+    /* 稍微变窄一点 */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 头部优化 */
+.modal-header {
+    height: auto !important;
+    min-height: 160px !important;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding-bottom: 24px !important;
+}
+
+.modal-header-inner {
+    padding-top: 24px !important;
+}
+
+.modal-title {
+    font-size: 32px !important;
+    margin-bottom: 4px !important;
+    color: #F8FAFC !important;
+}
+
+.modal-subtitle {
+    font-size: 14px !important;
+    color: #94A3B8 !important;
+    margin-bottom: 20px !important;
+}
+
+/* 标签切换 */
+.modal-tabs {
+    background: rgba(15, 23, 42, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    height: 48px !important;
+    width: 240px !important;
+}
+
+.tab-btn {
+    height: 48px !important;
+    color: #94A3B8 !important;
+    font-size: 16px !important;
+}
+
+.tab-btn.active {
+    background: #38BDF8 !important;
+    /* 亮蓝色激活 */
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3) !important;
+}
+
+/* 表单区域 */
+.modal-body {
+    background: transparent !important;
+    /* 去掉白色背景 */
+    height: auto !important;
+    padding: 0 24px !important;
+}
+
+.modal-form-area {
+    margin-top: 20px !important;
+    width: 100% !important;
+}
+
+.modal-form-tabs {
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    margin-bottom: 20px !important;
+    justify-content: center;
+}
+
+.form-tab {
+    color: #94A3B8 !important;
+    font-size: 16px !important;
+}
+
+.form-tab.active {
+    color: #F8FAFC !important;
+    border-bottom-color: #F97316 !important;
+    /* 橙色下标 */
+}
+
+/* 输入框优化 */
+.form-group label {
+    display: none !important;
+    /* 隐藏标签，精简空间 (placeholder足够) */
+}
+
+.form-group input,
+.code-group input {
+    width: 100% !important;
+    height: 44px !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #F8FAFC !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+}
+
+.form-group input:focus,
+.code-group input:focus {
+    border-color: #38BDF8 !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* 按钮优化 */
+.code-btn-inside {
+    top: 5px !important;
+    height: 34px !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38BDF8 !important;
+}
+
+.submit-btn {
+    height: 44px !important;
+    margin-top: 12px !important;
+    margin-bottom: 20px !important;
+    font-size: 16px !important;
+    border-radius: 99px !important;
+    background: linear-gradient(90deg, #F97316 0%, #EA580C 100%) !important;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3) !important;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* 补充链接 */
+.form-row {
+    font-size: 12px !important;
+    color: #64748B !important;
+    margin-bottom: 12px !important;
+}
+
+.forgot-link {
+    color: #94A3B8 !important;
+}
+
+.forgot-link:hover {
+    color: #38BDF8 !important;
+}
+
+/* 第三方登录 */
+.other-login-area {
+    width: 100% !important;
+    height: auto !important;
+    margin-top: 0 !important;
+}
+
+.other-login-title {
+    margin-bottom: 12px !important;
+}
+
+.other-login-title::before,
+.other-login-title::after {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.icon-btn {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+.icon-btn img {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+.modal-close {
+    color: #94A3B8 !important;
+    top: 16px !important;
+    right: 16px !important;
+}
+
+/* 调试条 (Optional) */
+.home-page::before {
+    display: none !important;
+    /* 定稿样式隐藏调试条 */
+}

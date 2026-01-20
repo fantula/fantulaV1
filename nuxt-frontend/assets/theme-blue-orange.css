@@ -1,0 +1,477 @@
+/* 方案 B：液态金属 (Liquid Metal) - 全屏背景版 */
+
+/* =========================================
+   1. 全局配置
+   ========================================= */
+:root {
+  /* 形象大使发色 - 统一色卡 */
+  --primary-blue: #178fc6;
+  /* 亮天蓝 (Sky Blue 500) - 对应左侧头发 */
+  --active-orange: #F97316;
+  /* 活力橙 (Orange 500) - 对应右侧头发 */
+
+  --text-main: #F8FAFC;
+  --text-sub: #94A3B8;
+  /* Slate-400 */
+
+  /* 覆盖 Element Plus 主题色 - 让所有组件自动同步 */
+  --el-color-primary: var(--primary-blue);
+  --el-button-hover-bg-color: var(--active-orange);
+  --el-button-active-bg-color: #EA580C;
+  /* Orange-600 */
+}
+
+/* 
+   核心背景：全屏图片
+*/
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: scroll; /* Force scrollbar to prevent layout shift */
+}
+
+body {
+  /* 移除静态背景图，使用纯色深黑，配合粒子组件 */
+  background: #020617 !important;
+  color: var(--text-main) !important;
+  font-family: 'PingFang SC', system-ui, sans-serif;
+}
+
+/* 
+   重要：强制所有外层容器透明 
+   否则背景图会被遮挡
+*/
+#__nuxt,
+.app-wrapper,
+.home-page {
+  background: transparent !important;
+}
+
+/* 禁用极光伪元素 (如果之前的未清除) */
+body::before,
+body::after {
+  display: none !important;
+}
+
+/* =========================================
+   2. 全局玻璃拟态 (Glassmorphism)
+   为了让背景图透出来，所有卡片必须半透明
+   ========================================= */
+
+/* 导航栏 - 较深玻璃 */
+.app-header {
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  z-index: 100 !important;
+  /* Ensure header is above animations? Actually below for immersion? Usually above. */
+}
+
+.logo-text {
+  color: #fff !important;
+  font-size: 24px !important;
+  /* Larger */
+  font-weight: 800 !important;
+  /* Bolder */
+  letter-spacing: 1.5px !important;
+  text-shadow: 0 0 15px rgba(23, 143, 198, 0.6) !important;
+  /* Blue Glow */
+  font-family: 'PingFang SC', sans-serif;
+}
+
+.logo-img {
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.logo-area:hover .logo-text {
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.8) !important;
+  /* Orange Glow on Hover */
+}
+
+.logo-area:hover .logo-img {
+  transform: rotate(15deg) scale(1.1);
+  /* Playful interaction */
+}
+
+.nav-btn {
+  color: #E2E8F0 !important;
+}
+
+.nav-btn:hover {
+  color: var(--active-orange) !important;
+}
+
+/* 轮播图 - 极透玻璃 */
+.banner-container {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.banner-container:hover {
+  border-color: rgba(255, 122, 69, 0.3) !important;
+}
+
+/* 商品卡片 - 核心玻璃层 */
+.goods-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  /* Dark Glass */
+  backdrop-filter: blur(12px) !important;
+  border: 2px solid var(--primary-blue) !important;
+  /* Thicker for visibility */
+  border-radius: 20px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  color: #fff !important;
+}
+
+.goods-card:hover {
+  /* Slightly darker on hover */
+  transform: translateY(-6px);
+  border-color: var(--active-orange) !important;
+  /* Fix: Use Active Orange on Hover */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 分类导航 - 极透玻璃 */
+.category-item {
+  background: rgba(15, 23, 42, 0.6) !important;
+  /* 深色底，防看不清文字 */
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #CBD5E1 !important;
+}
+
+.category-item:hover {
+  background: rgba(255, 122, 69, 0.15) !important;
+  color: #fff !important;
+  transform: translateY(-3px);
+  border-color: rgba(255, 122, 69, 0.4) !important;
+}
+
+.category-item.active {
+  background: linear-gradient(135deg, var(--active-orange) 0%, #FB923C 100%) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4) !important;
+  /* Increased shadow for depth */
+  transform: translateY(-4px) !important;
+  /* Elevation effect */
+}
+
+/* 商品卡片 - 核心玻璃层 */
+/* Second goods-card block removed to prevent override */
+
+/* 图片容器 */
+.goods-image-container {
+  background: transparent !important;
+  /* 彻底透明，不搞渐变遮挡 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.goods-image {
+  border: 2px solid var(--primary-blue) !important;
+}
+
+/* Fix: Enforce Orange Border on Image Hover */
+.goods-card:hover .goods-image {
+  border-color: var(--active-orange) !important;
+}
+
+.goods-title {
+  color: #F1F5F9 !important;
+}
+
+.goods-card:hover .goods-title {
+  color: var(--active-orange) !important;
+  text-shadow: 0 0 10px rgba(255, 122, 69, 0.3);
+}
+
+.goods-price-row .currency,
+.goods-price-row .price-val {
+  color: var(--active-orange) !important;
+  text-shadow: 0 0 10px rgba(255, 122, 69, 0.4);
+}
+
+.goods-price-row .price-unit {
+  color: #94A3B8 !important;
+}
+
+/* 购买按钮 */
+.select-btn {
+  background: var(--primary-blue) !important;
+  border: 1px solid var(--primary-blue) !important;
+  color: #fff !important;
+}
+
+.goods-card:hover .select-btn {
+  background: linear-gradient(90deg, var(--active-orange) 0%, #FB923C 100%) !important;
+  /* Orange-400 as accent */
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4) !important;
+}
+
+/* 
+   3. 页脚 & 辅助
+   ========================================= */
+.app-footer,
+.footer-root {
+  background: rgba(2, 6, 23, 0.6) !important;
+  /* 调整为 0.6，让背景图能透出来 */
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px);
+}
+
+.footer-title {
+  color: #fff !important;
+}
+
+.footer-item {
+  color: #94A3B8 !important;
+}
+
+/* 关于我们区域 - 全透明，利用卡片玻璃 */
+.about-section,
+.about-bg {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 关于我们区域 - 玻璃卡片 */
+.about-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px);
+}
+
+.about-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  /* 悬浮淡蓝 */
+  transform: translateY(-5px);
+}
+
+.about-title {
+  color: #fff !important;
+}
+
+.about-card-title {
+  color: #E2E8F0 !important;
+}
+
+.about-card-desc {
+  color: #94A3B8 !important;
+}
+
+/* =========================================
+   4. 通用工具类 (New)
+   ========================================= */
+/* 正方形封面适配 (Square Cover) - 用于订单、商品头图 */
+.sq-cover-img-container {
+  width: 100%;
+  padding-top: 100% !important;
+  /* Force 1:1 Aspect Ratio */
+  position: relative;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+}
+
+.sq-cover-img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  object-fit: cover !important;
+  /* Crop excess, no distortion */
+}
+
+/* =========================================
+   5. 全局消息提示 (Global Toast / ElMessage)
+   ========================================= */
+/* 覆盖 Element Plus Message */
+.el-message {
+  background: rgba(15, 23, 42, 0.85) !important;
+  /* 深色背景 */
+  backdrop-filter: blur(12px) !important;
+  /* 磨砂效果 */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 50px !important;
+  /* 胶囊圆角 */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  padding: 10px 24px !important;
+  min-width: 300px !important;
+  top: 40px !important;
+  /* 距离顶部距离 */
+}
+
+/* 文本颜色 */
+.el-message .el-message__content {
+  color: #fff !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+}
+
+/* 关闭按钮 */
+.el-message .el-message__closeBtn {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.el-message .el-message__closeBtn:hover {
+  color: #fff !important;
+}
+
+/* 成功状态 (Success) */
+.el-message--success {
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  /* Green Glow */
+  background: rgba(6, 78, 59, 0.85) !important;
+  /* Dark Green Tint */
+}
+
+.el-message--success .el-message__icon {
+  color: #34D399 !important;
+  /* Bright Green Icon */
+}
+
+/* 警告状态 (Warning) */
+.el-message--warning {
+  border-color: rgba(249, 115, 22, 0.3) !important;
+  /* Orange Glow */
+  background: rgba(124, 45, 18, 0.85) !important;
+  /* Dark Orange Tint */
+}
+
+.el-message--warning .el-message__icon {
+  color: var(--active-orange) !important;
+}
+
+/* 错误状态 (Error) */
+.el-message--error {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  /* Red Glow */
+  background: rgba(127, 29, 29, 0.85) !important;
+  /* Dark Red Tint */
+}
+
+.el-message--error .el-message__icon {
+  color: #F87171 !important;
+  /* Bright Red Icon */
+}
+
+/* 信息状态 (Info) */
+.el-message--info {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  /* Blue Glow */
+  background: rgba(30, 58, 138, 0.85) !important;
+  /* Dark Blue Tint */
+}
+
+.el-message--info .el-message__icon {
+  color: #60A5FA !important;
+  /* Bright Blue Icon */
+}
+
+/* =========================================
+   6. 全局页面路由过渡 (Global Page Transitions)
+   ========================================= */
+/* 
+   name: 'page-slide' (Pure Smooth) 
+   Effect: Subtle Slide Up + Fade (No Zoom/Flip)
+   
+   RENAMED from 'page' to 'page-slide' in Nuxt Config 
+   to ensure browser cache busting and avoid conflicts.
+*/
+
+/* 进场 (Enter): 仅水平滑动 + 淡入 */
+.page-slide-enter-active {
+  transition: all 0.3s ease-out !important;
+  /* Use simple ease-out if needed */
+  z-index: 10;
+}
+
+.page-slide-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+  /* Horizontal slide from right */
+}
+
+.page-slide-enter-to {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 退场 (Leave): 仅淡出 + 水平滑动 */
+.page-slide-leave-active {
+  transition: all 0.3s ease-out !important;
+  /* Faster leave */
+  z-index: 1;
+}
+
+.page-slide-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+  /* Horizontal slide to left */
+}
+
+/* ========================================================================= */
+/* Global Modal "Spring Zoom" Animation                                      */
+/* ========================================================================= */
+.modal-zoom-enter-active,
+.modal-zoom-leave-active {
+  transition: all 0.3s ease-out;
+  /* Mask Fade Time */
+}
+
+.modal-zoom-enter-active>*,
+.modal-zoom-leave-active>* {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Springy Zoom */
+}
+
+.modal-zoom-enter-from {
+  opacity: 0;
+}
+
+.modal-zoom-enter-from>* {
+  transform: scale(0.5);
+  /* Start small */
+  opacity: 0;
+}
+
+.modal-zoom-enter-to {
+  opacity: 1;
+}
+
+.modal-zoom-enter-to>* {
+  transform: scale(1);
+  /* End normal */
+  opacity: 1;
+}
+
+.modal-zoom-leave-from {
+  opacity: 1;
+}
+
+.modal-zoom-leave-from>* {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-zoom-leave-to {
+  opacity: 0;
+}
+
+.modal-zoom-leave-to>* {
+  transform: scale(0.8);
+  /* Shrink slightly on exit */
+  opacity: 0;
+}

@@ -1,0 +1,74 @@
+/* 方案 A：流光玻璃 (theme-glass.css) - 调试版 */
+
+/* 1. 明显的调试指示器 (确认文件已加载) */
+.home-page::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #409eff, #a259ff);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+/* 2. 全局背景：加深一点颜色，确保肉眼可见的变化 */
+html,
+body,
+#__nuxt,
+.app-wrapper,
+.home-page {
+    /* 使用稍深的蓝灰渐变，比原来的纯白/浅灰更明显 */
+    background: linear-gradient(135deg, #E6F3FF 0%, #F0F5FF 50%, #E8EAFA 100%) !important;
+    background-attachment: fixed !important;
+    /* 背景固定，让滚动时更有层次感 */
+}
+
+/* 3. 容器卡片：增强玻璃感 */
+.section-container,
+.goods-section,
+.category-nav,
+.banner-section {
+    position: relative;
+    z-index: 1;
+}
+
+/* 商品卡片：增强半透明和边框 */
+.goods-card {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.02),
+        0 10px 15px rgba(0, 0, 0, 0.03),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 分类卡片 */
+.category-item {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.category-item.active {
+    background: linear-gradient(270deg, rgba(76, 122, 224, 0.9) 0%, rgba(35, 92, 220, 0.9) 100%) !important;
+}
+
+/* 导航栏：更通透 */
+.app-header {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03) !important;
+}
+
+.search-box {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 字体颜色微调，适配深一度的背景 */
+body {
+    color: #2b3649 !important;
+}

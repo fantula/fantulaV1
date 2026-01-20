@@ -1,0 +1,185 @@
+/* 方案 C：钛金灰 (theme-titanium.css) - 预览版 */
+
+/* 1. 全局背景：高级中性灰 (Titanium Grey) */
+html,
+body,
+#__nuxt,
+.app-wrapper,
+.home-page {
+    background-color: #F0F2F5 !important;
+    color: #1F2937 !important;
+    /* Grey 900 */
+    min-height: 100vh;
+}
+
+/* 2. 容器与卡片：悬浮质感 (Floating Cards) */
+/* 卡片纯白，强调阴影而非边框 */
+.goods-card,
+.category-item,
+.banner-container,
+.service-modal-content,
+.login-modal-content,
+.bg-white {
+    background: #FFFFFF !important;
+    border: none !important;
+    /* 大弥散阴影，营造悬浮感 */
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 10px 15px -3px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(0, 0, 0, 0.02) !important;
+    border-radius: 12px !important;
+    /* 圆角稍微收敛一点，更商务 */
+}
+
+/* 强交互时的阴影加深 */
+.goods-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 文本颜色适配 */
+/* 标题更黑，正文更灰 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title,
+.goods-title,
+.cat-label {
+    color: #111827 !important;
+    /* Grey 900 */
+    font-weight: 700 !important;
+    letter-spacing: -0.025em;
+    /* 紧凑字距 */
+}
+
+p,
+.desc,
+.goods-price-row .price-unit,
+.stat-label {
+    color: #6B7280 !important;
+    /* Grey 500 */
+}
+
+/* 商品价格：使用品牌橙，强调购买欲 */
+.goods-price-row,
+.goods-price-row .currency,
+.goods-price-row .price-val {
+    color: #EA580C !important;
+    /* Orange 600 */
+}
+
+/* 3. 导航栏适配：磨砂白 */
+.app-header {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+    border-bottom: 1px solid rgba(229, 231, 235, 1) !important;
+    /* Grey 200 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.nav-btn {
+    color: #4B5563 !important;
+    /* Grey 600 */
+    font-weight: 600 !important;
+}
+
+.nav-btn:hover,
+.nav-btn.router-link-active {
+    color: #111827 !important;
+    background: transparent !important;
+}
+
+/* 搜索框：极简灰 */
+.search-box {
+    background: #F3F4F6 !important;
+    /* Grey 100 */
+    border: 1px solid transparent !important;
+    transition: all 0.2s;
+}
+
+.search-box:focus-within {
+    background: #FFFFFF !important;
+    border-color: #E5E7EB !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* 4. 分类导航：胶囊风格 */
+.category-item {
+    background: #FFFFFF !important;
+    color: #4B5563 !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+.category-item.active {
+    background: #1F2937 !important;
+    /* 纯黑/深灰激活态 */
+    color: #FFFFFF !important;
+    border-color: #1F2937 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 下划线去掉，改用胶囊背景 */
+.cat-label::after {
+    display: none !important;
+}
+
+/* 5. 按钮：扁平化商务风 */
+.login-btn,
+.select-btn {
+    background: #2563EB !important;
+    /* Blue 600 - 经典的商务蓝 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+}
+
+.select-btn {
+    background: #F9FAFB !important;
+    /* 浅灰底 */
+    color: #1F2937 !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+.goods-card:hover .select-btn {
+    background: #1F2937 !important;
+    color: #FFFFFF !important;
+    border-color: #1F2937 !important;
+}
+
+/* 6. 页脚适配：深灰底 */
+.app-footer,
+.footer-bg,
+.footer-root {
+    background: #FFFFFF !important;
+    border-top: 1px solid #E5E7EB;
+    margin-top: 0 !important;
+    color: #4B5563 !important;
+}
+
+.footer-title {
+    color: #111827 !important;
+}
+
+.footer-item {
+    color: #6B7280 !important;
+}
+
+/* 调试指示器：顶部橙色光条 */
+.home-page::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: #EA580C;
+    /* Orange 600 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}

@@ -1,0 +1,215 @@
+/* 方案 B：暗夜极光 (theme-dark.css) - 增强背景版 + 关于我们适配 */
+
+/* 1. 全局背景：多层次星云背景 */
+html,
+body,
+#__nuxt,
+.app-wrapper,
+.home-page {
+    /* 基础深色 */
+    background-color: #0F172A !important;
+    /* 
+     多层背景叠加：
+     1. 顶部光晕 (Blue)
+     2. 底部光晕 (Purple)
+     3. 极细的网格纹理 (Grid)
+  */
+    background-image:
+        /* 顶部流光 */
+        radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.15) 0%, transparent 40%),
+        /* 底部流光 */
+        radial-gradient(circle at 80% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+        /* 科技网格 (极淡) */
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) !important;
+
+    background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px !important;
+    background-attachment: fixed !important;
+    color: #E2E8F0 !important;
+    min-height: 100vh;
+}
+
+/* 2. 容器与卡片：增加半透明磨砂感，让背景透出来 */
+.goods-card,
+.category-item,
+.banner-container,
+.service-modal-content,
+.login-modal-content,
+.bg-white {
+    background: rgba(30, 41, 59, 0.7) !important;
+    /* 透明度降低，显示背景 */
+    backdrop-filter: blur(12px) !important;
+    /* 增加毛玻璃 */
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.1) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 文本颜色适配 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title,
+.goods-title,
+.cat-label {
+    color: #F1F5F9 !important;
+}
+
+p,
+.desc,
+.goods-price-row .price-unit,
+.stat-label {
+    color: #94A3B8 !important;
+}
+
+/* 商品价格高亮 */
+.goods-price-row {
+    color: #38BDF8 !important;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.goods-price-row .currency,
+.goods-price-row .price-val {
+    color: #38BDF8 !important;
+}
+
+/* 3. 导航栏适配：更通透 */
+.app-header {
+    background: rgba(15, 23, 42, 0.6) !important;
+    /* 更透明 */
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+.logo-text,
+.nav-btn {
+    color: #E2E8F0 !important;
+}
+
+.nav-btn:hover {
+    color: #38BDF8 !important;
+}
+
+/* 搜索框 */
+.search-box {
+    background: rgba(30, 41, 59, 0.5) !important;
+    /* 透明 */
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+.search-input {
+    color: #E2E8F0 !important;
+}
+
+/* 4. 分类导航激活态 */
+.category-item {
+    background: rgba(30, 41, 59, 0.5) !important;
+    color: #94A3B8 !important;
+}
+
+.category-item.active {
+    background: linear-gradient(90deg, #0EA5E9 0%, #2563EB 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4) !important;
+    border: none !important;
+}
+
+/* 5. 按钮发光效果 */
+.login-btn,
+.select-btn {
+    background: linear-gradient(90deg, #0EA5E9 0%, #2563EB 100%) !important;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* 6. 页脚适配 */
+.app-footer,
+.footer-bg,
+.footer-root {
+    background: rgba(11, 17, 32, 0.9) !important;
+    /* 微透 */
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    margin-top: 0 !important;
+}
+
+.footer-title {
+    color: #F8FAFC !important;
+}
+
+.footer-item {
+    color: #94A3B8 !important;
+}
+
+/* 7. 图片容器适配 */
+.goods-image-container {
+    background: rgba(15, 23, 42, 0.5) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+/* 8. 关于我们模块适配 (About Us) */
+/* 覆盖原有的浅色渐变背景 */
+.about-section {
+    background: transparent !important;
+    /* 去掉背景色，直接透出全局星云背景 */
+    box-shadow: none !important;
+    /* 去掉内阴影 */
+    margin-top: 40px;
+}
+
+.about-title {
+    color: #F8FAFC !important;
+    text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+.about-subtitle,
+.about-card-desc {
+    color: #94A3B8 !important;
+}
+
+/* 关于我们卡片 */
+.about-card {
+    background: rgba(30, 41, 59, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.1) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.about-card-title {
+    color: #E2E8F0 !important;
+}
+
+/* 图标反色处理 (如果是纯黑图标的话，可能需要反色) */
+.about-icon img {
+    filter: brightness(0) invert(1) opacity(0.8);
+    /* 简单的变成白色 */
+}
+
+/* 查看更多按钮 */
+.about-more-btn {
+    background: rgba(30, 41, 59, 0.8) !important;
+    color: #E2E8F0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+.about-more-btn:hover {
+    background: rgba(56, 189, 248, 0.2) !important;
+    border-color: #38BDF8 !important;
+    color: #38BDF8 !important;
+}
+
+/* 调试指示器：顶部双色条 */
+.home-page::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #0EA5E9, #8B5CF6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}

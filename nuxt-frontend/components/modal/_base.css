@@ -1,0 +1,147 @@
+/**
+ * 弹窗基础样式
+ * 遵循 CLIENT_DEVELOPMENT_GUIDE.md 规范
+ * 
+ * 使用方式:
+ * 在弹窗组件中 @import '@/components/modal/_base.css';
+ */
+
+/* 弹窗遮罩层 */
+.modal-mask {
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 弹窗容器 (Glassmorphism 风格) */
+.modal-container {
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+/* 弹窗头部 (渐变背景) */
+.modal-header {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  padding: 24px;
+  color: #fff;
+  position: relative;
+}
+
+.modal-header .modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal-header .modal-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* 关闭按钮 */
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 弹窗内容区 */
+.modal-content {
+  padding: 24px;
+  color: #F1F5F9;
+}
+
+/* 弹窗底部操作栏 */
+.modal-actions {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 通用按钮 */
+.modal-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: #fff;
+  border: none;
+}
+
+.modal-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.modal-btn-secondary {
+  background: transparent;
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #F1F5F9;
+}
+
+.modal-btn-danger {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: #fff;
+  border: none;
+}
+
+.modal-btn-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* 进入动画 */
+.modal-zoom-enter-active,
+.modal-zoom-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-zoom-enter-from,
+.modal-zoom-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}

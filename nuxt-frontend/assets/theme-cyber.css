@@ -1,0 +1,154 @@
+/* 方案 D：赛博霓虹 (theme-cyber.css) - 预览版 */
+
+/* 1. 全局背景：太空黑 + 霓虹光斑 */
+html,
+body,
+#__nuxt,
+.app-wrapper,
+.home-page {
+    background-color: #050510 !important;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 20%) !important;
+    color: #E0F2FE !important;
+    /* Ice Blue Text */
+    min-height: 100vh;
+}
+
+/* 2. 容器与卡片：全息玻璃 + 霓虹描边 */
+.goods-card,
+.category-item,
+.banner-container,
+.service-modal-content,
+.bg-white {
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(0, 255, 255, 0.2) !important;
+    /* 青色微光边框 */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.05) !important;
+}
+
+/* 强交互时的光效爆发 */
+.goods-card:hover {
+    border-color: rgba(255, 0, 255, 0.6) !important;
+    /* 悬浮变粉色边框 */
+    box-shadow:
+        0 0 20px rgba(255, 0, 255, 0.3),
+        inset 0 0 10px rgba(255, 0, 255, 0.1) !important;
+    transform: translateY(-5px) scale(1.02) !important;
+}
+
+/* 文本颜色适配 */
+h1,
+h2,
+h3,
+h4,
+.title,
+.goods-title {
+    color: #FFFFFF !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.cat-label {
+    color: #00FFFF !important;
+    /* 青色文字 */
+}
+
+/* 商品价格：高能粉紫 */
+.goods-price-row {
+    color: #FF00FF !important;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+.goods-price-row .currency,
+.goods-price-row .price-val {
+    color: #FF00FF !important;
+}
+
+.goods-price-row .price-unit {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 3. 导航栏适配：黑透 */
+.app-header {
+    background: rgba(5, 5, 16, 0.8) !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1) !important;
+}
+
+.nav-btn {
+    color: #E0E0E0 !important;
+}
+
+.nav-btn:hover {
+    color: #00FFFF !important;
+    text-shadow: 0 0 8px #00FFFF;
+}
+
+/* 4. 分类导航：赛博按钮 */
+.category-item {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+}
+
+.category-item.active {
+    background: linear-gradient(90deg, #FF00FF 0%, #00FFFF 100%) !important;
+    border: none !important;
+    color: #000 !important;
+    /* 黑色文字对比度最高 */
+    font-weight: 900 !important;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5) !important;
+}
+
+.category-item:hover {
+    background: rgba(0, 255, 255, 0.1) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) !important;
+}
+
+/* 5. 按钮：渐变光效 */
+.login-btn,
+.select-btn {
+    background: linear-gradient(90deg, #D946EF 0%, #8B5CF6 100%) !important;
+    /* Pink to Purple */
+    border: none !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px rgba(217, 70, 239, 0.4) !important;
+}
+
+.goods-card:hover .select-btn {
+    background: linear-gradient(90deg, #06B6D4 0%, #3B82F6 100%) !important;
+    /* Cyan to Blue */
+}
+
+/* 6. 页脚适配 */
+.app-footer,
+.footer-bg,
+.footer-root {
+    background: #020205 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0 !important;
+}
+
+.footer-title {
+    color: #00FFFF !important;
+}
+
+/* 7. 图片容器适配 */
+.goods-image-container {
+    background: linear-gradient(to bottom, #0F172A 0%, #050510 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 调试指示器：顶部双色霓虹条 */
+.home-page::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #FF00FF, #00FFFF);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    box-shadow: 0 0 15px #FF00FF;
+}
