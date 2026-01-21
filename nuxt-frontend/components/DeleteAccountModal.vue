@@ -15,7 +15,16 @@
     <div class="form-group">
       <label class="form-label">邮箱验证</label>
       <div class="captcha-row">
-        <input v-model="otpCode" type="text" class="form-input" placeholder="请输入验证码" />
+        <input 
+          v-model="otpCode" 
+          type="text" 
+          class="form-input" 
+          placeholder="请输入验证码" 
+          maxlength="6"
+          inputmode="numeric"
+          autocomplete="off"
+          @input="otpCode = otpCode.replace(/\D/g, '')"
+        />
         <button 
           class="send-code-btn" 
           :disabled="countdown > 0 || loading" 
@@ -51,6 +60,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 const props = defineProps<{
   email: string
@@ -107,13 +117,13 @@ const sendCode = async () => {
   try {
     const res = await authApi.sendOtp(props.email)
     if (res.success) {
-      ElMessage.success('验证码已发送')
+      ElMessage.success(CLIENT_MESSAGES.DELETE_MODAL.CODE_SENT)
       startTimer(COOLDOWN_SECONDS)
     } else {
-      ElMessage.error(res.msg || '发送失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PASSWORD_MODAL.SEND_FAIL)
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '发送失败')
+    ElMessage.error(e.message || CLIENT_MESSAGES.PASSWORD_MODAL.SEND_FAIL)
   } finally {
     loading.value = false
   }
@@ -126,14 +136,14 @@ const handleDelete = async () => {
   try {
     const verifyRes = await authApi.verifyOtp(props.email, otpCode.value)
     if (!verifyRes.success) {
-      ElMessage.error(verifyRes.msg || '验证码错误')
+      ElMessage.error(verifyRes.msg || CLIENT_MESSAGES.DELETE_MODAL.CODE_ERROR)
       loading.value = false
       return
     }
 
     emit('confirm')
   } catch (e: any) {
-    ElMessage.error(e.message || '验证失败')
+    ElMessage.error(e.message || CLIENT_MESSAGES.PASSWORD_MODAL.VERIFY_FAIL)
     loading.value = false
   }
 }

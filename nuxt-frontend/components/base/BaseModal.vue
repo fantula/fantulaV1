@@ -1,7 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="visible" class="base-modal-overlay" @click.self="handleClose">
+      <div 
+        v-if="visible" 
+        class="base-modal-overlay" 
+        @mousedown="handleMouseDown"
+        @click="handleOverlayClick"
+      >
         <div class="base-modal-container" :style="{ width: containerWidth }">
           <!-- Header -->
           <div class="base-modal-header">
@@ -14,7 +19,7 @@
             <slot></slot>
           </div>
 
-          <!-- Footer Actions -->
+        <!-- Footer Actions -->
           <div v-if="showFooter" class="base-modal-actions">
             <slot name="footer">
               <button class="base-modal-cancel" @click="handleClose">{{ cancelText }}</button>
@@ -27,6 +32,16 @@
               </button>
             </slot>
           </div>
+
+          <!-- Custom Mascot Slot -->
+          <slot name="mascot"></slot>
+
+          <!-- Phantom Mascot (Full Width Bottom) -->
+          <img 
+            v-if="showMascot"
+            src="/images/theme/modal_mascot.png" 
+            class="modal-mascot-phantom" 
+          />
         </div>
       </div>
     </Transition>
@@ -45,6 +60,7 @@ interface Props {
   loadingText?: string
   confirmDisabled?: boolean
   loading?: boolean
+  showMascot?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -55,12 +71,30 @@ const props = withDefaults(defineProps<Props>(), {
   confirmText: '确认',
   loadingText: '处理中...',
   confirmDisabled: false,
-  loading: false
+  loading: false,
+  showMascot: false
 })
 
 const emit = defineEmits(['close', 'confirm', 'update:visible'])
 
 const containerWidth = computed(() => props.width)
+
+// Fix: Prevent closing when dragging from inside modal to outside
+const isMouseDownOnOverlay = ref(false)
+
+const handleMouseDown = (e: MouseEvent) => {
+  // Only mark as overlay click if the target is strictly the overlay itself
+  isMouseDownOnOverlay.value = e.target === e.currentTarget
+}
+
+const handleOverlayClick = (e: MouseEvent) => {
+  // Only close if mousedown AND mouseup (click) both happened on overlay
+  if (isMouseDownOnOverlay.value && e.target === e.currentTarget) {
+    handleClose()
+  }
+  // Reset
+  isMouseDownOnOverlay.value = false
+}
 
 const handleClose = () => {
   emit('update:visible', false)
@@ -101,10 +135,41 @@ const handleClose = () => {
   display: flex;
   flex-direction: column;
   max-height: 90vh;
+  /* Scroll & Clip */
   overflow-y: auto;
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
+}
+
+/* Mascot Style */
+.modal-mascot-phantom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  opacity: 0.1; /* Final state */
+  pointer-events: none;
+  z-index: 0;
+  mask-image: linear-gradient(to top, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
+  filter: grayscale(0.4); 
+  
+  /* Phantom Entry Animation */
+  animation: phantom-float 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: bottom center;
+}
+
+@keyframes phantom-float {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 0.1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Header */
@@ -120,13 +185,10 @@ const handleClose = () => {
 .base-modal-title {
   font-size: 22px;
   font-weight: 700;
-  color: #fff;
+  color: #fff !important; /* Force Pure White */
   margin: 0;
   letter-spacing: -0.5px;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  background: linear-gradient(to right, #fff, #94A3B8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .base-modal-close {
@@ -241,7 +303,7 @@ const handleClose = () => {
 .base-modal-body .form-label {
   font-size: 14px;
   font-weight: 600;
-  color: #CBD5E1;
+  color: #fff !important; /* Force Pure White */
   margin-left: 4px;
 }
 

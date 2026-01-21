@@ -8,7 +8,9 @@
       </div>
       <div class="modal-content">
         <div class="order-info-bar">
-          <img class="shop-logo" :src="shopLogo" alt="logo" />
+          <div class="shop-logo-icon">
+            <el-icon :size="24"><Shop /></el-icon>
+          </div>
           <div class="shop-info">
             <div class="shop-name">{{ shopName }}</div>
             <div class="shop-desc">{{ shopDesc }}</div>
@@ -20,13 +22,13 @@
           <div class="pay-title">选择支付方式</div>
           <div class="pay-methods">
             <div :class="['pay-method', payType==='alipay' ? 'active' : '']" @click="payType='alipay'">
-              <img class="pay-icon" src="/images/client/pc/zhifu2.png" alt="支付宝" />
+              <el-icon class="pay-icon" :size="32" color="#1677FF"><CreditCard /></el-icon>
               <div class="pay-label">支付宝支付</div>
               <div class="pay-desc">推荐已安装支付宝的用户使用</div>
               <div v-if="payType==='alipay'" class="pay-checked"></div>
             </div>
             <div :class="['pay-method', payType==='other' ? 'active' : '']" @click="payType='other'">
-              <img class="pay-icon" src="/images/client/pc/zhifu3.png" alt="其他支付" />
+              <el-icon class="pay-icon" :size="32" color="#FAAD14"><Money /></el-icon>
               <div class="pay-label">其他支付</div>
               <div class="pay-desc">推荐需要其他支付的用户使用</div>
               <div v-if="payType==='other'" class="pay-checked"></div>
@@ -35,7 +37,7 @@
           <div class="pay-title pay-title-other">其他支付方式</div>
           <div class="pay-others">
             <div class="pay-other-item" :class="{active: payType==='balance'}" @click="payType='balance'">
-              <img class="pay-other-icon" src="/images/client/pc/zhifu4.png" alt="余额" />
+              <el-icon class="pay-other-icon" :size="24" color="#F97316"><Wallet /></el-icon>
               <div class="pay-other-info">
                 <div class="pay-other-label">余额支付</div>
                 <div class="pay-other-desc">使用账户余额支付 ¥{{ userBalance.toFixed(2) }}</div>
@@ -43,7 +45,7 @@
               <input type="checkbox" :checked="payType==='balance'" readonly />
             </div>
             <div class="pay-other-item" style="pointer-events:none;opacity:0.5;">
-              <img class="pay-other-icon" src="/images/client/pc/zhifu5.png" alt="优惠券" />
+              <el-icon class="pay-other-icon" :size="24" color="#F56C6C"><Ticket /></el-icon>
               <div class="pay-other-info">
                 <div class="pay-other-label">优惠券</div>
                 <div class="pay-other-desc">暂无可用优惠券</div>
@@ -87,6 +89,9 @@ import BalanceNotEnoughModal from './BalanceNotEnoughModal.vue'
 import PaySuccessModal from './PaySuccessModal.vue'
 import { useUserStore } from '@/stores/user'
 import { paymentApi } from '@/api/payment' // 引入支付API
+import { ElMessage } from 'element-plus'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+import { Shop, CreditCard, Money, Wallet, Ticket } from '@element-plus/icons-vue'
 
 const props = defineProps({
   shopLogo: { type: String, default: '/images/shop-logo.png' },
@@ -240,7 +245,7 @@ async function handlePay() {
     
   } catch (error) {
     console.error('❌ 支付失败:', error)
-    alert('支付失败，请重试')
+    ElMessage.error(CLIENT_MESSAGES.GLOBAL.UNKNOWN_ERROR)
     paying.value = false
   }
 }
@@ -323,14 +328,17 @@ function handleSuccessClose() {
   border-bottom: 1px solid #e3eaf2;
   background: #fff;
 }
-.shop-logo {
+.shop-logo-icon {
   width: 48px;
   height: 48px;
   border-radius: 8px;
-  object-fit: cover;
   margin-right: 16px;
   border: 1.5px dashed #b3c6e6;
-  background: #fff;
+  background: #f0f7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2196F3;
 }
 .shop-info {
   flex: 1;

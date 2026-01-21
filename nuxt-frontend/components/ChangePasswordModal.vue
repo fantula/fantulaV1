@@ -11,7 +11,16 @@
     <div class="form-group">
       <label class="form-label">邮箱验证码</label>
       <div class="captcha-row">
-        <input type="text" v-model="otpCode" class="form-input" placeholder="请输入验证码" maxlength="6" />
+        <input 
+          type="text" 
+          v-model="otpCode" 
+          class="form-input" 
+          placeholder="请输入验证码" 
+          maxlength="6" 
+          inputmode="numeric"
+          autocomplete="off"
+          @input="otpCode = otpCode.replace(/\D/g, '')"
+        />
         <button 
           type="button" 
           class="send-code-btn" 
@@ -32,6 +41,7 @@
         class="form-input" 
         placeholder="请输入新密码 (至少8位,包含数字和字母)" 
         @input="checkStrength"
+        autocomplete="new-password"
       />
       <div class="password-strength" v-if="newPassword">
         强度: <span :class="strengthClass">{{ strengthText }}</span>
@@ -40,7 +50,13 @@
 
     <div class="form-group">
       <label class="form-label">确认新密码</label>
-      <input v-model="confirmPassword" type="password" class="form-input" placeholder="请再次输入新密码" />
+      <input 
+        v-model="confirmPassword" 
+        type="password" 
+        class="form-input" 
+        placeholder="请再次输入新密码" 
+        autocomplete="new-password"
+      />
     </div>
   </BaseModal>
 </template>
@@ -49,6 +65,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 const props = defineProps<{
   email: string
@@ -132,17 +149,20 @@ const canSubmit = computed(() => {
 })
 
 const sendCode = async () => {
-  if (countdown.value > 0) return
+  if (countdown.value > 0 || loading.value) return
+  loading.value = true // Fix: Disable immediately
   try {
     const res = await authApi.sendOtp(props.email)
     if (res.success) {
       startTimer(COOLDOWN_SECONDS)
-      ElMessage.success('验证码已发送, 请查收')
+      ElMessage.success(CLIENT_MESSAGES.PASSWORD_MODAL.CODE_SENT)
     } else {
-      ElMessage.error(res.msg || '发送失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PASSWORD_MODAL.SEND_FAIL)
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '发送失败')
+    ElMessage.error(e.message || CLIENT_MESSAGES.PASSWORD_MODAL.SEND_FAIL)
+  } finally {
+    loading.value = false // Fix: Re-enable
   }
 }
 
@@ -153,23 +173,23 @@ const handleSubmit = async () => {
   try {
     const verifyRes = await authApi.verifyOtp(props.email, otpCode.value)
     if (!verifyRes.success) {
-      ElMessage.error(verifyRes.msg || '验证码错误')
+      ElMessage.error(verifyRes.msg || CLIENT_MESSAGES.PASSWORD_MODAL.VERIFY_FAIL)
       loading.value = false
       return
     }
 
     const updateRes = await authApi.updatePassword(newPassword.value)
     if (updateRes.success) {
-      ElMessage.success('密码更新成功')
+      ElMessage.success(CLIENT_MESSAGES.PASSWORD_MODAL.SUCCESS)
       emit('close')
     } else {
-      ElMessage.error(updateRes.msg || '修改失败')
+      ElMessage.error(updateRes.msg || CLIENT_MESSAGES.PASSWORD_MODAL.FAIL)
     }
   } catch (e: any) {
     if (e.message?.toLowerCase().includes('different')) {
-      ElMessage.error('新密码不能与旧密码相同')
+      ElMessage.error(CLIENT_MESSAGES.PASSWORD_MODAL.SAME_PASSWORD)
     } else {
-      ElMessage.error(e.message || '系统错误')
+      ElMessage.error(e.message || CLIENT_MESSAGES.GLOBAL.UNKNOWN_ERROR)
     }
   } finally {
     loading.value = false

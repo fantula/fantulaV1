@@ -14,11 +14,14 @@
       <div class="preview-wrapper">
         <div v-if="previewLoading" class="preview-skeleton"></div>
         <img 
-          v-else 
-          :src="previewAvatar || currentAvatar || DEFAULT_AVATAR" 
+          v-else-if="displayAvatar"
+          :src="displayAvatar" 
           class="preview-avatar" 
           @error="handleImageError"
         />
+        <div v-else class="preview-avatar-placeholder">
+          <el-icon :size="48"><UserFilled /></el-icon>
+        </div>
       </div>
       <div class="upload-btn-wrapper">
         <button class="btn-upload" @click="triggerUpload">
@@ -65,14 +68,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { getSupabaseClient } from '@/utils/supabase'
-import { Upload, Check } from '@element-plus/icons-vue'
+import { Upload, Check, UserFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 
 // 默认头像常量
-const DEFAULT_AVATAR = '/images/client/pc/avatars/avatar-cat.png'
-
 const props = defineProps<{
   currentAvatar: string
 }>()
@@ -93,19 +94,9 @@ const cropperImageSrc = ref('')
 let cropperInstance: Cropper | null = null
 
 // 系统头像列表（新增 AI 生成头像）
-const systemAvatars = [
-  '/images/client/pc/avatars/avatar-cat.png',
-  '/images/client/pc/avatars/avatar-penguin.png',
-  '/images/client/pc/avatars/avatar-bunny.png',
-  '/images/client/pc/avatars/avatar-owl.png',
-  '/images/client/pc/avatars/avatar-frog.png',
-  '/images/client/pc/avatars/avatar-bear.png',
-  '/images/client/pc/avatars/avatar-1.png',
-  '/images/client/pc/avatars/avatar-2.png',
-  '/images/client/pc/head1.png',
-  '/images/client/pc/head2.png',
-  '/images/client/pc/head3.png'
-]
+const systemAvatars: string[] = [] // Empty for now as assets were deleted
+
+const displayAvatar = computed(() => previewAvatar.value || props.currentAvatar)
 
 const hasChange = computed(() => {
   return (previewAvatar.value || selectedSystemAvatar.value) && !loading.value && !showCropper.value
@@ -116,7 +107,8 @@ const triggerUpload = () => {
 }
 
 const handleImageError = (e: Event) => {
-  (e.target as HTMLImageElement).src = DEFAULT_AVATAR
+  // If it breaks, hide it or clear it
+  (e.target as HTMLImageElement).src = ''
 }
 
 const handleFileChange = async (event: Event) => {
@@ -428,5 +420,18 @@ onUnmounted(() => {
   color: white;
   font-weight: bold;
   font-size: 14px;
+}
+
+.preview-avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94A3B8;
 }
 </style>

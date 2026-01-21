@@ -3,6 +3,7 @@ export {}
 declare global {
   const AVATAR_CONFIG: typeof import('../../utils/constants').AVATAR_CONFIG
   const ApiErrorHandler: typeof import('../../utils/error-handler').ApiErrorHandler
+  const CLIENT_MESSAGES: typeof import('../../utils/clientMessages').CLIENT_MESSAGES
   const DEFAULT_AVATAR: typeof import('../../utils/constants').DEFAULT_AVATAR
   const EDGE_FUNCTIONS_URL: typeof import('../../utils/supabase').EDGE_FUNCTIONS_URL
   const ElIconAddLocation: typeof import('../../node_modules/@element-plus/icons-vue/dist/index').AddLocation
@@ -537,6 +538,7 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     readonly AVATAR_CONFIG: UnwrapRef<typeof import('../../utils/constants')['AVATAR_CONFIG']>
     readonly ApiErrorHandler: UnwrapRef<typeof import('../../utils/error-handler')['ApiErrorHandler']>
+    readonly CLIENT_MESSAGES: UnwrapRef<typeof import('../../utils/clientMessages')['CLIENT_MESSAGES']>
     readonly DEFAULT_AVATAR: UnwrapRef<typeof import('../../utils/constants')['DEFAULT_AVATAR']>
     readonly EDGE_FUNCTIONS_URL: UnwrapRef<typeof import('../../utils/supabase')['EDGE_FUNCTIONS_URL']>
     readonly ElIconAddLocation: UnwrapRef<typeof import('../../node_modules/@element-plus/icons-vue/dist/index')['AddLocation']>

@@ -44,7 +44,7 @@
       <div class="modal-actions-card">
         <button class="btn-cancel-card" @click="$emit('close')">取消</button>
         <button class="btn-confirm-card" @click="goRecharge">
-          <img src="/images/client/pc/yue.png" alt="余额充值" style="width:20px;height:20px;margin-right:6px;vertical-align:middle;" />
+          <el-icon :size="20" style="margin-right: 6px;"><Wallet /></el-icon>
           前往钱包充值
         </button>
       </div>
@@ -60,6 +60,8 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+import { Wallet } from '@element-plus/icons-vue'
 
 interface RechargeOption { value: number; desc: string }
 const props = defineProps({
@@ -97,9 +99,9 @@ async function refreshBalance() {
   refreshing.value = true
   try {
     await userStore.fetchUserInfo()
-    ElMessage.success('余额已同步')
+    ElMessage.success(CLIENT_MESSAGES.WALLET.SYNC_SUCCESS)
   } catch (e) {
-    ElMessage.error('同步失败')
+    ElMessage.error(CLIENT_MESSAGES.WALLET.SYNC_FAIL)
   } finally {
     setTimeout(() => { refreshing.value = false }, 500)
   }

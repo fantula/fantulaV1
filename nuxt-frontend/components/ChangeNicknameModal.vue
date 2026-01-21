@@ -25,6 +25,7 @@
 import { ref, computed } from 'vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 const props = defineProps<{
   currentNickname: string
@@ -48,13 +49,13 @@ const handleUpdate = async () => {
   try {
     const res = await authApi.updateProfile({ nickname: newNickname.value })
     if (res.success) {
-      ElMessage.success('昵称更新成功')
+      ElMessage.success(CLIENT_MESSAGES.NICKNAME_MODAL.SUCCESS)
       emit('update', newNickname.value)
     } else {
-      ElMessage.error(res.msg || '更新失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.NICKNAME_MODAL.FAIL)
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '更新失败')
+    ElMessage.error(e.message || CLIENT_MESSAGES.NICKNAME_MODAL.FAIL)
   } finally {
     loading.value = false
   }

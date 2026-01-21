@@ -150,6 +150,7 @@ import {
   Camera, Edit, CircleCheck, CreditCard, CopyDocument, 
   Message, EditPen, Lock, Key, Connection, Warning, ArrowRight 
 } from '@element-plus/icons-vue'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 // Define Props
 interface Props {
@@ -186,14 +187,14 @@ const updateAvatar = async (newAvatar: string) => {
   try {
     const res = await authApi.updateProfile({ avatar: newAvatar })
     if (res.success) {
-      ElMessage.success('头像更新成功')
+      ElMessage.success(CLIENT_MESSAGES.PROFILE.AVATAR_UPDATE)
       await userStore.fetchUserInfo()
       closeModal('avatar')
     } else {
-      ElMessage.error(res.msg || '头像更新失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PROFILE.AVATAR_FAIL)
     }
   } catch (error: any) {
-    ElMessage.error(error.message || '头像更新失败')
+    ElMessage.error(error.message || CLIENT_MESSAGES.PROFILE.AVATAR_FAIL)
   }
 }
 
@@ -201,14 +202,14 @@ const updateNickname = async (newNickname: string) => {
   try {
     const res = await authApi.updateProfile({ nickname: newNickname })
     if (res.success) {
-      ElMessage.success('昵称更新成功')
+      ElMessage.success(CLIENT_MESSAGES.PROFILE.NICKNAME_UPDATE)
       await userStore.fetchUserInfo()
       closeModal('nickname')
     } else {
-      ElMessage.error(res.msg || '昵称更新失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PROFILE.NICKNAME_FAIL)
     }
   } catch (error: any) {
-    ElMessage.error(error.message || '昵称更新失败')
+    ElMessage.error(error.message || CLIENT_MESSAGES.PROFILE.NICKNAME_FAIL)
   }
 }
 
@@ -240,17 +241,17 @@ const handleDeleteAccount = async () => {
         }
       )
     } else {
-      ElMessage.error(res.msg || '注销失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PROFILE.LOGOUT_FAIL) // Mapped as defined
     }
   } catch (error: any) {
-    ElMessage.error(error.message || '注销失败')
+    ElMessage.error(error.message || CLIENT_MESSAGES.PROFILE.LOGOUT_FAIL)
   }
 }
 
 const handleCopy = (text: string) => {
   if(!text || text === '---') return
   navigator.clipboard.writeText(text).then(() => {
-    ElMessage.success('UID已复制')
+    ElMessage.success(CLIENT_MESSAGES.PROFILE.UID_COPY)
   })
 }
 </script>
@@ -275,6 +276,7 @@ const handleCopy = (text: string) => {
   overflow: hidden;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 0 40px;
 }
@@ -434,7 +436,7 @@ const handleCopy = (text: string) => {
 
 .tile-icon-bg {
   position: absolute; bottom: -10px; right: -10px;
-  font-size: 80px; color: rgba(255,255,255,0.02);
+  font-size: 80px; color: rgba(255,255,255,0.15); /* Significantly Increased visibility */
   transform: rotate(-15deg);
   pointer-events: none;
 }
@@ -512,7 +514,7 @@ const handleCopy = (text: string) => {
 
 .card-bg-icon {
   position: absolute; right: -10px; bottom: -15px;
-  font-size: 90px; opacity: 0.03;
+  font-size: 90px; opacity: 0.15; /* Significantly Increased visibility */
   transform: rotate(10deg);
   pointer-events: none;
   filter: grayscale(1);

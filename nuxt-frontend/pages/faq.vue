@@ -72,7 +72,7 @@
           <p class="contact-desc">我们的客服团队随时为您提供帮助，平均响应时间不超过3分钟，解决率高达99.8%!</p>
           <button class="contact-btn">
             <span class="contact-icon">
-              <img src="/images/client/pc/kefu.png" alt="客服" />
+              <el-icon><Service /></el-icon>
             </span>
             联系在线客服
           </button>
@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { InfoFilled, Right, Plus } from '@element-plus/icons-vue'
+import { InfoFilled, Right, Plus, Service } from '@element-plus/icons-vue'
 import { supabaseFaqApi } from '@/api/supabase'
 
 useHead({
@@ -560,10 +560,8 @@ onMounted(async () => {
   box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
-.contact-icon img {
-  width: 20px;
-  height: 20px;
-  display: block;
-  filter: brightness(100); /* Make icon white */
+.contact-icon .el-icon {
+  font-size: 20px;
+  color: #fff;
 }
 </style>

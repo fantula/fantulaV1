@@ -4,6 +4,10 @@
 
     <!-- 个人中心主体内容 -->
     <div class="profile-container">
+      
+      <!-- Simple Welcome Title -->
+      <h1 class="simple-welcome-text">欢迎回来</h1>
+
       <div class="profile-layout">
         <!-- 左侧边栏 (Unified Deep Glass) -->
         <aside class="profile-sidebar">
@@ -84,8 +88,13 @@
         <!-- 右侧主内容 (Unified Sheer Glass Frame) -->
         <main class="profile-main">
           <div class="profile-content-frame">
+             <!-- Phantom Watermark (Inside Frame) -->
+             <div class="phantom-ambassador"></div>
+             
              <!-- 强制刷新：确保每次切换 Tab 都会重新加载页面数据 -->
-             <NuxtPage :key="$route.fullPath" />
+             <div class="page-content-wrapper">
+                <NuxtPage :key="$route.fullPath" />
+             </div>
           </div>
         </main>
       </div>
@@ -213,28 +222,178 @@ onMounted(() => {
   background: #0F172A; /* Ensure background covers whole screen */
 }
 
+/* Phantom Background Layer (Now inside Content Frame) */
+.phantom-ambassador {
+  position: absolute;
+  right: 0;
+  top: 0; 
+  bottom: 0;
+  height: 100%; 
+  width: auto;
+  aspect-ratio: 3/4; 
+  background-image: url('/images/theme/ambassador.png');
+  background-repeat: no-repeat;
+  background-size: cover; 
+  background-position: right center;
+  
+  /* Natural Colors, Subtle Visibility */
+  opacity: 0.25; 
+  filter: none; 
+  mix-blend-mode: normal; 
+  
+  /* Soft Fade out to left */
+  mask-image: linear-gradient(to right, transparent 5%, black 60%);
+  -webkit-mask-image: linear-gradient(to right, transparent 5%, black 60%);
+  
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-content-wrapper {
+  position: relative;
+  z-index: 1; /* Content above phantom */
+  height: 100%;
+  overflow-y: auto; /* Internal scrolling */
+  scrollbar-width: none;
+}
+.page-content-wrapper::-webkit-scrollbar { width: 0; }
+
+.profile-content-frame {
+  position: relative; /* Context for absolute phantom */
+  width: 100%; height: 100%; border-radius: 24px; overflow: hidden;
+  background: rgba(30, 41, 59, 0.3); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
 /* 顶部导航 (Assuming Header component is used in Layout or App.vue, but here we treat profile-page as root) */
 
+/* --- Layout Container --- */
 .profile-container {
   flex: 1;
   display: flex;
-  justify-content: center;
-  padding: 20px; /* Reduced padding */
+  flex-direction: column; /* Stack Header and Layout */
+  align-items: center;    /* Center horizontally */
+  /* Extreme Pull Up: Reduced (Relaxed) */
+  padding: 0 20px 20px 20px; 
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-  height: calc(100vh - 80px); /* Subtract header height approx */
+  height: auto; 
+  flex-grow: 1;
   overflow: hidden;
+  gap: 0;
+  position: relative; 
+  z-index: 5; 
 }
 
-/* --- Layout Container --- */
 .profile-layout {
   display: flex;
-  gap: 32px; /* Increased from 24px for better separation */
+  gap: 32px;
   width: 100%;
-  height: 100%;
-  max-width: 1300px; /* Slightly wider to accommodate gap */
+  flex: 1;           
+  min-height: 0;     
+  max-width: 1300px;
   align-items: stretch;
+  margin-top: 0; 
+}
+
+/* --- Ambassador Header --- */
+.ambassador-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  flex-shrink: 0; 
+  height: auto; 
+  padding: 0; /* Zero padding */
+  margin-top: -25px; /* Aggressive pull up */
+  position: relative;
+  z-index: 5;
+}
+
+
+
+/* --- Ambassador Header --- */
+.ambassador-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0; /* Header doesn't shrink */
+  height: 180px;  /* Fixed header height */
+  margin-top: -10px; /* Slight pull up if needed, or adjust padding */
+  position: relative;
+  z-index: 5;
+}
+
+.ambassador-img-wrapper {
+  height: 130px; /* Adjust size to fit nicely */
+  width: auto;
+  display: flex;
+  justify-content: center;
+  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.4));
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.ambassador-img-wrapper:hover {
+  transform: scale(1.05) translateY(-5px);
+}
+
+.ambassador-img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  /* Soft fade at bottom to blend */
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.welcome-text {
+  text-align: center;
+  position: relative;
+  z-index: 3;
+  margin-bottom: 20px;
+}
+
+.welcome-sub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #60A5FA;
+  font-weight: 700;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  opacity: 0.8;
+  text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+.welcome-title {
+  font-size: 28px; /* Slightly smaller than banner version */
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+}
+
+.highlight-name {
+  color: transparent;
+  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Simple Welcome Text */
+.simple-welcome-text {
+  font-size: 20px; font-weight: 700; color: #fff;
+  margin: 0 0 20px 0; align-self: flex-start;
+  padding-left: 12px;
+  position: relative; z-index: 5;
 }
 
 /* --- Left Sidebar: Obsidian Glass Panel --- */
@@ -247,7 +406,7 @@ onMounted(() => {
   padding: 32px 24px 48px;
   height: 100%;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 50; /* High priority access */
   
   /* Obsidian Glass (Deepened) */
   background: rgba(10, 15, 30, 0.85); 

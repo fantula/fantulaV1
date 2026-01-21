@@ -24,7 +24,16 @@
       <div class="form-group">
         <label class="form-label">验证码</label>
         <div class="captcha-row">
-          <input v-model="currentCode" type="text" class="form-input" placeholder="请输入验证码" maxlength="6" />
+          <input 
+            v-model="currentCode" 
+            type="text" 
+            class="form-input" 
+            placeholder="请输入验证码" 
+            maxlength="6" 
+            inputmode="numeric"
+            autocomplete="off"
+            @input="currentCode = currentCode.replace(/\D/g, '')"
+          />
           <button 
             class="send-code-btn" 
             :disabled="countdown > 0 || loading"
@@ -86,6 +95,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/auth'
+import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 const props = defineProps<{
   currentEmail?: string
@@ -150,13 +160,13 @@ async function sendCurrentEmailCode() {
   try {
     const res = await authApi.sendOtp(props.currentEmail)
     if (res.success) {
-      ElMessage.success('验证码已发送到当前邮箱')
+      ElMessage.success(CLIENT_MESSAGES.EMAIL_MODAL.CODE_SENT)
       startTimer(COOLDOWN_SECONDS)
     } else {
-      ElMessage.error(res.msg || '发送失败')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PASSWORD_MODAL.SEND_FAIL)
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '发送失败')
+    ElMessage.error(e.message || CLIENT_MESSAGES.PASSWORD_MODAL.SEND_FAIL)
   } finally {
     loading.value = false
   }
@@ -169,13 +179,13 @@ async function verifyCurrentEmail() {
   try {
     const res = await authApi.verifyOtp(props.currentEmail!, currentCode.value)
     if (res.success) {
-      ElMessage.success('验证成功')
+      ElMessage.success(CLIENT_MESSAGES.EMAIL_MODAL.VERIFY_SUCCESS)
       step.value = 2
     } else {
-      ElMessage.error(res.msg || '验证码错误')
+      ElMessage.error(res.msg || CLIENT_MESSAGES.PASSWORD_MODAL.VERIFY_FAIL)
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '验证失败')
+    ElMessage.error(e.message || CLIENT_MESSAGES.PASSWORD_MODAL.VERIFY_FAIL)
   } finally {
     loading.value = false
   }
@@ -185,7 +195,7 @@ async function handleConfirm() {
   if (!isValidEmail.value || loading.value) return
   
   if (newEmail.value === props.currentEmail) {
-    ElMessage.error('新邮箱不能与当前邮箱相同')
+    ElMessage.error(CLIENT_MESSAGES.EMAIL_MODAL.SAME_EMAIL)
     return
   }
   
@@ -194,14 +204,14 @@ async function handleConfirm() {
   try {
     const checkRes = await authApi.checkEmailAvailable(newEmail.value)
     if (!checkRes.success) {
-      ElMessage.error('该邮箱已被注册，无法绑定')
+      ElMessage.error(CLIENT_MESSAGES.EMAIL_MODAL.EMAIL_OCCUPIED)
       loading.value = false
       return
     }
 
     const res = await authApi.updateEmail(newEmail.value)
     if (res.success) {
-      ElMessage.success('确认邮件已发送到新邮箱，请查收并点击确认链接完成换绑')
+      ElMessage.success(CLIENT_MESSAGES.EMAIL_MODAL.CONFIRM_SENT)
       emit('confirm', newEmail.value)
       emit('close')
     } else {

@@ -8,8 +8,8 @@
             <path d="M30 50l14 14 22-28" stroke="#2196F3" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="success-title">支付成功！</div>
-        <div class="success-desc">感谢您的购买，订单已处理完成</div>
+        <div class="success-title">付完了！</div>
+        <div class="success-desc">去订单看看吧～</div>
       </div>
       
       <div class="success-info">

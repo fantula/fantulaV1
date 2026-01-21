@@ -58,15 +58,15 @@ export function useBizConfig() {
     // 3. 订单状态定义
     // ==========================================
     const ORDER_STATUS = {
-        'pending': { label: '待支付', type: 'info' },
+        'pending': { label: '待支付', type: 'danger' }, // Changed to danger/orange
         'pending_delivery': { label: '待发货', type: 'warning' },
-        'active': { label: '服务中', type: 'success' },
+        'active': { label: '使用中', type: 'success' }, // Changed from 服务中
         'expired': { label: '已过期', type: 'info' },
-        'completed': { label: '已完成', type: '' }, // default
+        'completed': { label: '已完成', type: '' },
         'converted': { label: '已转换', type: 'info' },
         'cancelled': { label: '已取消', type: 'info' },
         'refunding': { label: '退款中', type: 'warning' },
-        'refunded': { label: '已退款', type: 'danger' }
+        'refunded': { label: '已退款', type: 'info' } // Refunded is usually neutral/gray or red. User didn't specify color, but "已退款" implies done. Info/Gray is safe.
     } as const
 
     const getOrderStatusLabel = (status: string) => {
