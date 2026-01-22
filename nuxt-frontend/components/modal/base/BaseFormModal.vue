@@ -32,6 +32,13 @@
             {{ submitText }}
           </button>
         </div>
+        
+        <!-- Phantom Mascot -->
+        <img 
+          v-if="showMascot"
+          src="/images/theme/modal_mascot.png" 
+          class="modal-mascot-phantom" 
+        />
       </div>
     </div>
   </Transition>
@@ -53,13 +60,17 @@ const props = withDefaults(defineProps<{
   loading?: boolean
   submitDisabled?: boolean
   showFooter?: boolean
+  showMascot?: boolean
 }>(), {
   title: '表单',
   cancelText: '取消',
   submitText: '提交',
   loading: false,
   submitDisabled: false,
-  showFooter: true
+  loading: false,
+  submitDisabled: false,
+  showFooter: true,
+  showMascot: false
 })
 
 const emit = defineEmits<{
@@ -110,6 +121,7 @@ const handleSubmit = () => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* 头部 */
@@ -118,6 +130,7 @@ const handleSubmit = () => {
   background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   position: relative;
   flex-shrink: 0;
+  z-index: 2;
 }
 
 .modal-title {
@@ -159,6 +172,8 @@ const handleSubmit = () => {
   padding: 24px 28px;
   overflow-y: auto;
   flex: 1;
+  position: relative;
+  z-index: 2;
 }
 
 /* 底部 */
@@ -169,6 +184,8 @@ const handleSubmit = () => {
   gap: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 /* 按钮 */
@@ -246,5 +263,34 @@ const handleSubmit = () => {
 .modal-fade-enter-from .modal-form,
 .modal-fade-leave-to .modal-form {
   transform: scale(0.95);
+}
+
+/* Mascot Style */
+.modal-mascot-phantom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: linear-gradient(to top, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
+  filter: grayscale(0.4); 
+  
+  animation: phantom-float 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: bottom center;
+}
+
+@keyframes phantom-float {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 0.1;
+    transform: translateY(0) scale(1);
+  }
 }
 </style>

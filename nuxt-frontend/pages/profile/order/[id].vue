@@ -7,11 +7,12 @@
         <div class="hero-aurora-bg" :class="order.status"></div>
         
         <div class="hero-content">
-          <!-- Top: Back, Order No, Actions Menu -->
-          <div class="hero-header">
-            <div class="header-left">
+          <!-- Top Row: Back | Order No | Amount (Right) -->
+          <div class="hero-top-row">
+            <div class="top-left-group">
               <div class="back-btn" @click="router.back()">
                 <el-icon><ArrowLeft /></el-icon>
+                <span class="back-text">返回</span>
               </div>
               <div class="order-no-badge">
                 <span class="label">订单号</span>
@@ -20,37 +21,19 @@
               </div>
             </div>
 
-            <!-- Action Menu Trigger -->
-            <div class="header-right">
-              <div class="action-menu-trigger" @click.stop="toggleActionMenu">
-                <el-icon><MoreFilled /></el-icon>
-              </div>
-              
-              <!-- Popover Menu -->
-              <transition name="menu-fade">
-                <div v-if="showActionMenu" class="action-menu-popover" @click.stop>
-                   <div class="menu-item" @click="handleAction('contact')">
-                     <el-icon><Service /></el-icon> 联系客服
-                   </div>
-                   <div class="menu-item" @click="handleAction('ticket')">
-                     <el-icon><Tickets /></el-icon> 申请工单
-                   </div>
-                   <!-- Only show Renew/Refund if logic allows, or always show as requested -->
-                   <div class="menu-item" @click="handleAction('renew')">
-                     <el-icon><Refresh /></el-icon> 续费
-                   </div>
-                   <div class="menu-item danger" @click="handleAction('refund')">
-                     <el-icon><Money /></el-icon> 申请退款
-                   </div>
-                </div>
-              </transition>
+            <!-- Amount Display (Top Right) -->
+            <div class="amount-display-top">
+              <span class="amount-integer">{{ getInteger(order.totalAmount || 0) }}</span>
+              <span class="amount-decimal">.{{ getDecimal(order.totalAmount || 0) }}</span>
+              <span class="amount-unit">点</span>
             </div>
           </div>
 
-          <!-- Middle: Status & Amount & CountDown -->
-          <div class="status-display">
-            <div class="status-main">
-              <!-- Icon based on 3 main statuses -->
+          <!-- Middle/Bottom Row: Status Icon+Text | Action Buttons -->
+          <div class="hero-main-row">
+            
+            <!-- Status Info (Left) -->
+            <div class="status-group">
               <div class="status-icon-box" :class="order.status">
                 <el-icon v-if="order.status === 'active' || order.status === 'completed'"><CircleCheck /></el-icon>
                 <el-icon v-else-if="order.status === 'pending_delivery'"><Box /></el-icon>
@@ -58,34 +41,61 @@
                 <el-icon v-else><InfoFilled /></el-icon>
               </div>
               
-              <div class="status-text-group">
-                <h1 class="status-title">{{ statusText }}</h1>
-                <!-- Remaining Time (Only for Active) -->
-                <div v-if="order.status === 'active' && remainingDays !== null" class="time-badge" :class="getTimeLevel(remainingDays)">
-                   <el-icon><Timer /></el-icon> 剩余 {{ remainingDays }} 天
+              <div class="status-text-wrapper">
+                <div class="status-title-row">
+                  <h1 class="status-title">{{ statusText }}</h1>
+                  <!-- Countdown Badge for Active -->
+                  <div v-if="order.status === 'active' && remainingDays !== null" class="time-badge" :class="getTimeLevel(remainingDays)">
+                     <el-icon><Timer /></el-icon> 剩余 {{ remainingDays }} 天
+                  </div>
                 </div>
-                <!-- Refund Text -->
-                <div v-else-if="order.status === 'refunding'" class="status-desc">
-                  退款申请处理中
-                </div>
-                <!-- Pending Delivery Text -->
-                <div v-else-if="order.status === 'pending_delivery'" class="status-desc">
-                   系统正在分配您的商品
-                </div>
-                <div v-else class="status-desc">
-                  下单时间: {{ formatTime(order.createdAt) }}
-                </div>
+                <!-- Subtitles -->
+                 <div class="status-desc">
+                    <span v-if="order.status === 'refunding'">退款申请待审核：{{ pendingRefundReason || '请耐心等待' }}</span>
+                    <span v-else-if="order.status === 'pending_delivery'">系统正在极速配货中</span>
+                    <span v-else-if="order.status === 'active'">商品状态正常，到期时间: {{ formatTime(order.expires_at) }}</span>
+                    <span v-else>下单时间: {{ formatTime(order.createdAt) }}</span>
+                 </div>
               </div>
             </div>
 
-            <!-- Amount: Wallet Style -->
-            <div class="amount-display">
-              <span class="amount-integer">{{ getInteger(order.totalAmount || 0) }}</span>
-              <span class="amount-decimal">.{{ getDecimal(order.totalAmount || 0) }}</span>
-              <span class="amount-unit">点</span>
+            <!-- Action Buttons (Right) - Plan A Logic -->
+            <div class="hero-actions">
+               
+               <!-- 0. Contact Service (Always Visible) -->
+               <button class="hero-btn secondary" @click="handleAction('contact')">
+                 <el-icon><Headset /></el-icon> 联系客服
+               </button>
+
+               <!-- 1. Ticket Action -->
+               <button v-if="activeTicketId" class="hero-btn secondary" @click="handleAction('view_ticket')">
+                 <el-icon><Tickets /></el-icon> 查看工单
+               </button>
+               <button v-else class="hero-btn secondary" @click="handleAction('create_ticket')">
+                 <el-icon><Tickets /></el-icon> 申请工单
+               </button>
+
+               <!-- 2. Renew Action (Hidden for One-Time) -->
+               <button v-if="canRenew" class="hero-btn primary" @click="handleAction('renew')">
+                 <el-icon><Refresh /></el-icon> 续费
+               </button>
+
+               <!-- 3. Refund Action (Hidden for One-Time) -->
+               <!-- Case A: Pending Refund -> Cancel Button -->
+               <button v-if="order.status === 'refunding' || pendingRefundRequest" class="hero-btn warning" @click="handleAction('cancel_refund')">
+                 <el-icon><CircleClose /></el-icon> 取消退款
+               </button>
+               <!-- Case B: Can Apply Refund -->
+               <button v-else-if="canRefund" class="hero-btn danger" @click="handleAction('apply_refund')">
+                 <el-icon><Money /></el-icon> 申请退款
+               </button>
+
             </div>
           </div>
         </div>
+        
+        <!-- Optional: Decorator or texture overlay -->
+        <div class="noise-overlay"></div>
       </div>
     </div>
 
@@ -113,7 +123,7 @@
       </div>
 
       <!-- Delivery / Fulfillment Section (The Core) -->
-      <!-- Only show for relevant statuses -->
+      <!-- Only show for relevant statuses (including refunding to see what happened) -->
       <div v-if="['pending_delivery', 'active', 'completed', 'refunding'].includes(order.status || '')" class="fulfillment-section fade-in-up">
         
         <!-- Shared Account Fulfillment -->
@@ -160,27 +170,57 @@
 
     </div>
 
-    <!-- Global Click Listener for closing menu -->
-    <div v-if="showActionMenu" class="click-outside-layer" @click="showActionMenu = false"></div>
+    <!-- Modals -->
+    <RenewalModal
+      v-if="order"
+      v-model="showRenewalModal"
+      :order-id="order.id"
+      @success="onRenewalSuccess"
+    />
 
+    <RefundModal
+      v-if="order"
+      v-model="showRefundModal"
+      :order-id="order.id"
+      :order-no="order.order_no"
+      @success="onRefundSuccess"
+    />
+
+    <TicketApplyModal
+      v-if="showTicketModal && order"
+      :order-id="order.id"
+      :order-info="{ order_no: order.order_no, product_name: order.product_snapshot?.product_name }"
+      @close="showTicketModal = false"
+      @success="onTicketSuccess"
+    />
+
+    <ContactModal
+      v-if="showContactModal"
+      @close="showContactModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, Timer, CircleClose, InfoFilled, 
-  ZoomIn, Box, MoreFilled, Service, Tickets, Refresh, Money, RefreshLeft
+  ZoomIn, Box, Tickets, Refresh, Money, RefreshLeft, Headset
 } from '@element-plus/icons-vue'
 import { clientOrderApi } from '@/api/client'
+import { ticketApi } from '@/api/client/ticket'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import FulfillmentShared from '@/components/order/FulfillmentShared.vue'
 import FulfillmentCdk from '@/components/order/FulfillmentCdk.vue'
 import FulfillmentSubmitForm from '@/components/order/FulfillmentSubmitForm.vue'
 import FulfillmentHistory from '@/components/order/FulfillmentHistory.vue'
+import RenewalModal from '@/components/order/RenewalModal.vue'
+import RefundModal from '@/components/order/RefundModal.vue'
+import TicketApplyModal from '@/components/TicketApplyModal.vue'
+import ContactModal from '@/components/ContactModal.vue'
 import type { FulfillmentField } from '@/types/order'
 
 definePageMeta({ ssr: false })
@@ -189,7 +229,6 @@ const route = useRoute()
 const router = useRouter()
 const orderId = route.params.id as string
 const loading = ref(true)
-const showActionMenu = ref(false)
 
 const { getOrderStatusLabel } = useBizConfig()
 const { formatDate } = useBizFormat()
@@ -221,6 +260,10 @@ const order = ref<Partial<OrderDetail>>({})
 const cdkList = ref<CdkItem[]>([])
 const instructionImage = ref('')
 
+// Logic State
+const activeTicketId = ref<string | null>(null)
+const pendingRefundRequest = ref<any>(null)
+
 // Computed Status Text
 const statusText = computed(() => {
   const s = order.value.status
@@ -230,6 +273,8 @@ const statusText = computed(() => {
   if (s === 'refunded') return '已退款'
   return getOrderStatusLabel(s || '')
 })
+
+const pendingRefundReason = computed(() => pendingRefundRequest.value?.reason)
 
 const remainingDays = computed(() => {
   // @ts-ignore
@@ -246,9 +291,27 @@ const getTimeLevel = (days: number) => {
   return 'safe'                    // Green
 }
 
+// Logic Computed
+// Rule: One-time orders don't show Renew/Refund
+const isOneTime = computed(() => order.value.orderType === 'one_time_cdk')
+
+const canRenew = computed(() => {
+  if (isOneTime.value) return false
+  const s = order.value.status
+  return ['active', 'expired'].includes(s || '')
+})
+
+const canRefund = computed(() => {
+  if (isOneTime.value) return false
+  const s = order.value.status
+  // Usually refund allowed for pending_delivery or active (within X days, ignoring X days for now as per user just status)
+  return ['pending_delivery', 'active'].includes(s || '')
+})
+
+
 // Amount Helpers
 const getInteger = (val: number) => Math.floor(val).toLocaleString()
-const getDecimal = (val: number) => (val % 1).toFixed(2).split('.')[1]
+const getDecimal = (val: number) => (val % 1).toFixed(2).split('.')[1] || '00'
 
 const fulfillmentFields = computed((): FulfillmentField[] => {
   if (!cdkList.value.length) return []
@@ -274,7 +337,6 @@ const fulfillmentFields = computed((): FulfillmentField[] => {
 })
 
 const historyRef = ref<{ refresh: () => void } | null>(null)
-
 const handleFulfillmentSuccess = () => { historyRef.value?.refresh() }
 
 // Utility
@@ -286,29 +348,82 @@ const copyText = (text?: string) => {
   ElMessage.success('已复制')
 }
 
-// Action Menu Interactions
-const toggleActionMenu = () => {
-  showActionMenu.value = !showActionMenu.value
-}
-const handleAction = (type: string) => {
-  showActionMenu.value = false
+// Action Handlers
+  const handleAction = async (type: string) => {
+  
   if (type === 'contact') {
-    window.open('https://work.weixin.qq.com/kfid/your_kfid', '_blank') // Replace with real link or config
-  } else if (type === 'ticket') {
-    // Open Ticket Modal (Not implemented here, verify if exists)
-    ElMessage.info('功能开发中: 申请工单')
-  } else if (type === 'renew') {
-    ElMessage.info('功能开发中: 续费')
-  } else if (type === 'refund') {
-    ElMessage.warning('请联系客服申请退款')
+    showContactModal.value = true
+  }
+
+  // 1. Ticket
+  else if (type === 'create_ticket') {
+    showTicketModal.value = true
+  } 
+  else if (type === 'view_ticket') {
+    if (activeTicketId.value) {
+       // TODO: Go to ticket detail if accessible, or maybe just list
+       router.push('/profile/tickets')
+    }
+  }
+
+  // 2. Renew
+  else if (type === 'renew') {
+    showRenewalModal.value = true
+  } 
+
+  // 3. Refund
+  else if (type === 'apply_refund') {
+    showRefundModal.value = true
+  } 
+  else if (type === 'cancel_refund') {
+    try {
+      await ElMessageBox.confirm('确定要撤销退款申请并恢复订单吗？', '撤销退款', {
+         confirmButtonText: '确定撤销',
+         cancelButtonText: '暂不撤销',
+         type: 'warning'
+      })
+      
+      const res = await clientOrderApi.cancelRefundRequest(orderId)
+      if (res.success) {
+        ElMessage.success(res.message || '已撤销')
+        loadData() // Refresh status
+      } else {
+        ElMessage.error(res.error || '撤销失败')
+      }
+    } catch {
+      // Cancelled
+    }
   }
 }
 
+// Modal Success Handlers
+const onRenewalSuccess = (newOrderId: string) => {
+    // RenewalModal already handles redirect, but we can close it here just in case
+    showRenewalModal.value = false
+}
+
+const onTicketSuccess = () => {
+    ElMessage.success('工单已提交')
+    loadData() // Refresh to see "View Ticket" button
+}
+
+const onRefundSuccess = () => {
+    loadData() // Refresh to see "Cancel Refund" button
+}
+
 // Fetch
+const showRenewalModal = ref(false)
+const showRefundModal = ref(false)
+const showTicketModal = ref(false)
+const showContactModal = ref(false)
+const ticketRefreshKey = ref(0) // Used to force refresh ticket list if needed
+
 const loadData = async () => {
+
   if (!orderId) return
   loading.value = true
   try {
+    // 1. Get Order
     const res = await clientOrderApi.getOrderDetail(orderId)
     if (res.success && res.data) {
       const d = res.data
@@ -329,6 +444,7 @@ const loadData = async () => {
         skuSpec: sSnap.spec_combination ? Object.values(sSnap.spec_combination).join(' ') : '默认'
       }
 
+      // 2. Parse CDKs
       if (d.cdkList) {
         const finalCdks = d.cdkList.map((cdk: any) => {
           let slotIndex = undefined
@@ -345,6 +461,33 @@ const loadData = async () => {
             instructionImage.value = acc.image || acc.help_image || acc.common_image || ''
         }
       }
+
+      // 3. Check Refund Request (If status is 'refunding' OR checking just in case)
+      if (d.status === 'refunding' || d.status === 'active' || d.status === 'pending_delivery') {
+         const refundRes = await clientOrderApi.getRefundRequest(orderId)
+         if (refundRes.success && refundRes.data) {
+             pendingRefundRequest.value = refundRes.data
+         } else {
+             pendingRefundRequest.value = null
+         }
+      }
+
+      // 4. Check Active Tickets
+      // We look for any currently processing ticket for this order
+      // Assuming ticketApi.getList can filter by order is hard without modifying it,
+      // but let's check what getList does. It filters by 'status' global.
+      // Ideally we need `ticketApi.getList(status, orderId)`.
+      // For now, let's fetch 'processing' tickets and search client side (not efficient but works for low volume)
+      const ticketRes = await ticketApi.getList('processing')
+      if (ticketRes.success && ticketRes.data) {
+          const match = ticketRes.data.find((t:any) => t.order_id === orderId)
+          if (match) {
+              activeTicketId.value = match.id
+          } else {
+              activeTicketId.value = null
+          }
+      }
+
     }
   } catch (e) {
     console.error(e)
@@ -357,11 +500,13 @@ onMounted(loadData)
 </script>
 
 <style scoped>
+
 .order-detail-page {
-  display: flex; flex-direction: column; gap: 24px;
+  display: flex; flex-direction: column; 
   width: 100%; max-width: 100%;
+  padding: 0; /* No global padding to allow full-bleed header */
+  /* overflow-x: hidden;  <-- REMOVED to fix sticky behavior */
   padding-bottom: 40px;
-  position: relative;
 }
 
 /* --- Sticky Wrapper --- */
@@ -369,23 +514,121 @@ onMounted(loadData)
   position: sticky;
   top: 0;
   z-index: 100;
-  margin: -20px -20px 0 -20px; /* Pull out of parent padding to stick to true top */
-  padding: 20px 20px 0 20px;   /* Compensation padding */
-  background: rgba(15, 23, 42, 0.85); /* Dark backdrop for sticky area */
-  backdrop-filter: blur(12px);
-  padding-bottom: 20px; /* Spacing below card */
+  width: 100%;
+  /* Remove negative margins that caused overflow */
+  margin: 0;
+  padding: 0;
+  
+  /* Background to mask content behind */
+  background: #0F172A; 
   border-bottom: 1px solid rgba(255,255,255,0.02);
 }
 
-/* --- 1. Status Hero Card --- */
+/* --- 1. Status Hero Card (Full Width Header) --- */
 .status-hero-card {
   position: relative;
-  width: 100%; height: 180px; 
-  border-radius: 20px; overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.4);
+  width: 100%; 
+  height: 180px; /* Restored/Fixed Height, user wanted ~140-180? Code says 140 before */
+  /* Let's keep 140px as requested previously, or adjusted */
+  height: 140px;
+  
+  /* Full bleed: No border radius at top to flush with container */
+  /* Optional: Round bottom for style */
+  border-radius: 0; 
+  /* Or if user wants floating look but flush top: */
+  /* border-radius: 0 0 24px 24px; */ 
+  
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
+  background: #0F172A;
 }
+
+.noise-overlay {
+  position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.hero-content {
+  position: relative; z-index: 3; height: 100%;
+  display: flex; flex-direction: column; 
+  padding: 20px 32px; /* Increased side padding for aesthetics */
+  justify-content: space-between;
+}
+
+.hero-top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.top-left-group { display: flex; align-items: center; gap: 16px; }
+
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  color: #fff; cursor: pointer; font-size: 14px; font-weight: 500;
+  opacity: 0.8; transition: opacity 0.2s;
+}
+.back-btn:hover { opacity: 1; }
+
+.order-no-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(0,0,0,0.3); padding: 4px 12px; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.05); height: 28px;
+}
+.order-no-badge .label { font-size: 11px; color: #64748B; font-weight: 700; transform: translateY(1px); }
+.order-no-badge .value { font-family: 'Monaco', monospace; color: #CBD5E1; font-size: 12px; }
+.copy-icon { cursor: pointer; color: #64748B; transition: color 0.2s; }
+.copy-icon:hover { color: #fff; }
+
+.amount-display-top { 
+  font-family: 'Outfit', sans-serif; display: flex; align-items: baseline; color: #fff; line-height: 1; 
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.amount-integer { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+.amount-decimal { font-size: 16px; font-weight: 500; color: #CBD5E1; }
+.amount-unit { font-size: 12px; color: #F59E0B; font-weight: 600; margin-left: 4px; }
+
+.hero-main-row { display: flex; justify-content: space-between; align-items: flex-end; }
+.status-group { display: flex; align-items: center; gap: 16px; }
+
+.status-icon-box {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.status-text-wrapper { display: flex; flex-direction: column; gap: 2px; }
+.status-title-row { display: flex; align-items: center; gap: 10px; }
+.status-title { font-size: 20px; font-weight: 700; color: #fff; margin: 0; }
+.status-desc { font-size: 12px; color: #94A3B8; font-weight: 400; }
+
+.time-badge { 
+  font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; 
+  padding: 2px 8px; border-radius: 4px; border: 1px solid;
+}
+.time-badge.critical { color: #FECACA; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); animation: pulse-red 2s infinite; }
+.time-badge.warning { color: #FDE68A; background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.3); }
+.time-badge.safe { color: #A7F3D0; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.3); }
+
+/* Buttons */
+.hero-actions { display: flex; gap: 10px; align-items: center; }
+
+.hero-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: none; transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.hero-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+.hero-btn:active { transform: translateY(0); }
+.hero-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+.hero-btn.secondary:hover { background: rgba(255,255,255,0.15); }
+.hero-btn.primary { background: #3B82F6; color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+.hero-btn.primary:hover { background: #2563EB; }
+.hero-btn.danger { background: rgba(239, 68, 68, 0.15); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.3); }
+.hero-btn.danger:hover { background: rgba(239, 68, 68, 0.25); color: #fff; border-color: rgba(239, 68, 68, 0.5); }
 
 /* Gradients */
 .hero-aurora-bg {
@@ -403,7 +646,7 @@ onMounted(loadData)
               linear-gradient(135deg, rgba(67, 20, 7, 0.3) 0%, rgba(10, 15, 30, 0.98) 100%);
 }
 .hero-aurora-bg.refunding {
-  background: radial-gradient(circle at 50% 10%, rgba(168, 85, 247, 0.3), transparent 50%),
+  background: radial-gradient(circle at 50% 10%, rgba(168, 85, 247, 0.25), transparent 50%),
               linear-gradient(135deg, rgba(88, 28, 135, 0.3) 0%, rgba(10, 15, 30, 0.98) 100%);
 }
 .hero-aurora-bg.refunded, .hero-aurora-bg.closed {
@@ -411,100 +654,17 @@ onMounted(loadData)
               linear-gradient(135deg, rgba(69, 10, 10, 0.3) 0%, rgba(10, 15, 30, 0.98) 100%);
 }
 
-.hero-content {
-  position: relative; z-index: 2; height: 100%;
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: 20px 28px;
-}
-
-.hero-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.header-left { display: flex; align-items: center; gap: 12px; }
-.header-right { position: relative; }
-
-.back-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px;
-  color: #fff; cursor: pointer; font-size: 16px;
-  border-radius: 8px; transition: all 0.2s;
-  background: rgba(255,255,255,0.1);
-}
-.back-btn:hover { background: rgba(255,255,255,0.2); }
-
-.order-no-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(0,0,0,0.3); padding: 6px 14px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.05); height: 32px;
-}
-.order-no-badge .label { font-size: 11px; color: #64748B; font-weight: 700; transform: translateY(1px); }
-.order-no-badge .value { font-family: 'Monaco', monospace; color: #CBD5E1; font-size: 13px; }
-.copy-icon { cursor: pointer; color: #64748B; transition: color 0.2s; }
-.copy-icon:hover { color: #fff; }
-
-/* Action Menu */
-.action-menu-trigger {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.1); border-radius: 8px;
-  cursor: pointer; color: #fff; transition: all 0.2s;
-}
-.action-menu-trigger:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
-
-.action-menu-popover {
-  position: absolute; top: 40px; right: 0; min-width: 160px;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 6px;
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
-  display: flex; flex-direction: column; gap: 2px;
-  z-index: 200;
-  transform-origin: top right;
-}
-.menu-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px;
-  font-size: 13px; font-weight: 500; color: #E2E8F0;
-  border-radius: 8px; cursor: pointer; transition: all 0.2s;
-}
-.menu-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-.menu-item.danger { color: #F87171; }
-.menu-item.danger:hover { background: rgba(239, 68, 68, 0.1); }
-
-.click-outside-layer { position: fixed; inset: 0; z-index: 90; cursor: default; }
-.menu-fade-enter-active, .menu-fade-leave-active { transition: all 0.2s ease; }
-.menu-fade-enter-from, .menu-fade-leave-to { opacity: 0; transform: scale(0.95); }
-
-/* Middle Areas */
-.status-display { display: flex; justify-content: space-between; align-items: flex-end; }
-.status-main { display: flex; align-items: center; gap: 16px; }
-.status-icon-box {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: rgba(255,255,255,0.1);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; color: #fff;
-  border: 1px solid rgba(255,255,255,0.1);
-}
 .status-icon-box.active { color: #34D399; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.3); }
 .status-icon-box.pending_delivery { color: #FB923C; background: rgba(249, 115, 22, 0.2); border-color: rgba(249, 115, 22, 0.3); }
 .status-icon-box.refunding { color: #A855F7; background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.3); }
 .status-icon-box.refunded { color: #F87171; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); }
 
-.status-text-group { display: flex; flex-direction: column; gap: 2px; }
-.status-title { font-size: 22px; font-weight: 700; color: #fff; margin: 0; letter-spacing: -0.5px; }
-.status-desc { font-size: 13px; color: #94A3B8; }
-.time-badge { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding-top: 2px; }
-.time-badge.critical { color: #EF4444; }
-.time-badge.warning { color: #F59E0B; }
-.time-badge.safe { color: #10B981; }
-
-.amount-display { font-family: 'Outfit', sans-serif; display: flex; align-items: baseline; color: #fff; line-height: 1; }
-.amount-integer { font-size: 36px; font-weight: 700; letter-spacing: -1px; }
-.amount-decimal { font-size: 20px; font-weight: 500; color: #CBD5E1; }
-.amount-unit { font-size: 14px; color: #F59E0B; font-weight: 600; margin-left: 4px; transform: translateY(-3px); }
-
 /* --- 2. Content Stream --- */
-.content-stream { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+.content-stream { 
+  display: flex; flex-direction: column; gap: 16px; 
+  margin-top: 10px; 
+  padding: 0 24px; /* ADDED PADDING to restore spacing for content */
+}
 
 .glass-tile {
   background: rgba(30, 41, 59, 0.3);
@@ -543,7 +703,8 @@ onMounted(loadData)
 
 /* Mobile */
 @media (max-width: 768px) {
-  .status-display { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .hero-main-row { flex-direction: column; align-items: flex-start; gap: 16px; }
   .status-hero-card { height: auto; }
+  .content-stream { padding: 0 16px; }
 }
 </style>

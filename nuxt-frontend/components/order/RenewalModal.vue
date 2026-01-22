@@ -2,8 +2,9 @@
   <BaseModal
     v-model:visible="visible"
     title="续费订单"
-    width="520px"
+    width="720px"
     :footer="false"
+    show-mascot
   >
     <div class="renewal-content">
       <!-- Loading State -->
@@ -20,102 +21,106 @@
 
       <!-- Main Content -->
       <div v-else class="renewal-form">
-        <!-- Product Header -->
-        <div class="product-header">
-          <div class="product-image">
-            <el-image 
-              :src="productInfo.image || '/images/placeholder.png'" 
-              fit="cover"
-              class="thumb-img"
-            >
-              <template #placeholder>
-                <div class="img-placeholder">加载中</div>
-              </template>
-            </el-image>
-          </div>
-          <div class="product-info">
-            <h3 class="product-name">{{ productInfo.name }}</h3>
-            <div class="current-end-time">
-              <span class="label">当前到期</span>
-              <span class="value">{{ formatDate(currentEndTime) }}</span>
+        <div class="renewal-split-layout">
+          
+          <!-- Left Column: Specs & Info -->
+          <div class="refresh-left-col">
+            <!-- Product Header -->
+            <div class="product-header-compact">
+              <el-image :src="productInfo.image" class="mini-thumb" fit="cover">
+                <template #placeholder><div class="ph">IMG</div></template>
+              </el-image>
+              <div class="ph-info">
+                 <div class="ph-name">{{ productInfo.name }}</div>
+                 <div class="ph-expire">当前到期: {{ formatDate(currentEndTime) }}</div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <!-- SKU Spec Selection (like product detail page) -->
-        <div class="spec-selection-area" v-if="specGroups.length > 0">
-          <div v-for="specGroup in specGroups" :key="specGroup.name" class="spec-group">
-            <div class="spec-label">{{ specGroup.name }}</div>
-            <div class="spec-values">
-              <div 
-                v-for="val in specGroup.values" 
-                :key="val.value"
-                :class="['spec-val-btn', { active: selectedSpecs[specGroup.name] === val.value }]"
-                @click="handleSpecSelect(specGroup.name, val.value)"
-              >
-                {{ val.value }}
-                <span v-if="val.price" class="spec-price">¥{{ val.price.toFixed(2) }}</span>
+            <!-- SKU Spec Selection -->
+            <div class="specs-wrapper">
+              
+               <div v-if="specGroups.length > 0">
+                <div v-for="specGroup in specGroups" :key="specGroup.name" class="spec-group">
+                  <div class="spec-label">{{ specGroup.name }}</div>
+                  <div class="spec-values">
+                    <div 
+                      v-for="val in specGroup.values" 
+                      :key="val.value"
+                      :class="['spec-val-btn', { active: selectedSpecs[specGroup.name] === val.value }]"
+                      @click="handleSpecSelect(specGroup.name, val.value)"
+                    >
+                      {{ val.value }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else-if="skuList.length > 0" class="simple-sku-list">
+                <div class="spec-label">选择时长</div>
+                <div class="spec-values">
+                  <div 
+                    v-for="sku in skuList" 
+                    :key="sku.sku_id"
+                    :class="['spec-val-btn', { active: selectedSkuId === sku.sku_id }]"
+                    @click="handleSimpleSkuSelect(sku)"
+                  >
+                    {{ sku.duration }}天
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+             <!-- Coupon Selection (Moved to Left) -->
+            <div class="coupon-section" @click="showCouponModal = true">
+              <div class="coupon-label">优惠券</div>
+              <div class="coupon-value">
+                <span v-if="selectedCoupon" class="coupon-selected">-¥{{ discountAmount.toFixed(2) }}</span>
+                <span v-else class="coupon-placeholder">选择优惠券</span>
+                <el-icon><ArrowRight /></el-icon>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Fallback: Simple SKU list if no spec groups -->
-        <div v-else-if="skuList.length > 0" class="simple-sku-list">
-          <div class="spec-label">选择续费时长</div>
-          <div class="spec-values">
-            <div 
-              v-for="sku in skuList" 
-              :key="sku.sku_id"
-              :class="['spec-val-btn', { active: selectedSkuId === sku.sku_id }]"
-              @click="handleSimpleSkuSelect(sku)"
-            >
-              {{ sku.duration }}天
-              <span class="spec-price">¥{{ sku.price.toFixed(2) }}</span>
-            </div>
-          </div>
-        </div>
+          <!-- Right Column: Summary & Actions -->
+          <div class="refresh-right-col">
+             <div class="summary-card">
+                <div class="summary-title">订单摘要</div>
+                
+                <div class="summary-row">
+                   <span>商品金额</span>
+                   <span>¥{{ originalAmount.toFixed(2) }}</span>
+                </div>
+                <div class="summary-row" v-if="discountAmount > 0">
+                   <span>优惠抵扣</span>
+                   <span class="text-danger">-¥{{ discountAmount.toFixed(2) }}</span>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="total-row">
+                   <div class="total-label">应付金额</div>
+                   <div class="total-price">
+                      <span class="unit">¥</span>{{ finalAmount.toFixed(2) }}
+                   </div>
+                </div>
 
-        <!-- Coupon Selection -->
-        <div class="coupon-section" @click="showCouponModal = true">
-          <div class="coupon-label">优惠券</div>
-          <div class="coupon-value">
-            <span v-if="selectedCoupon" class="coupon-selected">
-              -¥{{ discountAmount.toFixed(2) }}
-            </span>
-            <span v-else class="coupon-placeholder">选择优惠券</span>
-            <el-icon><ArrowRight /></el-icon>
-          </div>
-        </div>
+                <div class="new-expire-tip" v-if="newEndTime">
+                  续费后到期: {{ formatDate(newEndTime) }}
+                </div>
 
-        <!-- Price Summary -->
-        <div class="price-summary">
-          <div class="price-row">
-            <span>商品金额</span>
-            <span>¥{{ originalAmount.toFixed(2) }}</span>
+                <button
+                  class="pay-btn"
+                  :disabled="!selectedSkuId || paying"
+                  @click="handlePay"
+                >
+                  <span v-if="paying">支付中...</span>
+                  <span v-else>立即支付</span>
+                </button>
+             </div>
           </div>
-          <div v-if="discountAmount > 0" class="price-row discount">
-            <span>优惠券</span>
-            <span>-¥{{ discountAmount.toFixed(2) }}</span>
-          </div>
-          <div class="price-row total">
-            <span>应付金额</span>
-            <span class="final-price">¥{{ finalAmount.toFixed(2) }}</span>
-          </div>
-          <div class="new-end-time">
-            续费后到期：{{ formatDate(newEndTime) }}
-          </div>
+        
         </div>
-
-        <!-- Pay Button -->
-        <button
-          class="pay-btn"
-          :disabled="!selectedSkuId || paying"
-          @click="handlePay"
-        >
-          <span v-if="paying">支付中...</span>
-          <span v-else>立即支付 ¥{{ finalAmount.toFixed(2) }}</span>
-        </button>
       </div>
     </div>
 
@@ -436,233 +441,106 @@ const formatDate = (dateStr: string) => {
 </script>
 
 <style scoped>
-.renewal-content {
-  padding: 20px;
-}
-
-.loading-state, .error-state {
-  text-align: center;
-  padding: 40px 0;
-  color: #94A3B8;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #4C7AE0;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 16px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.error-icon { font-size: 48px; margin-bottom: 16px; }
-
-/* Product Header */
-.product-header {
+/* CSS for Two-Column Layout */
+.renewal-content { padding: 0; }
+.renewal-split-layout {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  margin-bottom: 20px;
+  height: 420px; /* Fixed height for consistent modal */
 }
 
-.product-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
+/* Left Column */
+.refresh-left-col {
+  flex: 1.4;
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.05);
 }
 
-.thumb-img {
-  width: 100%;
-  height: 100%;
+.product-header-compact {
+  display: flex; gap: 12px; align-items: center;
+  margin-bottom: 24px;
 }
+.mini-thumb { width: 48px; height: 48px; border-radius: 8px; overflow: hidden; background: #0F172A; margin: 0; display: block; }
+.ph-info { display: flex; flex-direction: column; gap: 4px; }
+.ph-name { font-size: 15px; font-weight: 600; color: #fff; }
+.ph-expire { font-size: 12px; color: #64748B; }
 
-.img-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  color: #64748B;
-  font-size: 12px;
-}
-
-.product-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.product-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #E2E8F0;
-  margin: 0 0 8px 0;
-  line-height: 1.3;
-}
-
-.current-end-time {
-  font-size: 13px;
-}
-
-.current-end-time .label {
-  color: #64748B;
-  margin-right: 8px;
-}
-
-.current-end-time .value {
-  color: #94A3B8;
-}
-
-/* Spec Selection (matching product detail page) */
-.spec-selection-area, .simple-sku-list {
-  margin-bottom: 20px;
-}
-
-.spec-group {
-  margin-bottom: 16px;
-}
-
-.spec-label {
-  color: #94A3B8;
-  font-size: 13px;
-  margin-bottom: 10px;
-}
-
-.spec-values {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+.specs-wrapper { min-height: 120px; }
+.spec-group { margin-bottom: 20px; }
+.spec-label { font-size: 13px; color: #94A3B8; margin-bottom: 10px; font-weight: 500; }
+.spec-values { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .spec-val-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 16px; 
   border-radius: 8px;
-  color: #E2E8F0;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
+  background: rgba(255,255,255,0.03); 
+  border: 1px solid rgba(255,255,255,0.08); 
+  color: #CBD5E1; font-size: 13px; 
+  cursor: pointer; transition: all 0.2s;
+  min-width: 60px; text-align: center;
 }
-
-.spec-val-btn:hover {
-  border-color: rgba(76, 122, 224, 0.4);
-  background: rgba(76, 122, 224, 0.05);
-}
-
+.spec-val-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
 .spec-val-btn.active {
-  border-color: #4C7AE0;
-  background: rgba(76, 122, 224, 0.1);
-  color: #4C7AE0;
+  background: rgba(59, 130, 246, 0.15); 
+  border-color: #3B82F6; 
+  color: #fff; 
+  font-weight: 600; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
-.spec-price {
-  font-size: 12px;
-  color: #64748B;
-  margin-top: 4px;
-}
-
-.spec-val-btn.active .spec-price {
-  color: #4C7AE0;
-}
-
-/* Coupon Section */
+/* Coupon (Compact) */
 .coupon-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 24px; padding: 12px 16px;
+  background: rgba(255,255,255,0.02); border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+}
+.coupon-section:hover { background: rgba(255,255,255,0.04); }
+.coupon-label { font-size: 13px; color: #94A3B8; }
+.coupon-value { font-size: 13px; color: #64748B; display: flex; align-items: center; gap: 4px; }
+.coupon-selected { color: #F87171; font-weight: 600; }
+
+/* Right Column */
+.refresh-right-col {
+  flex: 0.85;
+  padding: 24px;
+  background: rgba(0,0,0,0.1); /* Slightly darker/distinct */
+  display: flex; flex-direction: column;
 }
 
-.coupon-section:hover {
-  background: rgba(255, 255, 255, 0.05);
+.summary-card {
+  height: 100%;
+  display: flex; flex-direction: column;
 }
 
-.coupon-label { color: #94A3B8; }
-.coupon-value { 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-  color: #64748B;
-}
-.coupon-selected { color: #EF4444; }
+.summary-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 20px; }
 
-/* Price Summary */
-.price-summary {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
+.summary-row {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: #94A3B8; margin-bottom: 10px;
 }
+.text-danger { color: #EF4444; }
 
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #94A3B8;
-  margin-bottom: 8px;
+.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+
+.total-row { margin-bottom: auto; }
+.total-label { font-size: 13px; color: #CBD5E1; margin-bottom: 4px; }
+.total-price { font-size: 32px; font-weight: 700; color: #fff; font-family: 'Outfit', sans-serif; letter-spacing: -1px; }
+.total-price .unit { font-size: 18px; margin-right: 2px; color: #64748B; }
+
+.new-expire-tip {
+  font-size: 12px; color: #64748B; margin-bottom: 16px; text-align: center;
+  background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px;
 }
 
-.price-row.discount { color: #EF4444; }
-
-.price-row.total {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 16px;
-  color: #E2E8F0;
-}
-
-.final-price {
-  font-size: 20px;
-  font-weight: 600;
-  color: #4C7AE0;
-}
-
-.new-end-time {
-  text-align: center;
-  font-size: 13px;
-  color: #64748B;
-  margin-top: 12px;
-}
-
-/* Pay Button */
 .pay-btn {
   width: 100%;
-  background: #4C7AE0;
-  color: #fff;
-  border: none;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 14px;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  border: none; border-radius: 12px;
+  color: #fff; font-weight: 600; font-size: 15px;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   transition: all 0.2s;
 }
-
-.pay-btn:hover {
-  background: #3B66C5;
-}
-
-.pay-btn:disabled {
-  background: #334155;
-  color: #64748B;
-  cursor: not-allowed;
-}
+.pay-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
+.pay-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #334155; box-shadow: none; }
 </style>

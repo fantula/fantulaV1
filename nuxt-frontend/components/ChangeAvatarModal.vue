@@ -6,6 +6,7 @@
     confirm-text="保存修改"
     :loading="loading"
     :confirm-disabled="!hasChange"
+    show-mascot
     @close="$emit('close')"
     @confirm="handleConfirm"
   >

@@ -4,6 +4,7 @@
     title="换绑邮箱"
     width="440px"
     :show-footer="false"
+    show-mascot
     @close="$emit('close')"
   >
     <!-- Step 1: 验证当前邮箱 -->

@@ -15,7 +15,7 @@
             <!-- 政策说明板块 -->
             <div class="policy-section">
               <div class="section-header">
-                <div class="section-icon"><img src="/images/client/pc/tuikuan1.png" alt="政策说明" /></div>
+                <div class="section-icon"><el-icon><Document /></el-icon></div>
                 <div class="section-title">政策说明</div>
               </div>
               <div class="section-content">
@@ -31,7 +31,7 @@
             <!-- 退款规则板块 -->
             <div class="policy-section">
               <div class="section-header">
-                <div class="section-icon"><img src="/images/client/pc/tuikuan2.png" alt="退款规则" /></div>
+                <div class="section-icon"><el-icon><Money /></el-icon></div>
                 <div class="section-title">一、退款规则</div>
               </div>
               <div class="section-content">
@@ -71,7 +71,7 @@
             <!-- 申请流程板块 -->
             <div class="policy-section">
               <div class="section-header">
-                <div class="section-icon"><img src="/images/client/pc/tuikuan3.png" alt="申请流程" /></div>
+                <div class="section-icon"><el-icon><Guide /></el-icon></div>
                 <div class="section-title">二、申请流程</div>
               </div>
               <div class="section-content">
@@ -95,7 +95,7 @@
             <!-- 售后支持板块 -->
             <div class="policy-section">
               <div class="section-header">
-                <div class="section-icon"><img src="/images/client/pc/tuikuan4.png" alt="售后支持" /></div>
+                <div class="section-icon"><el-icon><Service /></el-icon></div>
                 <div class="section-title">三、售后支持</div>
               </div>
               <div class="section-content">
@@ -119,7 +119,7 @@
             <!-- 平台责任范围板块 -->
             <div class="policy-section">
               <div class="section-header">
-                <div class="section-icon"><img src="/images/client/pc/tuikuan5.png" alt="平台责任范围" /></div>
+                <div class="section-icon"><el-icon><Warning /></el-icon></div>
                 <div class="section-title">四、平台责任范围</div>
               </div>
               <div class="section-content">
@@ -154,7 +154,7 @@
       <div class="important-notice-section">
         <div class="notice-container">
           <div class="notice-header">
-            <div class="notice-icon"><img src="/images/client/pc/tuikuan6.png" alt="重要提示" /></div>
+            <div class="notice-icon"><el-icon><InfoFilled /></el-icon></div>
             <div class="notice-title">重要提示</div>
           </div>
           <div class="notice-content">
@@ -171,6 +171,7 @@
 <script setup lang="ts">
 import { useModalStore } from '@/stores/modal'
 import AppHeader from '@/components/AppHeader.vue'
+import { Document, Money, Guide, Service, Warning, InfoFilled } from '@element-plus/icons-vue'
 
 const modal = useModalStore()
 
@@ -293,9 +294,9 @@ useHead({
   flex-shrink: 0;
 }
 
-.section-icon img {
-  width: 32px;
-  height: 32px;
+.section-icon .el-icon {
+  font-size: 24px;
+  color: #60A5FA;
 }
 
 .section-title {

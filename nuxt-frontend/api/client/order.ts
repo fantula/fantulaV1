@@ -440,5 +440,65 @@ export const clientOrderApi = {
             totalAmount: data.total_amount,
             expiresAt: data.expires_at
         }
-    }
+    },
+
+    // ========================================
+    // 退款 API
+    // ========================================
+
+    /**
+     * 创建退款申请
+     */
+    async createRefundRequest(orderId: string, reason: string, reasonDetail: string = ''): Promise<{
+        success: boolean
+        requestId?: string
+        message?: string
+        error?: string
+    }> {
+        const client = getSupabaseClient()
+        const { data, error } = await client.rpc('create_refund_request', {
+            p_order_id: orderId,
+            p_reason: reason,
+            p_reason_detail: reasonDetail
+        })
+
+        if (error) return { success: false, error: error.message }
+        if (!data?.success) return { success: false, error: data?.error || '申请失败' }
+
+        return { success: true, requestId: data.request_id, message: data.message }
+    },
+
+    /**
+     * 获取退款申请详情
+     */
+    async getRefundRequest(orderId: string): Promise<{
+        success: boolean
+        data?: any
+        error?: string
+    }> {
+        const client = getSupabaseClient()
+        const { data, error } = await client.rpc('get_refund_request', { p_order_id: orderId })
+
+        if (error) return { success: false, error: error.message }
+        if (!data?.success) return { success: false, error: data?.error }
+
+        return { success: true, data: data.request }
+    },
+
+    /**
+     * 取消退款申请
+     */
+    async cancelRefundRequest(orderId: string): Promise<{
+        success: boolean
+        message?: string
+        error?: string
+    }> {
+        const client = getSupabaseClient()
+        const { data, error } = await client.rpc('cancel_user_refund_request', { p_order_id: orderId })
+
+        if (error) return { success: false, error: error.message }
+        if (!data?.success) return { success: false, error: data?.error || '取消失败' }
+
+        return { success: true, message: data.message }
+    },
 }

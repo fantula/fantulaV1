@@ -3,6 +3,7 @@
     :visible="true"
     title="注销账号"
     :show-footer="false"
+    show-mascot
     @close="$emit('close')"
   >
     <div class="warning-box">

@@ -1,11 +1,16 @@
 <template>
-  <div class="modal-mask">
-    <div class="ticket-apply-modal">
-      <div class="modal-header">
-        <div class="modal-title">申请工单</div>
-        <div class="modal-subtitle">工单创建后我们将尽快回复，您可以随时在"我的工单"中查看进度</div>
-        <button class="modal-close" @click="$emit('close')">×</button>
-      </div>
+  <BaseFormModal
+    :visible="true"
+    title="申请工单"
+    subtitle="我们将尽快处理您的问题，您可以在工单列表查看进度"
+    submit-text="提交工单"
+    :loading="submitting"
+    :submit-disabled="!isValid"
+    show-mascot
+    @close="$emit('close')"
+    @cancel="$emit('close')"
+    @submit="submit"
+  >
       <div class="modal-body">
          <!-- Order Info Preview -->
          <div class="order-context" v-if="orderInfo">
@@ -63,21 +68,14 @@
             <div class="tip">最多上传 3 张图片</div>
          </div>
       </div>
-      
-      <div class="modal-footer">
-        <button class="btn-cancel" @click="$emit('close')">取消</button>
-        <button class="btn-confirm" @click="submit" :disabled="submitting || !isValid">
-           {{ submitting ? '提交中...' : '提交工单' }}
-        </button>
-      </div>
-    </div>
-  </div>
+  </BaseFormModal>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
 import { ticketApi } from '@/api/client/ticket'
 import { getSupabaseClient } from '@/utils/supabase'
+import BaseFormModal from '@/components/modal/base/BaseFormModal.vue'
 
 const props = defineProps({
   orderId: { type: String, required: true },
@@ -175,82 +173,91 @@ const submit = async () => {
 </script>
 
 <style scoped>
-.modal-mask {
-  position: fixed; z-index: 2000; left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex; align-items: center; justify-content: center;
-}
-.ticket-apply-modal {
-  width: 600px; background: #fff; border-radius: 12px;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
-.modal-header {
-  padding: 20px 24px; border-bottom: 1px solid #eee; position: relative;
-  background: #fafafa;
-}
-.modal-title { font-size: 18px; font-weight: 700; color: #333; }
-.modal-subtitle { font-size: 13px; color: #888; margin-top: 4px; }
-.modal-close {
-  position: absolute; right: 20px; top: 20px; border: none; background: none;
-  font-size: 24px; color: #999; cursor: pointer;
-}
-.modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.modal-body { display: flex; flex-direction: column; gap: 20px; }
 
 .order-context {
-  background: #f0f7ff; padding: 12px; border-radius: 8px; border: 1px solid #bae0ff;
+  background: rgba(255,255,255,0.03); 
+  padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);
   display: flex; gap: 10px; align-items: center;
 }
-.context-label { font-size: 13px; color: #666; }
-.context-value { font-weight: 600; color: #1890ff; display: flex; gap: 10px; }
-.order-no { font-family: monospace; }
-.product-name { color: #333; }
+.context-label { font-size: 13px; color: #94A3B8; }
+.context-value { font-weight: 600; color: #3B82F6; display: flex; gap: 10px; }
+.order-no { font-family: monospace; color: #E2E8F0; }
+.product-name { color: #E2E8F0; }
 
-.form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #444; }
-.required { color: red; }
+.form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #F1F5F9; }
+.required { color: #EF4444; }
+
 .form-input, .form-textarea {
-  width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 10px;
-  font-size: 14px; outline: none; transition: border 0.2s;
+  width: 100%; 
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 8px; padding: 12px;
+  font-size: 14px; outline: none; transition: all 0.2s;
+  color: #F1F5F9;
 }
-.form-input:focus, .form-textarea:focus { border-color: #1890ff; }
+.form-input:focus, .form-textarea:focus { 
+  border-color: #3B82F6; 
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+  background: rgba(0,0,0,0.4);
+}
+.form-input::placeholder, .form-textarea::placeholder {
+  color: #64748B;
+}
 
 .priority-options { display: flex; gap: 10px; }
 .p-opt {
-  padding: 6px 16px; border-radius: 20px; border: 1px solid #eee; cursor: pointer; font-size: 13px;
-  transition: all 0.2s;
+  padding: 10px 24px; border-radius: 12px; 
+  border: 1px solid rgba(255,255,255,0.1); 
+  background: rgba(255,255,255,0.03);
+  cursor: pointer; font-size: 13px; color: #94A3B8; font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative; overflow: hidden;
 }
-.p-opt.active { font-weight: 600; border-color: transparent; color: #fff; }
-.p-opt.low.active { background: #52c41a; }
-.p-opt.medium.active { background: #faad14; }
-.p-opt.high.active { background: #f5222d; }
+.p-opt:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+
+.p-opt.active { 
+  font-weight: 600; 
+  color: #fff; 
+  transform: translateY(-1px); 
+  border-color: transparent;
+}
+
+/* Glass Gradients for Active States */
+.p-opt.low.active { 
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.4));
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2), inset 0 0 0 1px rgba(16, 185, 129, 0.4);
+}
+.p-opt.medium.active { 
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(180, 83, 9, 0.4));
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2), inset 0 0 0 1px rgba(245, 158, 11, 0.4);
+}
+.p-opt.high.active { 
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(153, 27, 27, 0.4)); 
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2), inset 0 0 0 1px rgba(239, 68, 68, 0.4);
+}
 
 .upload-area { display: flex; gap: 10px; flex-wrap: wrap; }
 .upload-btn {
-  width: 80px; height: 80px; border: 1px dashed #ddd; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center; cursor: pointer; color: #999;
+  width: 80px; height: 80px; 
+  border: 1px dashed rgba(255,255,255,0.2); 
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; 
+  cursor: pointer; color: #94A3B8;
+  transition: all 0.2s;
 }
-.upload-btn:hover { border-color: #1890ff; color: #1890ff; }
+.upload-btn:hover { border-color: #3B82F6; color: #3B82F6; background: rgba(59, 130, 246, 0.05); }
+
 .img-preview {
   width: 80px; height: 80px; border-radius: 8px; overflow: hidden; position: relative;
-  border: 1px solid #eee;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 .img-preview img { width: 100%; height: 100%; object-fit: cover; }
 .remove-btn {
-  position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.5); color: #fff;
+  position: absolute; top: 0; right: 0; background: rgba(0,0,0,0.6); color: #fff;
   width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: 14px;
 }
-.tip { font-size: 12px; color: #999; margin-top: 6px; }
-
-.modal-footer {
-  padding: 16px 24px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px;
-}
-.btn-cancel {
-  padding: 8px 24px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer;
-}
-.btn-confirm {
-  padding: 8px 24px; border: none; background: #1890ff; color: #fff; border-radius: 6px; cursor: pointer;
-  font-weight: 500;
-}
-.btn-confirm:disabled { background: #a0cfff; cursor: not-allowed; }
+.remove-btn:hover { background: #EF4444; }
+.tip { font-size: 12px; color: #64748B; margin-top: 6px; }
 </style> 

@@ -5,6 +5,7 @@
     confirm-text="确认更新"
     :loading="loading"
     :confirm-disabled="!canSubmit"
+    show-mascot
     @close="$emit('close')"
     @confirm="handleSubmit"
   >

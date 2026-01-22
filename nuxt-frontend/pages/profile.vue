@@ -148,7 +148,7 @@ const menuGroups = [
     items: [
       { key: 'profile', label: '个人中心', icon: User, to: '/profile' },
       { key: 'wallet', label: '我的额度', icon: Wallet, to: '/profile/wallet' },
-      { key: 'orders', label: '我的订单', icon: List, to: '/profile/orders' },
+      { key: 'orders', label: '我的订单', icon: List, to: '/profile/order' },
       { key: 'exchange', label: '兑换中心', icon: Ticket, to: '/profile/exchange' },
       { key: 'favorites', label: '我的收藏', icon: Star, to: '/profile/favorites' },
       { key: 'referral', label: '返现推广', icon: Share, to: '/profile/referral' },
