@@ -3,7 +3,6 @@
     :visible="true"
     title="换绑邮箱"
     width="440px"
-    :show-footer="false"
     show-mascot
     @close="$emit('close')"
   >
@@ -22,26 +21,24 @@
         <input :value="currentEmail" type="email" class="form-input" disabled />
       </div>
 
-      <div class="form-group">
+      <div class="form-group code-group-wrapper">
         <label class="form-label">验证码</label>
-        <div class="captcha-row">
+        <div class="code-group-inner">
           <input 
             v-model="currentCode" 
             type="text" 
-            class="form-input" 
+            class="form-input code-input" 
             placeholder="请输入验证码" 
             maxlength="6" 
             inputmode="numeric"
             autocomplete="off"
             @input="currentCode = currentCode.replace(/\D/g, '')"
           />
-          <button 
-            class="send-code-btn" 
-            :disabled="countdown > 0 || loading"
+          <SendCodeButton 
+            :loading="loading" 
+            :countdown="countdown" 
             @click="sendCurrentEmailCode"
-          >
-            {{ countdown > 0 ? `${countdown}s后重试` : '获取验证码' }}
-          </button>
+          />
         </div>
       </div>
       
@@ -60,7 +57,7 @@
       
       <div class="form-group">
         <label class="form-label">新邮箱地址</label>
-        <input v-model="newEmail" type="email" class="form-input" placeholder="请输入新邮箱" />
+        <EmailInput v-model="newEmail" placeholder="请输入新邮箱" />
       </div>
 
       <div class="info-box">
@@ -97,6 +94,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/auth'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+import EmailInput from '@/components/base/EmailInput.vue'
+import SendCodeButton from '@/components/base/SendCodeButton.vue'
 
 const props = defineProps<{
   currentEmail?: string
@@ -299,49 +298,20 @@ async function handleConfirm() {
   text-align: center;
 }
 
-.captcha-row {
-  display: flex;
-  gap: 12px;
+.code-group-wrapper {
+  position: relative;
 }
 
-.send-code-btn {
-  padding: 0 20px;
-  white-space: nowrap;
-  
-  /* Gradient Pill */
-  background: linear-gradient(90deg, #F59E0B, #EA580C); 
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  height: 48px; /* Match input height roughly */
-  
-  /* Flashy Effects */
-  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+.code-group-inner {
+  position: relative;
+  width: 100%;
 }
 
-.send-code-btn:hover { 
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
-  filter: brightness(1.1);
+.code-input {
+  padding-right: 120px !important; /* Make room for button */
 }
 
-.send-code-btn:active {
-  transform: scale(0.98);
-}
 
-.send-code-btn:disabled { 
-  background: rgba(255, 255, 255, 0.08); 
-  color: #64748B;
-  cursor: not-allowed; 
-  box-shadow: none;
-  transform: none;
-  border: 1px solid rgba(255,255,255,0.05);
-}
 
 .info-box {
   display: flex;

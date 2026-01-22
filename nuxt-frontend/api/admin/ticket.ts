@@ -35,7 +35,7 @@ export const adminTicketApi = {
 
     let query = client
       .from('tickets')
-      .select('*, profiles(email), orders(order_no)', { count: 'exact' })
+      .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status)', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -54,7 +54,7 @@ export const adminTicketApi = {
     const client = getAdminSupabaseClient()
     const { data, error } = await client
       .from('tickets')
-      .select('*, profiles(email), orders(order_no)')
+      .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status)')
       .eq('id', ticketId)
       .single()
 
@@ -67,7 +67,7 @@ export const adminTicketApi = {
     const client = getAdminSupabaseClient()
     const { data, error } = await client
       .from('ticket_messages')
-      .select('*, profiles(email, raw_user_meta_data)')
+      .select('*, profiles(email)')
       .eq('ticket_id', ticketId)
       .order('created_at', { ascending: true })
 

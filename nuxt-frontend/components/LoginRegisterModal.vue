@@ -24,7 +24,7 @@
             <form v-if="mode==='login' && loginType==='password'" @submit.prevent="onLogin">
               <div class="form-group">
                 <label>邮箱地址</label>
-                <input ref="loginEmailInput" v-model="loginForm.email" type="email" placeholder="请输入您的邮箱" required />
+                <EmailInput v-model="loginForm.email" ref="loginEmailInput" :required="true" />
               </div>
               <div class="form-group">
                 <label>密码</label>
@@ -48,11 +48,15 @@
             <form v-else-if="mode==='login' && loginType==='code'" @submit.prevent="onLoginCode">
               <div class="form-group">
                 <label>邮箱地址</label>
-                <input ref="loginCodeEmailInput" v-model="loginCodeForm.email" type="email" placeholder="请输入您的邮箱" required />
+                <EmailInput v-model="loginCodeForm.email" ref="loginCodeEmailInput" :required="true" />
               </div>
               <div class="form-group code-group">
                 <input v-model="loginCodeForm.code" type="text" placeholder="请输入验证码" required />
-                <button class="code-btn-inside" type="button" :disabled="codeTimer>0 || loading" @click="sendCode('login')">{{ loading ? '发送中...' : (codeTimer>0 ? `${codeTimer}s后重发` : '获取验证码') }}</button>
+                <SendCodeButton 
+                  :loading="loading" 
+                  :countdown="codeTimer" 
+                  @click="sendCode('login')"
+                />
               </div>
               <div class="form-row">
                 <label><input type="checkbox" v-model="loginCodeForm.remember" /> 记住我</label>
@@ -71,11 +75,15 @@
             <form v-else-if="mode==='register'" @submit.prevent="onRegister">
               <div class="form-group">
                 <label>邮箱地址</label>
-                <input ref="registerEmailInput" v-model="registerForm.email" type="email" placeholder="请输入您的邮箱" required />
+                <EmailInput v-model="registerForm.email" ref="registerEmailInput" :required="true" />
               </div>
               <div class="form-group code-group">
                 <input v-model="registerForm.code" type="text" placeholder="请输入验证码" required />
-                <button class="code-btn-inside" type="button" :disabled="codeTimer>0 || loading" @click="sendCode('register')">{{ loading ? '发送中...' : (codeTimer>0 ? `${codeTimer}s后重发` : '获取验证码') }}</button>
+                <SendCodeButton 
+                  :loading="loading" 
+                  :countdown="codeTimer" 
+                  @click="sendCode('register')"
+                />
               </div>
               <div class="form-group">
                 <label>密码</label>
@@ -131,12 +139,16 @@
         <form @submit.prevent="onForgotSubmit">
           <div class="form-group">
             <label>邮箱地址</label>
-            <input v-model="forgotForm.email" type="email" placeholder="请输入您的邮箱" required />
+            <EmailInput v-model="forgotForm.email" :required="true" />
           </div>
           <div class="form-group code-group">
             <label>验证码</label>
             <input v-model="forgotForm.code" type="text" placeholder="请输入验证码" required />
-            <button class="code-btn-inside" type="button" :disabled="forgotCodeTimer>0 || loading" @click="sendForgotCode">{{ loading ? '发送中...' : (forgotCodeTimer>0 ? `${forgotCodeTimer}s后重发` : '获取验证码') }}</button>
+            <SendCodeButton 
+              :loading="loading" 
+              :countdown="forgotCodeTimer" 
+              @click="sendForgotCode"
+            />
           </div>
           <div class="form-group">
             <label>新密码</label>
@@ -157,6 +169,9 @@ import { authApi } from '@/api/auth'
 import { getSupabaseClient } from '@/utils/supabase'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
+
+import EmailInput from '@/components/base/EmailInput.vue'
+import SendCodeButton from '@/components/base/SendCodeButton.vue'
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits(['close'])
@@ -645,26 +660,7 @@ function closeDialog(type: string) {
 .code-group input::placeholder {
   color: rgba(255, 255, 255, 0.3);
 }
-.code-btn-inside {
-  position: absolute;
-  right: 20px;
-  top: 7px;
-  height: 35px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: none;
-  background: var(--primary-blue);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-  z-index: 2;
-}
-.code-btn-inside:disabled {
-  background: #bcd2fa;
-  cursor: not-allowed;
-}
+
 .form-row {
   display: flex;
   align-items: center; /* Vertically align checkbox and text center */

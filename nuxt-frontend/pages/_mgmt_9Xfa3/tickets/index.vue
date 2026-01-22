@@ -1,9 +1,10 @@
+```
 <template>
   <AdminModuleLayout
     title="工单管理"
     :tabs="tabs"
-    :default-tab="currentTab"
-    @tab-change="handleTabChange"
+     :default-tab="currentTab"
+     @tab-change="handleTabChange"
   >
      <template #actions>
         <el-button type="warning" plain @click="handleCleanup">
@@ -12,61 +13,82 @@
      </template>
 
      <div class="p-6">
-        <el-table :data="list" v-loading="loading" border>
-           <el-table-column label="工单ID" prop="id" width="100">
-             <template #default="{ row }">
-               <span class="font-mono text-xs">...{{ row.id.split('-').pop() }}</span>
-             </template>
-           </el-table-column>
-           <el-table-column label="标题" prop="title" min-width="150" show-overflow-tooltip />
-           <el-table-column label="用户" width="180">
-              <template #default="{ row }">
-                 <div>{{ row.profiles?.email || '未知用户' }}</div>
-                 <div class="text-xs text-gray-400 font-mono">{{ row.user_id }}</div>
-              </template>
-           </el-table-column>
-           <el-table-column label="关联订单" width="160">
-              <template #default="{ row }">
-                 <router-link :to="`/_mgmt_9Xfa3/orders/detail/${row.order_id}`" class="text-blue-500 hover:underline font-mono">
-                    {{ row.orders?.order_no || row.order_id }}
-                 </router-link>
-              </template>
-           </el-table-column>
-           <el-table-column label="优先级" width="100">
-              <template #default="{ row }">
-                 <el-tag :type="getPriorityType(row.priority)">{{ getPriorityLabel(row.priority) }}</el-tag>
-              </template>
-           </el-table-column>
-           <el-table-column label="状态" width="100">
-              <template #default="{ row }">
-                 <el-tag :type="row.status === 'processing' ? 'primary' : 'success'">
-                    {{ row.status === 'processing' ? '处理中' : '已解决' }}
-                 </el-tag>
-              </template>
-           </el-table-column>
-           <el-table-column label="创建时间" width="170">
-              <template #default="{ row }">
-                 {{ formatDate(row.created_at) }}
-              </template>
-           </el-table-column>
-           <el-table-column label="操作" width="120" fixed="right">
-              <template #default="{ row }">
-                 <el-button type="primary" size="small" @click="openChat(row)">
-                    处理/回复
-                 </el-button>
-              </template>
-           </el-table-column>
-        </el-table>
+         <el-table :data="list" v-loading="loading" border @selection-change="handleSelectionChange">
+            <!-- 0. Selection -->
+            <el-table-column type="selection" width="55" align="center" />
 
-        <div class="flex justify-end mt-4">
-           <el-pagination
-              v-model:current-page="pagination.page"
-              :page-size="pagination.pageSize"
-              :total="pagination.total"
-              layout="total, prev, pager, next"
-              @current-change="handlePageChange"
-           />
-        </div>
+            <!-- 1. Ticket ID (Standard format) -->
+            <el-table-column label="工单ID" prop="ticket_no" width="140">
+              <template #default="{ row }">
+                <span class="font-mono font-medium text-blue-600 cursor-pointer hover:underline" @click="openChat(row)">
+                  {{ row.ticket_no || `T-${row.id.substring(0,8).toUpperCase()}` }}
+                </span>
+                <div class="text-xs text-gray-400 scale-90 origin-left mt-0.5">
+                   创建于 {{ formatDate(row.created_at).split(' ')[0] }}
+                </div>
+              </template>
+            </el-table-column>
+
+            <!-- 2. Content Preview -->
+            <el-table-column label="内容概要" min-width="200" show-overflow-tooltip>
+               <template #default="{ row }">
+                  <div class="font-medium truncate mb-1 cursor-pointer hover:text-blue-500" @click="openChat(row)">{{ row.title }}</div>
+                  <div class="text-xs text-gray-400 truncate">{{ row.ticket_messages?.[0]?.content || '暂无消息' }}</div>
+               </template>
+            </el-table-column>
+
+            <!-- 3. User Info (8-digit UID) -->
+            <el-table-column label="提交用户" width="180">
+               <template #default="{ row }">
+                  <div class="flex items-center gap-2">
+                     <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-xs font-mono text-gray-500">
+                        {{ row.user_id.substring(0,2).toUpperCase() }}
+                     </div>
+                     <div>
+                        <div class="text-xs font-mono font-medium">UID: {{ row.user_id.substring(0,8).toUpperCase() }}</div>
+                        <div class="text-xs text-gray-400 truncate w-24" :title="row.profiles?.email">{{ row.profiles?.email || '未知用户' }}</div>
+                     </div>
+                  </div>
+               </template>
+            </el-table-column>
+
+            <!-- 4. Priority -->
+            <el-table-column label="优先级" width="100" align="center">
+               <template #default="{ row }">
+                  <el-tag :type="getTicketPriorityType(row.priority)" effect="plain" size="small">{{ getTicketPriorityLabel(row.priority) }}</el-tag>
+               </template>
+            </el-table-column>
+
+            <!-- 5. Status -->
+            <el-table-column label="状态" width="100" align="center">
+               <template #default="{ row }">
+                  <el-tag :type="getTicketStatusType(row.status)" effect="dark" size="small">
+                     {{ getTicketStatusLabel(row.status) }}
+                  </el-tag>
+               </template>
+            </el-table-column>
+
+            <el-table-column label="操作" width="120" fixed="right">
+               <template #default="{ row }">
+                  <el-button link type="primary" size="small" @click="openChat(row)">
+                     处理/回复
+                  </el-button>
+               </template>
+            </el-table-column>
+         </el-table>
+
+         <div class="flex justify-between items-center mt-4">
+             <div class="text-xs text-gray-400">
+                已选 {{ selectedIds.length }} 项
+             </div>
+             <el-pagination
+                v-model:current-page="pagination.page"
+                :page-size="pagination.pageSize"
+                :total="pagination.total"
+                layout="total, prev, pager, next"
+                @current-change="handlePageChange"
+             />
+         </div>
      </div>
      
      <TicketChatModal 
@@ -85,10 +107,11 @@ import { useAdminTicketList } from '@/composables/admin/useAdminTicketList'
 import { Delete } from '@element-plus/icons-vue'
 import TicketChatModal from './components/TicketChatModal.vue'
 
+// Use standard composable + Common Config helpers
 const {
-  loading, list, pagination, currentTab,
-  loadList, handlePageChange, handleTabChange, handleCleanup,
-  formatDate
+  loading, list, pagination, currentTab, selectedIds,
+  loadList, handlePageChange, handleTabChange, handleSelectionChange, handleCleanup,
+  formatDate, getTicketPriorityLabel, getTicketPriorityType, getTicketStatusLabel, getTicketStatusType
 } = useAdminTicketList()
 
 const tabs = [
@@ -111,19 +134,8 @@ const onChatClosed = () => {
    loadList() // Refresh status
 }
 
-const getPriorityType = (p: string) => {
-   if (p === 'low') return 'info'
-   if (p === 'medium') return 'warning'
-   return 'danger'
-}
-const getPriorityLabel = (p: string) => {
-   if (p === 'low') return '一般'
-   if (p === 'medium') return '重要'
-   if (p === 'high') return '紧急'
-   return p
-}
-
 onMounted(() => {
    loadList()
 })
 </script>
+```

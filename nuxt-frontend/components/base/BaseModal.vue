@@ -38,9 +38,9 @@
 
           <!-- Phantom Mascot (Full Width Bottom) -->
           <img 
-            v-if="showMascot"
-            src="/images/theme/modal_mascot.png" 
-            class="modal-mascot-phantom" 
+            src="/images/phantom_color_v2.png" 
+            class="modal-mascot-phantom"
+            :class="[`phantom-${mascotPosition}`]"
           />
         </div>
       </div>
@@ -61,6 +61,7 @@ interface Props {
   confirmDisabled?: boolean
   loading?: boolean
   showMascot?: boolean
+  mascotPosition?: 'left' | 'right' | 'bottom'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -72,7 +73,8 @@ const props = withDefaults(defineProps<Props>(), {
   loadingText: '处理中...',
   confirmDisabled: false,
   loading: false,
-  showMascot: false
+  showMascot: false,
+  mascotPosition: 'left' // left | right | bottom
 })
 
 const emit = defineEmits(['close', 'confirm', 'update:visible'])
@@ -143,33 +145,67 @@ const handleClose = () => {
 }
 
 /* Mascot Style */
-.modal-mascot-phantom {
+  /* Phantom Style (Optimized) */
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: auto;
-  opacity: 0.1; /* Final state */
   pointer-events: none;
   z-index: 0;
-  mask-image: linear-gradient(to top, black 30%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
-  filter: grayscale(0.4); 
   
-  /* Phantom Entry Animation */
-  animation: phantom-float 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* Visuals: Standard 10% Opacity */
+  opacity: 0.1; 
+  filter: none;
+  mix-blend-mode: normal;
+  
+  mask-image: linear-gradient(to top, black 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
+  
+  /* Animation */
+  animation: mascot-rise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.1s;
   transform-origin: bottom center;
+
+/* Position Variants */
+.phantom-left {
+  /* Styles moved to .phantom-left definition below */
 }
 
-@keyframes phantom-float {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  100% {
-    opacity: 0.1;
-    transform: translateY(0) scale(1);
-  }
+.phantom-right {
+  /* Styles moved to .phantom-right definition below */
+}
+
+.phantom-bottom {
+  left: 50%; right: auto;
+  /* Animation handling moved to keyframes with variables */
+}
+
+@keyframes mascot-rise {
+  0% { opacity: 0; transform: var(--start-transform); }
+  100% { opacity: 0.4; transform: var(--end-transform); } /* Final opacity matches base */
+}
+
+/* Position Variants */
+.phantom-bottom {
+  --start-transform: translateX(-50%) translateY(50px) scale(0.8);
+  --end-transform: translateX(-50%) translateY(5px) scale(1);
+  left: 50%; right: auto;
+  transform: translateX(-50%);
+}
+
+.phantom-left {
+  --start-transform: translateY(50px) scale(0.8);
+  --end-transform: translateY(5px) scale(1);
+  left: 0; right: auto;
+  transform-origin: bottom left;
+}
+
+.phantom-right {
+  --start-transform: translateY(50px) scale(0.8);
+  --end-transform: translateY(5px) scale(1);
+  right: 0; left: auto;
+  transform-origin: bottom right;
 }
 
 /* Header */
@@ -228,48 +264,7 @@ const handleClose = () => {
   z-index: 2;
 }
 
-.base-modal-cancel {
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.03);
-  color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.base-modal-cancel:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.15);
-}
 
-.base-modal-confirm {
-  padding: 12px 32px;
-  background: linear-gradient(135deg, #3B82F6, #2563eb);
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-}
-.base-modal-confirm:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
-}
-.base-modal-confirm:active { transform: scale(0.98); }
-
-.base-modal-confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  background: #334155;
-}
 
 /* Transition: Pop In with Scale */
 .modal-enter-active,
@@ -349,5 +344,49 @@ const handleClose = () => {
   color: #64748B;
   margin-top: 6px;
   margin-left: 4px;
+}
+
+/* Global Modal Button Styles (Moved from Scoped) */
+.base-modal-cancel {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.base-modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.base-modal-confirm {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #3B82F6, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.base-modal-confirm:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.base-modal-confirm:active { transform: scale(0.98); }
+
+.base-modal-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  background: #334155;
 }
 </style>

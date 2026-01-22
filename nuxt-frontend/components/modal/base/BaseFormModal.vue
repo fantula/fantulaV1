@@ -35,9 +35,9 @@
         
         <!-- Phantom Mascot -->
         <img 
-          v-if="showMascot"
-          src="/images/theme/modal_mascot.png" 
+          src="/images/phantom_color_v2.png" 
           class="modal-mascot-phantom" 
+          :class="[`phantom-${mascotPosition}`]"
         />
       </div>
     </div>
@@ -61,6 +61,7 @@ const props = withDefaults(defineProps<{
   submitDisabled?: boolean
   showFooter?: boolean
   showMascot?: boolean
+  mascotPosition?: 'left' | 'right' | 'bottom'
 }>(), {
   title: '表单',
   cancelText: '取消',
@@ -70,7 +71,9 @@ const props = withDefaults(defineProps<{
   loading: false,
   submitDisabled: false,
   showFooter: true,
-  showMascot: false
+  showFooter: true,
+  showMascot: false,
+  mascotPosition: 'left'
 })
 
 const emit = defineEmits<{
@@ -266,31 +269,63 @@ const handleSubmit = () => {
 }
 
 /* Mascot Style */
-.modal-mascot-phantom {
+  /* Phantom Style (Optimized) */
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: 200px; /* Safe Standard Width */
   height: auto;
-  opacity: 0.1;
   pointer-events: none;
   z-index: 0;
-  mask-image: linear-gradient(to top, black 30%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
-  filter: grayscale(0.4); 
   
-  animation: phantom-float 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* Visuals: Standard 10% Opacity */
+  opacity: 0.1; 
+  filter: none;
+  mix-blend-mode: normal;
+  
+  mask-image: linear-gradient(to top, black 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
+  
+  /* Animation */
+  animation: mascot-rise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.1s;
   transform-origin: bottom center;
+
+/* Position Variants */
+.phantom-left {
+  left: 0; right: auto;
+  transform-origin: bottom left;
+  transform: translateY(100%);
 }
 
-@keyframes phantom-float {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  100% {
-    opacity: 0.1;
-    transform: translateY(0) scale(1);
-  }
+.phantom-right {
+  right: 0; left: auto;
+  transform-origin: bottom right;
+  transform: translateY(100%);
+}
+
+.phantom-bottom {
+  left: 50%; right: auto;
+  transform: translateX(-50%) translateY(100%);
+}
+
+@keyframes mascot-rise {
+  0% { opacity: 0; transform: var(--start-transform, translateY(50px)); }
+  100% { opacity: 1; transform: var(--end-transform, translateY(5px)); }
+}
+
+.phantom-bottom {
+  --start-transform: translateX(-50%) translateY(50px) scale(0.8);
+  --end-transform: translateX(-50%) translateY(5px) scale(1);
+}
+
+.phantom-left {
+  --start-transform: translateY(50px) scale(0.8);
+  --end-transform: translateY(5px) scale(1);
+}
+
+.phantom-right {
+  --start-transform: translateY(50px) scale(0.8);
+  --end-transform: translateY(5px) scale(1);
 }
 </style>

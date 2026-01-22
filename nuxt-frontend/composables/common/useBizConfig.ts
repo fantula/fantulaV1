@@ -181,6 +181,39 @@ export function useBizConfig() {
         COUPON_STATUS,
         getCouponStatusLabel,
         getCouponStatusType,
-        couponStatusOptions
+        couponStatusOptions,
+
+        // ==========================================
+        // 7. 工单优先级定义
+        // ==========================================
+        TICKET_PRIORITY: {
+            'low': { label: '一般', type: 'info' },
+            'medium': { label: '重要', type: 'warning' },
+            'high': { label: '紧急', type: 'danger' }
+        } as const,
+
+        getTicketPriorityLabel: (p: string) => {
+            const map: Record<string, string> = { 'low': '一般', 'medium': '重要', 'high': '紧急' }
+            return map[p] || p
+        },
+        getTicketPriorityType: (p: string) => {
+            const map: Record<string, string> = { 'low': 'info', 'medium': 'warning', 'high': 'danger' }
+            return map[p] || 'info'
+        },
+
+        // ==========================================
+        // 8. 工单状态定义
+        // ==========================================
+        TICKET_STATUS: {
+            'processing': { label: '处理中', type: 'primary' },
+            'resolved': { label: '已解决', type: 'success' }
+        } as const,
+
+        getTicketStatusLabel: (s: string) => {
+            return s === 'processing' ? '处理中' : '已解决'
+        },
+        getTicketStatusType: (s: string) => {
+            return s === 'processing' ? 'primary' : 'success'
+        }
     }
 }

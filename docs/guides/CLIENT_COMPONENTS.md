@@ -197,4 +197,48 @@ const handleDelete = async () => {
 
 ---
 
-*最后更新: 2026-01-17*
+
+---
+
+## 四、优惠券组件 (Exchange)
+
+位于 `components/exchange/coupon/` 目录下，用于兑换中心展示。
+
+### 4.1 基础票据 BaseCouponTicket
+
+核心视觉组件，提供左侧数值/右侧信息的票据样式。
+
+```vue
+<BaseCouponTicket
+  color="gold"            <!-- purple | gold | cyan -->
+  value="100"
+  unit="点"
+  title="优惠券标题"
+  desc="描述信息"
+  status="unused"         <!-- unused | used | expired -->
+  @action="handleUse"
+/>
+```
+
+### 4.2 业务封装组件
+
+| 组件 | 用途 | 颜色 |
+|------|------|------|
+| `CouponFlat.vue` | 立减券 | Purple |
+| `CouponBalance.vue` | 额度券 | Gold |
+| `CouponProduct.vue` | 商品券 | Cyan |
+
+**使用示例**:
+```vue
+<template>
+  <component 
+    :is="getComponent(item.type)" 
+    :coupon-data="item" 
+    @use="handleUse" 
+  />
+</template>
+```
+
+---
+
+*最后更新: 2026-01-22*

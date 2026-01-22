@@ -1,6 +1,7 @@
 import { ref, reactive } from 'vue'
 import { adminTicketApi } from '@/api/admin/ticket'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useBizConfig } from '@/composables/common/useBizConfig'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export function useAdminTicketList() {
@@ -12,9 +13,14 @@ export function useAdminTicketList() {
         total: 0
     })
 
-    const currentTab = ref('processing') // processing | resolved | all
+    const currentTab = ref('processing')
+    const selectedIds = ref<string[]>([])
 
     const { formatDate } = useBizFormat()
+    const {
+        getTicketPriorityLabel, getTicketPriorityType,
+        getTicketStatusLabel, getTicketStatusType
+    } = useBizConfig()
 
     const loadList = async () => {
         loading.value = true
@@ -48,6 +54,10 @@ export function useAdminTicketList() {
         loadList()
     }
 
+    const handleSelectionChange = (rows: any[]) => {
+        selectedIds.value = rows.map(r => r.id)
+    }
+
     const handleCleanup = async () => {
         try {
             await ElMessageBox.confirm(
@@ -72,10 +82,14 @@ export function useAdminTicketList() {
         list,
         pagination,
         currentTab,
+        selectedIds,
         loadList,
         handlePageChange,
         handleTabChange,
+        handleSelectionChange,
         handleCleanup,
-        formatDate
+        formatDate,
+        getTicketPriorityLabel, getTicketPriorityType,
+        getTicketStatusLabel, getTicketStatusType
     }
 }

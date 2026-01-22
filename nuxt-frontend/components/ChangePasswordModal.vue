@@ -9,27 +9,24 @@
     @close="$emit('close')"
     @confirm="handleSubmit"
   >
-    <div class="form-group">
+    <div class="form-group code-group-wrapper">
       <label class="form-label">邮箱验证码</label>
-      <div class="captcha-row">
+      <div class="code-group-inner">
         <input 
           type="text" 
           v-model="otpCode" 
-          class="form-input" 
+          class="form-input code-input" 
           placeholder="请输入验证码" 
           maxlength="6" 
           inputmode="numeric"
           autocomplete="off"
           @input="otpCode = otpCode.replace(/\D/g, '')"
         />
-        <button 
-          type="button" 
-          class="send-code-btn" 
-          :disabled="countdown > 0 || loading" 
+        <SendCodeButton 
+          :loading="loading" 
+          :countdown="countdown" 
           @click="sendCode"
-        >
-          {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
-        </button>
+        />
       </div>
       <p class="form-tip">验证码将发送至: {{ userEmail }}</p>
     </div>
@@ -67,6 +64,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+import SendCodeButton from '@/components/base/SendCodeButton.vue'
 
 const props = defineProps<{
   email: string
@@ -199,28 +197,15 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.captcha-row {
-  display: flex;
-  gap: 12px;
+.code-group-wrapper {
+  position: relative;
 }
-
-.send-code-btn {
-  padding: 0 16px;
-  white-space: nowrap;
-  background: var(--primary-blue);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  height: 46px;
-  transition: all 0.2s;
+.code-group-inner {
+  position: relative;
+  width: 100%;
 }
-.send-code-btn:hover { background: var(--active-orange); }
-.send-code-btn:disabled { 
-  background: rgba(255, 255, 255, 0.1);
-  color: #94A3B8;
-  cursor: not-allowed; 
+.code-input {
+  padding-right: 120px !important;
 }
 
 .password-strength {

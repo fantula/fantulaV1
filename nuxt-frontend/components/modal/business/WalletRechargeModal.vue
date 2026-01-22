@@ -28,10 +28,14 @@
                   :class="['amount-option', {active: selectedIdx===idx}]" 
                   @click="selectOption(idx)"
                 >
-                  <div class="amount-main">{{ item.value }}</div>
-                  <div class="unit">点</div>
-                  <div v-if="item.bonus > 0" class="bonus-tag">
-                    <el-icon><Present /></el-icon> 送 {{ item.bonus }}
+                  <div class="option-content">
+                    <div class="amount-row">
+                      <span class="amount-main">{{ item.value }}</span>
+                      <span class="unit">点</span>
+                    </div>
+                    <div v-if="item.bonus > 0" class="bonus-tag">
+                      <el-icon><Present /></el-icon> 送 {{ item.bonus }}
+                    </div>
                   </div>
                 </div>
 
@@ -40,7 +44,7 @@
                   :class="['amount-option', 'custom-option', {active: selectedIdx===-1}]" 
                   @click="selectOption(-1)"
                 >
-                  <span class="custom-label">自定义</span>
+                   <span class="custom-label">自定义</span>
                 </div>
               </div>
               
@@ -50,7 +54,7 @@
                     v-model.number="inputValue" 
                     type="number" 
                     min="1" 
-                    placeholder="输入金额" 
+                    placeholder="请输入充值金额" 
                     :disabled="selectedIdx!==-1" 
                   />
                   <span class="input-suffix">点</span>
@@ -81,14 +85,24 @@
 
             <!-- 3. Footer Action -->
             <div class="modal-footer">
-                <button 
-                  class="btn-confirm" 
-                  :disabled="!isValidAmount"
-                  @click="handleRecharge"
-                >
-                  <span class="btn-text">立即支付 ¥{{ payAmount.toFixed(2) }}</span>
-                  <el-icon class="btn-icon"><ArrowRight /></el-icon>
-                </button>
+                <!-- Dynamic Actual Amount Info -->
+                <div class="actual-arrival-info" v-if="isValidAmount">
+                  <span class="label">实际到账:</span>
+                  <span class="value">{{ totalPoints }} 点</span>
+                  <span class="bonus-hint" v-if="currentBonus > 0">(含赠送 {{ currentBonus }} 点)</span>
+                </div>
+
+                <div class="action-row">
+                  <button 
+                    class="btn-confirm" 
+                    :disabled="!isValidAmount"
+                    @click="handleRecharge"
+                  >
+                    <span class="btn-text">立即支付 ¥{{ payAmount.toFixed(2) }}</span>
+                    <el-icon class="btn-icon"><ArrowRight /></el-icon>
+                  </button>
+                </div>
+                
                 <div class="security-tip">
                   <el-icon><Lock /></el-icon>
                   安全加密支付
@@ -137,6 +151,17 @@ const payAmount = computed(() => {
   return inputValue.value || 0
 })
 
+const currentBonus = computed(() => {
+   if (selectedIdx.value !== -1 && options.value[selectedIdx.value]) {
+    return options.value[selectedIdx.value].bonus
+  }
+  return 0
+})
+
+const totalPoints = computed(() => {
+  return payAmount.value + currentBonus.value
+})
+
 const isValidAmount = computed(() => {
   return payAmount.value > 0
 })
@@ -147,8 +172,8 @@ function selectOption(idx:number) {
 }
 
 function handleRecharge() {
-  // Simulate Recharge Interaction
   loading.value = true
+  // Mock Pay
   setTimeout(() => {
       ElMessage.success(`已发起充值 ¥${payAmount.value.toFixed(2)} (${payType.value === 'alipay' ? '支付宝' : '微信'})`)
       loading.value = false
@@ -184,28 +209,25 @@ onMounted(async () => {
 /* Mascot Positioning: Phantom Style in Container Slot */
 .recharge-mascot-phantom {
   position: absolute;
-  right: -32px; /* Counteract padding */
-  top: -32px;   /* Counteract padding */
-  bottom: -32px;/* Counteract padding */
-  height: calc(100% + 64px); /* Full container height */
+  right: -32px; 
+  top: -32px;   
+  bottom: -32px;
+  height: calc(100% + 64px); 
   width: auto;
-  width: auto;
-  z-index: 0; /* Background */
-  pointer-events: none !important; /* Force pass-through */
+  z-index: 0; 
+  pointer-events: none !important; 
   opacity: 0.15;
-  
-  /* Blending */
-  filter: grayscale(0.2);
+  filter: none;
   mask-image: linear-gradient(to right, transparent 0%, black 50%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 50%);
-  object-fit: cover; /* or contain, depending on image */
+  object-fit: cover;
   object-position: right center;
 }
 
 /* Content Layout */
 .recharge-content {
   position: relative;
-  z-index: 10; /* Elevate above mascot */
+  z-index: 10; 
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -223,127 +245,128 @@ onMounted(async () => {
 
 .left-panel {
   flex: 1;
-  display: flex; flex-direction: column; gap: 24px;
+  display: flex; flex-direction: column; gap: 20px; /* Reduced gap */
 }
 
 .right-spacer {
-  width: 220px; /* Reserve space for the mascot visually */
+  width: 200px; /* Reduced slightly */
   flex-shrink: 0;
 }
 
 /* Section Labels */
 .section-label {
-  font-size: 14px; font-weight: 600; color: #E2E8F0; margin-bottom: 12px;
+  font-size: 14px; font-weight: 600; color: #E2E8F0; margin-bottom: 10px;
   display: flex; align-items: center; gap: 8px;
 }
 .section-label::before { content: ''; width: 3px; height: 14px; background: #F97316; border-radius: 2px; }
 
-/* Grid Options */
+/* Grid Options - Compact */
 .amount-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; /* Tighter gap */
 }
 
-/* Base Option Card */
+/* Base Option Card - Compact */
 .amount-option {
   position: relative;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 20px 16px;
+  border-radius: 12px; /* Smaller radius */
+  padding: 12px 8px; /* Compact padding */
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 8px;
-  cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  min-height: 100px;
+  cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  min-height: 80px; /* Reduced height */
   overflow: hidden;
 }
 
-/* Hover Effect */
 .amount-option:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-4px);
+  transform: translateY(-2px);
 }
 
-/* Active State: The "Different Look" */
 .amount-option.active {
   background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
   border-color: #FB923C !important;
-  box-shadow: 0 12px 32px -8px rgba(234, 88, 12, 0.5);
-  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px -6px rgba(234, 88, 12, 0.5);
+  transform: translateY(-2px) scale(1.02);
 }
 
-/* Amount Text */
+.option-content {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+
+.amount-row { display: flex; align-items: baseline; gap: 2px; }
 .amount-main { 
-  font-size: 28px; font-weight: 800; color: #fff; line-height: 1;
+  font-size: 20px; /* Smaller font */
+  font-weight: 800; color: #fff; line-height: 1;
   font-family: 'Outfit', sans-serif;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.unit { font-size: 13px; font-weight: 500; color: #94A3B8; margin-top: -4px; transition: color 0.3s; }
-
-/* Active Text Adjustment */
+.unit { font-size: 12px; font-weight: 500; color: #94A3B8; }
 .amount-option.active .unit { color: rgba(255,255,255,0.9); }
 
-/* Bonus Tag: Prominent & Obvious */
+/* Bonus Tag - Compact */
 .bonus-tag { 
   margin-top: 4px;
-  font-size: 13px; font-weight: 700;
-  padding: 4px 12px; border-radius: 100px;
-  
-  /* Unselected: High Contrast Tag */
+  font-size: 11px; /* Smaller font */
+  font-weight: 700;
+  padding: 2px 8px; /* Tighter padding */
+  border-radius: 100px;
   background: rgba(249, 115, 22, 0.15);
   color: #F97316;
   border: 1px solid rgba(249, 115, 22, 0.3);
-  
-  display: flex; align-items: center; gap: 4px;
-  transition: all 0.3s;
+  display: flex; align-items: center; gap: 2px;
 }
-
-/* Active Bonus: White on Orange */
 .amount-option.active .bonus-tag {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Custom Option Style */
-.custom-option {
-  border-style: dashed;
-}
-.custom-label { font-size: 16px; font-weight: 600; color: #94A3B8; transition: color 0.3s; }
+.custom-option { border-style: dashed; }
+.custom-label { font-size: 14px; font-weight: 600; color: #94A3B8; }
 .amount-option.active .custom-label { color: #fff; }
-.custom-input-wrapper { height: 0; overflow: hidden; opacity: 0; transition: all 0.3s; margin-top: 0; }
-.custom-input-wrapper.visible { height: 48px; opacity: 1; margin-top: 12px; }
-.custom-input-wrapper input {
-  width: 100%; height: 48px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px; padding: 0 40px 0 16px; color: #fff; font-size: 16px; outline: none;
-}
-.input-suffix { position: absolute; right: 16px; top: 24px; transform: translateY(-50%); color: #64748B; }
 
-/* Pay Methods (Compact) */
+.custom-input-wrapper { height: 0; overflow: hidden; opacity: 0; transition: all 0.3s; margin-top: 0; }
+.custom-input-wrapper.visible { height: 44px; opacity: 1; margin-top: 10px; }
+.custom-input-wrapper input {
+  width: 100%; height: 44px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 0 40px 0 16px; color: #fff; font-size: 15px; outline: none;
+}
+
+/* Pay Methods - Compact */
 .pay-methods { display: flex; gap: 12px; }
 .pay-method {
-  flex: 1; height: 56px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+  flex: 1; height: 50px; /* Reduced height */
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px;
   cursor: pointer; transition: all 0.2s;
 }
-.pay-method.active { background: rgba(16, 185, 129, 0.1) !important; border-color: #10B981 !important; } /* Wechat/Ali standard colors? Or Orange? Let's stick to Orange for consistency */
 .pay-method.active { background: rgba(249, 115, 22, 0.1) !important; border-color: #F97316 !important; }
 
-.icon-container { width: 28px; height: 28px; background: #fff; border-radius: 6px; padding: 4px; display: flex; align-items: center; justify-content: center; }
+.icon-container { width: 24px; height: 24px; background: #fff; border-radius: 5px; padding: 3px; display: flex; align-items: center; justify-content: center; }
 .pay-icon { width: 100%; height: 100%; object-fit: contain; }
 .pay-method span { color: #fff; font-size: 14px; font-weight: 500; }
 .pay-check { color: #F97316; font-size: 16px; }
 
 /* Footer */
-.modal-footer { margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.modal-footer { margin-top: 20px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+
+.actual-arrival-info {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 8px; 
+  margin-bottom: -4px;
+}
+.actual-arrival-info .label { font-size: 13px; color: #94A3B8; }
+.actual-arrival-info .value { font-size: 16px; font-weight: 700; color: #F97316; font-family: 'Outfit', sans-serif; }
+.actual-arrival-info .bonus-hint { font-size: 12px; color: #10B981; }
+
 .btn-confirm {
-  width: 100%; height: 52px; background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  width: 100%; height: 50px; background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
   border: none; border-radius: 100px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
   box-shadow: 0 8px 20px rgba(234, 88, 12, 0.3); transition: all 0.3s;
 }
 .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(234, 88, 12, 0.4); }
 .btn-confirm:disabled { background: #334155; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
 .btn-text { font-size: 16px; font-weight: 700; color: #fff; }
-.security-tip { font-size: 12px; color: #64748B; display: flex; align-items: center; gap: 4px; }
+.security-tip { font-size: 12px; color: #64748B; display: flex; align-items: center; justify-content: center; gap: 4px; }
 </style>

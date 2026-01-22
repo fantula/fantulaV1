@@ -2,13 +2,42 @@ import { getSupabaseClient } from '@/utils/supabase'
 import type { LoginParams, LoginResponse, User, ApiResponse } from '@/types/api'
 
 /**
+ * 错误信息中文化映射
+ */
+function localizeAuthError(originalMsg: string): string {
+  if (!originalMsg) return '未知错误'
+  const msg = originalMsg.toLowerCase()
+
+  if (msg.includes('token has expired') || msg.includes('invalid token') || msg.includes('token is invalid')) {
+    return '验证码已过期或无效' // Token has expired or is invalid
+  }
+  if (msg.includes('invalid login credentials')) {
+    return '账号或密码错误'
+  }
+  if (msg.includes('user not found') || msg.includes('invalid email')) {
+    return '用户不存在或邮箱错误'
+  }
+  if (msg.includes('already registered')) {
+    return '该邮箱已被注册'
+  }
+  if (msg.includes('password should be')) {
+    return '密码长度或格式不符合要求'
+  }
+  if (msg.includes('too many requests') || msg.includes('rate limit')) {
+    return '操作太频繁了，请稍后再试'
+  }
+
+  return originalMsg // 默认返回原文 (或者可以统一返回 '出错了，请稍后再试')
+}
+
+/**
  * 认证相关API
  */
 export const authApi = {
   /**
-   * 用户登录 (Supabase 密码版)
-   * @param params 登录参数
-   */
+    * 用户登录 (Supabase 密码版)
+    * @param params 登录参数
+    */
   async login(params: LoginParams): Promise<ApiResponse<any>> {
     const client = getSupabaseClient()
     const { data, error } = await client.auth.signInWithPassword({
@@ -17,7 +46,7 @@ export const authApi = {
     })
 
     if (error) {
-      return { code: 500, msg: error.message, success: false }
+      return { code: 500, msg: localizeAuthError(error.message), success: false }
     }
 
     return { code: 0, msg: '登录成功', data: data, success: true } as any
@@ -86,7 +115,7 @@ export const authApi = {
     })
 
     if (verifyError) {
-      return { code: 400, msg: verifyError.message || '验证码错误', success: false }
+      return { code: 400, msg: localizeAuthError(verifyError.message), success: false }
     }
 
     if (!data.user) {
@@ -99,7 +128,7 @@ export const authApi = {
     })
 
     if (updateError) {
-      return { code: 500, msg: '密码设置失败: ' + updateError.message, success: false }
+      return { code: 500, msg: '密码设置失败: ' + localizeAuthError(updateError.message), success: false }
     }
 
     // 3. (Optional) Handle Invite Code - requires backend support or storing in profile metadata
@@ -127,7 +156,7 @@ export const authApi = {
     })
 
     if (verifyError) {
-      return { code: 400, msg: '验证码错误: ' + verifyError.message, success: false }
+      return { code: 400, msg: localizeAuthError(verifyError.message), success: false }
     }
 
     // 2. Update Password
@@ -136,7 +165,7 @@ export const authApi = {
     })
 
     if (updateError) {
-      return { code: 500, msg: '密码重置失败: ' + updateError.message, success: false }
+      return { code: 500, msg: '密码重置失败: ' + localizeAuthError(updateError.message), success: false }
     }
 
     return { code: 0, msg: '密码重置成功', success: true } as any
@@ -215,7 +244,7 @@ export const authApi = {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
-    if (error) return { code: 500, msg: error.message, success: false }
+    if (error) return { code: 500, msg: localizeAuthError(error.message), success: false }
     return { code: 0, msg: 'success', data: data || [], success: true }
   },
 
@@ -256,7 +285,7 @@ export const authApi = {
       .order('sort_order', { ascending: true })
 
     if (error) {
-      return { code: 500, msg: error.message, data: [], success: false }
+      return { code: 500, msg: localizeAuthError(error.message), data: [], success: false }
     }
 
     // 适配前端弹窗格式
@@ -413,7 +442,7 @@ export const authApi = {
     })
 
     if (error) {
-      return { code: 400, msg: '验证码错误或已过期', success: false }
+      return { code: 400, msg: localizeAuthError(error.message), success: false }
     }
     return { code: 0, msg: '验证成功', success: true } as any
   },

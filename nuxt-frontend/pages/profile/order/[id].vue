@@ -219,7 +219,7 @@ import FulfillmentSubmitForm from '@/components/order/FulfillmentSubmitForm.vue'
 import FulfillmentHistory from '@/components/order/FulfillmentHistory.vue'
 import RenewalModal from '@/components/order/RenewalModal.vue'
 import RefundModal from '@/components/order/RefundModal.vue'
-import TicketApplyModal from '@/components/TicketApplyModal.vue'
+import TicketApplyModal from '@/components/modal/business/TicketApplyModal.vue'
 import ContactModal from '@/components/ContactModal.vue'
 import type { FulfillmentField } from '@/types/order'
 

@@ -25,7 +25,7 @@ export const ticketApi = {
         const client = getSupabaseClient()
         let query = client
             .from('tickets')
-            .select('*, orders(order_no), ticket_messages(content)') // Just get basic info
+            .select('*, orders(order_no, product_snapshot), ticket_messages(content)') // Fetch product info
             .order('created_at', { ascending: false })
 
         if (status !== 'all') {

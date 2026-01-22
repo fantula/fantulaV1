@@ -132,7 +132,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import WalletRechargeModal from '@/components/WalletRechargeModal.vue'
+import WalletRechargeModal from '@/components/modal/business/WalletRechargeModal.vue'
 import { authApi } from '@/api/auth'
 import { useUserStore } from '@/stores/user'
 import { Lightning, Top, Bottom, Wallet, Warning, Document } from '@element-plus/icons-vue'
