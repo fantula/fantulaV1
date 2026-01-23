@@ -231,6 +231,7 @@ import { supabaseProductApi, supabaseFaqApi } from '@/api/supabase'
 
 const route = useRoute()
 const router = useRouter()
+const config = useRuntimeConfig()
 const modal = useModalStore()
 const userStore = useUserStore()
 const cartStore = useCartStore()
@@ -241,9 +242,38 @@ const goodsId = computed(() => {
   return Array.isArray(id) ? id[0] : id
 })
 
+// --- SSR 数据获取 ---
+const { data: goodsResponse, error: fetchError } = await useAsyncData(
+  `goods-detail-${goodsId.value}`,
+  () => goodsApi.getGoodsDetail(goodsId.value)
+)
+
+const goodsData = computed(() => goodsResponse.value || null)
+// API 返回 success: false 也视为错误
+const goodsError = computed(() => !!fetchError.value || (goodsResponse.value && !goodsResponse.value.success))
+
+// --- SEO 配置 ---
+const goodsSeo = computed(() => {
+  const data = goodsData.value?.data || {}
+  return {
+    title: data.product_name || '商品详情',
+    desc: data.description || '凡图拉提供优质数字商品服务',
+    image: data.coverImage || data.image
+  }
+})
+
+useHead({
+  title: computed(() => `${goodsSeo.value.title} - 凡图拉`),
+  meta: [
+    { name: 'description', content: computed(() => goodsSeo.value.desc) },
+    { property: 'og:title', content: computed(() => goodsSeo.value.title) },
+    { property: 'og:description', content: computed(() => goodsSeo.value.desc) },
+    { property: 'og:image', content: computed(() => goodsSeo.value.image) },
+    { property: 'og:url', content: computed(() => `${config.public.siteUrl || 'http://localhost:3000'}/goods/${goodsId.value}`) }
+  ]
+})
+
 // --- 数据状态 ---
-const goodsData = ref<any>(null)
-const goodsError = ref(false)
 const qty = ref(1)
 const stock = ref(0) // 可用库存数量
 const submitting = ref(false) // 提交状态
@@ -256,51 +286,6 @@ const stockLoading = ref(false) // 默认不加载，只有在切换SKU时才加
 
 // 计算是否有库存
 const hasStock = computed(() => !stockLoading.value && skuAvailable.value && stock.value > 0)
-
-const fetchGoodsDetail = async () => {
-  try {
-    // 获取商品详情（包含 SKU 级别库存）
-    const detailRes = await goodsApi.getGoodsDetail(goodsId.value)
-
-    if (detailRes.success) {
-      goodsData.value = detailRes
-      
-      // 默认选中第一个规格
-      specGroups.value.forEach((g: { name: string; values: string[] }) => {
-        if (!selectedSpecs.value[g.name]) {
-          selectedSpecs.value[g.name] = g.values[0]
-        }
-      })
-      
-      // 设置默认 SKU 的图片
-      if (matchedSku.value) {
-        if (matchedSku.value.image) {
-          selectedSkuImage.value = matchedSku.value.image
-        }
-        // 检查 SKU 可购买性（通过 cdk_sku_map）
-        await checkSkuAvailability(matchedSku.value.id)
-      } else if (skus.value.length > 0 && skus.value[0].id) {
-        // 如果没匹配到 SKU，检查第一个 SKU
-        await checkSkuAvailability(skus.value[0].id)
-      }
-      
-      // Fetch FAQs
-      fetchBoundFaqs()
-    } else {
-      throw new Error(detailRes.msg)
-    }
-  } catch (err) {
-    console.error('获取商品详情失败:', err)
-    goodsError.value = true
-    stock.value = 0
-    skuAvailable.value = false
-  } finally {
-    // 确保无论是否有 SKU，Loading 都能结束
-    if (!matchedSku.value && (!skus.value || skus.value.length === 0)) {
-        stockLoading.value = false
-    }
-  }
-}
 
 /**
  * 检查 SKU 可购买性（调用数据库函数）
@@ -344,7 +329,7 @@ const buyNow = async () => {
   
   submitting.value = true
   try {
-    // 使用预订单 API（不再清空购物车）
+    // 使用预订单 API
     const { supabasePreOrderApi } = await import('@/api/supabase')
     const result = await supabasePreOrderApi.createPreOrder(
       matchedSku.value.id,
@@ -353,30 +338,25 @@ const buyNow = async () => {
     )
     
     if (!result.success) {
-      // 场景：重复下单（Duplicate）
       if (result.code === 'DUPLICATE_ORDER') {
          try {
            await ElMessageBox.confirm(
              '您已经下过该商品的订单了，快去看看吧',
              '重复下单提示',
              {
-               confirmButtonText: '去查看',  // 跳到 我的订单-待支付
-               cancelButtonText: '取消',      // 返回商品详情
+               confirmButtonText: '去查看',
+               cancelButtonText: '取消',
                type: 'warning',
                distinguishCancelAndClose: true
              }
            )
-           // 用户点击“去查看” -> 跳转到订单列表（待支付 Tab）
-           // 这里我们传递一个 query 参数 tab=pending 让订单页自动切换
            router.push('/profile/orders?tab=待支付')
            return
          } catch (action: any) {
-            // 用户点击“取消”或关闭弹窗 -> 留在当前页
             return
          }
       }
 
-      // 场景：订单超限（Limit Exceeded）
       if (result.code === 'LIMIT_EXCEEDED') {
          try {
            await ElMessageBox.confirm(
@@ -389,7 +369,6 @@ const buyNow = async () => {
                distinguishCancelAndClose: true
              }
            )
-           // 用户点击“去查看”
            router.push('/profile/orders?tab=待支付')
            return
          } catch (action: any) {
@@ -401,7 +380,6 @@ const buyNow = async () => {
       return
     }
     
-    // 成功 -> 跳转到结算页
     router.push(`/checkout/${result.pre_order_id}`)
   } catch (e) {
     console.error('立即购买失败', e)
@@ -427,7 +405,6 @@ const addToCart = async () => {
 
   submitting.value = true
   try {
-    // 【重构】只需传入 skuId 和 quantity
     const result = await cartStore.addToCart(matchedSku.value.id, qty.value)
     if (result.success) {
       ElMessage.success('已成功加入购物车')
@@ -443,7 +420,7 @@ const addToCart = async () => {
 
 // --- 模拟与 API 适配数据 ---
 const goodsInfo = computed(() => {
-  const data = goodsData.value?.data || {}
+  const data = goodsData.value?.data || ({} as any)
   return {
     name: data.title || data.product_name || '正在加载商品...',
     image: data.coverImage || data.image || '/images/placeholder.png',
@@ -455,12 +432,12 @@ const goodsInfo = computed(() => {
 
 // 是否允许加入购物车
 const allowAddon = computed(() => {
-  return goodsData.value?.data?.allow_addon === true
+  return (goodsData.value?.data as any)?.allow_addon === true
 })
 
-// 详情模块 - 使用生成的虚拟图片
+// 详情模块
 const detailModules = computed(() => {
-  const dataModules = goodsData.value?.data?.detail_modules
+  const dataModules = (goodsData.value?.data as any)?.detail_modules
   if (dataModules && dataModules.length > 0) return dataModules
   
   return [
@@ -482,7 +459,6 @@ const fetchedFaqs = ref<any[]>([])
 const faqs = computed(() => {
   if (fetchedFaqs.value.length > 0) return fetchedFaqs.value
   
-  // Default fallbacks with id for click handling
   return [
     { id: '1', question: '下单后多久发货？一般为秒级自动发货。' },
     { id: '2', question: '账号无法登录怎么办？请联系在线人工客服处理。' },
@@ -509,23 +485,20 @@ const tickerStyle = computed(() => ({
 const startFaqTicker = () => {
   if (tickerTimer) clearInterval(tickerTimer)
   tickerTimer = setInterval(() => {
-    // 1. 正常滚动到下一项
     isTransitioning.value = true
     activeFaqIndex.value++
 
-    // 2. 如果滚动到了克隆项（最后一项），等待动画结束后瞬间复位
     if (activeFaqIndex.value === faqs.value.length) {
       setTimeout(() => {
-        isTransitioning.value = false // 关闭动画
-        activeFaqIndex.value = 0 // 瞬间复位到 0
-      }, 500) // 等待 0.5s 动画完成
+        isTransitioning.value = false 
+        activeFaqIndex.value = 0 
+      }, 500) 
     }
-  }, 3000) // 3秒滚动一次
+  }, 3000) 
 }
 
 const fetchBoundFaqs = async () => {
   try {
-    // 混合策略：优先显示绑定 FAQ，不足 5 条用通用 FAQ 补齐
     let finalFaqs: any[] = []
     
     // 1. 获取绑定 FAQ
@@ -538,7 +511,6 @@ const fetchBoundFaqs = async () => {
     if (finalFaqs.length < 5) {
       const resGen = await supabaseFaqApi.getFaqs()
       if (resGen.success && resGen.faqs.length > 0) {
-        // 过滤掉已存在的
         const existingIds = new Set(finalFaqs.map(f => f.id))
         const generalToAdd = resGen.faqs.filter((f: any) => !existingIds.has(f.id))
         finalFaqs = [...finalFaqs, ...generalToAdd].slice(0, 5)
@@ -552,30 +524,25 @@ const fetchBoundFaqs = async () => {
 }
 
 const goToFaq = (faq: any) => {
-  // If it's a real FAQ with ID (not mock data, though mock has ID too)
-  // Navigate to FAQ page with query param
-  // Note: Mock IDs might not work on target page, but that's acceptable fallback behavior
   if (faq.id) {
-    router.push(`/faq?q=${faq.id}`) // Using 'q' to maybe perform search or highlighting
+    router.push(`/faq?q=${faq.id}`)
   } else {
     router.push('/faq')
   }
 }
 
-// 规格处理 (SKU) - 支持后端返回的 specGroups
-const skus = computed(() => goodsData.value?.data?.skus || [])
+// 规格处理 (SKU)
+const skus = computed(() => (goodsData.value?.data as any)?.skus || [])
 
 // 是否有 SKU
 const hasSkus = computed(() => skus.value.length > 0)
 
 const specGroups = computed(() => {
-  // 优先使用后端返回的 specGroups
-  const backendGroups = goodsData.value?.data?.specGroups
+  const backendGroups = (goodsData.value?.data as any)?.specGroups
   if (backendGroups && backendGroups.length > 0) {
     return backendGroups
   }
   
-  // 回退：从 SKU 的 spec_combination 提取规格组
   if (skus.value.length > 0) {
     const groups: Record<string, Set<string>> = {}
     skus.value.forEach((sku: any) => {
@@ -592,11 +559,10 @@ const specGroups = computed(() => {
     }))
   }
   
-  // 无 SKU 时返回空数组（不再使用假数据）
   return []
 })
 
-// 当前匹配到的 SKU - 支持多规格组合匹配
+// 当前匹配到的 SKU
 const matchedSku = computed(() => {
   if (skus.value.length === 0) return null
   
@@ -612,12 +578,10 @@ const matchedSku = computed(() => {
 
 const handleSpecSelect = async (group: string, val: string) => {
   selectedSpecs.value[group] = val
-  // 更新图片（基于选中的 SKU）
   if (matchedSku.value) {
     if (matchedSku.value.image) {
       selectedSkuImage.value = matchedSku.value.image
     }
-    // 重新检查 SKU 可购买性
     await checkSkuAvailability(matchedSku.value.id)
   }
 }
@@ -627,7 +591,6 @@ const currentPrice = computed(() => {
   return matchedSku.value?.price || goodsInfo.value.price || 35.00
 })
 
-// 格式化价格（两位小数，无货币符号）
 const formatPrice = (price: number | string) => {
   const num = typeof price === 'string' ? parseFloat(price) : price
   return num.toFixed(2)
@@ -638,15 +601,14 @@ const skuImages = computed(() => {
   return images.length > 0 ? Array.from(new Set(images)) : [goodsInfo.value.image]
 })
 
-// --- 收藏功能（使用新 API）---
+// --- 收藏功能 ---
 const isFavorited = ref(false)
 const favoriteLoading = ref(false)
 
-// 检查是否已收藏
 const checkFavoriteStatus = async () => {
   if (!userStore.isLoggedIn || !goodsId.value) return
   const { favoriteApi } = await import('@/api/common')
-  const res = await favoriteApi.checkFavorite(goodsId.value, matchedSku.value?.id)
+  const res = await favoriteApi.checkFavorite(String(goodsId.value), matchedSku.value?.id)
   isFavorited.value = res.data || false
 }
 
@@ -661,10 +623,9 @@ const toggleFavorite = async () => {
   try {
     const { favoriteApi } = await import('@/api/common')
     if (isFavorited.value) {
-      // 取消收藏需要先获取 favoriteId（简化处理：重新调用 getFavoritesData）
       ElMessage.info('取消收藏请前往"我的收藏"页面')
     } else {
-      const res = await favoriteApi.addFavorite(goodsId.value, matchedSku.value?.id)
+      const res = await favoriteApi.addFavorite(String(goodsId.value), matchedSku.value?.id)
       if (res.success) {
         isFavorited.value = true
         ElMessage.success('收藏成功')
@@ -677,11 +638,38 @@ const toggleFavorite = async () => {
   }
 }
 
-// --- 逻辑方法 ---
 const goBack = () => router.back()
 
+// Client-side initialization logic
+const initClientState = async () => {
+   // 只有成功获取数据后才进行客户端状态初始化
+   if (!goodsData.value?.success) return
+
+   // 默认选中第一个规格
+    if (specGroups.value && specGroups.value.length > 0) {
+        specGroups.value.forEach((g: { name: string; values: string[] }) => {
+            if (!selectedSpecs.value[g.name]) {
+               selectedSpecs.value[g.name] = g.values[0]
+            }
+        })
+    }
+    
+    // 设置默认 SKU 的图片
+    if (matchedSku.value) {
+        if (matchedSku.value.image) {
+           selectedSkuImage.value = matchedSku.value.image
+        }
+        await checkSkuAvailability(matchedSku.value.id)
+    } else if (skus.value.length > 0 && skus.value[0].id) {
+        await checkSkuAvailability(skus.value[0].id)
+    }
+    
+    // Fetch FAQs
+    fetchBoundFaqs()
+}
+
 onMounted(async () => {
-  await fetchGoodsDetail()
+  await initClientState()
   checkFavoriteStatus()
   startFaqTicker()
 })

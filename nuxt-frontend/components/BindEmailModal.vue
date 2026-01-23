@@ -1,10 +1,16 @@
 <template>
-  <BaseModal
-    :visible="true"
+  <BaseFormModal
+    :visible="visible"
     title="换绑邮箱"
-    width="440px"
+    width="500px"
     show-mascot
+    mascot-position="bottom"
+    :cancel-text="cancelText"
+    :submit-text="submitText"
+    :loading="loading"
+    :submit-disabled="submitDisabled"
     @close="$emit('close')"
+    @submit="handleStepSubmit"
   >
     <!-- Step 1: 验证当前邮箱 -->
     <div v-if="step === 1" class="step-content">
@@ -65,31 +71,11 @@
         <span>确认后，系统将向新邮箱发送确认链接，点击链接即可完成换绑</span>
       </div>
     </div>
-
-    <!-- Custom Footer -->
-    <template #footer>
-      <button class="base-modal-cancel" @click="$emit('close')">取消</button>
-      <button 
-        v-if="step === 1"
-        class="base-modal-confirm" 
-        @click="verifyCurrentEmail" 
-        :disabled="!currentCode || currentCode.length < 4 || loading"
-      >
-        {{ loading ? '验证中...' : '下一步' }}
-      </button>
-      <button 
-        v-if="step === 2"
-        class="base-modal-confirm" 
-        @click="handleConfirm" 
-        :disabled="!isValidEmail || loading"
-      >
-        {{ loading ? '处理中...' : '确认换绑' }}
-      </button>
-    </template>
-  </BaseModal>
+  </BaseFormModal>
 </template>
 
 <script setup lang="ts">
+import BaseFormModal from '@/components/modal/base/BaseFormModal.vue'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/auth'
@@ -98,6 +84,7 @@ import EmailInput from '@/components/base/EmailInput.vue'
 import SendCodeButton from '@/components/base/SendCodeButton.vue'
 
 const props = defineProps<{
+  visible?: boolean
   currentEmail?: string
 }>()
 
@@ -109,6 +96,26 @@ const newEmail = ref('')
 const countdown = ref(0)
 const loading = ref(false)
 let timerInterval: any = null
+
+const cancelText = computed(() => '取消')
+// Dynamic submit text based on step
+const submitText = computed(() => {
+  if (loading.value) return step.value === 1 ? '验证中...' : '提交中...'
+  return step.value === 1 ? '下一步' : '确认换绑'
+})
+
+const submitDisabled = computed(() => {
+  if (step.value === 1) return !currentCode.value || currentCode.value.length < 4 || loading.value
+  return !isValidEmail.value || loading.value
+})
+
+const handleStepSubmit = () => {
+  if (step.value === 1) {
+    verifyCurrentEmail()
+  } else {
+    handleConfirm()
+  }
+}
 
 const TIMER_KEY = 'otp_change_email_timer_end'
 const COOLDOWN_SECONDS = 300 

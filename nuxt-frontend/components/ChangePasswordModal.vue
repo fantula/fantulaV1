@@ -1,13 +1,15 @@
 <template>
-  <BaseModal
-    :visible="true"
+  <BaseFormModal
+    :visible="visible"
     title="更新密码"
-    confirm-text="确认更新"
+    width="500px" 
+    submit-text="确认更新"
     :loading="loading"
-    :confirm-disabled="!canSubmit"
+    :submit-disabled="!canSubmit"
     show-mascot
+    mascot-position="bottom"
     @close="$emit('close')"
-    @confirm="handleSubmit"
+    @submit="handleSubmit"
   >
     <div class="form-group code-group-wrapper">
       <label class="form-label">邮箱验证码</label>
@@ -56,17 +58,19 @@
         autocomplete="new-password"
       />
     </div>
-  </BaseModal>
+  </BaseFormModal>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import BaseFormModal from '@/components/modal/base/BaseFormModal.vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 import SendCodeButton from '@/components/base/SendCodeButton.vue'
 
 const props = defineProps<{
+  visible?: boolean
   email: string
 }>()
 

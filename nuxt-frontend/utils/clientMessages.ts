@@ -18,6 +18,7 @@ export const CLIENT_MESSAGES = {
         VERIFY_FAIL: '好像输错了，再检查一下吧',
         SUCCESS: '密码更新完成，我记住了',
         SAME_PASSWORD: '密码和之前一样哦',
+        FAIL: '更新失败了，稍后再试吧',
     },
     EMAIL_MODAL: {
         CODE_SENT: '已发送到邮箱啦，快去看看',

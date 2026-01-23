@@ -2,8 +2,10 @@
   <BaseModal
     :visible="true"
     title="注销账号"
+    width="500px"
     :show-footer="false"
     show-mascot
+    mascot-position="bottom"
     @close="$emit('close')"
   >
     <div class="warning-box">
@@ -64,6 +66,7 @@ import { ElMessage } from 'element-plus'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 const props = defineProps<{
+  visible?: boolean
   email: string
 }>()
 

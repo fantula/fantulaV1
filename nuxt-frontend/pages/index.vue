@@ -40,7 +40,13 @@ import { commonApi } from '@/api/common'
 import { goodsApi } from '@/api/goods'
 import type { Banner, Goods, GoodsCategory } from '@/types/api'
 
-// SEO配置
+// 1. 顶层定义路由实例 & 配置
+const route = useRoute()
+const router = useRouter()
+const config = useRuntimeConfig()
+const { getCache, setCache } = useSimpleCache()
+
+// 2. SEO配置 - 使用环境变量
 useHead({
   title: '凡图拉 - 优质商品平台',
   meta: [
@@ -49,7 +55,7 @@ useHead({
     { property: 'og:title', content: '凡图拉 - 优质商品平台' },
     { property: 'og:description', content: '凡图拉提供优质商品和服务，精选各类商品，确保品质与价格的完美平衡。' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:url', content: 'http://localhost:3000' }
+    { property: 'og:url', content: (config.public.siteUrl as string) || 'http://localhost:3000' }
   ]
 })
 
@@ -58,39 +64,7 @@ const categories = ref<GoodsCategory[]>([])
 const currentGoods = ref<Goods[]>([])
 const activeCategoryId = ref<string | number>('')
 const goodsLoading = ref(false)
-
-// ========================================
-// 缓存工具函数（5分钟过期）
-// ========================================
-const CACHE_EXPIRY_MS = 5 * 60 * 1000 // 5分钟
-
-const getCache = <T>(key: string): T | null => {
-  if (typeof window === 'undefined') return null
-  try {
-    const cached = localStorage.getItem(key)
-    if (!cached) return null
-    const { data, expiry } = JSON.parse(cached)
-    if (Date.now() > expiry) {
-      localStorage.removeItem(key)
-      return null
-    }
-    return data as T
-  } catch {
-    return null
-  }
-}
-
-const setCache = <T>(key: string, data: T): void => {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(key, JSON.stringify({
-      data,
-      expiry: Date.now() + CACHE_EXPIRY_MS
-    }))
-  } catch {
-    // ignore quota exceeded
-  }
-}
+const slideDirection = ref('slide-right')
 
 // ========================================
 // 数据获取函数（带缓存）
@@ -155,6 +129,7 @@ const fetchGoods = async (categoryId?: string | number) => {
     }
   } catch (error) {
     console.error('获取商品列表失败:', error)
+    // TODO: 增加用户界面的错误提示
     currentGoods.value = []
   } finally {
     goodsLoading.value = false
@@ -163,9 +138,6 @@ const fetchGoods = async (categoryId?: string | number) => {
 
 // 初始化数据 - 优化版：缓存优先 + 并行获取 + 后台刷新
 const initData = async () => {
-  const route = useRoute()
-  const router = useRouter()
-  
   // 第一批：并行获取轮播图和分类（有缓存则立即显示）
   const [_, firstCategoryId] = await Promise.all([
     fetchBanners(),
@@ -188,8 +160,6 @@ const initData = async () => {
   }
 }
 
-const slideDirection = ref('slide-right')
-
 // 分类切换处理
 const handleCategoryChange = async (categoryId: string | number) => {
   // 1. Calculate direction
@@ -203,8 +173,7 @@ const handleCategoryChange = async (categoryId: string | number) => {
   activeCategoryId.value = categoryId
   
   // Sync URL
-  const router = useRouter()
-  router.replace({ query: { ...useRoute().query, category_id: categoryId } })
+  router.replace({ query: { ...route.query, category_id: categoryId } })
   await fetchGoods(categoryId)
 }
 

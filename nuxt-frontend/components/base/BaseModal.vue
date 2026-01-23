@@ -145,7 +145,8 @@ const handleClose = () => {
 }
 
 /* Mascot Style */
-  /* Phantom Style (Optimized) */
+.modal-mascot-phantom {
+  /* Positioning (Restored) */
   position: absolute;
   bottom: 0;
   left: 0;
@@ -154,18 +155,19 @@ const handleClose = () => {
   pointer-events: none;
   z-index: 0;
   
-  /* Visuals: Standard 10% Opacity */
-  opacity: 0.1; 
+  /* Visuals: No Special Effects (Clean Image) */
+  opacity: 1; 
   filter: none;
-  mix-blend-mode: normal;
+  mix-blend-mode: normal; 
   
   mask-image: linear-gradient(to top, black 20%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
   
-  /* Animation */
-  animation: mascot-rise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  /* Standard Slide In */
+  animation: mascot-rise 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   animation-delay: 0.1s;
   transform-origin: bottom center;
+}
 
 /* Position Variants */
 .phantom-left {
@@ -183,7 +185,7 @@ const handleClose = () => {
 
 @keyframes mascot-rise {
   0% { opacity: 0; transform: var(--start-transform); }
-  100% { opacity: 0.4; transform: var(--end-transform); } /* Final opacity matches base */
+  100% { opacity: 1; transform: var(--end-transform); }
 }
 
 /* Position Variants */

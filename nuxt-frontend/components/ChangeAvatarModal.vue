@@ -7,6 +7,7 @@
     :loading="loading"
     :confirm-disabled="!hasChange"
     show-mascot
+    mascot-position="bottom"
     @close="$emit('close')"
     @confirm="handleConfirm"
   >

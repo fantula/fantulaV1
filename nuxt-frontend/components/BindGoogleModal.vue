@@ -1,8 +1,10 @@
 <template>
-  <BaseModal
-    :visible="true"
+  <BaseFormModal
+    :visible="visible"
     title="绑定谷歌邮箱"
     :show-footer="false"
+    show-mascot
+    mascot-position="bottom"
     @close="$emit('close')"
   >
     <div class="google-content">
@@ -39,11 +41,14 @@
         绑定后可直接使用 Google 账号登录凡图拉
       </div>
     </div>
-  </BaseModal>
+  </BaseFormModal>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+import BaseFormModal from '@/components/modal/base/BaseFormModal.vue'
+
+defineProps<{
+  visible?: boolean
   isBound: boolean,
   currentGoogleEmail?: string
 }>()
@@ -51,7 +56,6 @@ const props = defineProps<{
 const emit = defineEmits(['close', 'bind'])
 
 const handleBind = () => {
-  // 模拟调用 Google 登录/授权
   console.log('Initiating Google Binding...')
   emit('bind')
   emit('close')
@@ -59,6 +63,7 @@ const handleBind = () => {
 </script>
 
 <style scoped>
+/* Business Styles Only - No Layout */
 .google-content {
   display: flex;
   flex-direction: column;
