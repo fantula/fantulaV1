@@ -3,14 +3,14 @@
     :visible="visible"
     title="换绑邮箱"
     width="500px"
-    show-mascot
-    mascot-position="bottom"
+    theme-id="suit-001"
     :cancel-text="cancelText"
-    :submit-text="submitText"
+    :confirm-text="submitText"
     :loading="loading"
-    :submit-disabled="submitDisabled"
+    :confirm-disabled="submitDisabled"
     @close="$emit('close')"
-    @submit="handleStepSubmit"
+    @update:visible="$emit('update:visible', $event)"
+    @confirm="handleStepSubmit"
   >
     <!-- Step 1: 验证当前邮箱 -->
     <div v-if="step === 1" class="step-content">
@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import BaseFormModal from '@/components/modal/base/BaseFormModal.vue'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/auth'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
@@ -88,7 +88,7 @@ const props = defineProps<{
   currentEmail?: string
 }>()
 
-const emit = defineEmits(['close', 'confirm'])
+const emit = defineEmits(['close', 'confirm', 'update:visible'])
 
 const step = ref(1)
 const currentCode = ref('')
@@ -96,6 +96,14 @@ const newEmail = ref('')
 const countdown = ref(0)
 const loading = ref(false)
 let timerInterval: any = null
+
+watch(() => props.visible, (val) => {
+  if (val) {
+    step.value = 1
+    currentCode.value = ''
+    newEmail.value = ''
+  }
+})
 
 const cancelText = computed(() => '取消')
 // Dynamic submit text based on step

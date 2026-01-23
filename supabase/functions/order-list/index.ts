@@ -1,22 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
-import { decode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-// 解析 JWT 获取 user_id (不验证签名，仅本地开发使用)
-function parseJwt(token: string): { sub?: string } | null {
-    try {
-        const parts = token.replace('Bearer ', '').split('.')
-        if (parts.length !== 3) return null
-        const payload = JSON.parse(new TextDecoder().decode(decode(parts[1])))
-        return payload
-    } catch {
-        return null
-    }
 }
 
 serve(async (req) => {
@@ -26,45 +13,39 @@ serve(async (req) => {
 
     try {
         const authHeader = req.headers.get('Authorization')
+        if (!authHeader) {
+            throw new Error('Missing Authorization header')
+        }
 
-        // 解析 JWT 获取 user_id
-        const jwt = parseJwt(authHeader || '')
-        const userId = jwt?.sub
+        // Create Supabase Client
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+        const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        const supabase = createClient(supabaseUrl, serviceRoleKey)
 
-        console.log('[order-list] Parsed user_id from JWT:', userId)
+        // Validate Token
+        const token = authHeader.replace('Bearer ', '')
+        const { data: { user }, error: userError } = await supabase.auth.getUser(token)
 
-        if (!userId) {
-            return new Response(JSON.stringify({
-                error: 'Unauthorized',
-                detail: 'No user_id in token'
-            }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        if (userError || !user) {
+            return new Response(JSON.stringify({ error: 'Unauthorized', detail: userError?.message }), {
                 status: 401,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             })
         }
 
-        // 使用 Service Role 直接查询数据库
-        const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-        const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        const userId = user.id
 
-        const supabaseClient = createClient(supabaseUrl, serviceRoleKey)
-
-        // 1. 查询 orders (按 user_id 过滤)
-        const { data: orders, error: ordersError } = await supabaseClient
+        // 1. Get Orders
+        const { data: orders, error: ordersError } = await supabase
             .from('orders')
             .select('id, order_no, status, total_amount, quantity, created_at, product_snapshot, sku_snapshot')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
 
-        if (ordersError) {
-            console.log('[order-list] Orders error:', ordersError.message)
-            throw ordersError
-        }
+        if (ordersError) throw ordersError
 
-        console.log('[order-list] Orders found:', orders?.length)
-
-        // 2. 查询 pre_orders (待支付)
-        const { data: preOrders, error: preOrdersError } = await supabaseClient
+        // 2. Get PreOrders (Pending)
+        const { data: preOrders, error: preOrdersError } = await supabase
             .from('pre_orders')
             .select('id, order_no, status, total_amount, quantity, created_at, product_snapshot, sku_snapshot')
             .eq('user_id', userId)
@@ -72,14 +53,9 @@ serve(async (req) => {
             .gt('expires_at', new Date().toISOString())
             .order('created_at', { ascending: false })
 
-        if (preOrdersError) {
-            console.log('[order-list] PreOrders error:', preOrdersError.message)
-            throw preOrdersError
-        }
+        if (preOrdersError) throw preOrdersError
 
-        console.log('[order-list] PreOrders found:', preOrders?.length)
-
-        // 3. 格式化 orders
+        // 3. Format Data
         const paidOrders = (orders || []).map((order: any) => ({
             id: order.id,
             order_no: order.order_no,
@@ -87,12 +63,11 @@ serve(async (req) => {
             total_amount: order.total_amount,
             quantity: order.quantity,
             created_at: order.created_at,
-            product_name: order.product_snapshot?.product_name || '',
+            product_name: order.product_snapshot?.product_name || 'Unknown Product',
             product_image: order.product_snapshot?.image || '',
             spec_combination: order.sku_snapshot?.spec_combination || null
         }))
 
-        // 4. 格式化 pre_orders
         const pendingOrders = (preOrders || []).map((order: any) => ({
             id: order.id,
             order_no: order.order_no,
@@ -100,7 +75,7 @@ serve(async (req) => {
             total_amount: order.total_amount,
             quantity: order.quantity,
             created_at: order.created_at,
-            product_name: order.product_snapshot?.product_name || '',
+            product_name: order.product_snapshot?.product_name || 'Unknown Product',
             product_image: order.product_snapshot?.image || '',
             spec_combination: order.sku_snapshot?.spec_combination || null
         }))
@@ -113,8 +88,8 @@ serve(async (req) => {
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
 
-    } catch (error) {
-        console.log('[order-list] Error:', error.message)
+    } catch (error: any) {
+        console.error('[order-list] Error:', error.message)
         return new Response(JSON.stringify({ error: error.message }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,

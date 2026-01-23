@@ -6,9 +6,9 @@
     submit-text="确认更新"
     :loading="loading"
     :submit-disabled="!canSubmit"
-    show-mascot
-    mascot-position="bottom"
+    theme-id="suit-001"
     @close="$emit('close')"
+    @update:visible="$emit('update:visible', $event)"
     @submit="handleSubmit"
   >
     <div class="form-group code-group-wrapper">
@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import BaseFormModal from '@/components/modal/base/BaseFormModal.vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
@@ -74,7 +74,7 @@ const props = defineProps<{
   email: string
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'update:visible'])
 
 const otpCode = ref('')
 const newPassword = ref('')
@@ -83,6 +83,15 @@ const strength = ref(0)
 const loading = ref(false)
 const countdown = ref(0)
 let timerInterval: any = null
+
+watch(() => props.visible, (val) => {
+  if (val) {
+    otpCode.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+    strength.value = 0
+  }
+})
 
 const userEmail = computed(() => props.email || '当前账户')
 

@@ -9,8 +9,7 @@
     :confirm-text="submitText"
     :loading="loading"
     :confirm-disabled="submitDisabled"
-    :show-mascot="showMascot"
-    :mascot-position="mascotPosition"
+    :theme-id="themeId"
     @close="handleClose"
     @confirm="handleSubmit"
   >
@@ -47,8 +46,7 @@ const props = withDefaults(defineProps<{
   loading?: boolean
   submitDisabled?: boolean
   showFooter?: boolean
-  showMascot?: boolean
-  mascotPosition?: 'left' | 'right' | 'bottom'
+  themeId?: string
 }>(), {
   title: '表单',
   width: '500px', // Standard Form Width
@@ -57,8 +55,7 @@ const props = withDefaults(defineProps<{
   loading: false,
   submitDisabled: false,
   showFooter: true,
-  showMascot: false,
-  mascotPosition: 'bottom' // Default to bottom per new standard
+  themeId: 'suit-001'
 })
 
 const emit = defineEmits<{

@@ -3,9 +3,9 @@
     :visible="visible"
     title="绑定谷歌邮箱"
     :show-footer="false"
-    show-mascot
-    mascot-position="bottom"
+    theme-id="suit-001"
     @close="$emit('close')"
+    @update:visible="$emit('update:visible', $event)"
   >
     <div class="google-content">
       <div class="modal-subtitle">关联您的 Google 账号以更快捷登录</div>
@@ -53,7 +53,7 @@ defineProps<{
   currentGoogleEmail?: string
 }>()
 
-const emit = defineEmits(['close', 'bind'])
+const emit = defineEmits(['close', 'bind', 'update:visible'])
 
 const handleBind = () => {
   console.log('Initiating Google Binding...')

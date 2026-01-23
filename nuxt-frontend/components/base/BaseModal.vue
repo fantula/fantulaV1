@@ -34,13 +34,17 @@
           </div>
 
           <!-- Custom Mascot Slot -->
-          <slot name="mascot"></slot>
-
-          <!-- Phantom Mascot (Full Width Bottom) -->
+          <!-- Theme Mascot -->
           <img 
-            src="/images/phantom_color_v2.png" 
+            v-if="currentTheme.mascotImg"
+            :src="currentTheme.mascotImg" 
             class="modal-mascot-phantom"
-            :class="[`phantom-${mascotPosition}`]"
+            :class="[`phantom-${currentTheme.mascotPosition}`, currentTheme.variantClass]"
+            :style="{ 
+              animationName: currentTheme.animation,
+              animationDuration: currentTheme.duration || '0.6s',
+              opacity: currentTheme.opacity ?? 1
+            }"
           />
         </div>
       </div>
@@ -49,6 +53,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { getTheme } from '@/utils/modalThemeRegistry'
+
 interface Props {
   visible: boolean
   title: string
@@ -60,8 +67,8 @@ interface Props {
   loadingText?: string
   confirmDisabled?: boolean
   loading?: boolean
-  showMascot?: boolean
-  mascotPosition?: 'left' | 'right' | 'bottom'
+  // Theme ID replaces manual configuration
+  themeId?: string 
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -73,9 +80,10 @@ const props = withDefaults(defineProps<Props>(), {
   loadingText: '处理中...',
   confirmDisabled: false,
   loading: false,
-  showMascot: false,
-  mascotPosition: 'left' // left | right | bottom
+  themeId: 'suit-001' // Default Suit
 })
+
+const currentTheme = computed(() => getTheme(props.themeId))
 
 const emit = defineEmits(['close', 'confirm', 'update:visible'])
 

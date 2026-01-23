@@ -1,12 +1,12 @@
 <template>
   <BaseModal
-    :visible="true"
+    :visible="visible"
     title="注销账号"
     width="500px"
     :show-footer="false"
-    show-mascot
-    mascot-position="bottom"
+    theme-id="suit-001"
     @close="$emit('close')"
+    @update:visible="$emit('update:visible', $event)"
   >
     <div class="warning-box">
       <span class="warning-icon">⚠️</span>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
@@ -70,13 +70,20 @@ const props = defineProps<{
   email: string
 }>()
 
-const emit = defineEmits(['close', 'confirm'])
+const emit = defineEmits(['close', 'confirm', 'update:visible'])
 
 const isConfirmed = ref(false)
 const otpCode = ref('')
 const loading = ref(false)
 const countdown = ref(0)
 let timerInterval: any = null
+
+watch(() => props.visible, (val) => {
+  if (val) {
+    isConfirmed.value = false
+    otpCode.value = ''
+  }
+})
 
 const TIMER_KEY = 'otp_delete_timer_end'
 const COOLDOWN_SECONDS = 300

@@ -1,6 +1,6 @@
 <template>
   <BaseModal
-    :visible="true"
+    :visible="visible"
     title="修改头像"
     width="560px"
     confirm-text="保存修改"
@@ -9,6 +9,7 @@
     show-mascot
     mascot-position="bottom"
     @close="$emit('close')"
+    @update:visible="$emit('update:visible', $event)"
     @confirm="handleConfirm"
   >
     <!-- 预览和上传区 -->
@@ -68,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { getSupabaseClient } from '@/utils/supabase'
 import { Upload, Check, UserFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -77,10 +78,11 @@ import 'cropperjs/dist/cropper.css'
 
 // 默认头像常量
 const props = defineProps<{
+  visible?: boolean
   currentAvatar: string
 }>()
 
-const emit = defineEmits(['close', 'update'])
+const emit = defineEmits(['close', 'update', 'update:visible'])
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const previewAvatar = ref('')
@@ -97,6 +99,18 @@ let cropperInstance: Cropper | null = null
 
 // 系统头像列表（新增 AI 生成头像）
 const systemAvatars: string[] = [] // Empty for now as assets were deleted
+
+// Reset State on Open
+watch(() => props.visible, (val) => {
+  if (val) {
+    previewAvatar.value = ''
+    selectedSystemAvatar.value = ''
+    pendingFile.value = null
+    showCropper.value = false
+    destroyCropper()
+    if (fileInput.value) fileInput.value.value = ''
+  }
+})
 
 const displayAvatar = computed(() => previewAvatar.value || props.currentAvatar)
 

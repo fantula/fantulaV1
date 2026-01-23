@@ -7,8 +7,7 @@
     :cancel-text="cancelText"
     :loading="loading"
     :confirm-disabled="loading"
-    :show-mascot="showMascot"
-    :mascot-position="mascotPosition"
+    :theme-id="themeId"
     @close="handleClose"
     @confirm="handleConfirm"
   >
@@ -55,8 +54,7 @@ const props = withDefaults(defineProps<{
   confirmText?: string
   type?: 'default' | 'warning' | 'danger'
   loading?: boolean
-  showMascot?: boolean
-  mascotPosition?: 'left' | 'right' | 'bottom'
+  themeId?: string
 }>(), {
   title: '确认',
   message: '确定要执行此操作吗？',
@@ -64,8 +62,7 @@ const props = withDefaults(defineProps<{
   confirmText: '确定',
   type: 'default',
   loading: false,
-  showMascot: false,
-  mascotPosition: 'bottom'
+  themeId: 'suit-001'
 })
 
 const emit = defineEmits<{

@@ -1,12 +1,13 @@
 <template>
   <BaseModal
-    :visible="true"
+    :visible="visible"
     title="修改昵称"
     confirm-text="确认修改"
     :loading="loading"
     :confirm-disabled="!isValid"
     show-mascot
     @close="$emit('close')"
+    @update:visible="$emit('update:visible', $event)"
     @confirm="handleUpdate"
   >
     <div class="form-group">
@@ -23,19 +24,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { authApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
 
 const props = defineProps<{
+  visible?: boolean
   currentNickname: string
 }>()
 
-const emit = defineEmits(['close', 'update'])
+const emit = defineEmits(['close', 'update', 'update:visible'])
 
 const newNickname = ref(props.currentNickname)
 const loading = ref(false)
+
+watch(() => props.visible, (val) => {
+  if (val) {
+    newNickname.value = props.currentNickname
+  }
+})
 
 const isValid = computed(() => {
   return newNickname.value.trim().length >= 2 && 

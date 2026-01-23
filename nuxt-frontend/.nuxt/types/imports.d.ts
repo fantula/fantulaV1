@@ -5,6 +5,7 @@ declare global {
   const ApiErrorHandler: typeof import('../../utils/error-handler').ApiErrorHandler
   const CLIENT_MESSAGES: typeof import('../../utils/clientMessages').CLIENT_MESSAGES
   const DEFAULT_AVATAR: typeof import('../../utils/constants').DEFAULT_AVATAR
+  const DEFAULT_THEME_ID: typeof import('../../utils/modalThemeRegistry').DEFAULT_THEME_ID
   const EDGE_FUNCTIONS_URL: typeof import('../../utils/supabase').EDGE_FUNCTIONS_URL
   const ElIconAddLocation: typeof import('../../node_modules/@element-plus/icons-vue/dist/index').AddLocation
   const ElIconAim: typeof import('../../node_modules/@element-plus/icons-vue/dist/index').Aim
@@ -305,6 +306,7 @@ declare global {
   const ElNotification: typeof import('../../node_modules/element-plus/es/components/notification/index').ElNotification
   const ErrorHandler: typeof import('../../utils/error-handler').ErrorHandler
   const ID_INJECTION_KEY: typeof import('../../node_modules/element-plus/es/hooks/use-id/index').ID_INJECTION_KEY
+  const MODAL_THEMES: typeof import('../../utils/modalThemeRegistry').MODAL_THEMES
   const SYSTEM_AVATARS: typeof import('../../utils/constants').SYSTEM_AVATARS
   const ZINDEX_INJECTION_KEY: typeof import('../../node_modules/element-plus/es/hooks/use-z-index/index').ZINDEX_INJECTION_KEY
   const abortNavigation: typeof import('../../node_modules/nuxt/dist/app/composables/router').abortNavigation
@@ -345,6 +347,7 @@ declare global {
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getRouteRules: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getRouteRules
   const getSupabaseClient: typeof import('../../utils/supabase').getSupabaseClient
+  const getTheme: typeof import('../../utils/modalThemeRegistry').getTheme
   const h: typeof import('vue').h
   const hasInjectionContext: typeof import('vue').hasInjectionContext
   const http: typeof import('../../utils/request').http
@@ -527,6 +530,9 @@ declare global {
   export type { ApiErrorHandler, ErrorHandler, ErrorInfo } from '../../utils/error-handler'
   import('../../utils/error-handler')
   // @ts-ignore
+  export type { ModalTheme } from '../../utils/modalThemeRegistry'
+  import('../../utils/modalThemeRegistry')
+  // @ts-ignore
   export type { UploadProgressCallback } from '../../utils/uploadImage'
   import('../../utils/uploadImage')
   // @ts-ignore
@@ -541,6 +547,7 @@ declare module 'vue' {
     readonly ApiErrorHandler: UnwrapRef<typeof import('../../utils/error-handler')['ApiErrorHandler']>
     readonly CLIENT_MESSAGES: UnwrapRef<typeof import('../../utils/clientMessages')['CLIENT_MESSAGES']>
     readonly DEFAULT_AVATAR: UnwrapRef<typeof import('../../utils/constants')['DEFAULT_AVATAR']>
+    readonly DEFAULT_THEME_ID: UnwrapRef<typeof import('../../utils/modalThemeRegistry')['DEFAULT_THEME_ID']>
     readonly EDGE_FUNCTIONS_URL: UnwrapRef<typeof import('../../utils/supabase')['EDGE_FUNCTIONS_URL']>
     readonly ElIconAddLocation: UnwrapRef<typeof import('../../node_modules/@element-plus/icons-vue/dist/index')['AddLocation']>
     readonly ElIconAim: UnwrapRef<typeof import('../../node_modules/@element-plus/icons-vue/dist/index')['Aim']>
@@ -841,6 +848,7 @@ declare module 'vue' {
     readonly ElNotification: UnwrapRef<typeof import('../../node_modules/element-plus/es/components/notification/index')['ElNotification']>
     readonly ErrorHandler: UnwrapRef<typeof import('../../utils/error-handler')['ErrorHandler']>
     readonly ID_INJECTION_KEY: UnwrapRef<typeof import('../../node_modules/element-plus/es/hooks/use-id/index')['ID_INJECTION_KEY']>
+    readonly MODAL_THEMES: UnwrapRef<typeof import('../../utils/modalThemeRegistry')['MODAL_THEMES']>
     readonly SYSTEM_AVATARS: UnwrapRef<typeof import('../../utils/constants')['SYSTEM_AVATARS']>
     readonly ZINDEX_INJECTION_KEY: UnwrapRef<typeof import('../../node_modules/element-plus/es/hooks/use-z-index/index')['ZINDEX_INJECTION_KEY']>
     readonly abortNavigation: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['abortNavigation']>
@@ -881,6 +889,7 @@ declare module 'vue' {
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
     readonly getSupabaseClient: UnwrapRef<typeof import('../../utils/supabase')['getSupabaseClient']>
+    readonly getTheme: UnwrapRef<typeof import('../../utils/modalThemeRegistry')['getTheme']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly hasInjectionContext: UnwrapRef<typeof import('vue')['hasInjectionContext']>
     readonly http: UnwrapRef<typeof import('../../utils/request')['http']>

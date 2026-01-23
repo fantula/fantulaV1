@@ -131,13 +131,13 @@
       </div>
     </div>
 
-    <!-- Modals (Kept same logic) -->
-    <ChangeAvatarModal v-if="modals.avatar" :current-avatar="user.avatar" @close="closeModal('avatar')" @update="updateAvatar" />
-    <ChangeNicknameModal v-if="modals.nickname" :current-nickname="user.nickname" @close="closeModal('nickname')" @update="updateNickname" />
-    <BindEmailModal v-if="modals.email" :current-email="user.email" @close="closeModal('email')" @confirm="updateEmail" />
-    <BindGoogleModal v-if="modals.google" :is-bound="!!user.isGoogleBound" :current-google-email="user.googleEmail" @close="closeModal('google')" @bind="handleGoogleBind" />
-    <ChangePasswordModal v-if="modals.password" :email="user.email" @close="closeModal('password')" />
-    <DeleteAccountModal v-if="modals.delete" :email="user.email" @close="closeModal('delete')" @confirm="handleDeleteAccount" />
+    <!-- Modals (v-model:visible for correct transition handling) -->
+    <ChangeAvatarModal v-model:visible="modals.avatar" :current-avatar="user.avatar" @close="closeModal('avatar')" @update="updateAvatar" />
+    <ChangeNicknameModal v-model:visible="modals.nickname" :current-nickname="user.nickname" @close="closeModal('nickname')" @update="updateNickname" />
+    <BindEmailModal v-model:visible="modals.email" :current-email="user.email" @close="closeModal('email')" @confirm="updateEmail" />
+    <BindGoogleModal v-model:visible="modals.google" :is-bound="!!user.isGoogleBound" :current-google-email="user.googleEmail" @close="closeModal('google')" @bind="handleGoogleBind" />
+    <ChangePasswordModal v-model:visible="modals.password" :email="user.email" @close="closeModal('password')" />
+    <DeleteAccountModal v-model:visible="modals.delete" :email="user.email" @close="closeModal('delete')" @confirm="handleDeleteAccount" />
   </div>
 </template>
 
@@ -151,6 +151,14 @@ import {
   Message, EditPen, Lock, Key, Connection, Warning, ArrowRight 
 } from '@element-plus/icons-vue'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+
+// Component Imports (Explicit to fix hydration/loading issues)
+import ChangeAvatarModal from '@/components/ChangeAvatarModal.vue'
+import ChangeNicknameModal from '@/components/ChangeNicknameModal.vue'
+import BindEmailModal from '@/components/BindEmailModal.vue'
+import BindGoogleModal from '@/components/BindGoogleModal.vue'
+import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
+import DeleteAccountModal from '@/components/DeleteAccountModal.vue'
 
 // Define Props
 interface Props {
