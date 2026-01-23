@@ -21,8 +21,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
         return navigateTo('/_mgmt_9Xfa3/login')
     }
 
-    // 可选: 细粒度权限检查 (未来扩展)
-    // if (!adminStore.hasPermission(to.path)) {
-    //   return navigateTo('/_mgmt_9Xfa3/403')
-    // }
+    // 细粒度权限检查
+    if (!adminStore.hasPermission(to.path)) {
+        return navigateTo('/_mgmt_9Xfa3')  // 无权限跳转到仪表盘
+    }
 })

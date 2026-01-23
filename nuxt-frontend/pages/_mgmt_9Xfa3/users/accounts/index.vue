@@ -182,7 +182,7 @@ const handleSelectionChange = (rows: AdminBackendUser[]) => {
 }
 
 // --- User Logic ---
-const openAddUserDialog = () => {
+const openAddUserDialog = async () => {
   isEditUser.value = false
   userForm.id = ''
   userForm.name = ''
@@ -191,7 +191,10 @@ const openAddUserDialog = () => {
   userForm.department_id = ''
   userForm.status = 'enabled'
   userDialogVisible.value = true
+  // 刷新部门列表以获取最新数据
+  await loadDepartments()
 }
+
 
 const openEditUserDialog = (row: AdminBackendUser) => {
   isEditUser.value = true

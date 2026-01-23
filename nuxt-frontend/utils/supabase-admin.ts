@@ -13,8 +13,8 @@ console.log('>>> supabase-admin.ts LOADED - Using SERVICE_ROLE key <<<')
 const SUPABASE_URL = 'http://127.0.0.1:54321'
 
 // 使用 service_role key (绕过 RLS)
-// 本地开发环境的默认 service_role key
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
+// 新版 Supabase CLI 使用 sb_secret_ 格式
+const SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz'
 
 // 后台专用 Storage Key（与客户端隔离）
 const ADMIN_STORAGE_KEY = 'sb-admin-auth-token'

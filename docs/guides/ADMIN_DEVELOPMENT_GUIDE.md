@@ -162,14 +162,57 @@ const tabs = [
 
 ---
 
-## 四、认证机制
+## 四、认证与权限架构
 
-### 4.1 路由守卫
-所有 `/_mgmt_9Xfa3/*` 路由自动受 `admin-auth.global.ts` 保护：
-- 未登录 → 跳转 `/login`
-- 登录后验证 `admin_users` 表
+### 4.1 安全分层原则
 
-### 2.2 API 调用
+> **核心理念**：一次验证，处处信任。登录是唯一安全入口，登录成功即证明用户合法。
+
+| 层级 | 职责 | 文件 |
+|------|------|------|
+| **登录层** | 身份验证 + 角色验证 + 权限加载 | `stores/admin.ts` |
+| **路由层** | 权限过滤，无权限跳转仪表盘 | `middleware/admin-auth.global.ts` |
+| **页面层** | 业务展示，信任登录状态 | `pages/_mgmt_9Xfa3/*.vue` |
+| **API层** | 数据操作，使用 service_role 绕过 RLS | `utils/supabase-admin.ts` |
+
+### 4.2 登录流程
+
+```
+用户输入邮箱密码/验证码
+    ↓
+Supabase Auth 验证
+    ↓
+检查 admin_users 表（是否为管理员）
+    ↓
+关联查询 department.permissions
+    ↓
+存储到 adminStore → 登录成功
+```
+
+### 4.3 路由守卫
+
+`middleware/admin-auth.global.ts` 全局拦截所有 `/_mgmt_9Xfa3/*` 路由：
+- 未登录 → 跳转登录页
+- 无权限 → 跳转仪表盘
+
+### 4.4 开发注意事项
+
+```typescript
+// ❌ 错误：页面中重复验证
+onMounted(async () => {
+  await adminStore.init()  // 不需要！middleware 已处理
+})
+
+// ✅ 正确：直接使用登录状态
+const user = adminStore.adminInfo  // 信任已登录
+```
+
+- ❌ 页面中不要调用 `adminStore.init()`，middleware 会处理
+- ❌ API 中不要验证身份，service_role 已绕过 RLS
+- ✅ 新增页面路径需要在部门管理添加权限选项
+
+### 4.5 API 调用
+
 ```typescript
 // 使用 service_role key，绕过 RLS
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'

@@ -153,9 +153,9 @@
           </div>
        </div>
 
-       <!-- Phantom Mascot (Correct Global Asset - Color V2) -->
+       <!-- Phantom Mascot -->
        <img 
-          src="/images/phantom_color_v2.png" 
+          src="/images/modal/pc/mascot_01.png" 
           class="modal-mascot-phantom"
        />
     </div>

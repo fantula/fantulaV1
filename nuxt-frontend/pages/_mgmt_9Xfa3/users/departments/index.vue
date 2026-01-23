@@ -84,21 +84,9 @@ definePageMeta({
   title: '部门管理'
 })
 
-// 权限菜单列表 - 与侧边栏同步
-const menuList = [
-  { title: '仪表盘', path: '/_mgmt_9Xfa3' },
-  { title: '订单管理', path: '/_mgmt_9Xfa3/orders' },
-  { title: '商品管理', path: '/_mgmt_9Xfa3/products' },
-  { title: 'CDK管理', path: '/_mgmt_9Xfa3/cdk' },
-  { title: '优惠券管理', path: '/_mgmt_9Xfa3/coupons' },
-  { title: '用户管理', path: '/_mgmt_9Xfa3/users' },
-  { title: '工单管理', path: '/_mgmt_9Xfa3/tickets' },
-  { title: '充值管理', path: '/_mgmt_9Xfa3/recharge' },
-  { title: '媒体中心', path: '/_mgmt_9Xfa3/media' },
-  { title: '帮助中心', path: '/_mgmt_9Xfa3/help-center' },
-  { title: '消息发送管理', path: '/_mgmt_9Xfa3/messages' },
-  { title: '后台设定', path: '/_mgmt_9Xfa3/backend-settings' },
-]
+// 使用统一菜单配置 - 权限菜单列表
+import { getPermissionMenuItems } from '@/config/admin-menu'
+const menuList = getPermissionMenuItems()
 
 // --- State ---
 const departments = ref<AdminDepartment[]>([])

@@ -37,7 +37,7 @@ export const MODAL_THEMES: Record<string, ModalTheme> = {
     'suit-002': {
         id: 'suit-002',
         name: 'Soft Light',
-        mascotImg: '/images/phantom_color_v2.png',
+        mascotImg: '/images/modal/pc/mascot_02.png',
         mascotPosition: 'left',
         variantClass: 'variant-phantom-light',
         animation: 'phantom-rise-soft',
@@ -53,7 +53,7 @@ export const MODAL_THEMES: Record<string, ModalTheme> = {
     'suit-003': {
         id: 'suit-003',
         name: 'Cyberpunk',
-        mascotImg: '/images/global/mascot_cyber.png',
+        mascotImg: '/images/modal/pc/mascot_01.png',
         mascotPosition: 'right',
         variantClass: 'variant-cyber',
         animation: 'cyber-pop'

@@ -45,10 +45,13 @@ export const useAdminStore = defineStore('admin', () => {
             const { data: { session } } = await client.auth.getSession()
 
             if (session) {
-                // 验证是否在 admin_users 表中
+                // 验证是否在 admin_users 表中，并获取部门权限
                 const { data: adminData } = await client
                     .from('admin_users')
-                    .select('*')
+                    .select(`
+                        *,
+                        department:admin_departments(id, name, permissions)
+                    `)
                     .eq('auth_user_id', session.user.id)
                     .single()
 
@@ -97,10 +100,13 @@ export const useAdminStore = defineStore('admin', () => {
                 return { success: false, error: '登录失败，无法获取 Session' }
             }
 
-            // 验证是否在 admin_users 表中
+            // 验证是否在 admin_users 表中，并获取部门权限
             const { data: adminData, error: adminError } = await client
                 .from('admin_users')
-                .select('*')
+                .select(`
+                    *,
+                    department:admin_departments(id, name, permissions)
+                `)
                 .eq('auth_user_id', data.session.user.id)
                 .single()
 
@@ -138,14 +144,133 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     /**
+     * 发送验证码（OTP）
+     */
+    const sendOtp = async (email: string): Promise<{ success: boolean; error?: string }> => {
+        try {
+            const client = getAdminSupabaseClient()
+
+            // 先检查该邮箱是否是管理员
+            const { data: adminData } = await client
+                .from('admin_users')
+                .select('id, status')
+                .eq('email', email)
+                .single()
+
+            if (!adminData) {
+                return { success: false, error: '该邮箱未注册为管理员' }
+            }
+
+            if (adminData.status !== 'enabled') {
+                return { success: false, error: '该账号已被禁用' }
+            }
+
+            // 发送 OTP
+            const { error } = await client.auth.signInWithOtp({
+                email,
+                options: {
+                    shouldCreateUser: false  // 不自动创建用户
+                }
+            })
+
+            if (error) {
+                return { success: false, error: error.message }
+            }
+
+            return { success: true }
+        } catch (error: any) {
+            return { success: false, error: error.message || '发送验证码失败' }
+        }
+    }
+
+    /**
+     * 验证码登录（OTP）
+     */
+    const loginWithOtp = async (email: string, code: string): Promise<{ success: boolean; error?: string }> => {
+        try {
+            const client = getAdminSupabaseClient()
+
+            // 验证 OTP
+            const { data, error } = await client.auth.verifyOtp({
+                email,
+                token: code,
+                type: 'email'
+            })
+
+            if (error) {
+                // 处理常见错误
+                if (error.message.includes('Token has expired') || error.message.includes('invalid')) {
+                    return { success: false, error: '验证码已过期或无效' }
+                }
+                return { success: false, error: error.message }
+            }
+
+            if (!data.session) {
+                return { success: false, error: '登录失败，无法获取 Session' }
+            }
+
+            // 验证是否在 admin_users 表中，并获取部门权限
+            const { data: adminData, error: adminError } = await client
+                .from('admin_users')
+                .select(`
+                    *,
+                    department:admin_departments(id, name, permissions)
+                `)
+                .eq('auth_user_id', data.session.user.id)
+                .single()
+
+            if (adminError || !adminData) {
+                // 不是管理员，登出
+                await client.auth.signOut()
+                return { success: false, error: '该账号不是管理员' }
+            }
+
+            if (adminData.status !== 'enabled') {
+                await client.auth.signOut()
+                return { success: false, error: '该账号已被禁用' }
+            }
+
+            adminUser.value = {
+                id: data.session.user.id,
+                email: data.session.user.email || '',
+                role: adminData.role || 'admin'
+            }
+            adminInfo.value = adminData
+
+            return { success: true }
+        } catch (error: any) {
+            return { success: false, error: error.message || '登录失败' }
+        }
+    }
+
+
+    /**
      * 检查页面权限
+     * 支持子路由权限检查（如访问 /users/accounts 时检查 /users 权限）
      */
     const hasPermission = (path: string): boolean => {
         if (!adminUser.value) return false
-        // 超级管理员总是有权限
-        if (adminInfo.value?.department?.name === '超级管理员') return true
-        // 检查路径是否在权限列表中
-        return permissions.value.includes(path)
+        // 超级管理员总是有权限（部门名称包含"超级"或 permissions 包含 "*"）
+        const deptName = adminInfo.value?.department?.name || ''
+        const perms = adminInfo.value?.department?.permissions || []
+        if (deptName.includes('超级') || perms.includes('*')) return true
+
+        // 仪表盘始终可访问
+        if (path === '/_mgmt_9Xfa3') return true
+
+        // 如果没有权限配置，默认允许全部（兼容旧数据）
+        if (permissions.value.length === 0) return true
+
+        // 精确匹配
+        if (permissions.value.includes(path)) return true
+
+        // 子路由匹配：检查是否有父路由权限
+        // 例如访问 /_mgmt_9Xfa3/users/accounts 时，检查是否有 /_mgmt_9Xfa3/users 权限
+        for (const perm of permissions.value) {
+            if (path.startsWith(perm + '/')) return true
+        }
+
+        return false
     }
 
     return {
@@ -162,6 +287,8 @@ export const useAdminStore = defineStore('admin', () => {
         init,
         login,
         logout,
+        sendOtp,
+        loginWithOtp,
         hasPermission
     }
 })

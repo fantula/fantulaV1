@@ -37,7 +37,7 @@
         >
           <!-- Draggable Menu List -->
           <draggable 
-            v-model="menuList" 
+            v-model="filteredMenuList" 
             item-key="index"
             :animation="200"
             ghost-class="ghost-menu-item"
@@ -182,25 +182,36 @@ const iconMap: Record<string, any> = {
   Collection, Message, Setting, Timer, Monitor, UserFilled
 };
 
-// Default Menu Structure
-const defaultMenuItems = [
-  { index: '/_mgmt_9Xfa3', icon: 'Odometer', title: '仪表盘' },
-  { index: '/_mgmt_9Xfa3/orders', icon: 'List', title: '订单管理' },
-  { index: '/_mgmt_9Xfa3/products', icon: 'Goods', title: '商品管理' },
+// 使用统一菜单配置
+import { ADMIN_MENU_ITEMS } from '@/config/admin-menu';
 
+const menuList = ref([...ADMIN_MENU_ITEMS]);
 
-  { index: '/_mgmt_9Xfa3/cdk', icon: 'Key', title: 'CDK管理' },
-  { index: '/_mgmt_9Xfa3/coupons', icon: 'Ticket', title: '优惠券管理' },
-  { index: '/_mgmt_9Xfa3/users', icon: 'User', title: '用户管理', spacing: true },
-  { index: '/_mgmt_9Xfa3/tickets', icon: 'Service', title: '工单管理' },
-  { index: '/_mgmt_9Xfa3/recharge', icon: 'Money', title: '充值管理' },
-  { index: '/_mgmt_9Xfa3/media', icon: 'Picture', title: '媒体中心' },
-  { index: '/_mgmt_9Xfa3/help-center', icon: 'QuestionFilled', title: '帮助中心' },
-  { index: '/_mgmt_9Xfa3/messages', icon: 'Message', title: '消息发送管理' },
-  { index: '/_mgmt_9Xfa3/backend-settings', icon: 'Setting', title: '后台设定' },
-];
-
-const menuList = ref([...defaultMenuItems]);
+// 根据用户权限过滤菜单
+const filteredMenuList = computed(() => {
+  const deptName = adminStore.adminInfo?.department?.name || ''
+  const perms = adminStore.permissions || []
+  
+  // 超级管理员可见全部菜单（部门名称包含"超级"或 permissions 包含 "*"）
+  if (deptName.includes('超级') || perms.includes('*')) {
+    return menuList.value;
+  }
+  
+  const permissions = adminStore.permissions || [];
+  
+  // 如果没有权限配置，显示全部（兼容旧数据）
+  if (permissions.length === 0) {
+    return menuList.value;
+  }
+  
+  // 根据权限过滤菜单
+  return menuList.value.filter(item => {
+    // 仪表盘始终可见
+    if (item.index === '/_mgmt_9Xfa3') return true;
+    // 检查是否有权限访问该菜单
+    return permissions.includes(item.index);
+  });
+});
 
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value;
@@ -239,7 +250,7 @@ const loadMenuOrder = () => {
       const savedList = JSON.parse(saved);
       if (Array.isArray(savedList) && savedList.length > 0) {
         // Create a map of default items for checking updates
-        const defaultMap = new Map(defaultMenuItems.map(i => [i.index, i]));
+        const defaultMap = new Map(ADMIN_MENU_ITEMS.map(i => [i.index, i]));
         
         // 1. Sync properties (title/icon) of saved items with latest defaults
         // This ensures renamed items (like "Common Questions" -> "Help Center") are updated for the user
@@ -252,7 +263,7 @@ const loadMenuOrder = () => {
 
         // 2. Find and append any NEW items
         const savedIndexes = new Set(syncedList.map((item: any) => item.index));
-        const newItems = defaultMenuItems.filter(item => !savedIndexes.has(item.index));
+        const newItems = ADMIN_MENU_ITEMS.filter(item => !savedIndexes.has(item.index));
         
         menuList.value = [...syncedList, ...newItems];
       }
@@ -269,8 +280,10 @@ const loadMenuOrder = () => {
   }
 };
 
-// Check Auth - 简化：全局守卫已处理未登录跳转
-const checkAuth = async () => {
+// 等待 middleware 完成初始化后关闭 loading
+// 注意：身份验证由 admin-auth.global.ts 处理，这里只负责 UI 状态
+const waitForAuth = async () => {
+  // middleware 可能还在初始化中，等待完成
   if (!adminStore.isInitialized) {
     await adminStore.init();
   }
@@ -284,7 +297,7 @@ const handleLogout = async () => {
 };
 
 onMounted(() => {
-  checkAuth();
+  waitForAuth();
   loadMenuOrder();
 });
 </script>
