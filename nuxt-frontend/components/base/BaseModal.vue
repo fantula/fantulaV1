@@ -43,7 +43,7 @@
             :style="{ 
               animationName: currentTheme.animation,
               animationDuration: currentTheme.duration || '0.6s',
-              opacity: currentTheme.opacity ?? 1
+              '--mascot-final-opacity': currentTheme.opacity ?? 1
             }"
           />
         </div>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { getTheme } from '@/utils/modalThemeRegistry'
 
 interface Props {
@@ -152,9 +152,8 @@ const handleClose = () => {
   overflow: hidden;
 }
 
-/* Mascot Style */
+/* Mascot Style - 基础定位 */
 .modal-mascot-phantom {
-  /* Positioning (Restored) */
   position: absolute;
   bottom: 0;
   left: 0;
@@ -163,38 +162,29 @@ const handleClose = () => {
   pointer-events: none;
   z-index: 0;
   
-  /* Visuals: No Special Effects (Clean Image) */
-  opacity: 1; 
-  filter: none;
-  mix-blend-mode: normal; 
+  /* ⚠️ 初始隐藏，由动画控制显现 */
+  opacity: 0;
   
+  /* 确保动画结束后停留在最后一帧 (保持模糊/透明度) */
+  animation-fill-mode: forwards;
+  
+  /* 默认渐变遮罩 */
   mask-image: linear-gradient(to top, black 20%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
   
-  /* Standard Slide In */
-  animation: mascot-rise 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: 0.1s;
   transform-origin: bottom center;
 }
 
 /* Position Variants */
-.phantom-left {
-  /* Styles moved to .phantom-left definition below */
-}
-
-.phantom-right {
-  /* Styles moved to .phantom-right definition below */
-}
 
 .phantom-bottom {
   left: 50%; right: auto;
   /* Animation handling moved to keyframes with variables */
 }
 
-@keyframes mascot-rise {
-  0% { opacity: 0; transform: var(--start-transform); }
-  100% { opacity: 1; transform: var(--end-transform); }
-}
+/* Position Variants */
+
+
 
 /* Position Variants */
 .phantom-bottom {
@@ -399,4 +389,105 @@ const handleClose = () => {
   box-shadow: none;
   background: #334155;
 }
+</style>
+
+<style>
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 🎨 弹窗主题渲染层 (Modal Theme Rendering Layer)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * 📋 套装添加指南:
+ * 1. 在 utils/modalThemeRegistry.ts 中添加新套装配置
+ * 2. 在此文件对应位置添加 CSS variant 类和动画 keyframes
+ * 3. 使用明确的 [SUIT-XXX] 标识便于查找
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   [SUIT-001] 标准幽灵 (Classic Phantom)
+   ───────────────────────────────────────────────────────────────────────────
+   特点: 模糊+灰度+柔光混合，呈现若隐若现的幽灵效果
+   配置: mascotPosition: 'bottom', variantClass: 'variant-standard'
+   ═══════════════════════════════════════════════════════════════════════════ */
+.variant-standard {
+    filter: blur(1px) grayscale(0.35);
+    mix-blend-mode: soft-light;
+    mask-image: linear-gradient(
+      to top,
+      rgba(0,0,0,0.8) 0%,
+      rgba(0,0,0,0.4) 40%,
+      rgba(0,0,0,0.1) 70%,
+      transparent 100%
+    );
+}
+
+@keyframes mascot-rise {
+    0% {
+        opacity: 0;
+        transform: var(--start-transform) translateY(40px);
+        filter: blur(10px) grayscale(0.6);
+    }
+    60% {
+        opacity: 0.4;
+        filter: blur(4px) grayscale(0.4);
+    }
+    100% {
+        opacity: var(--mascot-final-opacity, 0.35);
+        transform: var(--end-transform);
+        filter: blur(2px) grayscale(0.35);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   [SUIT-002] 柔光风格 (Soft Light)
+   ───────────────────────────────────────────────────────────────────────────
+   特点: 明亮柔和，带暖色调
+   配置: mascotPosition: 'left', variantClass: 'variant-phantom-light'
+   ═══════════════════════════════════════════════════════════════════════════ */
+.variant-phantom-light {
+    filter: brightness(1.2) sepia(0.2);
+    mix-blend-mode: hard-light;
+}
+
+@keyframes phantom-rise-soft {
+    0% { 
+        transform: scale(0.95); 
+        opacity: 0; 
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: var(--mascot-final-opacity, 0.8); 
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   [SUIT-003] 赛博朋克 (Cyberpunk)
+   ───────────────────────────────────────────────────────────────────────────
+   特点: 霓虹发光边缘，高对比度
+   配置: mascotPosition: 'right', variantClass: 'variant-cyber'
+   ═══════════════════════════════════════════════════════════════════════════ */
+.variant-cyber {
+    filter: drop-shadow(0 0 5px #00ff00) contrast(1.2);
+    mix-blend-mode: screen;
+}
+
+@keyframes cyber-pop {
+    0% { 
+        transform: scale(0); 
+        opacity: 0;
+    }
+    60% { 
+        transform: scale(1.1); 
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: var(--mascot-final-opacity, 1);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   [SUIT-XXX] 新套装添加位置
+   ───────────────────────────────────────────────────────────────────────────
+   复制以上模板，替换 XXX 为新编号 (004, 005...)
+   ═══════════════════════════════════════════════════════════════════════════ */
 </style>

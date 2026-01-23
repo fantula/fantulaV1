@@ -38,6 +38,7 @@ import { ref, onMounted } from 'vue'
 import { useModalStore } from '@/stores/modal'
 import { commonApi } from '@/api/common'
 import { goodsApi } from '@/api/goods'
+import { preloadModalAssets } from '@/utils/modalAssetPreloader'
 import type { Banner, Goods, GoodsCategory } from '@/types/api'
 
 // 1. 顶层定义路由实例 & 配置
@@ -177,7 +178,12 @@ const handleCategoryChange = async (categoryId: string | number) => {
   await fetchGoods(categoryId)
 }
 
-onMounted(initData)
+onMounted(() => {
+  // 预加载弹窗素材（消除闪烁）
+  preloadModalAssets()
+  // 初始化页面数据
+  initData()
+})
 
 const modal = useModalStore()
 </script>

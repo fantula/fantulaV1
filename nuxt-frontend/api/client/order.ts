@@ -501,4 +501,30 @@ export const clientOrderApi = {
 
         return { success: true, message: data.message }
     },
+
+    /**
+     * 获取订单退款状态（待审核请求和取消次数）
+     */
+    async getOrderRefundInfo(orderId: string): Promise<{
+        success: boolean
+        pendingRequest?: {
+            id: string
+            reason: string
+            created_at: string
+        } | null
+        cancelledCount?: number
+        error?: string
+    }> {
+        const client = getSupabaseClient()
+        const { data, error } = await client.rpc('get_order_refund_info', { p_order_id: orderId })
+
+        if (error) return { success: false, error: error.message }
+        if (!data?.success) return { success: false, error: data?.error }
+
+        return {
+            success: true,
+            pendingRequest: data.pending_request,
+            cancelledCount: data.cancelled_count
+        }
+    },
 }

@@ -241,4 +241,52 @@ const handleDelete = async () => {
 
 ---
 
-*最后更新: 2026-01-22*
+*最后更新: 2026-01-23*
+
+---
+
+## 五、弹窗主题系统 (Modal Theme)
+
+### 5.1 系统概述
+
+弹窗主题系统提供统一的视觉风格管理，支持多套 mascot 动效。
+
+| 文件 | 作用 |
+|------|------|
+| `utils/modalThemeRegistry.ts` | 主题配置（图片/位置/动画） |
+| `components/base/BaseModal.vue` | 主题渲染（CSS 滤镜/动画） |
+| `utils/modalAssetPreloader.ts` | 素材预加载（消除闪烁） |
+
+### 5.2 内置套装
+
+| ID | 名称 | 特点 |
+|----|------|------|
+| `suit-001` | Classic Phantom | 若隐若现的幽灵效果 |
+| `suit-002` | Soft Light | 明亮柔和，暖色调 |
+| `suit-003` | Cyberpunk | 霓虹发光，高对比 |
+
+### 5.3 添加新套装
+
+**步骤1**: 在 `modalThemeRegistry.ts` 添加配置
+
+```typescript
+'suit-004': {
+    id: 'suit-004',
+    name: 'Your Theme',
+    mascotImg: '/images/your-mascot.png',
+    mascotPosition: 'bottom',
+    variantClass: 'variant-your-theme',
+    animation: 'your-animation',
+    opacity: 0.8,
+    duration: '0.6s'
+}
+```
+
+**步骤2**: 在 `BaseModal.vue` 底部添加 CSS（有明确的 `[SUIT-XXX]` 注释标识）
+
+**步骤3**: 使用 `<BaseModal themeId="suit-004" />`
+
+### 5.4 素材预加载
+
+首页加载时自动预加载所有主题图片（调用 `preloadModalAssets()`），新增图片会自动被包含。
+

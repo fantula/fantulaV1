@@ -18,10 +18,11 @@
       </div>
 
       <!-- Group 2: Business Actions (Refund / Renew) -->
-      <!-- Only for Virtual & Shared Account types -->
+      <!-- Only for Virtual & Shared Account types (NOT one_time_cdk) -->
       <div v-if="isVirtualOrShared" class="right-group">
         
-        <!-- Button 3: Request Refund -->
+        <!-- 退款按钮组 -->
+        <!-- 1. 可申请退款 -->
         <button 
           v-if="canRefund" 
           class="action-btn danger-glass pop-in" 
@@ -32,7 +33,30 @@
           <span class="label">申请退款</span>
         </button>
 
-        <!-- Button 4: Renew Now -->
+        <!-- 2. 可取消退款 (有待审核申请) -->
+        <button 
+          v-else-if="canCancelRefund" 
+          class="action-btn warning-glass pop-in" 
+          style="animation-delay: 100ms" 
+          :disabled="cancellingRefund"
+          @click="handleCancelRefund"
+        >
+          <span class="icon">↩️</span>
+          <span class="label">{{ cancellingRefund ? '取消中...' : '取消退款' }}</span>
+        </button>
+
+        <!-- 3. 退款次数已达上限 -->
+        <button 
+          v-else-if="isRefundBlocked" 
+          class="action-btn disabled pop-in" 
+          style="animation-delay: 100ms" 
+          disabled
+        >
+          <span class="icon">🚫</span>
+          <span class="label">退款次数已达上限</span>
+        </button>
+
+        <!-- 续费按钮: 仅 active 状态 -->
         <button 
           v-if="canRenew" 
           class="action-btn primary-gradient pop-in" 
@@ -53,6 +77,14 @@
       @success="handleRenewalSuccess"
     />
 
+    <!-- Refund Modal -->
+    <RefundModal
+      v-model="showRefundModal"
+      :orderId="order?.id || ''"
+      :orderNo="order?.order_no || ''"
+      @success="handleRefundSuccess"
+    />
+
     <!-- Ticket Apply Modal -->
     <TicketApplyModal 
       v-if="showTicketModal"
@@ -65,49 +97,138 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import RenewalModal from '@/components/order/RenewalModal.vue'
+import RefundModal from '@/components/order/RefundModal.vue'
 import TicketApplyModal from '@/components/TicketApplyModal.vue'
+import { clientOrderApi } from '@/api/client/order'
 
 const props = defineProps<{
   order: any
 }>()
 
+const emit = defineEmits(['refresh'])
+
 const router = useRouter()
 
 // Modal state
 const showRenewalModal = ref(false)
+const showRefundModal = ref(false)
 const showTicketModal = ref(false)
 
-// Logic: Refund/Renew ONLY for 'virtual' (虚拟充值) and 'shared_account' (账号合租)
+// Refund state
+const pendingRefundRequest = ref<any>(null)
+const refundCancelledCount = ref(0)
+const cancellingRefund = ref(false)
+
+// ========================================
+// 类型判断
+// ========================================
+
+// One-time (one_time_cdk) 不显示退款/续费按钮
 const isVirtualOrShared = computed(() => {
   if (!props.order?.orderType) return false
   return ['virtual', 'shared_account'].includes(props.order.orderType)
 })
 
-// Condition: Refund
-// Allowed if order is pending delivery or active (service running)
+// ========================================
+// 退款条件
+// ========================================
+
+// 可申请退款: 
+// 1. 虚拟/合租类型
+// 2. 状态为 pending_delivery 或 active
+// 3. 没有待审核退款
+// 4. 取消次数未达上限
 const canRefund = computed(() => 
-  ['pending_delivery', 'active'].includes(props.order?.status)
+  isVirtualOrShared.value &&
+  ['pending_delivery', 'active'].includes(props.order?.status) &&
+  !pendingRefundRequest.value &&
+  refundCancelledCount.value < 3
 )
 
-// 续费条件: 虚拟/合租 + (使用中 OR 已过期)
-// 允许过期后续费是常见需求
+// 可取消退款: 有待审核申请
+const canCancelRefund = computed(() =>
+  isVirtualOrShared.value &&
+  props.order?.status === 'refunding' &&
+  !!pendingRefundRequest.value
+)
+
+// 退款次数已达上限
+const isRefundBlocked = computed(() =>
+  isVirtualOrShared.value &&
+  ['pending_delivery', 'active'].includes(props.order?.status) &&
+  !pendingRefundRequest.value &&
+  refundCancelledCount.value >= 3
+)
+
+// ========================================
+// 续费条件 (仅 active 状态)
+// ========================================
 const canRenew = computed(() => 
   isVirtualOrShared.value && 
-  ['active', 'expired', 'completed'].includes(props.order?.status)
+  props.order?.status === 'active'
 )
 
+// ========================================
+// 加载退款状态
+// ========================================
+const loadRefundInfo = async () => {
+  if (!props.order?.id || !isVirtualOrShared.value) return
+  
+  try {
+    const res = await clientOrderApi.getOrderRefundInfo(props.order.id)
+    if (res.success) {
+      pendingRefundRequest.value = res.pendingRequest
+      refundCancelledCount.value = res.cancelledCount ?? 0
+    }
+  } catch (e) {
+    console.error('Failed to load refund info:', e)
+  }
+}
+
+// 监听订单变化
+watch(() => props.order?.id, () => {
+  loadRefundInfo()
+}, { immediate: true })
+
+// ========================================
 // Actions
+// ========================================
 const handleContactService = () => {
-    // Placeholder or redirect to a help page
-    ElMessage.info('客服系统连接中...')
+  ElMessage.info('客服系统连接中...')
 }
 
 const handleRefund = () => {
-  router.push('/support/refund/create?orderId=' + props.order?.id)
+  showRefundModal.value = true
+}
+
+const handleCancelRefund = async () => {
+  if (!props.order?.id || cancellingRefund.value) return
+  
+  cancellingRefund.value = true
+  try {
+    const res = await clientOrderApi.cancelRefundRequest(props.order.id)
+    if (res.success) {
+      ElMessage.success('退款申请已取消')
+      pendingRefundRequest.value = null
+      refundCancelledCount.value++
+      emit('refresh') // 通知父组件刷新订单
+    } else {
+      ElMessage.error(res.error || '取消失败')
+    }
+  } catch (e: any) {
+    ElMessage.error(e.message || '系统错误')
+  } finally {
+    cancellingRefund.value = false
+  }
+}
+
+const handleRefundSuccess = () => {
+  loadRefundInfo()
+  emit('refresh')
 }
 
 const handleRenew = () => {
@@ -115,7 +236,7 @@ const handleRenew = () => {
 }
 
 const handleRenewalSuccess = () => {
-  // Handled
+  emit('refresh')
 }
 
 const handleTicketSuccess = () => {
@@ -131,7 +252,7 @@ const handleTicketSuccess = () => {
   right: 0;
   z-index: 100;
   padding: 16px 24px;
-  background: rgba(15, 23, 42, 0.85); /* Semi-transparent dark bg */
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(16px);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -173,7 +294,7 @@ const handleTicketSuccess = () => {
 
 .action-btn .icon { font-size: 16px; }
 
-/* 1. Pop-In Animation */
+/* Pop-In Animation */
 @keyframes popIn {
   0% { opacity: 0; transform: translateY(20px) scale(0.8); }
   60% { opacity: 1; transform: translateY(-5px) scale(1.05); }
@@ -208,7 +329,31 @@ const handleTicketSuccess = () => {
   transform: translateY(-2px);
 }
 
-/* Style: Primary Gradient (Renew - The specialized 'Renew Now' button) */
+/* Style: Warning Glass (Cancel Refund) */
+.warning-glass {
+  background: rgba(234, 179, 8, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+.warning-glass:hover:not(:disabled) {
+  background: rgba(234, 179, 8, 0.2);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+  transform: translateY(-2px);
+}
+.warning-glass:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Style: Disabled (Refund Blocked) */
+.action-btn.disabled {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  cursor: not-allowed;
+}
+
+/* Style: Primary Gradient (Renew) */
 .primary-gradient {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: #fff;

@@ -103,24 +103,14 @@
     <div class="content-stream">
       
       <!-- Product Info Card -->
-      <div class="glass-tile product-tile">
-        <div class="tile-header">
-          <span class="tile-title">商品信息</span>
-        </div>
-        <div class="product-content">
-          <div class="product-thumb">
-            <img v-if="order.productImage" :src="order.productImage" />
-            <div v-else class="placeholder">📦</div>
-          </div>
-          <div class="product-details">
-            <div class="product-name">{{ order.productName }}</div>
-            <div class="product-meta">
-              <span class="spec-tag">{{ order.skuSpec }}</span>
-              <span class="qty-tag">x{{ order.quantity }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Product Info Card -->
+      <ProductInfoCard 
+        class="fade-in-up" 
+        :product-snapshot="order.product_snapshot"
+        :sku-snapshot="order.sku_snapshot"
+        :quantity="order.quantity"
+        :order-status="order.status"
+      />
 
       <!-- Delivery / Fulfillment Section (The Core) -->
       <!-- Only show for relevant statuses (including refunding to see what happened) -->
@@ -156,14 +146,22 @@
       </div>
 
       <!-- Tutorial Section -->
+      <!-- Tutorial Section -->
       <div v-if="instructionImage" class="glass-tile tutorial-tile fade-in-up">
         <div class="tile-header">
-          <span class="tile-title">使用教程</span>
+          <div class="header-left">
+             <el-icon class="header-icon"><Guide /></el-icon>
+             <span class="tile-title">使用说明</span>
+          </div>
         </div>
         <div class="tutorial-body" @click="previewImage(instructionImage)">
-          <img :src="instructionImage" loading="lazy" />
-          <div class="zoom-hint">
-            <el-icon><ZoomIn /></el-icon> 点击查看大图
+          <div class="image-wrapper">
+             <img :src="instructionImage" loading="lazy" />
+          </div>
+          <div class="zoom-overlay">
+            <div class="zoom-pill">
+               <el-icon><ZoomIn /></el-icon> 点击查看大图
+            </div>
           </div>
         </div>
       </div>
@@ -172,14 +170,14 @@
 
     <!-- Modals -->
     <RenewalModal
-      v-if="order"
+      v-if="order.id"
       v-model="showRenewalModal"
       :order-id="order.id"
       @success="onRenewalSuccess"
     />
 
     <RefundModal
-      v-if="order"
+      v-if="order.id"
       v-model="showRefundModal"
       :order-id="order.id"
       :order-no="order.order_no"
@@ -187,9 +185,9 @@
     />
 
     <TicketApplyModal
-      v-if="showTicketModal && order"
+      v-if="showTicketModal && order.id"
       :order-id="order.id"
-      :order-info="{ order_no: order.order_no, product_name: order.product_snapshot?.product_name }"
+      :order-info="{ order_no: order.order_no || '', product_name: order.product_snapshot?.product_name || '' }"
       @close="showTicketModal = false"
       @success="onTicketSuccess"
     />
@@ -207,7 +205,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, Timer, CircleClose, InfoFilled, 
-  ZoomIn, Box, Tickets, Refresh, Money, RefreshLeft, Headset
+  ZoomIn, Box, Tickets, Refresh, Money, RefreshLeft, Headset, Guide
 } from '@element-plus/icons-vue'
 import { clientOrderApi } from '@/api/client'
 import { ticketApi } from '@/api/client/ticket'
@@ -221,6 +219,7 @@ import RenewalModal from '@/components/order/RenewalModal.vue'
 import RefundModal from '@/components/order/RefundModal.vue'
 import TicketApplyModal from '@/components/modal/business/TicketApplyModal.vue'
 import ContactModal from '@/components/ContactModal.vue'
+import ProductInfoCard from '@/components/order/ProductInfoCard.vue'
 import type { FulfillmentField } from '@/types/order'
 
 definePageMeta({ ssr: false })
@@ -246,6 +245,8 @@ interface OrderDetail {
   productName: string
   productImage: string
   skuSpec: string
+  product_snapshot?: any
+  sku_snapshot?: any
 }
 
 interface CdkItem {
@@ -427,8 +428,8 @@ const loadData = async () => {
     const res = await clientOrderApi.getOrderDetail(orderId)
     if (res.success && res.data) {
       const d = res.data
-      const pSnap = d.product_snapshot || {}
-      const sSnap = d.sku_snapshot || {}
+      const pSnap = d.product_snapshot || {} as any
+      const sSnap = d.sku_snapshot || {} as any
 
       order.value = {
         id: d.id,
@@ -439,9 +440,11 @@ const loadData = async () => {
         totalAmount: d.total_amount,
         createdAt: d.created_at,
         expires_at: d.expires_at,
-        productName: pSnap.product_name,
-        productImage: pSnap.image,
-        skuSpec: sSnap.spec_combination ? Object.values(sSnap.spec_combination).join(' ') : '默认'
+        productName: pSnap.product_name || '',
+        productImage: pSnap.image || '',
+        skuSpec: sSnap.spec_combination ? Object.values(sSnap.spec_combination).join(' ') : '默认',
+        product_snapshot: pSnap,
+        sku_snapshot: sSnap
       }
 
       // 2. Parse CDKs
@@ -688,15 +691,40 @@ onMounted(loadData)
 .spec-tag, .qty-tag { padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); font-size: 12px; color: #94A3B8; }
 
 /* Tutorial */
-.tutorial-body { position: relative; cursor: pointer; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-.tutorial-body img { width: 100%; display: block; transition: transform 0.3s; }
-.zoom-hint {
-  position: absolute; inset: 0; background: rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  opacity: 0; transition: opacity 0.2s; color: #fff; font-weight: 600;
+.header-icon { font-size: 18px; color: #3B82F6; }
+
+.tutorial-body {
+  position: relative; cursor: pointer; border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0,0,0,0.2);
 }
-.tutorial-body:hover .zoom-hint { opacity: 1; }
-.tutorial-body:hover img { transform: scale(1.02); }
+.tutorial-body:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.image-wrapper { width: 100%; display: flex; justify-content: center; background: #000; }
+.image-wrapper img { max-width: 100%; display: block; }
+
+.zoom-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(2px);
+}
+.tutorial-body:hover .zoom-overlay { opacity: 1; }
+
+.zoom-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 20px; border-radius: 20px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; font-size: 13px; font-weight: 600;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
 
 .fade-in-up { animation: fadeInUp 0.4s ease-out backwards; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,41 +1,69 @@
 <template>
   <div class="glass-card delivery-card">
-    <div class="section-title">📦 交付内容</div>
-
+    
     <!-- 账号合租 (Shared) -->
-    <div v-if="cdkList.length > 0" class="delivery-list">
-      <div v-for="(item, idx) in cdkList" :key="idx" class="delivery-item shared-item">
-        <!-- 车位位置 -->
-        <div class="slot-header">
-          <span class="slot-icon">🚗</span>
-          <span class="slot-badge">位置: {{ formatSlotIndex(item.slotIndex) }}</span>
+    <div v-if="cdkList.length > 0" class="delivery-content">
+      <div v-for="(item, idx) in cdkList" :key="idx" class="shared-account-group">
+        
+        <!-- 1. Credential Card (Account & Password) -->
+        <div class="credential-card">
+           <div class="credential-header">
+              <!-- Promoted Slot Badge (Premium Look) -->
+              <div class="slot-title-badge">
+                 <div class="icon-box"><el-icon><User /></el-icon></div>
+                 <span class="label">您的位置:</span>
+                 <span class="value">{{ formatSlotIndex(item.slotIndex) }}号</span>
+              </div>
+           </div>
+
+           <div class="credential-body">
+              <div v-for="(val, key) in parseCdkCode(item)" :key="key" class="credential-row">
+                 <div class="row-label">{{ key }}</div>
+                 <div class="row-value-group">
+                    <span class="row-value large-text">{{ val }}</span>
+                    <button class="copy-btn-icon" @click="copyText(String(val))">
+                       <el-icon><CopyDocument /></el-icon>
+                    </button>
+                 </div>
+              </div>
+           </div>
         </div>
 
-        <!-- 账号信息字段 -->
-        <div class="fields-grid">
-          <div v-for="(val, key) in parseCdkCode(item)" :key="key" class="field-row">
-            <span class="f-label">{{ key }}:</span>
-            <span class="f-value">{{ val }}</span>
-            <span class="copy-btn" @click="copyText(String(val))">复制</span>
-          </div>
+      </div>
+
+      <!-- 2. Roommates (Full Slot List) -->
+      <div class="roommates-section">
+        <div class="roommates-header">
+          <span class="header-title">和您共享的友友</span>
+          <span class="header-count">{{ occupiedCount }}/{{ maxSlots }} 已入座</span>
+        </div>
+        
+        <div class="profiles-scroll-container">
+           <div 
+              v-for="slot in allSlots" 
+              :key="slot.index" 
+              class="profile-item"
+              :class="{ 'is-me': slot.isMe }"
+           >
+              <div class="avatar-ring" :class="{ 'empty': !slot.user, 'active': slot.user }">
+                 <img v-if="slot.user && slot.user.avatar" :src="slot.user.avatar" class="profile-avatar" />
+                 <div v-else-if="slot.user" class="profile-avatar placeholder">
+                    {{ (slot.user.nickname || 'U')[0].toUpperCase() }}
+                 </div>
+                 <div v-else class="profile-avatar placeholder empty-icon">
+                    <el-icon><Plus /></el-icon>
+                 </div>
+              </div>
+              
+              <span class="profile-name">
+                 {{ slot.isMe ? '我' : (slot.user?.nickname || '待加入') }}
+              </span>
+              
+              <span class="slot-number-tag">{{ slot.index }}号</span>
+           </div>
         </div>
       </div>
 
-      <!-- 共享用户列表 -->
-      <div v-if="coSharingUsers.length > 0" class="co-sharing-section">
-        <div class="co-sharing-header">
-          <span class="header-icon">👥</span>
-          <span class="header-text">一起共享的友友</span>
-          <span class="user-count">{{ coSharingUsers.length }}人</span>
-        </div>
-        <div class="users-grid">
-          <div v-for="user in coSharingUsers" :key="user.id" class="user-item">
-            <img v-if="user.avatar" :src="user.avatar" class="user-avatar" />
-            <div v-else class="user-avatar placeholder">👤</div>
-            <span class="user-name">{{ user.nickname || '用户' }}</span>
-          </div>
-        </div>
-      </div>
     </div>
     <div v-else class="empty-state">
       暂无详细交付信息
@@ -44,8 +72,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { User, CopyDocument, Plus } from '@element-plus/icons-vue'
 import { getSupabaseClient } from '@/utils/supabase'
 
 interface CdkItem {
@@ -60,6 +89,7 @@ interface CoSharingUser {
   id: string
   avatar: string | null
   nickname: string | null
+  slot_index: number
 }
 
 const props = defineProps<{
@@ -67,6 +97,40 @@ const props = defineProps<{
 }>()
 
 const coSharingUsers = ref<CoSharingUser[]>([])
+
+// --- Logic for Slots ---
+// 1. Get Max Slots from first CDK
+const maxSlots = computed(() => {
+    if (!props.cdkList.length) return 5 // Default fallback
+    const cdk = props.cdkList[0]
+    // Check accountData for max_slots
+    if (cdk.accountData && cdk.accountData.max_slots) {
+        return Number(cdk.accountData.max_slots)
+    }
+    return 5
+})
+
+// 2. Identify My Slot
+const mySlotIndex = computed(() => props.cdkList[0]?.slotIndex)
+
+// 3. Build Full Slot List
+const allSlots = computed(() => {
+    const slots = []
+    for (let i = 1; i <= maxSlots.value; i++) {
+        const user = coSharingUsers.value.find(u => u.slot_index === i)
+        // Assume slots are 1-based, we can adjust if logic changes
+        const isMe = (i === Number(mySlotIndex.value))
+        slots.push({
+            index: i,
+            user,
+            isMe
+        })
+    }
+    return slots
+})
+
+const occupiedCount = computed(() => coSharingUsers.value.length)
+
 
 // 解析 CDK code 为字段对象
 const parseCdkCode = (item: CdkItem) => {
@@ -94,19 +158,16 @@ const formatSlotIndex = (idx?: number) => {
 // 获取共享用户列表
 const fetchCoSharingUsers = async () => {
   if (!props.cdkList.length) return
-  
-  // 获取第一个 CDK 的 ID
   const cdkId = props.cdkList[0].id
   if (!cdkId) return
 
   try {
     const client = getSupabaseClient()
-    
-    // 查询同一 CDK 下所有 using 状态的槽位用户
     const { data, error } = await client
       .from('slot_occupancies')
       .select(`
         user_id,
+        slot_index,
         profiles:user_id (
           id,
           avatar,
@@ -123,7 +184,8 @@ const fetchCoSharingUsers = async () => {
         .map((item: any) => ({
           id: item.profiles.id,
           avatar: item.profiles.avatar,
-          nickname: item.profiles.nickname
+          nickname: item.profiles.nickname,
+          slot_index: item.slot_index
         }))
     }
   } catch (err) {
@@ -146,163 +208,163 @@ watch(() => props.cdkList, () => {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   overflow: hidden;
+  margin-top: 16px;
 }
 
 .section-title { 
-  padding: 16px 24px; 
+  padding: 14px 24px; 
   border-bottom: 1px solid rgba(255,255,255,0.05); 
   font-weight: 600; 
-  font-size: 15px; 
-  background: rgba(0,0,0,0.2); 
-}
-
-.delivery-list { 
-  padding: 20px 24px; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 16px; 
-}
-
-.delivery-item { 
-  padding: 16px; 
-  background: rgba(255,255,255,0.03); 
-  border-radius: 12px; 
-  border: 1px solid rgba(255,255,255,0.05); 
-}
-
-/* Slot Header */
-.slot-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.slot-icon { font-size: 20px; }
-
-.slot-badge { 
   font-size: 14px; 
-  color: #facc15; 
-  font-weight: 600; 
-  background: rgba(250, 204, 21, 0.1);
-  padding: 4px 12px;
-  border-radius: 6px;
+  color: #E2E8F0;
+  background: rgba(0,0,0,0.15); 
+  display: flex; align-items: center; gap: 8px;
+}
+.title-icon { font-size: 16px; }
+
+.delivery-content { 
+  display: flex; flex-direction: column; 
 }
 
-/* Fields Grid */
-.fields-grid { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 10px; 
+/* 1. Credential Card */
+.shared-account-group {
+    padding: 20px 24px;
 }
 
-.field-row { 
-  display: flex; 
-  align-items: center; 
-  gap: 12px; 
-  padding: 8px 12px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 6px;
+.credential-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
 }
 
-.f-label { 
-  color: #94a3b8; 
-  font-size: 13px;
-  min-width: 60px;
+.credential-header {
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.1);
+    display: flex; align-items: center; /* Left align as requested */
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.f-value { 
-  color: #e2e8f0; 
-  font-family: 'Roboto Mono', monospace; 
-  font-size: 14px;
-  flex: 1; 
+/* Premium Slot Badge Title */
+.slot-title-badge {
+    display: flex; align-items: center; gap: 10px;
 }
 
-.copy-btn { 
-  cursor: pointer; 
-  font-size: 12px; 
-  color: #3b82f6;
-  padding: 2px 8px;
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-.copy-btn:hover { 
-  background: rgba(59, 130, 246, 0.2); 
+.icon-box {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #34D399; font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Co-Sharing Section */
-.co-sharing-section {
-  margin-top: 16px;
-  padding: 16px;
-  background: rgba(255,255,255,0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
+.slot-title-badge .label {
+    font-size: 14px; font-weight: 500; color: #94A3B8;
 }
 
-.co-sharing-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+.slot-title-badge .value {
+    font-size: 16px; font-weight: 700; color: #fff;
+    font-family: 'Outfit', sans-serif; /* Or system font */
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); /* Subtle glow */
 }
 
-.header-icon { font-size: 18px; }
-.header-text { font-size: 14px; font-weight: 600; color: #e2e8f0; }
-.user-count { 
-  font-size: 12px; 
-  color: #64748b;
-  margin-left: auto;
+.credential-body {
+    padding: 16px 20px;
+    display: flex; flex-direction: column; gap: 12px;
 }
 
-.users-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+.credential-row {
+    display: flex; flex-direction: column; gap: 4px;
 }
 
-.user-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 8px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 8px;
-  min-width: 60px;
+.row-label { font-size: 12px; color: #64748B; }
+
+.row-value-group {
+    display: flex; align-items: center; gap: 10px;
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.1);
+.row-value {
+    font-family: 'Monaco', monospace; font-size: 16px; color: #fff; letter-spacing: 0.5px;
+    background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;
 }
 
-.user-avatar.placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255,255,255,0.05);
-  font-size: 18px;
+.copy-btn-icon {
+    background: rgba(255,255,255,0.1); border: none; color: #94A3B8;
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+}
+.copy-btn-icon:hover { background: rgba(255,255,255,0.2); color: #fff; transform: translateY(-1px); }
+
+
+/* 2. Roommates Section (Netflix Style) */
+.roommates-section {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 20px 24px 24px;
+    background: linear-gradient(to bottom, rgba(15,23,42,0.4), rgba(15,23,42,0.6));
 }
 
-.user-name {
-  font-size: 11px;
-  color: #94a3b8;
-  max-width: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
+.roommates-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+}
+.header-title { font-size: 13px; font-weight: 600; color: #CBD5E1; }
+.header-count { font-size: 12px; color: #64748B; }
+
+.profiles-scroll-container {
+    display: flex; align-items: flex-start; gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 8px; /* For scrollbar space */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+.profiles-scroll-container::-webkit-scrollbar { display: none; }
+
+.profile-item {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    width: 64px; flex-shrink: 0;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+.profile-item:hover { transform: translateY(-2px); }
+
+.avatar-ring {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+    padding: 2px; /* Ring gap */
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.3s;
 }
 
-.empty-state { 
-  text-align: center; 
-  padding: 20px; 
-  color: #64748b; 
+.profile-item:hover .avatar-ring { border-color: #E2E8F0; }
+
+/* Placeholder Avatar with Gradient */
+.profile-avatar.placeholder {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: #CBD5E1; font-weight: 700; font-size: 20px;
+    border: none;
 }
+.profile-avatar {
+    width: 100%; height: 100%;
+    border-radius: 8px; /* Inner radius */
+    object-fit: cover;
+    background: #1E293B;
+}
+
+.profile-name {
+    font-size: 11px; color: #94A3B8; text-align: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    width: 100%;
+    transition: color 0.2s;
+}
+.profile-item:hover .profile-name { color: #fff; }
+
+/* Empty Slot Styling */
+.empty-slot { opacity: 0.5; cursor: default; }
+.empty-slot:hover { transform: none; }
+.avatar-ring.empty { border-style: dashed; border-color: rgba(255,255,255,0.1); color: #64748B; }
 </style>
+

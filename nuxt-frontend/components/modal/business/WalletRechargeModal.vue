@@ -4,13 +4,9 @@
     title="购置额度"
     width="860px"
     :show-footer="false"
-    :show-mascot="false"
+    theme-id="suit-002"
     @close="$emit('close')"
   >
-    <!-- Custom Recharge Mascot (Phantom Style) in Container Slot -->
-    <template #mascot>
-      <img src="/images/theme/recharge_mascot.png" class="recharge-mascot-phantom" />
-    </template>
 
     <template #default>
       <div class="recharge-content">
@@ -205,25 +201,9 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-/* Mascot Positioning: Phantom Style in Container Slot */
-.recharge-mascot-phantom {
-  position: absolute;
-  right: -32px; 
-  top: -32px;   
-  bottom: -32px;
-  height: calc(100% + 64px); 
-  width: auto;
-  z-index: 0; 
-  pointer-events: none !important; 
-  opacity: 0.15;
-  filter: none;
-  mask-image: linear-gradient(to right, transparent 0%, black 50%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 50%);
-  object-fit: cover;
-  object-position: right center;
-}
 
+
+<style scoped>
 /* Content Layout */
 .recharge-content {
   position: relative;
