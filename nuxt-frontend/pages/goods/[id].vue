@@ -170,7 +170,7 @@
                 </button>
                 <button 
                   :class="['favorite-btn', { favorited: isFavorited }]" 
-                  @click="toggleFavorite"
+                  @click="toggleFavorite($event)"
                   :disabled="stockLoading || !hasStock || !hasSkus"
                 >
                   <el-icon><Star v-if="!isFavorited" /><StarFilled v-else /></el-icon>
@@ -629,7 +629,11 @@ const checkFavoriteStatus = async () => {
   isFavorited.value = res.data || false
 }
 
-const toggleFavorite = async () => {
+// 动画 composable
+import { useFlyingAnimation } from '@/composables/useFlyingAnimation'
+const { startAnimation: startFavAnimation } = useFlyingAnimation()
+
+const toggleFavorite = async (event: MouseEvent) => {
   if (!userStore.isLoggedIn) {
     modal.showLogin = true
     return
@@ -640,11 +644,28 @@ const toggleFavorite = async () => {
   try {
     const { favoriteApi } = await import('@/api/common')
     if (isFavorited.value) {
+      // 这里的逻辑保持不变：如果是取消收藏，暂时提示用户去列表页操作
+      // 用户提到 "取消收藏就是要减吗？对不要减", 意味着取消收藏可能不需要特效，或者不期望有反向动画。
+      // 当前逻辑是 "取消收藏请前往我的收藏页面"，暂不修改此行为，除非明确要求原地取消。
+      // 如果要原地取消：调用 removeFavoriteAPI -> isFavorited = false -> Toast '已取消'
+      // 根据 Analysis: "取消收藏...不要减就是这个右上角这个动画" -> 用户似乎希望取消也在详情页做？
+      // User said: "我需要这么优化之后那个取消收藏吗？取消收藏就是要减吗？对不要减就是这个右上角这个动画"
+      // Interpretation: Don't do a "flying away" animation for remove, or maybe just keep simple.
+      // Current code forces user to go to favorites page to remove. Let's keep it simple for now as Plan didn't specify changing this logic (Plan said "Cancel Favorite: ... Current logic prompts to go to page. We will keep this unless asked").
       ElMessage.info('取消收藏请前往"我的收藏"页面')
     } else {
       const res = await favoriteApi.addFavorite(String(goodsId.value), matchedSku.value?.id)
       if (res.success) {
         isFavorited.value = true
+        // 触发飞入动画
+        const btnEl = event.target as HTMLElement
+        // 找到按钮元素
+        const targetBtn = btnEl.closest('.favorite-btn') as HTMLElement || btnEl
+        const imageToFly = selectedSkuImage.value || goodsInfo.value.image
+
+        startFavAnimation(targetBtn, imageToFly, 'favorites-icon-ref', () => {
+             // 动画结束后不需要额外操作，状态已经变了
+        })
         ElMessage.success('收藏成功')
       } else {
         ElMessage.warning(res.msg || '收藏失败')

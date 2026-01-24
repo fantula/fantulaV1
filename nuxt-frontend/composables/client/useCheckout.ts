@@ -15,8 +15,9 @@ export function useCheckout() {
   const error = ref('')
   const preOrders = ref<PreOrder[]>([])
   const paying = ref(false)
-  const showBalanceModal = ref(false)
+  // const showBalanceModal = ref(false) // Removed
   const showPaySuccess = ref(false)
+  const refreshingBalance = ref(false) // New
   
   // Settlement Data
   const lastOrderId = ref('')
@@ -57,6 +58,19 @@ export function useCheckout() {
   })
 
   // --- Methods ---
+
+  const refreshBalance = async () => {
+    if (refreshingBalance.value) return
+    refreshingBalance.value = true
+    try {
+        await userStore.fetchUserInfo()
+        ElMessage.success('额度已更新')
+    } catch (e) {
+        ElMessage.error('更新失败')
+    } finally {
+        refreshingBalance.value = false
+    }
+  }
 
   const startCountdown = (expiresTime: number) => {
     const update = () => {
@@ -197,7 +211,10 @@ export function useCheckout() {
     }
 
     if (userBalance.value < finalPayAmount.value) {
-      showBalanceModal.value = true
+      // showBalanceModal.value = true // Removed
+      // Should be handled by UI button state now
+      ElMessage.warning('额度不足，请先充值')
+      router.push('/profile/recharge')
       return
     }
     
@@ -211,11 +228,11 @@ export function useCheckout() {
       )
       
       if (!res.success) {
-        if (res.error?.includes('余额不足')) {
-          showBalanceModal.value = true
-        } else {
+        // if (res.error?.includes('余额不足')) {
+        //   showBalanceModal.value = true
+        // } else {
           ElMessage.error(res.error || '支付失败')
-        }
+        // }
         return
       }
       
@@ -248,8 +265,9 @@ export function useCheckout() {
     error,
     preOrders,
     paying,
-    showBalanceModal,
+    // showBalanceModal, // Removed
     showPaySuccess,
+    refreshingBalance, // New
     lastOrderId,
     lastOrderAmount,
     selectedCoupon,
@@ -268,6 +286,7 @@ export function useCheckout() {
     loadPreOrders,
     handleCouponSelect,
     handlePay,
-    formatSpec
+    formatSpec,
+    refreshBalance // New
   }
 }

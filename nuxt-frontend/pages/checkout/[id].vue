@@ -48,26 +48,29 @@
                 </div>
                 <div class="product-info">
                   <div class="product-name">{{ order.product_snapshot?.product_name }}</div>
-                  <div class="product-spec">
-                    {{ formatSpec(order.sku_snapshot?.spec_combination) }}
+                  <div class="product-meta-row">
+                     <el-tag size="small" effect="dark" class="spec-tag">{{ formatSpec(order.sku_snapshot?.spec_combination) }}</el-tag>
+                     <span class="delivery-info">发货方式：自动发货</span>
                   </div>
                 </div>
                 <div class="product-price">
-                  <div class="price-val">¥{{ order.unit_price.toFixed(2) }}</div>
+                  <div class="price-val">{{ order.unit_price.toFixed(2) }} 点</div>
                   <div class="qty">x{{ order.quantity }}</div>
                 </div>
               </div>
             </div>
           </div>
           
-          <!-- 温馨提示 -->
-          <div class="tips-card glass-card">
-            <h4><el-icon><InfoFilled /></el-icon> 温馨提示</h4>
-            <ul>
-              <li>资源已为您锁定，请尽快完成支付。</li>
-              <li>超时未支付将自动释放，需重新下单。</li>
-              <li>如遇问题，请联系在线客服。</li>
-            </ul>
+          <!-- 温馨提示 moved to bottom of left section -->
+          <div class="tips-container">
+             <div class="tips-card glass-card">
+              <h4><el-icon><InfoFilled /></el-icon> 温馨提示</h4>
+              <ul>
+                <li>资源已为您锁定，请尽快完成支付。</li>
+                <li>超时未支付将自动释放，需重新下单。</li>
+                <li>如遇问题，请联系在线客服。</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -80,7 +83,7 @@
             <div class="price-rows">
               <div class="price-row">
                 <span>商品总额</span>
-                <span class="val">¥{{ totalProductAmount.toFixed(2) }}</span>
+                <span class="val">{{ totalProductAmount.toFixed(2) }} 点</span>
               </div>
               
               <!-- 优惠券选择 -->
@@ -88,11 +91,11 @@
                 <div class="coupon-label">
                   <span>优惠券</span>
                   <el-tag v-if="selectedCoupon" size="small" type="danger" effect="dark" class="discount-tag">
-                    已抵扣 ¥{{ couponDiscount.toFixed(2) }}
+                    已抵扣 {{ couponDiscount.toFixed(2) }} 点
                   </el-tag>
                 </div>
                 <div class="coupon-action">
-                  <span v-if="selectedCoupon" class="val discount">-¥{{ couponDiscount.toFixed(2) }}</span>
+                  <span v-if="selectedCoupon" class="val discount">-{{ couponDiscount.toFixed(2) }} 点</span>
                   <span v-else class="placeholder">选择优惠券</span>
                   <el-icon><ArrowRight /></el-icon>
                 </div>
@@ -102,11 +105,11 @@
 
               <div class="price-row total">
                 <span>应付金额</span>
-                <span class="val final">¥{{ finalPayAmount.toFixed(2) }}</span>
+                <span class="val final">{{ finalPayAmount.toFixed(2) }} 点</span>
               </div>
             </div>
 
-            <!-- 支付方式 (只保留余额) -->
+            <!-- 支付方式 (Changes: Balance -> Quota) -->
             <div class="payment-method">
               <div class="method-title">支付方式</div>
               <div class="balance-card active">
@@ -114,8 +117,13 @@
                   <el-icon><Wallet /></el-icon>
                 </div>
                 <div class="balance-info">
-                  <div class="method-name">余额支付</div>
-                  <div class="user-balance">可用余额: ¥{{ userBalance.toFixed(2) }}</div>
+                  <div class="method-name">额度支付</div>
+                  <div class="user-balance-row">
+                      <span class="user-balance">可用额度: {{ userBalance.toFixed(2) }} 点</span>
+                      <el-button link type="primary" size="small" @click.stop="refreshBalance" :loading="refreshingBalance" class="refresh-btn">
+                          <el-icon><Refresh /></el-icon>
+                      </el-button>
+                  </div>
                 </div>
                 <div class="check-mark"><el-icon><Select /></el-icon></div>
               </div>
@@ -125,14 +133,17 @@
             <div class="action-area">
               <button 
                 class="pay-btn" 
+                :class="{ 'insufficient': isBalanceInsufficient }"
                 :disabled="paying || remainingSeconds <= 0"
-                @click="handlePay"
+                @click="handlePayAction"
               >
                 <div v-if="paying" class="btn-loader"></div>
-                <span v-else>立即支付 ¥{{ finalPayAmount.toFixed(2) }}</span>
+                <!-- Logic change: If insufficient, show 'Go Recharge' -->
+                <span v-else-if="isBalanceInsufficient">额度不足，去充值</span>
+                <span v-else>立即支付 {{ finalPayAmount.toFixed(2) }} 点</span>
               </button>
               <div class="agreement-text">
-                点击支付即表示同意 <a href="#">服务协议</a>
+                点击支付即表示同意 <a href="/docs/terms" target="_blank">服务协议</a> 和 <a href="/docs/privacy" target="_blank">隐私协议</a>
               </div>
             </div>
           </div>
@@ -141,12 +152,7 @@
     </div>
 
     <!-- 弹窗组件 -->
-    <BalanceNotEnoughModal
-      v-if="showBalanceModal"
-      :balance="userBalance"
-      :needAmount="finalPayAmount"
-      @close="showBalanceModal = false"
-    />
+    <!-- BalanceNotEnoughModal removed -->
     
     <PaySuccessModal 
       v-if="showPaySuccess" 
@@ -170,9 +176,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, Timer, InfoFilled, ArrowRight, Wallet, Select } from '@element-plus/icons-vue'
+import { ArrowLeft, Timer, InfoFilled, ArrowRight, Wallet, Select, Refresh } from '@element-plus/icons-vue'
 import { useCheckout } from '@/composables/client/useCheckout'
-import BalanceNotEnoughModal from '@/components/BalanceNotEnoughModal.vue'
+// BalanceNotEnoughModal import removed
 import PaySuccessModal from '@/components/PaySuccessModal.vue'
 import CouponSelectorModal from '@/components/modal/business/CouponSelectorModal.vue'
 
@@ -188,7 +194,6 @@ const {
   error,
   preOrders,
   paying,
-  showBalanceModal,
   showPaySuccess,
   
   lastOrderId,
@@ -208,7 +213,9 @@ const {
   loadPreOrders,
   handleCouponSelect,
   handlePay,
-  formatSpec
+  formatSpec,
+  refreshBalance, // New
+  refreshingBalance // New
 } = useCheckout()
 
 // Computed
@@ -219,6 +226,19 @@ const preOrderIds = computed(() => {
   if (id) return [id]
   return []
 })
+
+const isBalanceInsufficient = computed(() => {
+    return userBalance.value < finalPayAmount.value
+})
+
+const handlePayAction = () => {
+    if (isBalanceInsufficient.value) {
+        // Redirect to recharge
+        router.push('/profile/recharge') // Assuming recharge route
+        return
+    }
+    handlePay()
+}
 
 // Lifecycle
 onMounted(() => {
@@ -362,13 +382,26 @@ const handlePaySuccessClose = () => {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.product-spec {
-  font-size: 13px;
-  color: var(--text-sub);
+.product-meta-row {
+    display: flex; gap: 12px; align-items: center;
 }
+
+.spec-tag {
+    /* Element Plus Tag Override */
+    --el-tag-bg-color: rgba(255, 255, 255, 0.1);
+    --el-tag-border-color: rgba(255, 255, 255, 0.2);
+    --el-tag-text-color: var(--text-sub);
+}
+
+.delivery-info {
+    font-size: 12px; color: var(--primary-blue);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 2px 8px; border-radius: 4px;
+}
+
 
 .product-price {
   text-align: right;
@@ -384,6 +417,10 @@ const handlePaySuccessClose = () => {
   font-size: 13px;
   color: var(--text-sub);
   margin-top: 4px;
+}
+
+.tips-container {
+    margin-top: auto;
 }
 
 .tips-card h4 {
@@ -407,6 +444,8 @@ const handlePaySuccessClose = () => {
 .sticky-card {
   position: sticky;
   top: 100px;
+  min-height: 480px; /* Slight height increase */
+  display: flex; flex-direction: column;
 }
 
 .card-title {
@@ -488,6 +527,9 @@ const handlePaySuccessClose = () => {
 }
 
 /* Payment Method */
+.payment-method {
+    flex: 1; /* Push others */
+}
 .method-title {
   font-size: 15px;
   font-weight: 600;
@@ -529,10 +571,22 @@ const handlePaySuccessClose = () => {
   color: #fff;
 }
 
+.user-balance-row {
+    display: flex; align-items: center; gap: 8px; margin-top: 4px;
+}
+
 .user-balance {
   font-size: 13px;
   color: var(--text-sub);
-  margin-top: 4px;
+}
+.refresh-btn {
+    padding: 0; height: auto;
+}
+.refresh-btn :deep(.el-icon) {
+    font-size: 14px; color: var(--text-sub);
+}
+.refresh-btn:hover :deep(.el-icon) {
+    color: var(--active-orange);
 }
 
 .check-mark {
@@ -565,8 +619,18 @@ const handlePaySuccessClose = () => {
   box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
 }
 
+.pay-btn.insufficient {
+    background: #334155;
+    box-shadow: none;
+    color: #94A3B8;
+}
+.pay-btn.insufficient:hover {
+    background: #475569;
+    color: #fff;
+}
+
 .pay-btn:disabled {
-  background: #334155;
+  background: #1e293b;
   color: #64748B;
   cursor: not-allowed;
   transform: none;

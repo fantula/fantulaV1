@@ -66,6 +66,12 @@
                 class="header-mini-cart"
               />
             </div>
+
+            <!-- Favorites Icon -->
+            <div class="favorites-wrapper" @click="navigateToFavorites" id="favorites-icon-ref" title="我的收藏">
+              <el-icon :size="24" color="#E2E8F0" class="fav-icon"><Star /></el-icon>
+            </div>
+
             <div class="user-info-container">
               <!-- 加载状态：骨架屏 -->
               <div v-if="userStore.loading" class="user-info user-info--loading">
@@ -99,7 +105,7 @@ import { useCartStore } from '@/stores/cart'
 import ServiceModal from './ServiceModal.vue'
 import LoginRegisterModal from './LoginRegisterModal.vue'
 import MiniCartPopup from '@/components/cart/MiniCartPopup.vue'
-import { Shop, ShoppingCart, Search } from '@element-plus/icons-vue'
+import { Shop, ShoppingCart, Search, Star } from '@element-plus/icons-vue'
 
 
 const modal = useModalStore()
@@ -142,6 +148,10 @@ const navigateToProfile = () => {
   } else {
     navigateTo('/profile')
   }
+}
+
+const navigateToFavorites = () => {
+    navigateTo('/profile/favorites')
 }
 
 // 监听登录状态变化，登录成功后自动关闭弹窗
@@ -411,6 +421,23 @@ onUnmounted(() => {
   justify-content: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1;
+}
+
+/* Favorites Icon */
+.favorites-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  height: 100%;
+}
+.favorites-wrapper:hover .fav-icon {
+  color: var(--active-orange) !important;
+  transform: scale(1.1);
+}
+.fav-icon {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* 用户信息样式 */

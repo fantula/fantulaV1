@@ -1051,7 +1051,7 @@ const _routes = [
     name: "checkout-id",
     path: "/checkout/:id()",
     meta: __nuxt_page_meta || {},
-    component: () => import('./_id_-DLoHkiHq.mjs')
+    component: () => import('./_id_-CQyFWmRt.mjs')
   },
   {
     name: "support-refund-create",

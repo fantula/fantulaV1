@@ -440,6 +440,7 @@ declare global {
   const useFaqTicker: typeof import('../../composables/useFaqTicker').useFaqTicker
   const useFavorite: typeof import('../../composables/useFavorite').useFavorite
   const useFetch: typeof import('../../node_modules/nuxt/dist/app/composables/fetch').useFetch
+  const useFlyingAnimation: typeof import('../../composables/useFlyingAnimation').useFlyingAnimation
   const useGoodsDetail: typeof import('../../composables/useGoodsDetail').useGoodsDetail
   const useHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHead
   const useHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHeadSafe
@@ -985,6 +986,7 @@ declare module 'vue' {
     readonly useFaqTicker: UnwrapRef<typeof import('../../composables/useFaqTicker')['useFaqTicker']>
     readonly useFavorite: UnwrapRef<typeof import('../../composables/useFavorite')['useFavorite']>
     readonly useFetch: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/fetch')['useFetch']>
+    readonly useFlyingAnimation: UnwrapRef<typeof import('../../composables/useFlyingAnimation')['useFlyingAnimation']>
     readonly useGoodsDetail: UnwrapRef<typeof import('../../composables/useGoodsDetail')['useGoodsDetail']>
     readonly useHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHead']>
     readonly useHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHeadSafe']>
