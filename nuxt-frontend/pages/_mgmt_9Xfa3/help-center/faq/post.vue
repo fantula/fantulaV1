@@ -95,7 +95,8 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { adminFaqApi, adminProductApi, type AdminFaqCategory } from '@/api/admin-supabase'
+import { adminFaqApi, type AdminFaqCategory } from '@/api/admin/help-center'
+import { adminProductApi } from '@/api/admin/product'
 
 const route = useRoute()
 const router = useRouter()
@@ -191,7 +192,7 @@ const submitForm = async () => {
       const res = await adminFaqApi.updateFaq(form.id, data)
       if (res.success) {
         ElMessage.success('更新成功')
-        router.push('/_mgmt_9Xfa3/faq')
+        router.push('/_mgmt_9Xfa3/help-center/faq')
       } else {
         ElMessage.error(res.error || '更新失败')
       }
@@ -199,7 +200,7 @@ const submitForm = async () => {
       const res = await adminFaqApi.createFaq(data)
       if (res.success) {
         ElMessage.success('创建成功')
-        router.push('/_mgmt_9Xfa3/faq')
+        router.push('/_mgmt_9Xfa3/help-center/faq')
       } else {
         ElMessage.error(res.error || '创建失败')
       }

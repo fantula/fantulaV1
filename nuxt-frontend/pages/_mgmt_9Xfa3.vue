@@ -1,132 +1,134 @@
 <template>
-  <!-- 登录页：直接渲染，不显示侧边栏 -->
-  <NuxtPage v-if="isLoginPage" />
-  
-  <!-- 加载中：显示骨架屏 -->
-  <div v-else-if="isLoading" class="admin-loading-screen">
-    <div class="loading-content">
-      <div class="loading-logo">F</div>
-      <p class="loading-text">正在验证身份...</p>
-    </div>
-  </div>
-  
-  <!-- 已登录：显示完整布局 -->
-  <el-container v-else-if="currentUser" class="admin-layout" :class="{ 'dark-mode': isDark }">
-    <el-aside :width="isCollapse ? '64px' : '250px'" class="admin-aside">
-      <!-- Logo Area -->
-      <div class="logo" :class="{ 'collapsed': isCollapse }">
-        <div class="logo-icon">F</div>
-        <div class="logo-text" v-show="!isCollapse">
-          <h2>FANTULA</h2>
-          <span class="logo-sub">ADMINISTRATOR</span>
-        </div>
-      </div>
-
-      <!-- Menu Scrollbar -->
-      <el-scrollbar class="menu-scrollbar">
-        <el-menu
-          :default-active="activeMenu"
-          class="el-menu-vertical"
-          :collapse="isCollapse"
-          :collapse-transition="false"
-          router
-          unique-opened
-          background-color="transparent"
-          text-color="var(--el-text-color-regular)"
-          active-text-color="var(--el-color-primary)"
-        >
-          <!-- Draggable Menu List -->
-          <draggable 
-            v-model="filteredMenuList" 
-            item-key="index"
-            :animation="200"
-            ghost-class="ghost-menu-item"
-            @end="saveMenuOrder"
-            handle=".drag-handle" 
-          >
-            <template #item="{ element }">
-              <div class="menu-wrapper">
-                <el-sub-menu v-if="element.children && element.children.length > 0" :index="element.index">
-                  <template #title>
-                    <el-icon class="drag-handle"><component :is="iconMap[element.icon]" /></el-icon>
-                    <span>{{ element.title }}</span>
-                  </template>
-                  <el-menu-item 
-                    v-for="child in element.children" 
-                    :key="child.index" 
-                    :index="child.index"
-                  >
-                    <el-icon v-if="child.icon"><component :is="iconMap[child.icon]" /></el-icon>
-                    <template #title><span>{{ child.title }}</span></template>
-                  </el-menu-item>
-                </el-sub-menu>
-                
-                <el-menu-item v-else :index="element.index" :class="{ 'menu-item-spacing': element.spacing }">
-                  <el-icon class="drag-handle"><component :is="iconMap[element.icon]" /></el-icon>
-                  <template #title><span>{{ element.title }}</span></template>
-                </el-menu-item>
-              </div>
-            </template>
-          </draggable>
-        </el-menu>
-      </el-scrollbar>
-      
-      <!-- Collapse Toggle Button -->
-      <div class="sidebar-toggle" @click="toggleCollapse">
-        <el-icon v-if="isCollapse"><Expand /></el-icon>
-        <el-icon v-else><Fold /></el-icon>
-      </div>
-    </el-aside>
+  <div>
+    <!-- 登录页：直接渲染，不显示侧边栏 -->
+    <NuxtPage v-if="isLoginPage" />
     
-    <el-container class="main-container">
-      <el-header class="admin-header">
-        <div class="header-content">
-          <div id="header-portal" class="header-portal"></div>
-
-          <div class="header-right-actions">
-            <!-- Dark Mode Toggle -->
-            <button class="theme-toggle" @click="toggleDark" :title="isDark ? 'Switch to Light' : 'Switch to Dark'">
-              <el-icon v-if="isDark"><Sunny /></el-icon>
-              <el-icon v-else><Moon /></el-icon>
-            </button>
-
-            <!-- User Dropdown -->
-            <div class="user-info" v-if="currentUser">
-              <el-dropdown trigger="click">
-                <div class="el-dropdown-link">
-                  <el-avatar :size="36" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" class="user-avatar" />
-                  <div class="user-details">
-                     <span class="username">{{ currentUser.name }}</span>
-                     <span class="user-role">{{ currentUser.email }}</span>
-                  </div>
-                  <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-                </div>
-                <template #dropdown>
-                  <el-dropdown-menu class="user-dropdown">
-                    <el-dropdown-item>
-                      <el-icon><User /></el-icon> 个人中心
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-icon><Setting /></el-icon> 系统设置
-                    </el-dropdown-item>
-                    <el-dropdown-item divided @click="handleLogout">
-                      <el-icon><SwitchButton /></el-icon> 退出登录
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
+    <!-- 加载中：显示骨架屏 -->
+    <div v-else-if="isLoading" class="admin-loading-screen">
+      <div class="loading-content">
+        <div class="loading-logo">F</div>
+        <p class="loading-text">正在验证身份...</p>
+      </div>
+    </div>
+    
+    <!-- 已登录：显示完整布局 -->
+    <el-container v-else-if="currentUser" class="admin-layout" :class="{ 'dark-mode': isDark }">
+      <el-aside :width="isCollapse ? '64px' : '250px'" class="admin-aside">
+        <!-- Logo Area -->
+        <div class="logo" :class="{ 'collapsed': isCollapse }">
+          <div class="logo-icon">F</div>
+          <div class="logo-text" v-show="!isCollapse">
+            <h2>FANTULA</h2>
+            <span class="logo-sub">ADMINISTRATOR</span>
           </div>
         </div>
-      </el-header>
-      
-      <el-main class="admin-main">
-        <div class="main-content-wrapper">
-          <NuxtPage />
+
+        <!-- Menu Scrollbar -->
+        <el-scrollbar class="menu-scrollbar">
+          <el-menu
+            :default-active="activeMenu"
+            class="el-menu-vertical"
+            :collapse="isCollapse"
+            :collapse-transition="false"
+            router
+            unique-opened
+            background-color="transparent"
+            text-color="var(--el-text-color-regular)"
+            active-text-color="var(--el-color-primary)"
+          >
+            <!-- Draggable Menu List -->
+            <draggable 
+              :list="filteredMenuList" 
+              item-key="index"
+              :animation="200"
+              ghost-class="ghost-menu-item"
+              @end="saveMenuOrder"
+              handle=".drag-handle" 
+            >
+              <template #item="{ element }">
+                <div class="menu-wrapper">
+                  <el-sub-menu v-if="element.children && element.children.length > 0" :index="element.index">
+                    <template #title>
+                      <el-icon class="drag-handle"><component :is="iconMap[element.icon]" /></el-icon>
+                      <span>{{ element.title }}</span>
+                    </template>
+                    <el-menu-item 
+                      v-for="child in element.children" 
+                      :key="child.index" 
+                      :index="child.index"
+                    >
+                      <el-icon v-if="child.icon"><component :is="iconMap[child.icon]" /></el-icon>
+                      <template #title><span>{{ child.title }}</span></template>
+                    </el-menu-item>
+                  </el-sub-menu>
+                  
+                  <el-menu-item v-else :index="element.index" :class="{ 'menu-item-spacing': element.spacing }">
+                    <el-icon class="drag-handle"><component :is="iconMap[element.icon]" /></el-icon>
+                    <template #title><span>{{ element.title }}</span></template>
+                  </el-menu-item>
+                </div>
+              </template>
+            </draggable>
+          </el-menu>
+        </el-scrollbar>
+        
+        <!-- Collapse Toggle Button -->
+        <div class="sidebar-toggle" @click="toggleCollapse">
+          <el-icon v-if="isCollapse"><Expand /></el-icon>
+          <el-icon v-else><Fold /></el-icon>
         </div>
-      </el-main>
+      </el-aside>
+      
+      <el-container class="main-container">
+        <el-header class="admin-header">
+          <div class="header-content">
+            <div id="header-portal" class="header-portal"></div>
+
+            <div class="header-right-actions">
+              <!-- Dark Mode Toggle -->
+              <button class="theme-toggle" @click="toggleDark" :title="isDark ? 'Switch to Light' : 'Switch to Dark'">
+                <el-icon v-if="isDark"><Sunny /></el-icon>
+                <el-icon v-else><Moon /></el-icon>
+              </button>
+
+              <!-- User Dropdown -->
+              <div class="user-info" v-if="currentUser">
+                <el-dropdown trigger="click">
+                  <div class="el-dropdown-link">
+                    <el-avatar :size="36" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" class="user-avatar" />
+                    <div class="user-details">
+                       <span class="username">{{ currentUser.name }}</span>
+                       <span class="user-role">{{ currentUser.email }}</span>
+                    </div>
+                    <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+                  </div>
+                  <template #dropdown>
+                    <el-dropdown-menu class="user-dropdown">
+                      <el-dropdown-item>
+                        <el-icon><User /></el-icon> 个人中心
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-icon><Setting /></el-icon> 系统设置
+                      </el-dropdown-item>
+                      <el-dropdown-item divided @click="handleLogout">
+                        <el-icon><SwitchButton /></el-icon> 退出登录
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
+          </div>
+        </el-header>
+        
+        <el-main class="admin-main">
+          <div class="main-content-wrapper">
+            <NuxtPage />
+          </div>
+        </el-main>
+      </el-container>
     </el-container>
-  </el-container>
+  </div>
 </template>
 
 <script setup lang="ts">

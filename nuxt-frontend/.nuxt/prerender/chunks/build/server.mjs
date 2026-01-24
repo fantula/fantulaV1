@@ -551,12 +551,12 @@ const _routes = [
       {
         name: "profile",
         path: "",
-        component: () => import('./index-Bw0sIbIb.mjs')
+        component: () => import('./index-nOEBPeAv.mjs')
       },
       {
         name: "profile-wallet",
         path: "wallet",
-        component: () => import('./wallet-B2ooliuK.mjs')
+        component: () => import('./wallet-YkKrLqMM.mjs')
       },
       {
         name: "profile-tickets",
@@ -571,7 +571,7 @@ const _routes = [
       {
         name: "profile-messages",
         path: "messages",
-        component: () => import('./messages-H5pbhYcv.mjs')
+        component: () => import('./messages-DTocuuHs.mjs')
       },
       {
         name: "profile-referral",
@@ -620,12 +620,12 @@ const _routes = [
   {
     name: "goods-id",
     path: "/goods/:id()",
-    component: () => import('./_id_-DeMxHHiA.mjs')
+    component: () => import('./_id_-DmZ1KTyC.mjs')
   },
   {
     name: __nuxt_page_meta$1?.name,
     path: "/_mgmt_9Xfa3",
-    component: () => import('./_mgmt_9Xfa3--kAluYQM.mjs'),
+    component: () => import('./_mgmt_9Xfa3-DNG8n7bM.mjs'),
     children: [
       {
         name: __nuxt_page_meta$v?.name,
@@ -635,18 +635,18 @@ const _routes = [
           {
             name: "_mgmt_9Xfa3-cdk-cdks",
             path: "cdks",
-            component: () => import('./cdks-DYwHvdnx.mjs')
+            component: () => import('./cdks-lPSVKufb.mjs')
           },
           {
             name: "_mgmt_9Xfa3-cdk-keys",
             path: "keys",
             meta: __nuxt_page_meta$z || {},
-            component: () => import('./keys-B_fXYAmV.mjs')
+            component: () => import('./keys-CLmNn-hV.mjs')
           },
           {
             name: "_mgmt_9Xfa3-cdk-post",
             path: "post",
-            component: () => import('./post-CqqH5X0N.mjs')
+            component: () => import('./post-2Xu1ccKD.mjs')
           },
           {
             name: "_mgmt_9Xfa3-cdk-debug",
@@ -663,18 +663,18 @@ const _routes = [
             name: "_mgmt_9Xfa3-cdk-virtual",
             path: "virtual",
             meta: __nuxt_page_meta$x || {},
-            component: () => import('./virtual-B_nYnTsU.mjs')
+            component: () => import('./virtual-DIX_hAxg.mjs')
           },
           {
             name: "_mgmt_9Xfa3-cdk-accounts",
             path: "accounts",
             meta: __nuxt_page_meta$w || {},
-            component: () => import('./accounts-DaZYCU5I.mjs')
+            component: () => import('./accounts-0gEZtAZq.mjs')
           },
           {
             name: "_mgmt_9Xfa3-cdk-edit-id",
             path: "edit/:id()",
-            component: () => import('./_id_-CGIXBHjC.mjs')
+            component: () => import('./_id_-DvLUyqHr.mjs')
           }
         ]
       },
@@ -682,13 +682,13 @@ const _routes = [
         name: "_mgmt_9Xfa3",
         path: "",
         meta: __nuxt_page_meta$u || {},
-        component: () => import('./index-6S3h3Htr.mjs')
+        component: () => import('./index-CB96Dynw.mjs')
       },
       {
         name: "_mgmt_9Xfa3-login",
         path: "login",
         meta: __nuxt_page_meta$t || {},
-        component: () => import('./login-DHYdf6uF.mjs')
+        component: () => import('./login-Chne7RSo.mjs')
       },
       {
         name: __nuxt_page_meta$r?.name,
@@ -703,13 +703,13 @@ const _routes = [
           {
             name: "_mgmt_9Xfa3-media-images",
             path: "images",
-            component: () => import('./images-DWx0AUSH.mjs')
+            component: () => import('./images-C2_3n7c_.mjs')
           },
           {
             name: "_mgmt_9Xfa3-media-banners",
             path: "banners",
             meta: __nuxt_page_meta$s || {},
-            component: () => import('./banners-BWnBdaKR.mjs')
+            component: () => import('./banners-Bo9Ey6Rj.mjs')
           }
         ]
       },
@@ -728,13 +728,13 @@ const _routes = [
             name: "_mgmt_9Xfa3-users-accounts",
             path: "accounts",
             meta: __nuxt_page_meta$p || {},
-            component: () => import('./index-BeyraRO8.mjs')
+            component: () => import('./index-DN4JCY6W.mjs')
           },
           {
             name: "_mgmt_9Xfa3-users-departments",
             path: "departments",
             meta: __nuxt_page_meta$o || {},
-            component: () => import('./index-UBUsDtHS.mjs')
+            component: () => import('./index-Cx8RSwUG.mjs')
           }
         ]
       },
@@ -747,52 +747,52 @@ const _routes = [
             name: "_mgmt_9Xfa3-orders-cdkey",
             path: "cdkey",
             meta: __nuxt_page_meta$m || {},
-            component: () => import('./index-BBPNw4s_.mjs')
+            component: () => import('./index-BBaj6l7n.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-share",
             path: "share",
             meta: __nuxt_page_meta$l || {},
-            component: () => import('./index-CE_ce1UJ.mjs')
+            component: () => import('./index-2CJqYKzh.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-cdkey-detail",
             path: "cdkey/detail",
-            component: () => import('./detail-eWJCKUr7.mjs')
+            component: () => import('./detail-Cons2GGJ.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-refund",
             path: "refund",
             meta: __nuxt_page_meta$k || {},
-            component: () => import('./index-BZTIVZRx.mjs')
+            component: () => import('./index-BRVMzk_h.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-share-detail",
             path: "share/detail",
-            component: () => import('./detail-Cw_aGZrF.mjs')
+            component: () => import('./detail-CWnU4Zsm.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-recharge",
             path: "recharge",
             meta: __nuxt_page_meta$j || {},
-            component: () => import('./index-Cbxj_iPe.mjs')
+            component: () => import('./index-Dnn5iKIl.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-preorders",
             path: "preorders",
             meta: __nuxt_page_meta$i || {},
-            component: () => import('./index-CD7ZDQ0f.mjs')
+            component: () => import('./index-DjKjob_M.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-recharge-detail",
             path: "recharge/detail",
-            component: () => import('./detail-BR1d1RBF.mjs')
+            component: () => import('./detail-7WTksD_H.mjs')
           },
           {
             name: "_mgmt_9Xfa3-orders-cancelled-refunds",
             path: "cancelled-refunds",
             meta: __nuxt_page_meta$h || {},
-            component: () => import('./index-DPzIHOE-.mjs')
+            component: () => import('./index-ONWF44uy.mjs')
           }
         ]
       },
@@ -809,44 +809,39 @@ const _routes = [
           {
             name: "_mgmt_9Xfa3-coupons-flat-post",
             path: "flat/post",
-            component: () => import('./post-IXg0RdqS.mjs')
+            component: () => import('./post-532gPcLx.mjs')
           },
           {
             name: "_mgmt_9Xfa3-coupons-flat",
             path: "flat",
-            component: () => import('./index-BcDD6Dtx.mjs')
+            component: () => import('./index-DWXeo_cs.mjs')
           },
           {
             name: "_mgmt_9Xfa3-coupons-stats",
             path: "stats",
-            component: () => import('./index-BOPc54D6.mjs')
+            component: () => import('./index-DOO3vbSi.mjs')
           },
           {
             name: "_mgmt_9Xfa3-coupons-balance-post",
             path: "balance/post",
-            component: () => import('./post-C86zZuxa.mjs')
+            component: () => import('./post-zqo8v50D.mjs')
           },
           {
             name: "_mgmt_9Xfa3-coupons-product-post",
             path: "product/post",
-            component: () => import('./post-DWLyqUjF.mjs')
+            component: () => import('./post-BvOhZfNz.mjs')
           },
           {
             name: "_mgmt_9Xfa3-coupons-balance",
             path: "balance",
-            component: () => import('./index-Se-b_hRa.mjs')
+            component: () => import('./index-CQrJyE5g.mjs')
           },
           {
             name: "_mgmt_9Xfa3-coupons-product",
             path: "product",
-            component: () => import('./index-fzi4nC9r.mjs')
+            component: () => import('./index-Oam0YnWG.mjs')
           }
         ]
-      },
-      {
-        name: "_mgmt_9Xfa3-faq-post",
-        path: "faq/post",
-        component: () => import('./post-CCI39wE9.mjs')
       },
       {
         name: __nuxt_page_meta$b?.name,
@@ -857,35 +852,35 @@ const _routes = [
             name: "_mgmt_9Xfa3-products-post",
             path: "post",
             meta: __nuxt_page_meta$f || {},
-            component: () => import('./post-BPTaom9z.mjs')
+            component: () => import('./post-CWT05w6n.mjs')
           },
           {
             name: "_mgmt_9Xfa3-products-skus",
             path: "skus",
-            component: () => import('./skus-DXFjVCex.mjs')
+            component: () => import('./skus-DbYI0GuN.mjs')
           },
           {
             name: "_mgmt_9Xfa3-products",
             path: "",
             meta: __nuxt_page_meta$e || {},
-            component: () => import('./index-tnRVnrFX.mjs')
+            component: () => import('./index-CQFshjsf.mjs')
           },
           {
             name: "_mgmt_9Xfa3-products-sku-id",
             path: "sku/:id()",
-            component: () => import('./_id_-1CGK7MJb.mjs')
+            component: () => import('./_id_-CYx45PvK.mjs')
           },
           {
             name: "_mgmt_9Xfa3-products-categories",
             path: "categories",
             meta: __nuxt_page_meta$d || {},
-            component: () => import('./categories-BJoiUj_8.mjs')
+            component: () => import('./categories-CxLjC_D3.mjs')
           },
           {
             name: "_mgmt_9Xfa3-products-shared-sku",
             path: "shared-sku",
             meta: __nuxt_page_meta$c || {},
-            component: () => import('./shared-sku-DY5SD9Sr.mjs')
+            component: () => import('./shared-sku-pkSP9RW0.mjs')
           }
         ]
       },
@@ -903,7 +898,7 @@ const _routes = [
           {
             name: "_mgmt_9Xfa3-recharge-tiers",
             path: "tiers",
-            component: () => import('./tiers-DTyqpu_x.mjs')
+            component: () => import('./tiers-do6EcD6e.mjs')
           },
           {
             name: "_mgmt_9Xfa3-recharge-orders",
@@ -913,27 +908,10 @@ const _routes = [
         ]
       },
       {
-        name: "_mgmt_9Xfa3-faq",
-        path: "faq",
-        component: () => import('./index-BSQEsBJC.mjs')
-      },
-      {
         name: __nuxt_page_meta$8?.name,
         path: "help-center",
         component: () => import('./help-center-CFV5svYP.mjs'),
         children: [
-          {
-            name: "_mgmt_9Xfa3-help-center-faq",
-            path: "faq",
-            component: () => import('./faq-BJ7RB-iQ.mjs'),
-            children: [
-              {
-                name: "_mgmt_9Xfa3-help-center-faq-post",
-                path: "post",
-                component: () => import('./post-CxB1OAdi.mjs')
-              }
-            ]
-          },
           {
             name: "_mgmt_9Xfa3-help-center",
             path: "",
@@ -942,70 +920,75 @@ const _routes = [
           {
             name: "_mgmt_9Xfa3-help-center-articles",
             path: "articles",
-            component: () => import('./articles-CUzQDGRf.mjs'),
+            component: () => import('./articles-CWWiLr39.mjs'),
             children: [
               {
                 name: "_mgmt_9Xfa3-help-center-articles-post",
                 path: "post",
-                component: () => import('./post-BQ21BMZ_.mjs')
+                component: () => import('./post-DxlLRo3K.mjs')
               }
             ]
           },
           {
+            name: "_mgmt_9Xfa3-help-center-faq-post",
+            path: "faq/post",
+            component: () => import('./post-CPu_UL6P.mjs')
+          },
+          {
+            name: "_mgmt_9Xfa3-help-center-faq",
+            path: "faq",
+            component: () => import('./index-0xdJbswi.mjs')
+          },
+          {
             name: "_mgmt_9Xfa3-help-center-faq-categories",
             path: "faq-categories",
-            component: () => import('./faq-categories-CxKTEnwZ.mjs')
+            component: () => import('./faq-categories-BydvFbIh.mjs')
           },
           {
             name: "_mgmt_9Xfa3-help-center-article-categories",
             path: "article-categories",
-            component: () => import('./article-categories-2WXsiF2z.mjs')
+            component: () => import('./article-categories-pGe5LY-3.mjs')
           }
         ]
       },
       {
         name: "_mgmt_9Xfa3-article-post",
         path: "article/post",
-        component: () => import('./post-DIGtBYuJ.mjs')
-      },
-      {
-        name: "_mgmt_9Xfa3-faq-category",
-        path: "faq/category",
-        component: () => import('./category-DH7p9iRI.mjs')
+        component: () => import('./post-BMa7AdfT.mjs')
       },
       {
         name: "_mgmt_9Xfa3-images",
         path: "images",
         meta: __nuxt_page_meta$7 || {},
-        component: () => import('./index-BJ-NxF7C.mjs')
+        component: () => import('./index-sT4A9BXP.mjs')
       },
       {
         name: "_mgmt_9Xfa3-article",
         path: "article",
-        component: () => import('./index-BQIj21bO.mjs')
+        component: () => import('./index-BxbV-7sZ.mjs')
       },
       {
         name: "_mgmt_9Xfa3-banners",
         path: "banners",
         meta: __nuxt_page_meta$6 || {},
-        component: () => import('./index-CjnNa-q7.mjs')
+        component: () => import('./index-Dlbx9vGz.mjs')
       },
       {
         name: "_mgmt_9Xfa3-refunds",
         path: "refunds",
         meta: __nuxt_page_meta$5 || {},
-        component: () => import('./index-BVik5JWj.mjs')
+        component: () => import('./index-DtKZW-CB.mjs')
       },
       {
         name: "_mgmt_9Xfa3-tickets",
         path: "tickets",
-        component: () => import('./index-6L1kOSdi.mjs')
+        component: () => import('./index-CYOPMI85.mjs')
       },
       {
         name: "_mgmt_9Xfa3-messages",
         path: "messages",
         meta: __nuxt_page_meta$4 || {},
-        component: () => import('./index-Dct6vo3M.mjs')
+        component: () => import('./index-DiwTpCi7.mjs')
       },
       {
         name: __nuxt_page_meta$2?.name,
@@ -1021,24 +1004,24 @@ const _routes = [
           {
             name: "_mgmt_9Xfa3-backend-settings-storage",
             path: "storage",
-            component: () => import('./storage-DgFfIUZf.mjs')
+            component: () => import('./storage-uUeUaTIM.mjs')
           },
           {
             name: "_mgmt_9Xfa3-backend-settings-scheduler",
             path: "scheduler",
-            component: () => import('./scheduler-BuB-Aqri.mjs')
+            component: () => import('./scheduler-SGR-C8xV.mjs')
           }
         ]
       },
       {
         name: "_mgmt_9Xfa3-article-categories",
         path: "article/categories",
-        component: () => import('./categories-DGTxmuNE.mjs')
+        component: () => import('./categories-BpG42MMd.mjs')
       },
       {
         name: "_mgmt_9Xfa3-tickets-components-TicketChatModal",
         path: "tickets/components/TicketChatModal",
-        component: () => import('./TicketChatModal-B0_FVH8D.mjs').then((n) => n.b)
+        component: () => import('./TicketChatModal-DW4iUsSW.mjs').then((n) => n.b)
       }
     ]
   },
@@ -1051,12 +1034,12 @@ const _routes = [
     name: "checkout-id",
     path: "/checkout/:id()",
     meta: __nuxt_page_meta || {},
-    component: () => import('./_id_-CQyFWmRt.mjs')
+    component: () => import('./_id_-I9e5TI8I.mjs')
   },
   {
     name: "support-refund-create",
     path: "/support/refund/create",
-    component: () => import('./create-Bbz2fR_0.mjs')
+    component: () => import('./create-DGVyWqRU.mjs')
   }
 ];
 const ROUTE_KEY_PARENTHESES_RE = /(:\w+)\([^)]+\)/g;
@@ -10759,14 +10742,14 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
     return (_ctx, _push, _parent, _attrs) => {
       const _component_NuxtLink = __nuxt_component_0$1;
       const _component_el_icon = ElIcon;
-      _push(`<!--[--><header class="app-header" data-v-5d18ee7a><div class="header-inner" data-v-5d18ee7a>`);
+      _push(`<!--[--><header class="app-header" data-v-1723ff5b><div class="header-inner" data-v-1723ff5b>`);
       _push(ssrRenderComponent(_component_NuxtLink, {
         to: "/",
         class: "logo-area"
       }, {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`<img${ssrRenderAttr("src", _imports_0)} alt="logo" class="logo-img" data-v-5d18ee7a${_scopeId}><span class="logo-text" data-v-5d18ee7a${_scopeId}>凡图拉</span>`);
+            _push2(`<img${ssrRenderAttr("src", _imports_0)} alt="logo" class="logo-img" data-v-1723ff5b${_scopeId}><span class="logo-text" data-v-1723ff5b${_scopeId}>凡图拉</span>`);
           } else {
             return [
               createVNode("img", {
@@ -10780,7 +10763,7 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
         }),
         _: 1
       }, _parent));
-      _push(`<nav class="nav-menu" data-v-5d18ee7a>`);
+      _push(`<nav class="nav-menu" data-v-1723ff5b>`);
       _push(ssrRenderComponent(_component_NuxtLink, {
         to: "/",
         class: "nav-btn"
@@ -10796,7 +10779,7 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
         }),
         _: 1
       }, _parent));
-      _push(`<button class="nav-btn" data-v-5d18ee7a>订单</button>`);
+      _push(`<button class="nav-btn" data-v-1723ff5b>订单</button>`);
       _push(ssrRenderComponent(_component_NuxtLink, {
         to: "/community",
         class: "nav-btn"
@@ -10812,7 +10795,7 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
         }),
         _: 1
       }, _parent));
-      _push(`<button class="nav-btn" data-v-5d18ee7a>客服</button></nav><div class="header-actions" data-v-5d18ee7a><div class="search-box" data-v-5d18ee7a><input class="search-input" type="text" placeholder="搜索..."${ssrRenderAttr("value", searchQuery.value)} data-v-5d18ee7a><div class="search-icon-bg" style="${ssrRenderStyle({ "cursor": "pointer" })}" data-v-5d18ee7a>`);
+      _push(`<button class="nav-btn" data-v-1723ff5b>客服</button></nav><div class="header-actions" data-v-1723ff5b><div class="search-box" data-v-1723ff5b><input class="search-input" type="text" placeholder="搜索..."${ssrRenderAttr("value", searchQuery.value)} data-v-1723ff5b><div class="search-icon-bg" style="${ssrRenderStyle({ "cursor": "pointer" })}" data-v-1723ff5b>`);
       _push(ssrRenderComponent(_component_el_icon, {
         size: 18,
         color: "#fff"
@@ -10847,7 +10830,7 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
           _: 1
         }, _parent));
       } else {
-        _push(`<div class="user-section" data-v-5d18ee7a><div class="cart-wrapper" style="${ssrRenderStyle({ "position": "relative" })}" data-v-5d18ee7a><div class="cart-icon" title="购物车" id="cart-icon-ref" data-v-5d18ee7a><div class="cart-icon-wrapper" data-v-5d18ee7a>`);
+        _push(`<div class="user-section" data-v-1723ff5b><div class="cart-wrapper" style="${ssrRenderStyle({ "position": "relative" })}" data-v-1723ff5b><div class="cart-icon" title="购物车" id="cart-icon-ref" data-v-1723ff5b><div class="cart-icon-wrapper" data-v-1723ff5b>`);
         _push(ssrRenderComponent(_component_el_icon, {
           size: 26,
           color: "#E2E8F0"
@@ -10864,7 +10847,7 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
           _: 1
         }, _parent));
         if (unref(cartStore).totalCount > 0) {
-          _push(`<span class="cart-badge" data-v-5d18ee7a>${ssrInterpolate(unref(cartStore).totalCount)}</span>`);
+          _push(`<span class="cart-badge" data-v-1723ff5b>${ssrInterpolate(unref(cartStore).totalCount)}</span>`);
         } else {
           _push(`<!---->`);
         }
@@ -10874,11 +10857,28 @@ const _sfc_main$7 = /* @__PURE__ */ defineComponent({
           onClose: ($event) => unref(cartStore).miniCartVisible = false,
           class: "header-mini-cart"
         }, null, _parent));
-        _push(`</div><div class="user-info-container" data-v-5d18ee7a>`);
+        _push(`</div><div class="favorites-wrapper" id="favorites-icon-ref" title="我的收藏" data-v-1723ff5b>`);
+        _push(ssrRenderComponent(_component_el_icon, {
+          size: 24,
+          color: "#E2E8F0",
+          class: "fav-icon"
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(ssrRenderComponent(unref(star_default), null, null, _parent2, _scopeId));
+            } else {
+              return [
+                createVNode(unref(star_default))
+              ];
+            }
+          }),
+          _: 1
+        }, _parent));
+        _push(`</div><div class="user-info-container" data-v-1723ff5b>`);
         if (unref(userStore).loading) {
-          _push(`<div class="user-info user-info--loading" data-v-5d18ee7a><div class="avatar-skeleton" data-v-5d18ee7a></div><div class="name-skeleton" data-v-5d18ee7a></div></div>`);
+          _push(`<div class="user-info user-info--loading" data-v-1723ff5b><div class="avatar-skeleton" data-v-1723ff5b></div><div class="name-skeleton" data-v-1723ff5b></div></div>`);
         } else {
-          _push(`<div class="user-info" title="进入个人中心" data-v-5d18ee7a><img${ssrRenderAttr("src", unref(userStore).user?.avatar || "/images/client/pc/avatars/avatar-cat.png")}${ssrRenderAttr("alt", unref(userStore).user?.nickName || unref(userStore).user?.nickname || "用户头像")} class="user-avatar" data-v-5d18ee7a><span class="user-name" data-v-5d18ee7a>${ssrInterpolate(unref(userStore).user?.nickName || unref(userStore).user?.nickname || "用户")}</span></div>`);
+          _push(`<div class="user-info" title="进入个人中心" data-v-1723ff5b><img${ssrRenderAttr("src", unref(userStore).user?.avatar || "/images/client/pc/avatars/avatar-cat.png")}${ssrRenderAttr("alt", unref(userStore).user?.nickName || unref(userStore).user?.nickname || "用户头像")} class="user-avatar" data-v-1723ff5b><span class="user-name" data-v-1723ff5b>${ssrInterpolate(unref(userStore).user?.nickName || unref(userStore).user?.nickname || "用户")}</span></div>`);
         }
         _push(`</div></div>`);
       }
@@ -10904,7 +10904,7 @@ _sfc_main$7.setup = (props, ctx) => {
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/AppHeader.vue");
   return _sfc_setup$7 ? _sfc_setup$7(props, ctx) : void 0;
 };
-const AppHeader = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-5d18ee7a"]]);
+const AppHeader = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-1723ff5b"]]);
 const MODAL_THEMES = {
   /* ======================================================================
      [方案 SUIT-001] 标准幽灵 (Standard)
@@ -11565,5 +11565,5 @@ let entry;
 }
 const entry_default = (ssrContext) => entry(ssrContext);
 
-export { document_default as $, isUndefined$1 as A, withInstall as B, withNoopInstall as C, definePropType as D, ElIcon as E, mutable as F, scale_to_original_default as G, full_screen_default as H, useZIndex as I, close_default as J, zoom_out_default as K, zoom_in_default as L, refresh_left_default as M, refresh_right_default as N, keysOf as O, isElement as P, isWindow as Q, picture_filled_default as R, useId as S, addUnit as T, getStyle as U, getEventCode as V, EVENT_CODE as W, throwError as X, hasClass as Y, addClass as Z, _export_sfc as _, __nuxt_component_0$1 as a, isFirefox as a$, money_default as a0, guide_default as a1, warning_default as a2, info_filled_default as a3, user_default as a4, wallet_default as a5, list_default as a6, ticket_default as a7, star_default as a8, bell_default as a9, select_default as aA, _imports_1 as aB, lightning_default as aC, top_default as aD, bottom_default as aE, buildProp as aF, isBoolean$1 as aG, composeEventHandlers as aH, useGetDerivedNamespace as aI, useIdInjection as aJ, view_default as aK, useGlobalComponentSettings as aL, removeClass as aM, clock_default as aN, right_default as aO, chat_dot_round_default as aP, shopping_cart_default as aQ, componentSizes as aR, d_arrow_left_default as aS, more_filled_default as aT, d_arrow_right_default as aU, useEmptyValues as aV, ValidateComponentsMap as aW, isEmpty as aX, useEmptyValuesProps as aY, arrow_down_default as aZ, circle_close_default as a_, switch_button_default as aa, __nuxt_component_0 as ab, authApi as ac, BaseModal as ad, user_filled_default as ae, upload_default as af, check_default as ag, ElMessage as ah, SendCodeButton as ai, EmailInput as aj, setInterval as ak, camera_default as al, circle_check_default as am, edit_default as an, credit_card_default as ao, copy_document_default as ap, message_default as aq, edit_pen_default as ar, lock_default as as, key_default as at, connection_default as au, useGlobalConfig as av, iconPropType as aw, useSizeProp as ax, useGlobalSize as ay, present_default as az, useRoute as b, iconProps as b$, hide_default as b0, star_filled_default as b1, operation_default as b2, files_default as b3, document_add_default as b4, box_default as b5, timer_default as b6, headset_default as b7, tickets_default as b8, refresh_default as b9, cpu_default as bA, circle_check_filled_default as bB, getEventKey as bC, CloseComponents as bD, defaultNamespace as bE, warning_filled_default as bF, entriesOf as bG, folder_remove_default as bH, folder_default as bI, search_default as bJ, calendar_default as bK, magic_stick_default as bL, document_copy_default as bM, rank_default as bN, video_pause_default as bO, caret_right_default as bP, back_default as bQ, withInstallDirective as bR, circle_close_filled_default as bS, sort_up_default as bT, sort_down_default as bU, badgeProps as bV, ElBadge as bW, messageConfig as bX, configProviderProps as bY, configProviderContextKey as bZ, provideGlobalConfig as b_, picture_default as ba, delete_default as bb, video_play_default as bc, useNuxtApp as bd, asyncDataDefaults as be, createError as bf, useAdminStore as bg, setting_default as bh, collection_default as bi, question_filled_default as bj, goods_default as bk, odometer_default as bl, expand_default as bm, fold_default as bn, sunny_default as bo, moon_default as bp, whenMouse as bq, more_default as br, isPropAbsent as bs, __nuxt_component_0$2 as bt, TypeComponentsMap as bu, TypeComponents as bv, getProp as bw, arrow_up_default as bx, getAdminSupabaseClient as by, minus_default as bz, __nuxt_component_2$1 as c, MESSAGE_DEFAULT_PLACEMENT as c0, messageDefaults as c1, messageEmits as c2, messagePlacement as c3, messageProps as c4, messageTypes as c5, buildLocaleContext as c6, buildTranslator as c7, localeContextKey as c8, translate as c9, ID_INJECTION_KEY as ca, namespaceContextKey as cb, ZINDEX_INJECTION_KEY as cc, defaultInitialZIndex as cd, zIndexContextKey as ce, SIZE_INJECTION_KEY as cf, DEFAULT_EMPTY_VALUES as cg, DEFAULT_VALUE_ON_CLEAR as ch, SCOPE as ci, emptyValuesContextKey as cj, getAuthToken as ck, EDGE_FUNCTIONS_URL as cl, supabaseAdmin as cm, supabase as cn, useUserStore as d, entry_default as default, useCartStore as e, arrow_right_default as f, trophy_default as g, share_default as h, useRouter as i, useRuntimeConfig as j, callEdgeFunction as k, loading_default as l, monitor_default as m, navigateTo as n, getSupabaseClient as o, plus_default as p, buildProps as q, isNumber$1 as r, service_default as s, tryUseNuxtApp as t, useModalStore as u, debugWarn as v, _export_sfc$1 as w, useNamespace as x, useLocale as y, arrow_left_default as z };
+export { document_default as $, isUndefined$1 as A, withInstall as B, withNoopInstall as C, definePropType as D, ElIcon as E, mutable as F, scale_to_original_default as G, full_screen_default as H, useZIndex as I, close_default as J, zoom_out_default as K, zoom_in_default as L, refresh_left_default as M, refresh_right_default as N, keysOf as O, isElement as P, isWindow as Q, picture_filled_default as R, useId as S, addUnit as T, getStyle as U, getEventCode as V, EVENT_CODE as W, throwError as X, hasClass as Y, addClass as Z, _export_sfc as _, __nuxt_component_0$1 as a, isFirefox as a$, money_default as a0, guide_default as a1, warning_default as a2, info_filled_default as a3, user_default as a4, wallet_default as a5, list_default as a6, ticket_default as a7, star_default as a8, bell_default as a9, top_default as aA, bottom_default as aB, buildProp as aC, isBoolean$1 as aD, composeEventHandlers as aE, useGetDerivedNamespace as aF, useIdInjection as aG, present_default as aH, select_default as aI, _imports_1 as aJ, view_default as aK, useGlobalComponentSettings as aL, removeClass as aM, clock_default as aN, right_default as aO, chat_dot_round_default as aP, shopping_cart_default as aQ, componentSizes as aR, d_arrow_left_default as aS, more_filled_default as aT, d_arrow_right_default as aU, useEmptyValues as aV, ValidateComponentsMap as aW, isEmpty as aX, useEmptyValuesProps as aY, arrow_down_default as aZ, circle_close_default as a_, switch_button_default as aa, __nuxt_component_0 as ab, authApi as ac, BaseModal as ad, user_filled_default as ae, upload_default as af, check_default as ag, ElMessage as ah, SendCodeButton as ai, EmailInput as aj, setInterval as ak, camera_default as al, circle_check_default as am, edit_default as an, credit_card_default as ao, copy_document_default as ap, message_default as aq, edit_pen_default as ar, lock_default as as, key_default as at, connection_default as au, useGlobalConfig as av, iconPropType as aw, useSizeProp as ax, useGlobalSize as ay, lightning_default as az, useRoute as b, iconProps as b$, hide_default as b0, star_filled_default as b1, operation_default as b2, files_default as b3, document_add_default as b4, box_default as b5, timer_default as b6, headset_default as b7, tickets_default as b8, refresh_default as b9, cpu_default as bA, circle_check_filled_default as bB, getEventKey as bC, CloseComponents as bD, defaultNamespace as bE, warning_filled_default as bF, entriesOf as bG, folder_remove_default as bH, folder_default as bI, search_default as bJ, calendar_default as bK, magic_stick_default as bL, document_copy_default as bM, rank_default as bN, video_pause_default as bO, caret_right_default as bP, back_default as bQ, withInstallDirective as bR, circle_close_filled_default as bS, sort_up_default as bT, sort_down_default as bU, badgeProps as bV, ElBadge as bW, messageConfig as bX, configProviderProps as bY, configProviderContextKey as bZ, provideGlobalConfig as b_, picture_default as ba, delete_default as bb, video_play_default as bc, useNuxtApp as bd, asyncDataDefaults as be, createError as bf, useAdminStore as bg, setting_default as bh, collection_default as bi, question_filled_default as bj, goods_default as bk, odometer_default as bl, expand_default as bm, fold_default as bn, sunny_default as bo, moon_default as bp, whenMouse as bq, more_default as br, isPropAbsent as bs, __nuxt_component_0$2 as bt, TypeComponentsMap as bu, TypeComponents as bv, getProp as bw, arrow_up_default as bx, getAdminSupabaseClient as by, minus_default as bz, __nuxt_component_2$1 as c, MESSAGE_DEFAULT_PLACEMENT as c0, messageDefaults as c1, messageEmits as c2, messagePlacement as c3, messageProps as c4, messageTypes as c5, buildLocaleContext as c6, buildTranslator as c7, localeContextKey as c8, translate as c9, ID_INJECTION_KEY as ca, namespaceContextKey as cb, ZINDEX_INJECTION_KEY as cc, defaultInitialZIndex as cd, zIndexContextKey as ce, SIZE_INJECTION_KEY as cf, DEFAULT_EMPTY_VALUES as cg, DEFAULT_VALUE_ON_CLEAR as ch, SCOPE as ci, emptyValuesContextKey as cj, getAuthToken as ck, EDGE_FUNCTIONS_URL as cl, supabaseAdmin as cm, supabase as cn, useUserStore as d, entry_default as default, useCartStore as e, arrow_right_default as f, trophy_default as g, share_default as h, useRouter as i, useRuntimeConfig as j, callEdgeFunction as k, loading_default as l, monitor_default as m, navigateTo as n, getSupabaseClient as o, plus_default as p, buildProps as q, isNumber$1 as r, service_default as s, tryUseNuxtApp as t, useModalStore as u, debugWarn as v, _export_sfc$1 as w, useNamespace as x, useLocale as y, arrow_left_default as z };
 //# sourceMappingURL=server.mjs.map

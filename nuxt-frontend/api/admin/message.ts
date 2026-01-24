@@ -79,4 +79,55 @@ export const adminMessageApi = {
         }
         return { success: true, message_id: data.id }
     },
+
+    /**
+     * 获取客户消息通知配置
+     */
+    async getNotificationSettings(): Promise<{ success: boolean; settings?: any; error?: string }> {
+        const client = getAdminSupabaseClient()
+        const { data, error } = await client
+            .from('system_settings')
+            .select('value')
+            .eq('key', 'customer_notification_config')
+            .single()
+
+        if (error) {
+            // 如果未找到配置，返回默认空对象或错误
+            if (error.code === 'PGRST116') {
+                return { success: true, settings: {} }
+            }
+            return { success: false, error: error.message }
+        }
+
+        // Parse JSON if needed (Supabase returns JSONB as object automatically)
+        let settings = data.value
+        if (typeof settings === 'string') {
+            try { settings = JSON.parse(settings) } catch (e) { }
+        }
+
+        return { success: true, settings }
+    },
+
+    /**
+     * 更新客户消息通知配置
+     */
+    async updateNotificationSettings(settings: any): Promise<{ success: boolean; error?: string }> {
+        const client = getAdminSupabaseClient()
+
+        // Ensure it's stored as JSON
+        const value = settings
+
+        const { error } = await client
+            .from('system_settings')
+            .upsert({
+                key: 'customer_notification_config',
+                value: value,
+                description: 'Customer notification trigger configuration'
+            })
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+        return { success: true }
+    }
 }

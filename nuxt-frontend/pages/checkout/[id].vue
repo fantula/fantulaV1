@@ -50,7 +50,6 @@
                   <div class="product-name">{{ order.product_snapshot?.product_name }}</div>
                   <div class="product-meta-row">
                      <el-tag size="small" effect="dark" class="spec-tag">{{ formatSpec(order.sku_snapshot?.spec_combination) }}</el-tag>
-                     <span class="delivery-info">发货方式：自动发货</span>
                   </div>
                 </div>
                 <div class="product-price">
@@ -61,6 +60,29 @@
             </div>
           </div>
           
+          <!-- FAQ Section -->
+          <div class="faq-section" v-if="checkoutFaqs.length > 0">
+            <div class="faq-card glass-card">
+              <h4><el-icon><QuestionFilled /></el-icon> 常见问题</h4>
+              <div class="faq-list">
+                <div 
+                  v-for="(faq, index) in checkoutFaqs" 
+                  :key="faq.id" 
+                  class="faq-item"
+                  :class="{ active: activeFaq === index }"
+                >
+                  <div class="faq-question" @click="toggleFaq(index)">
+                    <span class="q-text">{{ faq.question }}</span>
+                    <el-icon class="arrow-icon"><ArrowDown /></el-icon>
+                  </div>
+                  <div class="faq-answer-wrapper" :style="{ maxHeight: activeFaq === index ? '200px' : '0' }">
+                    <div class="faq-answer">{{ faq.answer }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- 温馨提示 moved to bottom of left section -->
           <div class="tips-container">
              <div class="tips-card glass-card">
@@ -170,23 +192,34 @@
       :currentCouponId="selectedCoupon?.id"
       @select="handleCouponSelect"
     />
+
+    <!-- Recharge Modal -->
+    <WalletRechargeModal
+      v-if="showRechargeModal"
+      @close="handleRechargeClose"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, Timer, InfoFilled, ArrowRight, Wallet, Select, Refresh } from '@element-plus/icons-vue'
+import { ArrowLeft, Timer, InfoFilled, ArrowRight, Wallet, Select, Refresh, QuestionFilled, ArrowDown } from '@element-plus/icons-vue'
 import { useCheckout } from '@/composables/client/useCheckout'
 // BalanceNotEnoughModal import removed
 import PaySuccessModal from '@/components/PaySuccessModal.vue'
 import CouponSelectorModal from '@/components/modal/business/CouponSelectorModal.vue'
+import WalletRechargeModal from '@/components/modal/business/WalletRechargeModal.vue'
+import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
 
 definePageMeta({ ssr: false })
 
 const route = useRoute()
 const router = useRouter()
 const showCouponModal = ref(false)
+const showRechargeModal = ref(false)
+const checkoutFaqs = ref<ClientFaq[]>([])
+const activeFaq = ref<number | null>(null)
 
 // Use Composable
 const {
@@ -233,16 +266,32 @@ const isBalanceInsufficient = computed(() => {
 
 const handlePayAction = () => {
     if (isBalanceInsufficient.value) {
-        // Redirect to recharge
-        router.push('/profile/recharge') // Assuming recharge route
+        showRechargeModal.value = true
         return
     }
     handlePay()
 }
 
+const toggleFaq = (index: number) => {
+    activeFaq.value = activeFaq.value === index ? null : index
+}
+
+const fetchFaqs = async () => {
+    const res = await clientFaqApi.getCheckoutFaqs()
+    if (res.success) {
+        checkoutFaqs.value = res.faqs
+    }
+}
+
+const handleRechargeClose = () => {
+  showRechargeModal.value = false
+  refreshBalance()
+}
+
 // Lifecycle
 onMounted(() => {
   loadPreOrders(preOrderIds.value)
+  fetchFaqs()
 })
 
 const handlePaySuccessClose = () => {
@@ -371,7 +420,8 @@ const handlePaySuccessClose = () => {
   height: 72px;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15); /* Slightly lighter border */
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2); /* Inner shadow effect */
 }
 
 .product-info {
@@ -396,13 +446,6 @@ const handlePaySuccessClose = () => {
     --el-tag-text-color: var(--text-sub);
 }
 
-.delivery-info {
-    font-size: 12px; color: var(--primary-blue);
-    background: rgba(59, 130, 246, 0.1);
-    padding: 2px 8px; border-radius: 4px;
-}
-
-
 .product-price {
   text-align: right;
 }
@@ -417,6 +460,64 @@ const handlePaySuccessClose = () => {
   font-size: 13px;
   color: var(--text-sub);
   margin-top: 4px;
+}
+
+/* FAQ Section */
+.faq-section {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.faq-card h4 {
+  font-size: 15px;
+  color: var(--text-main);
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    padding: 12px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-sub);
+    transition: color 0.2s;
+}
+
+.faq-question:hover, .faq-item.active .faq-question {
+    color: var(--active-orange);
+}
+
+.faq-question .arrow-icon {
+    transition: transform 0.3s;
+    font-size: 12px;
+}
+
+.faq-item.active .arrow-icon {
+    transform: rotate(180deg);
+}
+
+.faq-answer-wrapper {
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.faq-answer {
+    padding-bottom: 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
 }
 
 .tips-container {
@@ -441,11 +542,18 @@ const handlePaySuccessClose = () => {
 }
 
 /* Summary Section */
+.summary-section {
+  display: flex;
+  flex-direction: column;
+}
+
 .sticky-card {
-  position: sticky;
-  top: 100px;
-  min-height: 480px; /* Slight height increase */
-  display: flex; flex-direction: column;
+  /* position: sticky;  Removed to enforce equal height alignment as requested */
+  /* top: 100px; */
+  height: 100%;       /* Force full height */
+  min-height: 480px;
+  display: flex; 
+  flex-direction: column;
 }
 
 .card-title {

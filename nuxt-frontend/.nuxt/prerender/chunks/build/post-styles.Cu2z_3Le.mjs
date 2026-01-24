@@ -1,0 +1,8 @@
+const post_vue_vue_type_style_index_0_scoped_dda7eb90_lang = ".faq-post-page[data-v-dda7eb90]{margin:0 auto;max-width:800px}.page-header[data-v-dda7eb90]{margin-bottom:24px}.header-left[data-v-dda7eb90]{align-items:center;display:flex;gap:16px}.page-title[data-v-dda7eb90]{font-size:24px;margin:0}.form-card[data-v-dda7eb90]{background:var(--el-bg-color);border-radius:8px;box-shadow:var(--el-box-shadow-lighter);padding:40px}.faq-form[data-v-dda7eb90]{max-width:100%}.form-tip[data-v-dda7eb90]{color:var(--el-text-color-secondary);font-size:13px;line-height:1.5;margin-top:4px}.product-option[data-v-dda7eb90]{align-items:center;display:flex;justify-content:space-between}.product-id-sub[data-v-dda7eb90]{color:var(--el-text-color-secondary);font-size:12px}";
+
+const postStyles_Cu2z_3Le = [
+  post_vue_vue_type_style_index_0_scoped_dda7eb90_lang
+];
+
+export { postStyles_Cu2z_3Le as default };
+//# sourceMappingURL=post-styles.Cu2z_3Le.mjs.map

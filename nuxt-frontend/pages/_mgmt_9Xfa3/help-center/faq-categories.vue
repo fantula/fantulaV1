@@ -16,6 +16,12 @@
             <el-tag v-else type="info" size="small">禁用</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="结算页显示" width="120" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.is_checkout_visible" type="warning" size="small">显示</el-tag>
+            <el-tag v-else type="info" size="small" effect="plain">隐藏</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="created_at" label="创建时间" width="200">
           <template #default="{ row }">
             {{ new Date(row.created_at).toLocaleString() }}
@@ -40,7 +46,7 @@
       :title="isEdit ? '编辑分类' : '新增分类'"
       width="500px"
     >
-      <el-form :model="form" label-width="80px">
+      <el-form :model="form" label-width="110px">
         <el-form-item label="分类名称">
           <el-input v-model="form.name" placeholder="请输入分类名称" />
         </el-form-item>
@@ -49,6 +55,10 @@
         </el-form-item>
         <el-form-item label="启用状态" v-if="isEdit">
           <el-switch v-model="form.is_active" />
+        </el-form-item>
+        <el-form-item label="结算页显示">
+          <el-switch v-model="form.is_checkout_visible" />
+          <div class="form-tip">开启后，该分类下的问题将显示在结算界面。</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -77,7 +87,8 @@ const currentId = ref('')
 const form = ref({
   name: '',
   sort_order: 0,
-  is_active: true
+  is_active: true,
+  is_checkout_visible: false
 })
 
 const fetchCategories = async () => {
@@ -91,7 +102,7 @@ const fetchCategories = async () => {
 
 const handleAdd = () => {
   isEdit.value = false
-  form.value = { name: '', sort_order: 0, is_active: true }
+  form.value = { name: '', sort_order: 0, is_active: true, is_checkout_visible: false }
   dialogVisible.value = true
 }
 
@@ -101,7 +112,8 @@ const handleEdit = (row: AdminFaqCategory) => {
   form.value = {
     name: row.name,
     sort_order: row.sort_order,
-    is_active: row.is_active
+    is_active: row.is_active,
+    is_checkout_visible: row.is_checkout_visible
   }
   dialogVisible.value = true
 }
@@ -133,7 +145,8 @@ const submitForm = async () => {
     } else {
       const res = await adminFaqApi.createCategory({
         name: form.value.name,
-        sort_order: form.value.sort_order
+        sort_order: form.value.sort_order,
+        is_checkout_visible: form.value.is_checkout_visible
       })
       if (res.success) {
         ElMessage.success('创建成功')

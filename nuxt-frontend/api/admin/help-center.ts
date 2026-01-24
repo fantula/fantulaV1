@@ -6,6 +6,7 @@ export interface AdminFaqCategory {
     name: string
     sort_order: number
     is_active: boolean
+    is_checkout_visible: boolean
     created_at: string
 }
 
@@ -36,20 +37,21 @@ export const adminFaqApi = {
         return { success: true, categories: data || [] }
     },
 
-    async createCategory(data: { name: string; sort_order: number }): Promise<{ success: boolean; error?: string }> {
+    async createCategory(data: { name: string; sort_order: number; is_checkout_visible?: boolean }): Promise<{ success: boolean; error?: string }> {
         const client = getAdminSupabaseClient()
         const { error } = await client
             .from('faq_categories')
             .insert({
                 name: data.name,
                 sort_order: data.sort_order,
-                is_active: true
+                is_active: true,
+                is_checkout_visible: data.is_checkout_visible || false
             })
         if (error) return { success: false, error: error.message }
         return { success: true }
     },
 
-    async updateCategory(id: string, data: { name?: string; sort_order?: number; is_active?: boolean }): Promise<{ success: boolean; error?: string }> {
+    async updateCategory(id: string, data: { name?: string; sort_order?: number; is_active?: boolean; is_checkout_visible?: boolean }): Promise<{ success: boolean; error?: string }> {
         const client = getAdminSupabaseClient()
         const { error } = await client
             .from('faq_categories')
