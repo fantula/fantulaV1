@@ -19,6 +19,7 @@ import { adminOrderApi } from './admin/order'
 export { adminCdkApi, type AdminCDK } from './admin/cdk'
 export { adminCouponApi, type AdminCoupon as AdminCouponNew } from './admin/coupon'
 export { adminOrderApi, type AdminOrder, type AdminOrderDelivery } from './admin/order'
+export { adminFaqApi } from './admin/help-center'
 
 
 // ========================================

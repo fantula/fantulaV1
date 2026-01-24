@@ -74,8 +74,10 @@
                 </div>
 
                 <div class="product-info">
-                  <h3 class="product-name">{{ item.product_name }}</h3>
-                  <div class="product-spec">{{ item.spec_text || '标准规格' }}</div>
+                  <div class="name-row">
+                    <h3 class="product-name">{{ item.product_name }}</h3>
+                    <span class="spec-tag">{{ item.spec_text || '标准规格' }}</span>
+                  </div>
                   
                   <div class="price-row">
               <div class="price">
@@ -283,7 +285,7 @@ const handleConfirmDelete = async () => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Scroll Area & Container Limit */
+/* Scroll Area & Container Limit - WIDE */
 .orders-scroll-area { flex: 1; overflow-y: auto; padding: 24px 32px; }
 .orders-container { max-width: 900px; margin: 0 auto; }
 
@@ -312,60 +314,78 @@ const handleConfirmDelete = async () => {
   background: #64748B; opacity: 0.8;
 }
 
-/* Card Content - Tight padding */
-.card-inner { padding: 12px 18px; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+/* Card Content - COMPACT PADDING */
+.card-inner { 
+  padding: 16px 20px; padding-left: 28px; /* Extra left for status line separation */
+  display: flex; flex-direction: column; gap: 0; 
+}
 
 /* Header */
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.order-no-group { display: flex; gap: 6px; font-family: 'Monaco', monospace; font-size: 12px; color: #64748B; }
+.card-header { 
+  display: flex; justify-content: space-between; align-items: center; 
+  margin-bottom: 12px;
+}
+.order-no-group { display: flex; gap: 6px; font-family: 'Monaco', monospace; font-size: 13px; color: #64748B; }
 .order-no-group .value { color: #94A3B8; }
 
 /* Status Pill */
 .status-pill {
   display: flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: 100px;
+  padding: 4px 12px; border-radius: 100px;
   font-size: 12px; font-weight: 700;
   background: rgba(255,255,255,0.05); color: #94A3B8;
   letter-spacing: 0.5px;
 }
 .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
 
-/* Body */
-.card-body { display: flex; gap: 16px; align-items: center; min-height: 56px; }
+/* Body - COMPACT */
+.card-body { display: flex; gap: 16px; align-items: center; }
 .product-thumb {
-  width: 56px; height: 56px; border-radius: 10px; background: rgba(0,0,0,0.3); overflow: hidden; border: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+  width: 56px; height: 56px; border-radius: 12px; background: rgba(0,0,0,0.3); overflow: hidden; border: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
 }
 .thumb-img { width: 100%; height: 100%; object-fit: cover; }
-.placeholder-img { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #334155; }
+.placeholder-img { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #334155; }
 
-.product-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.product-info { flex: 1; display: flex; flex-direction: column; gap: 2px; justify-content: center; } /* Gap reduced */
+
+/* INLINE NAME & SPEC */
+.name-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+}
 .product-name { font-size: 15px; font-weight: 600; color: #fff; margin: 0; line-height: 1.4; }
-.product-spec { font-size: 12px; color: #64748B; }
 
+.spec-tag {
+  font-size: 11px; font-weight: 500; color: #94A3B8;
+  background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.price-row { display: flex; align-items: baseline; gap: 10px; margin-top: 2px; }
 .price { display: flex; align-items: baseline; gap: 2px; }
 .price .amount { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.5px; font-family: 'Outfit', sans-serif; }
 .price .unit { font-size: 12px; color: #F59E0B; font-weight: 600; }
-.qty { font-size: 12px; color: #64748B; margin-left: 8px; }
+.qty { font-size: 12px; color: #64748B; font-weight: 500; }
 
-/* Footer - Ultra Tight */
+/* Footer - TIGHTER */
 .card-footer {
-  display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex; justify-content: space-between; align-items: center; 
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);
 }
 .order-time { font-size: 12px; color: #475569; }
 
-.card-actions { display: flex; gap: 8px; }
+.card-actions { display: flex; gap: 10px; }
 .action-btn {
-  padding: 5px 12px; border-radius: 8px; border: 1px solid transparent;
-  font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;
+  padding: 6px 14px; border-radius: 10px; border: 1px solid transparent;
+  font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
   background: rgba(255,255,255,0.03); color: #94A3B8; transition: all 0.2s;
   border: 1px solid rgba(255,255,255,0.05);
 }
 .action-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.1); transform: translateY(-1px); }
 
-/* Pay Button - Premium Gradient */
+/* Swipe Pay Button */
 .action-btn.pay {
   background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
-  color: #fff; border: none; padding: 5px 16px;
+  color: #fff; border: none; padding: 6px 18px;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
 }
 .action-btn.pay:hover { 
@@ -374,10 +394,10 @@ const handleConfirmDelete = async () => {
   transform: translateY(-1px);
 }
 
-.action-btn.delete { color: #64748B; padding: 5px; }
+.action-btn.delete { color: #64748B; padding: 6px 10px; }
 .action-btn.delete:hover { color: #EF4444; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
 
-.action-btn.cleanup { color: #64748B; padding: 5px 10px; }
+.action-btn.cleanup { color: #64748B; padding: 6px 12px; }
 .action-btn.cleanup:hover { color: #F87171; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); }
 
 /* --- Status Colors (Generated by class) --- */

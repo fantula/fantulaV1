@@ -103,7 +103,7 @@ const menuItems = [
     label: '我的订单',
     icon: '📦',
     iconClass: 'icon-orders',
-    to: '/profile/orders'
+    to: '/profile/order'
   },
   {
     key: 'exchange',
@@ -144,7 +144,18 @@ const menuItems = [
 ]
 
 const isActive = (to: string) => {
-  return route.path === to
+  const current = route.path
+  
+  // 1. Root Profile Page (Strict Exact)
+  if (to === '/profile') {
+    return current === '/profile' || current === '/profile/'
+  }
+
+  // 2. Sub-pages (Inclusive)
+  // Check if current path starts with the link path
+  if (current.startsWith(to)) return true
+  
+  return false
 }
 </script>
 

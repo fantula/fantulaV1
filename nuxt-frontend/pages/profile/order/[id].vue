@@ -114,43 +114,52 @@
 
       <!-- Delivery / Fulfillment Section (The Core) -->
       <!-- Only show for relevant statuses (including refunding to see what happened) -->
+      <!-- Delivery / Fulfillment Section (The Core) -->
+      <!-- Only show for relevant statuses (including refunding to see what happened) -->
       <div v-if="['pending_delivery', 'active', 'completed', 'refunding'].includes(order.status || '')" class="fulfillment-section fade-in-up">
         
-        <!-- Shared Account Fulfillment -->
-        <FulfillmentShared 
-          v-if="order.orderType === 'shared_account'" 
-          :cdk-list="cdkList" 
-        />
+        <!-- Shared Account: STRICT LOOP by Slot List -->
+        <!-- Display Rule: Display Slot1 Content... Display Slot2 Content... -->
+        <template v-if="order.orderType === 'shared_account'">
+           <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="virtual-item-group">
+               
+               <!-- Separator if multiple -->
+               <div v-if="slotList.length > 1" class="item-separator">
+                  <span class="sep-label">车位 {{ idx + 1 }}</span>
+               </div>
+
+               <!-- Pass Single Slot Context -->
+               <FulfillmentShared 
+                  :cdk-item="getCdkForSlot(slot)"
+                  :slot-index="slot.slot_index"
+               />
+           </div>
+        </template>
         
-        <!-- CDK / Standard Fulfillment -->
-        <FulfillmentCdk 
-          v-else-if="order.orderType !== 'virtual'" 
-          :cdk-list="cdkList" 
-        />
+        <!-- One-Time CDK: Standard List -->
+        <template v-else-if="order.orderType === 'one_time_cdk'">
+            <FulfillmentCdk :cdk-list="cdkList" />
+        </template>
 
-        <!-- Virtual Submit Form & History (Looped per CDK) -->
-        <template v-if="order.orderType === 'virtual'">
-          <div v-for="(cdk, idx) in cdkList" :key="cdk.id || idx" class="virtual-item-group">
-             <!-- Label if multiple -->
-             <div v-if="cdkList.length > 1" class="item-separator">
-                <span class="sep-label">充值项 {{ idx + 1 }}</span>
-             </div>
-
+        <!-- Virtual: Single View (First CDK only) -->
+        <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
+           <div class="virtual-item-group">
              <FulfillmentSubmitForm
                 :order-id="order.id || ''"
                 :order-status="order.status || ''"
-                :cdk-fields="getFieldsForCdk(cdk)"
-                :cdk-id="cdk.id"
+                :cdk-fields="getFieldsForCdk(cdkList[0])"
+                :cdk-id="cdkList[0].id"
                 @submit-success="handleFulfillmentSuccess"
              />
 
              <FulfillmentHistory
                 ref="historyRef"
                 :order-id="order.id || ''"
-                :filter-cdk-id="cdk.id"
+                :filter-cdk-id="cdkList[0].id"
              />
-          </div>
+           </div>
         </template>
+
       </div>
 
       <!-- Tutorial Section -->
@@ -267,6 +276,7 @@ interface CdkItem {
 
 const order = ref<Partial<OrderDetail>>({})
 const cdkList = ref<CdkItem[]>([])
+const slotList = ref<any[]>([])
 const instructionImage = ref('')
 
 // Logic State
@@ -342,6 +352,12 @@ const getFieldsForCdk = (cdk: CdkItem): FulfillmentField[] => {
   }
 
   return keys.map(key => ({ key, label: key, value: '' }))
+}
+
+// Helper to find CDK for a Slot
+const getCdkForSlot = (slot: any) => {
+    if (!slot || !slot.cdk_id) return {} as CdkItem
+    return cdkList.value.find(c => c.id === slot.cdk_id) || {} as CdkItem
 }
 
 const historyRef = ref<{ refresh: () => void } | null>(null)
@@ -456,31 +472,23 @@ const loadData = async () => {
 
       // 2. Parse CDKs & Slots
       if (d.cdkList && Array.isArray(d.cdkList)) {
-        let finalCdks: any[] = []
+        // Raw CDK List (used for Virtual & One-time, and as Lookup for Shared)
+        cdkList.value = d.cdkList.map((cdk: any) => ({ ...cdk }))
         
-        // Strategy: For Shared Account, we must display per SLOT (Visual Item = Slot)
-        // If we purchased 2 slots on the same account, we need 2 entries.
-        if (d.order_type === 'shared_account' && (d as any).slotList && (d as any).slotList.length > 0) {
-           finalCdks = (d as any).slotList.map((slot: any) => {
-              // @ts-ignore
-              const cdk = d.cdkList.find((c: any) => c.id === slot.cdk_id) || {}
-              return { ...cdk, slotIndex: slot.slot_index }
-           })
-        } else {
-           // Default: Visual Item = CDK
-           finalCdks = d.cdkList.map((cdk: any) => ({ ...cdk }))
-        }
-        
-        cdkList.value = finalCdks
-
-        if (finalCdks.length > 0) {
-            // Try to find account data from the first available real CDK
-            const firstReal = finalCdks.find((c: any) => c.accountData)
-            if (firstReal) {
-               const acc = firstReal.accountData
-               instructionImage.value = acc.image || acc.help_image || acc.common_image || ''
+        // Strict Rule: Image always from CDK[0]
+        if (cdkList.value.length > 0) {
+            const first = cdkList.value[0]
+            if (first.accountData) {
+               instructionImage.value = first.accountData.image || first.accountData.help_image || first.accountData.common_image || ''
             }
         }
+      }
+      
+      // Strict Rule: Shared uses slotList from slot_occupancy_ids
+      if (d.slotList && Array.isArray(d.slotList)) {
+          slotList.value = d.slotList
+      } else {
+          slotList.value = []
       }
 
       // 3. Check Refund Request (If status is 'refunding' OR checking just in case)

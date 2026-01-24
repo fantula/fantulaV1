@@ -29,8 +29,8 @@ export { withCtx, withDirectives, withKeys, withMemo, withModifiers, withScopeId
 export { requestIdleCallback, cancelIdleCallback } from '#app/compat/idle-callback';
 export { setInterval } from '#app/compat/interval';
 export { ID_INJECTION_KEY } from '../node_modules/element-plus/es/hooks/use-id/index';
-export { ZINDEX_INJECTION_KEY } from '../node_modules/element-plus/es/hooks/use-z-index/index';
 export { provideGlobalConfig } from '../node_modules/element-plus/es/components/config-provider/src/hooks/use-global-config';
+export { ZINDEX_INJECTION_KEY } from '../node_modules/element-plus/es/hooks/use-z-index/index';
 export { ElLoading } from '../node_modules/element-plus/es/components/loading/index';
 export { ElMessage } from '../node_modules/element-plus/es/components/message/index';
 export { ElMessageBox } from '../node_modules/element-plus/es/components/message-box/index';

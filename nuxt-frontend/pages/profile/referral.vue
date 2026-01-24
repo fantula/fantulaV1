@@ -42,7 +42,7 @@
     <div class="referral-stats">
       <div class="stat-item">
         <div class="stat-icon">
-          <img src="/images/client/pc/tuiguang1.png" alt="推广用户图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <img src="/images/shared/logo.png" alt="推广用户图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
           <div class="stat-icon-placeholder" style="display: none;"><div class="placeholder-box">用户</div></div>
         </div>
         <div class="stat-label">推广用户</div>
@@ -50,7 +50,7 @@
       </div>
       <div class="stat-item">
         <div class="stat-icon">
-          <img src="/images/client/pc/tuiguang2.png" alt="成功订单图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <img src="/images/shared/logo.png" alt="成功订单图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
           <div class="stat-icon-placeholder" style="display: none;"><div class="placeholder-box">订单</div></div>
         </div>
         <div class="stat-label">成功订单</div>
@@ -58,7 +58,7 @@
       </div>
       <div class="stat-item">
         <div class="stat-icon">
-          <img src="/images/client/pc/tuiguang3.png" alt="累计收益图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <img src="/images/shared/logo.png" alt="累计收益图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
           <div class="stat-icon-placeholder" style="display: none;"><div class="placeholder-box">收益</div></div>
         </div>
         <div class="stat-label">累计收益</div>
@@ -66,7 +66,7 @@
       </div>
       <div class="stat-item">
         <div class="stat-icon">
-          <img src="/images/client/pc/tuiguang4.png" alt="本月收益图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <img src="/images/shared/logo.png" alt="本月收益图标" class="stat-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
           <div class="stat-icon-placeholder" style="display: none;"><div class="placeholder-box">月收益</div></div>
         </div>
         <div class="stat-label">本月收益</div>
@@ -96,12 +96,12 @@ const inviteInfo = ref({
 
 const fetchReferralData = async () => {
   // 获取统计数据
-  const statRes = await $fetch('/invite/statistics')
+  const statRes: any = await $fetch('/invite/statistics')
   if (statRes && statRes.data) {
     stats.value = statRes.data
   }
   // 获取推广码等
-  const inviterRes = await $fetch('/invite/inviter')
+  const inviterRes: any = await $fetch('/invite/inviter')
   if (inviterRes && inviterRes.data) {
     inviteInfo.value.nickName = inviterRes.data.nickName || ''
     inviteInfo.value.code = userStore.user?.id ? String(userStore.user.id).padStart(8, '0') : '00000000'

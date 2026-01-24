@@ -3,6 +3,7 @@
     class="coupon-ticket" 
     :class="[
       `color-${color}`, 
+      `size-${size}`,
       { 'is-disabled': disabled || status !== 'unused' }
     ]"
     @click="$emit('click')"
@@ -57,6 +58,7 @@ import { Clock } from '@element-plus/icons-vue'
 
 interface Props {
   color?: 'purple' | 'gold' | 'cyan' | 'default'
+  size?: 'normal' | 'compact'
   value: string | number
   unit?: string
   title: string
@@ -70,6 +72,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   color: 'default',
+  size: 'normal',
   unit: '点',
   status: 'unused',
   disabled: false,
@@ -97,6 +100,11 @@ const statusText = computed(() => {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: default;
   height: 120px;
+}
+
+.coupon-ticket.size-compact {
+  height: 90px;
+  border-radius: 12px;
 }
 
 .coupon-ticket:hover:not(.is-disabled) {
@@ -169,17 +177,29 @@ const statusText = computed(() => {
   flex-shrink: 0;
 }
 
+.size-compact .ticket-left {
+  width: 100px;
+}
+
 .ticket-value {
   display: flex; align-items: baseline; gap: 2px;
 }
 .value-amount {
   font-size: 32px; font-weight: 700; font-family: 'Outfit', sans-serif; color: #fff;
 }
+.size-compact .value-amount {
+  font-size: 24px;
+}
+
 .value-unit {
   font-size: 14px; color: rgba(255,255,255,0.6); margin-left: 2px;
 }
 .ticket-type-label {
   font-size: 12px; color: #94A3B8; margin-top: 6px;
+}
+.size-compact .ticket-type-label {
+  margin-top: 2px;
+  font-size: 11px;
 }
 
 /* Right Side */
@@ -192,12 +212,23 @@ const statusText = computed(() => {
   min-width: 0;
 }
 
+.size-compact .ticket-right {
+  padding: 12px 16px;
+}
+
 .ticket-name {
   font-size: 16px; font-weight: 600; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.size-compact .ticket-name {
+  font-size: 14px;
+}
+
 .ticket-desc {
   font-size: 13px; color: #94A3B8; margin-top: 4px;
+}
+.size-compact .ticket-desc {
+  font-size: 12px; margin-top: 2px;
 }
 
 .ticket-footer {
@@ -239,6 +270,9 @@ const statusText = computed(() => {
   background: #0f172a; /* Should match page bg, but page might have gradient. Using dark default. */
   border-radius: 50%; transform: translateX(-50%);
   z-index: 2;
+}
+.size-compact .punch-hole {
+  left: 100px;
 }
 .punch-hole.top { top: -6px; }
 .punch-hole.bottom { bottom: -6px; }

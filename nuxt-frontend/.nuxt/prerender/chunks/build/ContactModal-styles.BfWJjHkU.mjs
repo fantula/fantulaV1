@@ -1,0 +1,8 @@
+const ContactModal_vue_vue_type_style_index_0_scoped_98727de8_lang = ".contact-content[data-v-98727de8]{flex-direction:column;gap:16px;padding:10px 10px 30px;position:relative;z-index:2}.contact-content[data-v-98727de8],.icon-wrapper[data-v-98727de8]{align-items:center;display:flex}.icon-wrapper[data-v-98727de8]{background:#3b82f61a;border:1px solid rgba(59,130,246,.2);border-radius:50%;box-shadow:0 0 20px #3b82f626;height:64px;justify-content:center;margin-bottom:8px;width:64px}.service-icon[data-v-98727de8]{font-size:32px}.desc[data-v-98727de8]{color:#94a3b8;font-size:14px;line-height:1.5;margin:0;max-width:80%;text-align:center}.contact-card[data-v-98727de8]{align-items:center;background:#ffffff08;border:1px solid hsla(0,0%,100%,.08);border-radius:12px;display:flex;justify-content:space-between;padding:16px;transition:all .2s;width:100%}.contact-card[data-v-98727de8]:hover{background:#ffffff0d;border-color:#ffffff26;transform:translateY(-1px)}.card-label[data-v-98727de8]{color:#64748b;font-size:13px}.card-value[data-v-98727de8]{color:#e2e8f0;font-family:monospace;font-size:16px;font-weight:700}";
+
+const ContactModalStyles_BfWJjHkU = [
+  ContactModal_vue_vue_type_style_index_0_scoped_98727de8_lang
+];
+
+export { ContactModalStyles_BfWJjHkU as default };
+//# sourceMappingURL=ContactModal-styles.BfWJjHkU.mjs.map

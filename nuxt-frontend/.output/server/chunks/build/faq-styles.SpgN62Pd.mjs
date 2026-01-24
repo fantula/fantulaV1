@@ -1,0 +1,8 @@
+const faq_vue_vue_type_style_index_0_scoped_1c3d4b06_lang = ".faq-list-page[data-v-1c3d4b06]{padding:0}.page-actions[data-v-1c3d4b06],.toolbar-card[data-v-1c3d4b06]{margin-bottom:20px}.toolbar-card[data-v-1c3d4b06]{background:var(--el-bg-color);border-radius:8px;box-shadow:var(--el-box-shadow-lighter);padding:20px}.search-form[data-v-1c3d4b06]{margin-bottom:0}.table-card[data-v-1c3d4b06]{background:var(--el-bg-color);border-radius:8px;box-shadow:var(--el-box-shadow-lighter);padding:20px}.question-text[data-v-1c3d4b06]{color:var(--el-text-color-primary);font-weight:500}.bound-product[data-v-1c3d4b06]{align-items:center;color:var(--el-color-primary);display:flex;font-size:13px;gap:6px}.pagination-row[data-v-1c3d4b06]{display:flex;justify-content:flex-end;margin-top:20px}";
+
+const faqStyles_SpgN62Pd = [
+  faq_vue_vue_type_style_index_0_scoped_1c3d4b06_lang
+];
+
+export { faqStyles_SpgN62Pd as default };
+//# sourceMappingURL=faq-styles.SpgN62Pd.mjs.map

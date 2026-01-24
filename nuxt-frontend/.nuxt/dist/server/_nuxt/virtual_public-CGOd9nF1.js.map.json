@@ -1,0 +1,1 @@
+{"file":"virtual_public-CGOd9nF1.js","mappings":";AAAuD,MAAA,aAAe,gBAAgB,yBAAyB;","names":[],"sources":["../../../../virtual:public?%2Fimages%2Fshared%2Flogo.png"],"sourcesContent":["import { publicAssetsURL } from '#internal/nuxt/paths';export default publicAssetsURL(\"/images/shared/logo.png\")"],"version":3}

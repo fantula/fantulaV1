@@ -119,7 +119,7 @@
                 
                 <!-- 设备展示图片 -->
                 <div class="device-showcase">
-                  <img src="/images/placeholder.png" alt="智能电视盒子界面展示" class="showcase-image" />
+                  <img src="/images/shared/logo.png" alt="智能电视盒子界面展示" class="showcase-image" />
                 </div>
                 
                 <div class="warning-notice">
@@ -181,7 +181,7 @@
                 
                 <!-- 应用界面展示图片 -->
                 <div class="app-showcase">
-                  <img src="/images/placeholder.png" alt="电视盒子应用界面展示" class="showcase-image" />
+                  <img src="/images/shared/logo.png" alt="电视盒子应用界面展示" class="showcase-image" />
                 </div>
                 
                 <div class="warning-notice">
@@ -217,7 +217,7 @@
                 
                 <!-- 设备配置展示图片 -->
                 <div class="config-showcase">
-                  <img src="/images/placeholder.png" alt="设备配置和设置界面" class="showcase-image" />
+                  <img src="/images/shared/logo.png" alt="设备配置和设置界面" class="showcase-image" />
                 </div>
               </div>
               
@@ -309,13 +309,13 @@
             <div class="related-articles">
               <div class="related-article">
                 <div class="related-image">
-                  <img src="/images/client/pc/related-1.jpg" alt="Apple TV 4K评测" />
+                  <img src="/images/shared/logo.png" alt="Apple TV 4K评测" />
                 </div>
                 <div class="related-content">
                   <div class="related-category">设备评测</div>
                   <h3 class="related-article-title">2023年Apple TV 4K全面评测：值得购买吗？</h3>
                   <div class="related-author">
-                    <img src="/images/client/pc/head1.png" alt="李评测" class="author-avatar-small" />
+                    <img src="/images/shared/logo.png" alt="李评测" class="author-avatar-small" />
                     <span class="author-name-small">李评测</span>
                     <span class="publish-date-small">2023-06-15</span>
                   </div>
@@ -324,13 +324,13 @@
               
               <div class="related-article">
                 <div class="related-image">
-                  <img src="/images/client/pc/related-2.jpg" alt="家庭影院搭建" />
+                  <img src="/images/shared/logo.png" alt="家庭影院搭建" />
                 </div>
                 <div class="related-content">
                   <div class="related-category">家居影院</div>
                   <h3 class="related-article-title">打造完美家庭影院：从入门到专业的完整指南</h3>
                   <div class="related-author">
-                    <img src="/images/client/pc/head2.png" alt="王影音" class="author-avatar-small" />
+                    <img src="/images/shared/logo.png" alt="王影音" class="author-avatar-small" />
                     <span class="author-name-small">王影音</span>
                     <span class="publish-date-small">2023-06-10</span>
                   </div>
@@ -339,13 +339,13 @@
               
               <div class="related-article">
                 <div class="related-image">
-                  <img src="/images/client/pc/related-3.jpg" alt="流媒体平台对比" />
+                  <img src="/images/shared/logo.png" alt="流媒体平台对比" />
                 </div>
                 <div class="related-content">
                   <div class="related-category">流媒体</div>
                   <h3 class="related-article-title">五大流媒体平台对比：Netflix、Disney+、HBO哪家强？</h3>
                   <div class="related-author">
-                    <img src="/images/client/pc/head3.png" alt="赵媒体" class="author-avatar-small" />
+                    <img src="/images/shared/logo.png" alt="赵媒体" class="author-avatar-small" />
                     <span class="author-name-small">赵媒体</span>
                     <span class="publish-date-small">2023-06-05</span>
                   </div>
@@ -384,12 +384,12 @@ const articles: any = {
     id: 1,
     title: '电视盒子看奈飞4K完整教程：解锁高清流媒体体验',
     description: '教你如何选择合适的电视盒子，安装奈飞App解码4K画质，解决播放卡顿问题...',
-    image: '/images/client/pc/help1.png',
+    image: '/images/shared/logo.png',
     date: '2023年6月20日',
     category: '教程指南',
     readTime: '8分钟',
     author: {
-      avatar: '/images/client/pc/zhangkeji.png',
+      avatar: '/images/shared/logo.png',
       name: '张科技'
     }
   }

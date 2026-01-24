@@ -1,11 +1,9 @@
 <template>
-  <div class="checkout-page dark-theme">
-    <div class="checkout-bg"></div>
-    
+  <div class="checkout-page">
     <div class="checkout-content">
       <!-- 头部导航 -->
       <div class="checkout-header">
-        <button class="back-btn" @click="goBack">
+        <button class="back-btn" @click="router.back()">
           <el-icon><ArrowLeft /></el-icon> 返回
         </button>
         <div class="page-title">订单结算</div>
@@ -44,7 +42,9 @@
               
               <div class="order-body">
                 <div class="product-thumb">
-                  <img :src="order.product_snapshot?.image || '/images/shared/logo.png'" />
+                  <div class="sq-cover-img-container">
+                    <img :src="order.product_snapshot?.image || '/images/shared/logo.png'" class="sq-cover-img" />
+                  </div>
                 </div>
                 <div class="product-info">
                   <div class="product-name">{{ order.product_snapshot?.product_name }}</div>
@@ -53,7 +53,7 @@
                   </div>
                 </div>
                 <div class="product-price">
-                  <div class="price-val">{{ order.unit_price.toFixed(2) }}</div>
+                  <div class="price-val">¥{{ order.unit_price.toFixed(2) }}</div>
                   <div class="qty">x{{ order.quantity }}</div>
                 </div>
               </div>
@@ -80,19 +80,19 @@
             <div class="price-rows">
               <div class="price-row">
                 <span>商品总额</span>
-                <span class="val">{{ totalProductAmount.toFixed(2) }}</span>
+                <span class="val">¥{{ totalProductAmount.toFixed(2) }}</span>
               </div>
               
               <!-- 优惠券选择 -->
               <div class="price-row coupon-row" @click="showCouponModal = true">
                 <div class="coupon-label">
                   <span>优惠券</span>
-                  <el-tag v-if="selectedCoupon" size="small" type="danger" effect="dark">
-                    已抵扣 {{ couponDiscount.toFixed(2) }}
+                  <el-tag v-if="selectedCoupon" size="small" type="danger" effect="dark" class="discount-tag">
+                    已抵扣 ¥{{ couponDiscount.toFixed(2) }}
                   </el-tag>
                 </div>
                 <div class="coupon-action">
-                  <span v-if="selectedCoupon" class="val discount">-{{ couponDiscount.toFixed(2) }}</span>
+                  <span v-if="selectedCoupon" class="val discount">-¥{{ couponDiscount.toFixed(2) }}</span>
                   <span v-else class="placeholder">选择优惠券</span>
                   <el-icon><ArrowRight /></el-icon>
                 </div>
@@ -102,7 +102,7 @@
 
               <div class="price-row total">
                 <span>应付金额</span>
-                <span class="val final">{{ finalPayAmount.toFixed(2) }}</span>
+                <span class="val final">¥{{ finalPayAmount.toFixed(2) }}</span>
               </div>
             </div>
 
@@ -115,7 +115,7 @@
                 </div>
                 <div class="balance-info">
                   <div class="method-name">余额支付</div>
-                  <div class="user-balance">可用余额: {{ userBalance.toFixed(2) }}</div>
+                  <div class="user-balance">可用余额: ¥{{ userBalance.toFixed(2) }}</div>
                 </div>
                 <div class="check-mark"><el-icon><Select /></el-icon></div>
               </div>
@@ -129,7 +129,7 @@
                 @click="handlePay"
               >
                 <div v-if="paying" class="btn-loader"></div>
-                <span v-else>立即支付 {{ finalPayAmount.toFixed(2) }}</span>
+                <span v-else>立即支付 ¥{{ finalPayAmount.toFixed(2) }}</span>
               </button>
               <div class="agreement-text">
                 点击支付即表示同意 <a href="#">服务协议</a>
@@ -168,43 +168,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { supabasePreOrderApi, type PreOrder } from '@/api/supabase'
-import { couponApi, type UserCoupon } from '@/api/coupon'
-import { ElMessage } from 'element-plus'
 import { ArrowLeft, Timer, InfoFilled, ArrowRight, Wallet, Select } from '@element-plus/icons-vue'
+import { useCheckout } from '@/composables/client/useCheckout'
 import BalanceNotEnoughModal from '@/components/BalanceNotEnoughModal.vue'
 import PaySuccessModal from '@/components/PaySuccessModal.vue'
-import CouponSelectorModal from '@/components/CouponSelectorModal.vue'
+import CouponSelectorModal from '@/components/modal/business/CouponSelectorModal.vue'
 
 definePageMeta({ ssr: false })
 
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
-
-// 状态
-const loading = ref(true)
-const error = ref('')
-const preOrders = ref<PreOrder[]>([])
-const paying = ref(false)
-const showBalanceModal = ref(false)
-const showPaySuccess = ref(false)
 const showCouponModal = ref(false)
 
-// 结算数据
-const lastOrderId = ref('')
-const lastOrderAmount = ref(0)
-const selectedCoupon = ref<UserCoupon | null>(null)
-const couponDiscount = ref(0) // 实际抵扣金额
+// Use Composable
+const {
+  loading,
+  error,
+  preOrders,
+  paying,
+  showBalanceModal,
+  showPaySuccess,
+  
+  lastOrderId,
+  lastOrderAmount,
+  selectedCoupon,
+  couponDiscount,
+  
+  remainingSeconds,
+  formatCountdown,
+  
+  totalProductAmount,
+  finalPayAmount,
+  userBalance,
+  orderSkuIds,
+  orderProductIds,
+  
+  loadPreOrders,
+  handleCouponSelect,
+  handlePay,
+  formatSpec
+} = useCheckout()
 
-// 倒计时
-const remainingSeconds = ref(0)
-let countdownTimer: any = null
-
-// 计算属性
+// Computed
 const preOrderIds = computed(() => {
   const id = route.params.id as string
   const ids = route.query.ids as string
@@ -213,213 +220,29 @@ const preOrderIds = computed(() => {
   return []
 })
 
-const totalProductAmount = computed(() => {
-  return preOrders.value.reduce((sum, o) => sum + o.total_amount, 0)
+// Lifecycle
+onMounted(() => {
+  loadPreOrders(preOrderIds.value)
 })
-
-const finalPayAmount = computed(() => {
-  // preOrder.total_amount 已经被 applyCouponToPreOrder 更新为折后价了
-  // 所以直接累加即可。
-  // 注意：如果需要显示"原价"和"折扣"，可能需要额外字段，或者通过 couponDiscount 反推
-  return preOrders.value.reduce((sum, o) => sum + o.total_amount, 0)
-})
-
-const userBalance = computed(() => userStore.user?.balance ?? 0)
-
-const orderSkuIds = computed(() => {
-  return preOrders.value.map(o => o.sku_snapshot?.sku_id).filter(Boolean)
-})
-
-const orderProductIds = computed(() => {
-  return preOrders.value.map(o => o.product_snapshot?.product_id).filter(Boolean)
-})
-
-const formatCountdown = computed(() => {
-  const mins = Math.floor(remainingSeconds.value / 60)
-  const secs = remainingSeconds.value % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-})
-
-// 生命周期
-onMounted(async () => {
-  if (!userStore.isLoggedIn) {
-    ElMessage.warning('请先登录')
-    router.push('/')
-    return
-  }
-  await userStore.fetchUserInfo()
-  await loadPreOrders()
-})
-
-onUnmounted(() => {
-  if (countdownTimer) clearInterval(countdownTimer)
-})
-
-// 方法
-const loadPreOrders = async () => {
-  loading.value = true
-  try {
-    if (preOrderIds.value.length === 0) throw new Error('缺少订单 ID')
-    
-    const list: PreOrder[] = []
-    for (const id of preOrderIds.value) {
-      const res = await supabasePreOrderApi.getPreOrder(id)
-      if (res.success && res.pre_order) list.push(res.pre_order)
-    }
-    
-    if (list.length === 0) throw new Error('订单不存在或已过期')
-    preOrders.value = list
-    
-    // 初始化倒计时
-    const minExpires = Math.min(...list.map(o => new Date(o.expires_at).getTime()))
-    startCountdown(minExpires)
-    
-  } catch (e: any) {
-    error.value = e.message
-  } finally {
-    loading.value = false
-  }
-}
-
-const startCountdown = (expiresTime: number) => {
-  const update = () => {
-    const now = Date.now()
-    remainingSeconds.value = Math.max(0, Math.floor((expiresTime - now) / 1000))
-    if (remainingSeconds.value <= 0) {
-      error.value = '订单已过期，请重新下单'
-      if (countdownTimer) clearInterval(countdownTimer)
-    }
-  }
-  update()
-  countdownTimer = setInterval(update, 1000)
-}
-
-const handleCouponSelect = async (coupon: UserCoupon | null) => {
-  selectedCoupon.value = coupon
-  
-  // 1. 调用 API 持久化应用优惠券到预订单
-  // 注意：如果是取消优惠券，coupon?.id 为 undefined，API 会处理为清除
-  const couponId = coupon?.id || null
-  
-  // 假设只处理单个订单（目前逻辑）
-  const preOrder = preOrders.value[0]
-  if (!preOrder) return
-
-  loading.value = true // 短暂 loading 避免闪烁
-  try {
-      const res = await supabasePreOrderApi.applyCouponToPreOrder(preOrder.id, couponId)
-      
-      if (res.success) {
-          // 2. 更新本地数据
-          if (res.total_amount !== undefined) {
-             // 更新该订单的 total_amount (虽然前端显示的 sum 是 computed，但源数据变了会自动更新)
-             preOrder.total_amount = res.total_amount
-             
-             // 更新显示的折扣金额
-             couponDiscount.value = res.discount_amount || 0
-          }
-          
-          if (!coupon) {
-             ElMessage.success('已取消优惠券')
-          } else {
-             ElMessage.success('优惠券使用成功')
-          }
-      } else {
-          ElMessage.error(res.error || '应用优惠券失败')
-          // 回滚选择
-          if (coupon) selectedCoupon.value = null
-          couponDiscount.value = 0
-      }
-  } catch (e: any) {
-      ElMessage.error('系统异常: ' + (e.message || JSON.stringify(e)))
-      console.error(e)
-  } finally {
-      loading.value = false
-  }
-}
-
-const handlePay = async () => {
-  if (paying.value) return
-  
-  // 余额预检
-  if (userBalance.value < finalPayAmount.value) {
-    showBalanceModal.value = true
-    return
-  }
-  
-  paying.value = true
-  try {
-    // 假设只支持单订单支付，如果是批量，需循环调用或后端支持批量
-    // 目前逻辑先取第一个 (如需支持批量，需后端改造)
-    const preOrder = preOrders.value[0]
-    
-    const res = await supabasePreOrderApi.confirmPreOrder(
-        preOrder.id, 
-        'balance',
-        selectedCoupon.value?.id // 传入优惠券ID
-    )
-    
-    if (!res.success) {
-      if (res.error?.includes('余额不足')) {
-        showBalanceModal.value = true
-      } else {
-        ElMessage.error(res.error || '支付失败')
-      }
-      return
-    }
-    
-    // 成功
-    lastOrderId.value = res.order_no || ''
-    lastOrderAmount.value = finalPayAmount.value
-    showPaySuccess.value = true
-    await userStore.fetchUserInfo() // 刷新余额
-    
-  } catch (e: any) {
-    ElMessage.error(e.message || '系统异常')
-  } finally {
-    paying.value = false
-  }
-}
-
-const formatSpec = (spec: any) => {
-  if (!spec) return '默认规格'
-  return Object.values(spec).join(' / ')
-}
-
-const goBack = () => router.back()
 
 const handlePaySuccessClose = () => {
   showPaySuccess.value = false
-  if (preOrders.value.length === 1) {
-    router.push(`/profile/orders`) // 简化跳转逻辑
-  } else {
-    router.push('/profile/orders')
-  }
+  router.push('/profile/orders')
 }
 </script>
 
 <style scoped>
 .checkout-page {
-  min-height: 100vh;
+  /* Using global background, no need for specific background here as per theme */
+  min-height: calc(100vh - 80px); /* Adjust for header */
   position: relative;
-  background: #0F172A;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-}
-
-.checkout-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 400px;
-  background: radial-gradient(circle at 50% 0%, rgba(76, 122, 224, 0.15), transparent 70%);
-  pointer-events: none;
+  font-family: 'PingFang SC', system-ui, sans-serif;
+  color: var(--text-main);
 }
 
 .checkout-content {
   position: relative;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 40px 24px;
 }
@@ -434,7 +257,7 @@ const handlePaySuccessClose = () => {
 .back-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94A3B8;
+  color: var(--text-sub);
   padding: 8px 16px;
   border-radius: 8px;
   display: flex;
@@ -447,21 +270,27 @@ const handlePaySuccessClose = () => {
 .back-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
+  border-color: var(--active-orange);
 }
 
 .page-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   margin-left: 20px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(23, 143, 198, 0.4);
 }
 
-/* Glass Card */
+/* Glass Card Global Override for Local Use if needed, 
+   but ideally we use global .glass-card if available, 
+   here we define local specific tweaks */
 .glass-card {
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(30, 41, 59, 0.6);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 /* Main Layout */
@@ -476,9 +305,9 @@ const handlePaySuccessClose = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(234, 179, 8, 0.1);
-  border: 1px solid rgba(234, 179, 8, 0.2);
-  color: #EAB308;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  color: var(--active-orange);
   padding: 12px 20px;
   border-radius: 12px;
   margin-bottom: 24px;
@@ -488,10 +317,18 @@ const handlePaySuccessClose = () => {
 .time-highlight {
   font-family: monospace;
   font-size: 16px;
+  font-weight: 700;
 }
 
 .order-card {
   margin-bottom: 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-blue);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .order-header-row {
@@ -501,7 +338,7 @@ const handlePaySuccessClose = () => {
   padding-bottom: 12px;
   margin-bottom: 16px;
   font-size: 13px;
-  color: #94A3B8;
+  color: var(--text-sub);
 }
 
 .order-body {
@@ -509,12 +346,12 @@ const handlePaySuccessClose = () => {
   gap: 16px;
 }
 
-.product-thumb img {
+.product-thumb {
   width: 72px;
   height: 72px;
   border-radius: 12px;
-  object-fit: cover;
-  background: rgba(0,0,0,0.2);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .product-info {
@@ -522,15 +359,15 @@ const handlePaySuccessClose = () => {
 }
 
 .product-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: #F1F5F9;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
   margin-bottom: 6px;
 }
 
 .product-spec {
   font-size: 13px;
-  color: #64748B;
+  color: var(--text-sub);
 }
 
 .product-price {
@@ -538,32 +375,32 @@ const handlePaySuccessClose = () => {
 }
 
 .price-val {
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--active-orange);
 }
 
 .qty {
   font-size: 13px;
-  color: #64748B;
+  color: var(--text-sub);
   margin-top: 4px;
 }
 
 .tips-card h4 {
-  font-size: 14px;
-  color: #F1F5F9;
+  font-size: 15px;
+  color: var(--text-main);
   margin: 0 0 12px 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .tips-card ul {
   margin: 0;
   padding-left: 20px;
-  color: #64748B;
+  color: var(--text-sub);
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 /* Summary Section */
@@ -573,9 +410,12 @@ const handlePaySuccessClose = () => {
 }
 
 .card-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  color: #fff;
+  border-left: 4px solid var(--primary-blue);
+  padding-left: 12px;
 }
 
 .price-rows {
@@ -586,13 +426,13 @@ const handlePaySuccessClose = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   font-size: 14px;
-  color: #94A3B8;
+  color: var(--text-sub);
 }
 
 .val {
-  color: #F1F5F9;
+  color: var(--text-main);
   font-weight: 500;
 }
 
@@ -613,6 +453,12 @@ const handlePaySuccessClose = () => {
   gap: 8px;
 }
 
+.discount-tag {
+  border: none;
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+}
+
 .coupon-action {
   display: flex;
   align-items: center;
@@ -620,7 +466,7 @@ const handlePaySuccessClose = () => {
 }
 
 .placeholder {
-  color: #64748B;
+  color: var(--text-sub);
   font-size: 13px;
 }
 
@@ -631,77 +477,92 @@ const handlePaySuccessClose = () => {
 .divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
-  margin: 16px 0;
+  margin: 20px 0;
 }
 
 .price-row.total .val.final {
-  font-size: 24px;
-  color: #4C7AE0;
-  font-weight: 600;
+  font-size: 28px;
+  color: var(--active-orange);
+  font-weight: 700;
+  text-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
 }
 
 /* Payment Method */
 .method-title {
-  font-size: 14px;
-  color: #94A3B8;
-  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-sub);
+  margin-bottom: 16px;
 }
 
 .balance-card {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(76, 122, 224, 0.1);
-  border: 1px solid rgba(76, 122, 224, 0.3);
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 24px;
+  background: rgba(23, 143, 198, 0.1);
+  border: 1px solid rgba(23, 143, 198, 0.3);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 32px;
   position: relative;
+  transition: all 0.2s;
+}
+
+.balance-card.active {
+  background: rgba(23, 143, 198, 0.15);
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 20px rgba(23, 143, 198, 0.15);
 }
 
 .balance-icon {
-  font-size: 24px;
-  color: #4C7AE0;
+  font-size: 28px;
+  color: var(--primary-blue);
+}
+
+.balance-info {
+  flex: 1;
 }
 
 .method-name {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: #fff;
 }
 
 .user-balance {
-  font-size: 12px;
-  color: #94A3B8;
-  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-top: 4px;
 }
 
 .check-mark {
   margin-left: auto;
-  color: #4C7AE0;
+  color: var(--primary-blue);
   font-weight: bold;
+  font-size: 18px;
 }
 
 /* Action Area */
 .pay-btn {
   width: 100%;
-  background: #4C7AE0;
+  background: linear-gradient(90deg, var(--active-orange) 0%, #FB923C 100%);
   color: #fff;
   border: none;
   padding: 16px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }
 
 .pay-btn:hover {
-  background: #3B66C5;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
 }
 
 .pay-btn:disabled {
@@ -709,45 +570,59 @@ const handlePaySuccessClose = () => {
   color: #64748B;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .agreement-text {
   text-align: center;
   font-size: 12px;
-  color: #64748B;
-  margin-top: 12px;
+  color: var(--text-sub);
+  margin-top: 16px;
 }
 
 .agreement-text a {
-  color: #4C7AE0;
+  color: var(--primary-blue);
   text-decoration: none;
+  transition: color 0.2s;
+}
+
+.agreement-text a:hover {
+  color: var(--active-orange);
 }
 
 /* Loading/Error */
 .checkout-loading, .checkout-error {
   text-align: center;
   padding: 100px 0;
-  color: #94A3B8;
+  color: var(--text-sub);
 }
 
 .action-btn {
   background: rgba(255, 255, 255, 0.1);
-  color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 24px;
-  border-radius: 8px;
-  margin-top: 20px;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 20px;
   cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.2s;
 }
 
-.btn-loader {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.glass-loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: var(--primary-blue);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>

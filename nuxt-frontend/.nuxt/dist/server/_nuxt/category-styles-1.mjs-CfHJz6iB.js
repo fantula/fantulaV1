@@ -1,0 +1,5 @@
+const category_vue_vue_type_style_index_0_scoped_bc6e31f1_lang = ".faq-category-page[data-v-bc6e31f1]{margin:0 auto;max-width:1000px}.page-header[data-v-bc6e31f1]{justify-content:space-between;margin-bottom:24px}.header-left[data-v-bc6e31f1],.page-header[data-v-bc6e31f1]{align-items:center;display:flex}.header-left[data-v-bc6e31f1]{gap:16px}.title-area h2[data-v-bc6e31f1]{font-size:24px;margin:0}.content-card[data-v-bc6e31f1]{background:var(--el-bg-color);border-radius:8px;box-shadow:0 1px 4px #0000000d;padding:24px}";
+export {
+  category_vue_vue_type_style_index_0_scoped_bc6e31f1_lang as default
+};
+//# sourceMappingURL=category-styles-1.mjs-CfHJz6iB.js.map

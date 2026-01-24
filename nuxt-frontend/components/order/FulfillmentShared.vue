@@ -1,10 +1,9 @@
 <template>
   <div class="glass-card delivery-card">
     
-    <!-- 账号合租 (Shared) -->
-    <div v-if="cdkList.length > 0" class="delivery-content">
-      <div v-for="(item, idx) in cdkList" :key="idx" class="shared-account-group">
-        
+    <!-- 账号合租 (Shared) - Single Slot View -->
+    <div class="delivery-content">
+      
         <!-- 1. Credential Card (Account & Password) -->
         <div class="credential-card">
            <div class="credential-header">
@@ -12,12 +11,12 @@
               <div class="slot-title-badge">
                  <div class="icon-box"><el-icon><User /></el-icon></div>
                  <span class="label">您的位置:</span>
-                 <span class="value">{{ formatSlotIndex(item.slotIndex) }}号</span>
+                 <span class="value">{{ formatSlotIndex(slotIndex) }}号</span>
               </div>
            </div>
 
            <div class="credential-body">
-              <div v-for="(val, key) in parseCdkCode(item)" :key="key" class="credential-row">
+              <div v-for="(val, key) in parseCdkCode(cdkItem)" :key="key" class="credential-row">
                  <div class="row-label">{{ key }}</div>
                  <div class="row-value-group">
                     <span class="row-value large-text">{{ val }}</span>
@@ -28,8 +27,6 @@
               </div>
            </div>
         </div>
-
-      </div>
 
       <!-- 2. Roommates (Full Slot List) -->
       <div class="roommates-section">
@@ -65,9 +62,6 @@
       </div>
 
     </div>
-    <div v-else class="empty-state">
-      暂无详细交付信息
-    </div>
   </div>
 </template>
 
@@ -82,7 +76,6 @@ interface CdkItem {
   code: string
   parsed: any
   accountData: any
-  slotIndex?: number
 }
 
 interface CoSharingUser {
@@ -93,32 +86,33 @@ interface CoSharingUser {
 }
 
 const props = defineProps<{
-  cdkList: CdkItem[]
+  cdkItem: CdkItem
+  slotIndex: number
 }>()
 
 const coSharingUsers = ref<CoSharingUser[]>([])
 
 // --- Logic for Slots ---
-// 1. Get Max Slots from first CDK
+// 1. Get Max Slots from CDK
 const maxSlots = computed(() => {
-    if (!props.cdkList.length) return 5 // Default fallback
-    const cdk = props.cdkList[0]
+    if (!props.cdkItem) return 5 // Default fallback
     // Check accountData for max_slots
-    if (cdk.accountData && cdk.accountData.max_slots) {
-        return Number(cdk.accountData.max_slots)
+    if (props.cdkItem.accountData && props.cdkItem.accountData.max_slots) {
+        return Number(props.cdkItem.accountData.max_slots)
     }
     return 5
 })
 
 // 2. Identify My Slot
-const mySlotIndex = computed(() => props.cdkList[0]?.slotIndex)
+// We use the prop slotIndex directly
+const mySlotIndex = computed(() => props.slotIndex)
 
 // 3. Build Full Slot List
 const allSlots = computed(() => {
     const slots = []
     for (let i = 1; i <= maxSlots.value; i++) {
         const user = coSharingUsers.value.find(u => u.slot_index === i)
-        // Assume slots are 1-based, we can adjust if logic changes
+        // Check if this slot matches the "Me" slot index passed in
         const isMe = (i === Number(mySlotIndex.value))
         slots.push({
             index: i,
@@ -134,6 +128,7 @@ const occupiedCount = computed(() => coSharingUsers.value.length)
 
 // 解析 CDK code 为字段对象
 const parseCdkCode = (item: CdkItem) => {
+  if (!item) return {}
   // 优先使用已解析的 parsed
   if (item.parsed && typeof item.parsed === 'object') {
     return item.parsed
@@ -157,9 +152,8 @@ const formatSlotIndex = (idx?: number) => {
 
 // 获取共享用户列表
 const fetchCoSharingUsers = async () => {
-  if (!props.cdkList.length) return
-  const cdkId = props.cdkList[0].id
-  if (!cdkId) return
+  if (!props.cdkItem || !props.cdkItem.id) return
+  const cdkId = props.cdkItem.id
 
   try {
     const client = getSupabaseClient()
@@ -197,7 +191,7 @@ onMounted(() => {
   fetchCoSharingUsers()
 })
 
-watch(() => props.cdkList, () => {
+watch(() => props.cdkItem, () => {
   fetchCoSharingUsers()
 }, { deep: true })
 </script>
@@ -211,37 +205,22 @@ watch(() => props.cdkList, () => {
   margin-top: 16px;
 }
 
-.section-title { 
-  padding: 14px 24px; 
-  border-bottom: 1px solid rgba(255,255,255,0.05); 
-  font-weight: 600; 
-  font-size: 14px; 
-  color: #E2E8F0;
-  background: rgba(0,0,0,0.15); 
-  display: flex; align-items: center; gap: 8px;
-}
-.title-icon { font-size: 16px; }
-
 .delivery-content { 
   display: flex; flex-direction: column; 
 }
 
 /* 1. Credential Card */
-.shared-account-group {
-    padding: 20px 24px;
-}
-
 .credential-card {
     background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.08);
+    /* border-radius: 16px; removed inside card */
+    /* border: 1px solid rgba(255,255,255,0.08); */
     overflow: hidden;
 }
 
 .credential-header {
     padding: 16px 24px;
     background: rgba(0,0,0,0.1);
-    display: flex; align-items: center; /* Left align as requested */
+    display: flex; align-items: center; 
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
@@ -266,9 +245,9 @@ watch(() => props.cdkList, () => {
 
 .slot-title-badge .value {
     font-size: 16px; font-weight: 700; color: #fff;
-    font-family: 'Outfit', sans-serif; /* Or system font */
+    font-family: 'Outfit', sans-serif; 
     letter-spacing: 0.5px;
-    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); /* Subtle glow */
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); 
 }
 
 .credential-body {
@@ -317,8 +296,8 @@ watch(() => props.cdkList, () => {
 .profiles-scroll-container {
     display: flex; align-items: flex-start; gap: 20px;
     overflow-x: auto;
-    padding-bottom: 8px; /* For scrollbar space */
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    padding-bottom: 8px; 
+    scrollbar-width: none; 
 }
 .profiles-scroll-container::-webkit-scrollbar { display: none; }
 
@@ -334,7 +313,7 @@ watch(() => props.cdkList, () => {
     width: 56px; height: 56px;
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.1);
-    padding: 2px; /* Ring gap */
+    padding: 2px; 
     display: flex; align-items: center; justify-content: center;
     transition: border-color 0.3s;
 }
@@ -349,7 +328,7 @@ watch(() => props.cdkList, () => {
 }
 .profile-avatar {
     width: 100%; height: 100%;
-    border-radius: 8px; /* Inner radius */
+    border-radius: 8px; 
     object-fit: cover;
     background: #1E293B;
 }
@@ -366,5 +345,14 @@ watch(() => props.cdkList, () => {
 .empty-slot { opacity: 0.5; cursor: default; }
 .empty-slot:hover { transform: none; }
 .avatar-ring.empty { border-style: dashed; border-color: rgba(255,255,255,0.1); color: #64748B; }
+
+/* Me Highlight - Subtle gold ring or text */
+.profile-item.is-me .avatar-ring {
+    border-color: #10B981; /* Green for me */
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+.profile-item.is-me .profile-name {
+    color: #10B981; font-weight: 700;
+}
 </style>
 

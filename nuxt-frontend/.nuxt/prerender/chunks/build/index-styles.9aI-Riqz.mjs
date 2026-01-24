@@ -1,0 +1,8 @@
+const index_vue_vue_type_style_index_0_scoped_97bb9292_lang = ".refund-stats-page[data-v-97bb9292]{padding:0}.page-header[data-v-97bb9292]{margin-bottom:24px}.page-header h2[data-v-97bb9292]{color:var(--el-text-color-primary);font-size:28px;font-weight:600;margin:0}.page-header .sub-desc[data-v-97bb9292]{color:var(--el-text-color-secondary);font-size:14px;margin:8px 0 0}.filter-card[data-v-97bb9292]{margin-bottom:24px}.filter-container[data-v-97bb9292]{justify-content:space-between}.filter-container[data-v-97bb9292],.filter-left[data-v-97bb9292]{align-items:center;display:flex}.filter-right[data-v-97bb9292]{text-align:right}.stat-number[data-v-97bb9292]{color:#909399;font-size:24px;font-weight:600}";
+
+const indexStyles_9aIRiqz = [
+  index_vue_vue_type_style_index_0_scoped_97bb9292_lang
+];
+
+export { indexStyles_9aIRiqz as default };
+//# sourceMappingURL=index-styles.9aI-Riqz.mjs.map

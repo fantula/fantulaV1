@@ -1,0 +1,8 @@
+const index_vue_vue_type_style_index_0_scoped_30f8d51a_lang = ".faq-list-page[data-v-30f8d51a]{padding:0}.page-header[data-v-30f8d51a]{align-items:center;display:flex;justify-content:space-between;margin-bottom:24px}.page-title[data-v-30f8d51a]{color:var(--el-text-color-primary);font-size:24px;font-weight:700;margin:0}.page-desc[data-v-30f8d51a]{color:var(--el-text-color-secondary);display:block;font-size:14px;margin-top:4px}.toolbar-card[data-v-30f8d51a]{background:var(--el-bg-color);border-radius:8px;box-shadow:var(--el-box-shadow-lighter);margin-bottom:20px;padding:20px}.search-form[data-v-30f8d51a]{margin-bottom:0}.table-card[data-v-30f8d51a]{background:var(--el-bg-color);border-radius:8px;box-shadow:var(--el-box-shadow-lighter);padding:20px}.question-text[data-v-30f8d51a]{color:var(--el-text-color-primary);font-weight:500}.bound-product[data-v-30f8d51a]{align-items:center;color:var(--el-color-primary);display:flex;font-size:13px;gap:6px}.pagination-row[data-v-30f8d51a]{display:flex;justify-content:flex-end;margin-top:20px}";
+
+const indexStyles_rZ6UiSdg = [
+  index_vue_vue_type_style_index_0_scoped_30f8d51a_lang
+];
+
+export { indexStyles_rZ6UiSdg as default };
+//# sourceMappingURL=index-styles.rZ6UiSdg.mjs.map

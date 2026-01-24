@@ -1,0 +1,1 @@
+import{f as o,h as t,C as n,c as a,o as s}from"./gYbOYKrZ.js";const c={class:"loading-redirect"},d=o({__name:"index",setup(r){const e=n();return t(()=>{e.replace("/_mgmt_9Xfa3/coupons/balance")}),(_,p)=>(s(),a("div",c))}});export{d as default};
