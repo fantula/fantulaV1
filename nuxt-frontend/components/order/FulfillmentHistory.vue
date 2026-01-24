@@ -34,7 +34,7 @@
 
         <!-- Payload (Compact) -->
         <div class="card-payload">
-             <div v-for="(value, key) in record.payload" :key="key" class="payload-field">
+             <div v-for="(value, key) in record.payload" :key="key" class="payload-field" v-show="key !== '_cdk_id'">
                <span class="field-label">{{ key }}:</span>
                <span class="field-value">{{ maskValue(value) }}</span>
              </div>
@@ -59,6 +59,7 @@ import type { OrderFulfillment } from '@/types/order'
 
 const props = defineProps<{
   orderId: string
+  filterCdkId?: string
 }>()
 
 const records = ref<OrderFulfillment[]>([])
@@ -77,11 +78,18 @@ const fetchHistory = async () => {
   
   try {
     const client = getSupabaseClient()
-    const { data, error } = await client
+    let query = client
       .from('order_fulfillments')
       .select('*')
       .eq('order_id', props.orderId)
       .order('submitted_at', { ascending: false })
+
+    // 过滤特定 CDK
+    if (props.filterCdkId) {
+        query = query.contains('payload', { _cdk_id: props.filterCdkId })
+    }
+
+    const { data, error } = await query
 
     if (!error && data) {
       records.value = data as OrderFulfillment[]

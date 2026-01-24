@@ -53,8 +53,8 @@
                  <div class="status-desc">
                     <span v-if="order.status === 'refunding'">退款申请待审核：{{ pendingRefundReason || '请耐心等待' }}</span>
                     <span v-else-if="order.status === 'pending_delivery'">系统正在极速配货中</span>
-                    <span v-else-if="order.status === 'active'">商品状态正常，到期时间: {{ formatTime(order.expires_at) }}</span>
-                    <span v-else>下单时间: {{ formatTime(order.createdAt) }}</span>
+                    <span v-else-if="order.status === 'active'">商品状态正常，到期时间: {{ formatTime(order.expires_at || '') }}</span>
+                    <span v-else>下单时间: {{ formatTime(order.createdAt || '') }}</span>
                  </div>
               </div>
             </div>
@@ -128,21 +128,29 @@
           :cdk-list="cdkList" 
         />
 
-        <!-- Virtual Submit Form -->
-        <FulfillmentSubmitForm
-          v-if="order.orderType === 'virtual'"
-          :order-id="order.id || ''"
-          :order-status="order.status || ''"
-          :cdk-fields="fulfillmentFields"
-          @submit-success="handleFulfillmentSuccess"
-        />
+        <!-- Virtual Submit Form & History (Looped per CDK) -->
+        <template v-if="order.orderType === 'virtual'">
+          <div v-for="(cdk, idx) in cdkList" :key="cdk.id || idx" class="virtual-item-group">
+             <!-- Label if multiple -->
+             <div v-if="cdkList.length > 1" class="item-separator">
+                <span class="sep-label">充值项 {{ idx + 1 }}</span>
+             </div>
 
-        <!-- Virtual History -->
-        <FulfillmentHistory
-          v-if="order.orderType === 'virtual'"
-          ref="historyRef"
-          :order-id="order.id || ''"
-        />
+             <FulfillmentSubmitForm
+                :order-id="order.id || ''"
+                :order-status="order.status || ''"
+                :cdk-fields="getFieldsForCdk(cdk)"
+                :cdk-id="cdk.id"
+                @submit-success="handleFulfillmentSuccess"
+             />
+
+             <FulfillmentHistory
+                ref="historyRef"
+                :order-id="order.id || ''"
+                :filter-cdk-id="cdk.id"
+             />
+          </div>
+        </template>
       </div>
 
       <!-- Tutorial Section -->
@@ -314,9 +322,8 @@ const canRefund = computed(() => {
 const getInteger = (val: number) => Math.floor(val).toLocaleString()
 const getDecimal = (val: number) => (val % 1).toFixed(2).split('.')[1] || '00'
 
-const fulfillmentFields = computed((): FulfillmentField[] => {
-  if (!cdkList.value.length) return []
-  const cdk = cdkList.value[0]
+// Helper to get fields for a specific CDK
+const getFieldsForCdk = (cdk: CdkItem): FulfillmentField[] => {
   let keys: string[] = []
   
   if (cdk.parsed && typeof cdk.parsed === 'object') {
@@ -335,7 +342,7 @@ const fulfillmentFields = computed((): FulfillmentField[] => {
   }
 
   return keys.map(key => ({ key, label: key, value: '' }))
-})
+}
 
 const historyRef = ref<{ refresh: () => void } | null>(null)
 const handleFulfillmentSuccess = () => { historyRef.value?.refresh() }
@@ -447,21 +454,32 @@ const loadData = async () => {
         sku_snapshot: sSnap
       }
 
-      // 2. Parse CDKs
-      if (d.cdkList) {
-        const finalCdks = d.cdkList.map((cdk: any) => {
-          let slotIndex = undefined
-          if (d.order_type === 'shared_account' && (d as any).slotList) {
-            const matchSlot = (d as any).slotList.find((s: any) => s.cdk_id === cdk.id)
-            if (matchSlot) slotIndex = matchSlot.slot_index
-          }
-          return { ...cdk, slotIndex }
-        })
+      // 2. Parse CDKs & Slots
+      if (d.cdkList && Array.isArray(d.cdkList)) {
+        let finalCdks: any[] = []
+        
+        // Strategy: For Shared Account, we must display per SLOT (Visual Item = Slot)
+        // If we purchased 2 slots on the same account, we need 2 entries.
+        if (d.order_type === 'shared_account' && (d as any).slotList && (d as any).slotList.length > 0) {
+           finalCdks = (d as any).slotList.map((slot: any) => {
+              // @ts-ignore
+              const cdk = d.cdkList.find((c: any) => c.id === slot.cdk_id) || {}
+              return { ...cdk, slotIndex: slot.slot_index }
+           })
+        } else {
+           // Default: Visual Item = CDK
+           finalCdks = d.cdkList.map((cdk: any) => ({ ...cdk }))
+        }
+        
         cdkList.value = finalCdks
 
-        if (finalCdks.length > 0 && finalCdks[0].accountData) {
-            const acc = finalCdks[0].accountData
-            instructionImage.value = acc.image || acc.help_image || acc.common_image || ''
+        if (finalCdks.length > 0) {
+            // Try to find account data from the first available real CDK
+            const firstReal = finalCdks.find((c: any) => c.accountData)
+            if (firstReal) {
+               const acc = firstReal.accountData
+               instructionImage.value = acc.image || acc.help_image || acc.common_image || ''
+            }
         }
       }
 
@@ -734,5 +752,19 @@ onMounted(loadData)
   .hero-main-row { flex-direction: column; align-items: flex-start; gap: 16px; }
   .status-hero-card { height: auto; }
   .content-stream { padding: 0 16px; }
+}
+/* Virtual Loop Styles */
+.virtual-item-group {
+  display: flex; flex-direction: column; gap: 16px;
+  margin-bottom: 24px;
+}
+
+.item-separator {
+  display: flex; align-items: center;
+  margin-bottom: 8px;
+}
+.sep-label {
+  font-size: 13px; font-weight: 600; color: #94A3B8;
+  background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;
 }
 </style>

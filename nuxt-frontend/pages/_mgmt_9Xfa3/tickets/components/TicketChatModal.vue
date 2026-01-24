@@ -10,166 +10,175 @@
     append-to-body
   >
     <div class="modal-layout" v-loading="loading">
-       <!-- Left Sidebar: Info -->
-       <div class="layout-sidebar">
-          <!-- Ticket Status -->
-          <div class="info-block">
-             <div class="label">工单状态</div>
-             <div class="value">
-                <el-tag :type="getTicketStatusType(ticket?.status)" effect="dark" size="large">
-                   {{ getTicketStatusLabel(ticket?.status) }}
-                </el-tag>
-             </div>
-          </div>
-
-          <!-- User Info -->
-          <div class="info-block">
-             <div class="label">提交用户</div>
-             <div class="user-card">
-                <el-avatar :size="32" class="user-avatar">
-                   {{ ticket?.user_id?.substring(0,2).toUpperCase() }}
-                </el-avatar>
-                <div class="user-details">
-                   <div class="uid">UID: {{ ticket?.user_id?.substring(0,8).toUpperCase() }}</div>
-                   <div class="email" v-if="ticket?.profiles?.email">{{ ticket.profiles.email }}</div>
-                </div>
-             </div>
-          </div>
-
-          <!-- Associated Order Snapshot -->
-          <div class="info-block" v-if="ticket?.orders">
-             <div class="label">关联订单快照</div>
-             <div class="order-card-large">
-                 <img :src="ticket.orders.product_snapshot?.image" class="order-img-large" />
-                 
-                 <div class="order-details-rows">
-                    <div class="detail-row">
-                       <span class="row-label">订单号</span>
-                       <span class="row-value font-mono copyable" @click="copyText(ticket.orders.order_no)">
-                          {{ ticket.orders.order_no }}
-                       </span>
-                    </div>
-                    <div class="detail-row">
-                       <span class="row-label">商品</span>
-                       <span class="row-value" :title="ticket.orders.product_snapshot?.product_name">
-                          {{ ticket.orders.product_snapshot?.product_name }}
-                       </span>
-                    </div>
-                    <div class="detail-row" v-if="ticket.orders.sku_snapshot?.spec_combination">
-                       <span class="row-label">规格</span>
-                       <span class="row-value spec-tag">
-                          {{ Object.values(ticket.orders.sku_snapshot.spec_combination).join(' / ') }}
-                       </span>
-                    </div>
-                    <div class="detail-row">
-                       <span class="row-label">金额</span>
-                       <span class="row-value price">¥{{ ticket.orders.total_amount?.toFixed(2) }}</span>
-                    </div>
-                    
-                    <!-- Time Remaining -->
-                    <div class="detail-row bg-blue-50 p-2 rounded mt-2 border border-blue-100" v-if="timeLeft">
-                       <span class="row-label text-blue-600">剩余时间</span>
-                       <span class="row-value font-bold text-blue-700">{{ timeLeft }}</span>
-                    </div>
-                 </div>
-             </div>
-          </div>
-          
-          <!-- Created Time -->
-          <div class="info-block">
-             <div class="label">创建时间</div>
-             <div class="value text-gray-500 text-sm">
-                {{ ticket ? new Date(ticket.created_at).toLocaleString() : '-' }}
-             </div>
-          </div>
+       <!-- Error State -->
+       <div v-if="error" class="flex flex-col items-center justify-center w-full h-full text-center">
+          <el-icon class="text-red-500 mb-2" :size="40"><CircleCloseFilled /></el-icon>
+          <div class="text-gray-600 mb-4">{{ error }}</div>
+          <el-button type="primary" @click="loadData">
+             <el-icon class="mr-1"><RefreshRight /></el-icon> 重试
+          </el-button>
        </div>
 
-       <!-- Right Content: Chat -->
-       <div class="layout-main">
-          <!-- Chat History -->
-          <div class="chat-container custom-scrollbar" ref="chatBox">
-              <div v-if="messages.length === 0 && !loading" class="empty-chat">
-                 <el-empty description="暂无沟通记录" :image-size="60" />
+       <!-- Content (Only show when loaded and no error) -->
+       <template v-else-if="loaded">
+           <!-- Left Sidebar: Info -->
+           <div class="layout-sidebar">
+              <!-- Ticket Status -->
+              <div class="info-block">
+                 <div class="label">工单状态</div>
+                 <div class="value">
+                    <el-tag :type="getTicketStatusType(ticket?.status)" effect="dark" size="large">
+                       {{ getTicketStatusLabel(ticket?.status) }}
+                    </el-tag>
+                 </div>
               </div>
 
-              <div v-for="(group, date) in groupedMessages" :key="date">
-                 <div class="date-divider"><span>{{ date }}</span></div>
-                 
-                 <div v-for="msg in group" :key="msg.id" class="message-row" :class="{ 'is-admin': msg.is_admin }">
-                    <el-avatar :size="32" :class="msg.is_admin ? 'avatar-admin' : 'avatar-user'">
-                       {{ msg.is_admin ? '服' : '客' }}
+              <!-- User Info -->
+              <div class="info-block">
+                 <div class="label">提交用户</div>
+                 <div class="user-card">
+                    <el-avatar :size="32" class="user-avatar">
+                       {{ ticket?.user_id?.substring(0,2).toUpperCase() }}
                     </el-avatar>
-                    
-                    <div class="message-content">
-                       <div class="bubble">
-                          {{ msg.content }}
-                       </div>
-                       
-                       <div class="meta">
-                          <span>{{ formatTime(msg.created_at) }}</span>
-                       </div>
-
-                       <div v-if="msg.attachments?.length" class="attachments">
-                          <el-image 
-                            v-for="url in msg.attachments" :key="url"
-                            :src="url" 
-                            class="attachment-img"
-                            :preview-src-list="msg.attachments"
-                            preview-teleported
-                            fit="cover"
-                          />
-                       </div>
+                    <div class="user-details">
+                       <div class="uid">UID: {{ ticket?.user_id?.substring(0,8).toUpperCase() }}</div>
+                       <div class="email" v-if="ticket?.profiles?.email">{{ ticket.profiles.email }}</div>
                     </div>
                  </div>
               </div>
-          </div>
 
-          <!-- Action Footer -->
-          <div class="chat-footer" v-if="ticket">
-              <!-- Debug: Show status if it's not processing or resolved (temporary) -->
-              <div v-if="ticket.status !== 'processing' && ticket.status !== 'resolved'" class="text-xs text-red-400 text-center mb-2">
-                  当前状态异常: {{ ticket.status }}
-              </div>
-
-              <div v-if="ticket.status === 'processing'" class="action-area">
-                 <el-input 
-                    v-model="replyText" 
-                    type="textarea" 
-                    :rows="3"
-                    resize="none"
-                    placeholder="请输入回复内容 (Cmd/Ctrl + Enter 发送)" 
-                    @keydown.meta.enter="handleReply"
-                    @keydown.ctrl.enter="handleReply"
-                 />
-                 <div class="footer-buttons">
-                     <el-button type="success" plain @click="handleResolve" :loading="resolving">
-                        <el-icon class="mr-1"><Check /></el-icon> 标记已解决
-                     </el-button>
-                     <el-button type="primary" @click="handleReply" :loading="sending" :disabled="!replyText.trim()">
-                        发送回复
-                     </el-button>
+              <!-- Associated Order Snapshot -->
+              <div class="info-block" v-if="ticket?.orders">
+                 <div class="label">关联订单快照</div>
+                 <div class="order-card-large">
+                     <img :src="ticket.orders.product_snapshot?.image" class="order-img-large" />
+                     
+                     <div class="order-details-rows">
+                        <div class="detail-row">
+                           <span class="row-label">订单号</span>
+                           <span class="row-value font-mono copyable" @click="copyText(ticket.orders.order_no)">
+                              {{ ticket.orders.order_no }}
+                           </span>
+                        </div>
+                        <div class="detail-row">
+                           <span class="row-label">商品</span>
+                           <span class="row-value" :title="ticket.orders.product_snapshot?.product_name">
+                              {{ ticket.orders.product_snapshot?.product_name }}
+                           </span>
+                        </div>
+                        <div class="detail-row" v-if="ticket.orders.sku_snapshot?.spec_combination">
+                           <span class="row-label">规格</span>
+                           <span class="row-value spec-tag">
+                              {{ Object.values(ticket.orders.sku_snapshot.spec_combination).join(' / ') }}
+                           </span>
+                        </div>
+                        <div class="detail-row">
+                           <span class="row-label">金额</span>
+                           <span class="row-value price">¥{{ ticket.orders.total_amount?.toFixed(2) }}</span>
+                        </div>
+                        
+                        <!-- Time Remaining -->
+                        <div class="detail-row bg-blue-50 p-2 rounded mt-2 border border-blue-100" v-if="timeLeft">
+                           <span class="row-label text-blue-600">剩余时间</span>
+                           <span class="row-value font-bold text-blue-700">{{ timeLeft }}</span>
+                        </div>
+                     </div>
                  </div>
               </div>
               
-              <div v-else-if="ticket.status === 'resolved'" class="resolved-banner">
-                 <el-icon class="text-green-500 mr-2"><CircleCheckFilled /></el-icon>
-                 工单已结单，无法继续回复
+              <!-- Created Time -->
+              <div class="info-block">
+                 <div class="label">创建时间</div>
+                 <div class="value text-gray-500 text-sm">
+                    {{ ticket ? new Date(ticket.created_at).toLocaleString() : '-' }}
+                 </div>
               </div>
-          </div>
-          <div class="chat-footer flex justify-center items-center" v-else>
-              <span class="text-gray-400 text-sm">加载中...</span>
-          </div>
-       </div>
+           </div>
+
+           <!-- Right Content: Chat -->
+           <div class="layout-main">
+              <!-- Chat History -->
+              <div class="chat-container custom-scrollbar" ref="chatBox">
+                  <div v-if="messages.length === 0" class="empty-chat">
+                     <el-empty description="暂无沟通记录" :image-size="60" />
+                  </div>
+
+                  <div v-for="(group, date) in groupedMessages" :key="date">
+                     <div class="date-divider"><span>{{ date }}</span></div>
+                     
+                     <div v-for="msg in group" :key="msg.id" class="message-row" :class="{ 'is-admin': msg.is_admin }">
+                        <el-avatar :size="32" :class="msg.is_admin ? 'avatar-admin' : 'avatar-user'">
+                           {{ msg.is_admin ? '服' : '客' }}
+                        </el-avatar>
+                        
+                        <div class="message-content">
+                           <div class="bubble">
+                              {{ msg.content }}
+                           </div>
+                           
+                           <div class="meta">
+                              <span>{{ formatTime(msg.created_at) }}</span>
+                           </div>
+
+                           <div v-if="msg.attachments?.length" class="attachments">
+                              <el-image 
+                                v-for="url in msg.attachments" :key="url"
+                                :src="url" 
+                                class="attachment-img"
+                                :preview-src-list="msg.attachments"
+                                preview-teleported
+                                fit="cover"
+                              />
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+              </div>
+
+              <!-- Action Footer -->
+              <div class="chat-footer">
+                  <!-- Debug: Show status if it's not processing or resolved (temporary) -->
+                  <div v-if="ticket?.status !== 'processing' && ticket?.status !== 'resolved'" class="text-xs text-red-400 text-center mb-2">
+                      当前状态异常: {{ ticket?.status }}
+                  </div>
+
+                  <div v-if="ticket?.status === 'processing'" class="action-area">
+                     <el-input 
+                        v-model="replyText" 
+                        type="textarea" 
+                        :rows="3"
+                        resize="none"
+                        placeholder="请输入回复内容 (Cmd/Ctrl + Enter 发送)" 
+                        @keydown.meta.enter="handleReply"
+                        @keydown.ctrl.enter="handleReply"
+                     />
+                     <div class="footer-buttons">
+                         <el-button type="success" plain @click="handleResolve" :loading="resolving">
+                            <el-icon class="mr-1"><Check /></el-icon> 标记已解决
+                         </el-button>
+                         <el-button type="primary" @click="handleReply" :loading="sending" :disabled="!replyText.trim()">
+                            发送回复
+                         </el-button>
+                     </div>
+                  </div>
+                  
+                  <div v-else-if="ticket?.status === 'resolved'" class="resolved-banner">
+                     <el-icon class="text-green-500 mr-2"><CircleCheckFilled /></el-icon>
+                     工单已结单，无法继续回复
+                  </div>
+              </div>
+           </div>
+       </template>
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { adminTicketApi, type TicketMessage } from '@/api/admin/ticket'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, CircleCheckFilled } from '@element-plus/icons-vue'
+import { Check, CircleCheckFilled, RefreshRight } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -186,6 +195,8 @@ const visible = computed({
 })
 
 const loading = ref(false)
+const loaded = ref(false) // New: distinct loaded state
+const error = ref<string | null>(null) // New: error state
 const sending = ref(false)
 const resolving = ref(false)
 const messages = ref<TicketMessage[]>([])
@@ -264,29 +275,37 @@ const scrollToBottom = () => {
 
 const loadData = async () => {
    if (!props.ticketId) return
-   // Only show full loading on first open or explicit refresh
-   if (!ticket.value || ticket.value.id !== props.ticketId) {
-      loading.value = true
-   }
+   
+   loading.value = true
+   error.value = null
    
    try {
-      const resDetail = await adminTicketApi.getDetail(props.ticketId)
+      console.log('[TicketChatModal] Loading data for:', props.ticketId)
+      
+      // Parallel fetch for better performance
+      const [resDetail, resMsgs] = await Promise.all([
+         adminTicketApi.getDetail(props.ticketId),
+         adminTicketApi.getMessages(props.ticketId)
+      ])
+
       if (resDetail.success) {
           ticket.value = resDetail.data
-          console.log('[TicketDebug] Detail loaded:', { 
-              id: ticket.value.id, 
-              status: ticket.value.status, 
-              order_no: ticket.value.orders?.order_no 
-          })
+          loaded.value = true // Successful load
+      } else {
+          throw new Error(resDetail.error || '工单详情加载失败')
       }
 
-      const resMsgs = await adminTicketApi.getMessages(props.ticketId)
       if (resMsgs.success) {
          messages.value = resMsgs.data
          scrollToBottom()
+      } else {
+         console.warn('[TicketChatModal] Messages load warning:', resMsgs.error)
+         // We don't block the UI if just messages fail, but maybe show a toast
       }
-   } catch(e) {
-      ElMessage.error('加载失败')
+   } catch(e: any) {
+      console.error('[TicketChatModal] Load Failed:', e)
+      error.value = e.message || '加载失败，请重试'
+      loaded.value = false
    } finally {
       loading.value = false
    }
@@ -339,12 +358,16 @@ const handleResolve = async () => {
 // Watch for modal open
 watch(() => props.modelValue, (val) => {
     if (val && props.ticketId) {
+        // Reset state
         messages.value = []
         ticket.value = null
         replyText.value = ''
+        error.value = null
+        loaded.value = false
+        
         loadData()
     }
-})
+}, { immediate: true })
 </script>
 
 <style scoped>

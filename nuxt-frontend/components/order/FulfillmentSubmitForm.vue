@@ -80,6 +80,7 @@ const props = defineProps<{
   orderId: string
   orderStatus: string
   cdkFields: FulfillmentField[]
+  cdkId?: string
 }>()
 
 const emit = defineEmits(['submit-success'])
@@ -104,10 +105,12 @@ const initFormData = () => {
   })
   
   // submitted 或 rejected 状态：填充上次提交的内容
-  // approved 或 无记录：保持空白
   if (latestFulfillment.value?.payload && 
       (latestStatus.value === 'submitted' || latestStatus.value === 'rejected')) {
     Object.entries(latestFulfillment.value.payload).forEach(([k, v]) => {
+      // 排除内部字段
+      if (k === '_cdk_id') return
+      
       if (k in formData) {
         formData[k] = v
       }
@@ -121,17 +124,25 @@ const fetchLatestFulfillment = async () => {
   
   try {
     const client = getSupabaseClient()
-    const { data, error } = await client
+    let query = client
       .from('order_fulfillments')
       .select('*')
       .eq('order_id', props.orderId)
       .order('submitted_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
+      
+    // 如果指定了 cdkId，则过滤 payload
+    if (props.cdkId) {
+       query = query.contains('payload', { _cdk_id: props.cdkId })
+    }
+
+    const { data, error } = await query.limit(1).maybeSingle()
     
     if (!error && data) {
       latestFulfillment.value = data as OrderFulfillment
       initFormData()
+    } else {
+      latestFulfillment.value = null
+      initFormData() // Reset if no data found
     }
   } catch (err) {
     console.error('获取回执失败:', err)
@@ -147,6 +158,11 @@ const handleInsert = async () => {
     fields.value.forEach(f => {
       payload[f.key] = formData[f.key] || ''
     })
+    
+    // 注入 CDK 标识 (使用 ID 确保唯一)
+    if (props.cdkId) {
+        payload['_cdk_id'] = props.cdkId
+    }
     
     const { data, error } = await client
       .from('order_fulfillments')
@@ -185,6 +201,10 @@ const handleUpdate = async () => {
     fields.value.forEach(f => {
       payload[f.key] = formData[f.key] || ''
     })
+    
+    if (props.cdkId) {
+        payload['_cdk_id'] = props.cdkId
+    }
     
     const { error } = await client
       .from('order_fulfillments')

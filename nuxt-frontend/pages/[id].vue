@@ -119,7 +119,7 @@
                 
                 <!-- 设备展示图片 -->
                 <div class="device-showcase">
-                  <img src="/images/client/pc/tv-box-interface.jpg" alt="智能电视盒子界面展示" class="showcase-image" />
+                  <img src="/images/placeholder.png" alt="智能电视盒子界面展示" class="showcase-image" />
                 </div>
                 
                 <div class="warning-notice">
@@ -181,7 +181,7 @@
                 
                 <!-- 应用界面展示图片 -->
                 <div class="app-showcase">
-                  <img src="/images/client/pc/netflix-apps-interface.jpg" alt="电视盒子应用界面展示" class="showcase-image" />
+                  <img src="/images/placeholder.png" alt="电视盒子应用界面展示" class="showcase-image" />
                 </div>
                 
                 <div class="warning-notice">
@@ -217,7 +217,7 @@
                 
                 <!-- 设备配置展示图片 -->
                 <div class="config-showcase">
-                  <img src="/images/client/pc/device-setup-config.jpg" alt="设备配置和设置界面" class="showcase-image" />
+                  <img src="/images/placeholder.png" alt="设备配置和设置界面" class="showcase-image" />
                 </div>
               </div>
               

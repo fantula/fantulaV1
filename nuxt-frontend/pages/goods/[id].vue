@@ -164,7 +164,7 @@
                 <span class="btn-subtext" v-if="!stockLoading && hasStock && hasSkus">安全合规·秒速发货</span>
               </button>
               <div class="secondary-btns">
-                <button class="add-cart-btn" @click="addToCart" :disabled="stockLoading || !hasStock || !hasSkus || submitting">
+                <button class="add-cart-btn" @click="addToCart($event)" :disabled="stockLoading || !hasStock || !hasSkus || submitting">
                   <el-icon><ShoppingCart /></el-icon>
                   加入购物车
                 </button>
@@ -388,7 +388,11 @@ const buyNow = async () => {
   }
 }
 
-const addToCart = async () => {
+// 动画 composable
+import { useCartAnimation } from '@/composables/useCartAnimation' // 确保正确导入
+const { startAnimation } = useCartAnimation()
+
+const addToCart = async (event: MouseEvent) => {
   if (!userStore.isLoggedIn) {
      modal.showLogin = true
      return
@@ -407,9 +411,22 @@ const addToCart = async () => {
   try {
     const result = await cartStore.addToCart(matchedSku.value.id, qty.value)
     if (result.success) {
-      ElMessage.success('已成功加入购物车')
+      // 成功：执行动画
+      const btnEl = event.target as HTMLElement
+      // 如果点击的是图标，可能需要找到按钮本身
+      const target = btnEl.closest('button') || btnEl
+      
+      startAnimation(target, matchedSku.value.image || goodsInfo.value.image, () => {
+         cartStore.miniCartVisible = true
+         ElMessage.success('已成功加入购物车')
+      })
+      
     } else {
-      ElMessage.error(result.msg || '加入购物车失败')
+      if (result.code === 'DIFFERENT_SKU') {
+         ElMessage.warning(result.msg || '暂时不支持同时购买不同商品')
+      } else {
+         ElMessage.error(result.msg || '加入购物车失败')
+      }
     }
   } catch (e) {
     ElMessage.error('加入购物车失败')

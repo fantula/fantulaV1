@@ -16,12 +16,14 @@ export interface CartItem {
 interface CartState {
   items: CartItem[]
   loading: boolean
+  miniCartVisible: boolean
 }
 
 export const useCartStore = defineStore('cart', {
   state: (): CartState => ({
     items: [],
-    loading: false
+    loading: false,
+    miniCartVisible: false
   }),
 
   actions: {
@@ -47,8 +49,21 @@ export const useCartStore = defineStore('cart', {
 
     /**
      * 添加到购物车（只需 skuId）
+     * 规则：购物车必须保持单一 SKU。如果已存在不同 SKU，则禁止添加。
      */
     async addToCart(skuId: string, quantity: number = 1) {
+      // 检查当前购物车是否有其他 SKU
+      if (this.items.length > 0) {
+        const existingItem = this.items[0] // 假设此时只有一个或多个相同的 SKU，取第一个判断即可
+        if (existingItem.skuId !== skuId) {
+          return {
+            success: false,
+            msg: '暂时不支持同时购买不同规格商品，请先结算现有商品',
+            code: 'DIFFERENT_SKU'
+          }
+        }
+      }
+
       try {
         const res = await cartApi.addToCart(skuId, quantity)
         if (res.success) {

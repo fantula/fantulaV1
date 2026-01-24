@@ -50,16 +50,22 @@
         
           <!-- 已登录状态：显示购物车和用户信息 -->
           <div v-else class="user-section">
-            <!-- 购物车图标 -->
-            <NuxtLink to="/cart" class="cart-icon" title="购物车" @click.stop>
-              <div class="cart-icon-wrapper">
-                <el-icon :size="26" color="#E2E8F0"><ShoppingCart /></el-icon>
-                <!-- 购物车数量badge -->
-                <span v-if="cartStore.totalCount > 0" class="cart-badge">{{ cartStore.totalCount }}</span>
+            <!-- 购物车图标容器 -->
+            <div class="cart-wrapper" style="position: relative;" ref="cartWrapperRef">
+              <div class="cart-icon" title="购物车" @click.stop="toggleMiniCart" id="cart-icon-ref">
+                <div class="cart-icon-wrapper">
+                  <el-icon :size="26" color="#E2E8F0"><ShoppingCart /></el-icon>
+                  <!-- 购物车数量badge -->
+                  <span v-if="cartStore.totalCount > 0" class="cart-badge">{{ cartStore.totalCount }}</span>
+                </div>
               </div>
-            </NuxtLink>
-          
-            <!-- 用户信息 - 直接点击跳转个人中心 (沉浸式交互) -->
+              
+              <MiniCartPopup 
+                :visible="cartStore.miniCartVisible" 
+                @close="cartStore.miniCartVisible = false"
+                class="header-mini-cart"
+              />
+            </div>
             <div class="user-info-container">
               <!-- 加载状态：骨架屏 -->
               <div v-if="userStore.loading" class="user-info user-info--loading">
@@ -92,6 +98,7 @@ import { useUserStore } from '@/stores/user'
 import { useCartStore } from '@/stores/cart'
 import ServiceModal from './ServiceModal.vue'
 import LoginRegisterModal from './LoginRegisterModal.vue'
+import MiniCartPopup from '@/components/cart/MiniCartPopup.vue'
 import { Shop, ShoppingCart, Search } from '@element-plus/icons-vue'
 
 
@@ -138,11 +145,36 @@ const navigateToProfile = () => {
 }
 
 // 监听登录状态变化，登录成功后自动关闭弹窗
-watch(() => userStore.isLoggedIn, (newValue) => {
-  if (newValue && showLoginModal.value) {
-    // 用户登录成功，关闭登录弹窗
-    showLoginModal.value = false
+// 监听登录状态变化
+watch(() => userStore.isLoggedIn, async (newValue) => {
+  if (newValue) {
+    // 登录成功: 关闭弹窗并加载购物车
+    if (showLoginModal.value) showLoginModal.value = false
+    await cartStore.loadCart()
+  } else {
+    // 退出登录: 清空本地购物车
+    cartStore.items = []
   }
+})
+
+const toggleMiniCart = () => {
+  cartStore.miniCartVisible = !cartStore.miniCartVisible
+}
+
+// 点击外部关闭购物车
+const cartWrapperRef = ref<HTMLElement | null>(null)
+const handleClickOutside = (event: MouseEvent) => {
+  if (cartStore.miniCartVisible && cartWrapperRef.value && !cartWrapperRef.value.contains(event.target as Node)) {
+    cartStore.miniCartVisible = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
