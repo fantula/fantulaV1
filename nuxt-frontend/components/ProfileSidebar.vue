@@ -39,7 +39,7 @@
           >
             <span class="nav-icon" :class="item.iconClass">{{ item.icon }}</span>
             <span class="nav-text">{{ item.label }}</span>
-            <span v-if="item.badge" class="nav-badge">{{ item.badge }}</span>
+            <div v-if="item.key === 'messages' && unreadCount > 0" class="nav-indicator-glow"></div>
           </NuxtLink>
         </li>
       </ul>
@@ -81,6 +81,20 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const route = useRoute()
+const unreadCount = ref(0)
+import { messageApi } from '@/api/message'
+import { onMounted } from 'vue'
+
+const fetchUnread = async () => {
+    const res = await messageApi.getUnreadCount()
+    if (res.success && typeof res.data === 'number') {
+        unreadCount.value = res.data
+    }
+}
+
+onMounted(() => {
+    fetchUnread()
+})
 
 // 导航菜单项配置
 const menuItems = [
@@ -138,8 +152,7 @@ const menuItems = [
     label: '我的消息',
     icon: '💬',
     iconClass: 'icon-messages',
-    to: '/profile/messages',
-    badge: '8'
+    to: '/profile/messages'
   }
 ]
 
@@ -292,18 +305,20 @@ const isActive = (to: string) => {
   color: inherit;
 }
 
-.nav-badge {
-  background: #ff4d4f;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 10px;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.nav-indicator-glow {
+  width: 8px;
+  height: 8px;
+  background: #F97316;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #F97316;
+  animation: pulse-glow 2s infinite;
+  margin-left: auto;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+  70% { transform: scale(1.5); opacity: 0; box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+  100% { transform: scale(1); opacity: 0; box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
 }
 
 /* 退出登录区域 */

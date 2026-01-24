@@ -60,7 +60,7 @@
             v-for="msg in filteredMessages" 
             :key="msg.id" 
             class="message-card"
-            :class="{ unread: !msg.is_read, clickable: !!msg.link }"
+            :class="{ unread: !msg.is_read }"
             @click="handleMessageClick(msg)"
           >
             <!-- Icon -->
@@ -75,10 +75,7 @@
                 <span class="message-time">{{ formatTime(msg.created_at) }}</span>
               </div>
               <div class="message-body">{{ msg.content }}</div>
-              <div v-if="msg.link" class="message-link-hint">
-                <el-icon><Right /></el-icon>
-                点击查看详情
-              </div>
+              <!-- Link hint removed as per request -->
             </div>
 
             <!-- Unread Dot -->
@@ -168,10 +165,10 @@ const handleMessageClick = async (msg: UserMessage) => {
     msg.is_read = true
     unreadCount.value = Math.max(0, unreadCount.value - 1)
   }
-  // Navigate if link exists
-  if (msg.link) {
-    router.push(msg.link)
-  }
+  // Navigate if link exists (DISABLED)
+  // if (msg.link) {
+  //   router.push(msg.link)
+  // }
 }
 
 const handleMarkAllRead = async () => {
