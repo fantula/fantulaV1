@@ -77,6 +77,12 @@ export function useAdminTicketList() {
         }
     }
 
+    const handleCopy = (text: string) => {
+        if (!text) return
+        navigator.clipboard.writeText(text)
+        ElMessage.success('复制成功')
+    }
+
     return {
         loading,
         list,
@@ -88,6 +94,7 @@ export function useAdminTicketList() {
         handleTabChange,
         handleSelectionChange,
         handleCleanup,
+        handleCopy,  // Exported
         formatDate,
         getTicketPriorityLabel, getTicketPriorityType,
         getTicketStatusLabel, getTicketStatusType

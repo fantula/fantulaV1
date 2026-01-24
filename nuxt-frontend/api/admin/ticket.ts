@@ -35,7 +35,7 @@ export const adminTicketApi = {
 
     let query = client
       .from('tickets')
-      .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status)', { count: 'exact' })
+      .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status, created_at, end_time, expires_at)', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -54,7 +54,7 @@ export const adminTicketApi = {
     const client = getAdminSupabaseClient()
     const { data, error } = await client
       .from('tickets')
-      .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status)')
+      .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status, created_at, end_time, expires_at)')
       .eq('id', ticketId)
       .single()
 
@@ -165,7 +165,7 @@ export const adminTicketApi = {
 
     if (filesToDelete.length > 0) {
       const { data, error } = await client.storage.from('tickets').remove(filesToDelete)
-      if (error) return { success: false, error: error.message }
+      if (error) return { success: false, count: 0, error: error.message }
       deletedFilesCount = data?.length || 0
     }
 
