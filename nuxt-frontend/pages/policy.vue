@@ -34,13 +34,13 @@
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
-                <strong>1.1</strong> 凡图拉平台为用户提供数字商品的买、充值服务，包括但不限于会员订阅充值、礼品卡购买、虚拟商品转发等。平台以"礼品卡"形式对外展示商品信息，实际服务内容为中介性质的代充代付。
+                <strong>1.1</strong> 凡图拉平台为用户提供数字权益的订阅、兑换服务，包括但不限于会员订阅兑换、礼品卡兑换、虚拟权益转发等。平台以"礼品卡/权益包"形式对外展示服务，实际服务内容为数字化权益服务协助。
               </div>
               <div class="policy-section-item">
-                <strong>1.2</strong> 本平台所提供服务并非目标服务商官方渠道，凡图拉为第三方平台，所提供服务基于用户自主下单行为完成。
+                <strong>1.2</strong> 本平台所提供服务并非目标服务商官方渠道，凡图拉为第三方服务平台，所提供服务基于用户自主委托行为完成。
               </div>
               <div class="policy-section-item">
-                <strong>1.3</strong> 本平台不保证某一商品长期有效或目标服务商政策始终保持不变，如因政策调整导致商品无法使用、价格波动、服务中断等，平台将尽合理范围内协助处理，但不承担由此产生的法律责任。
+                <strong>1.3</strong> 本平台不保证某一权益长期有效或目标服务商政策始终保持不变，如因政策调整导致权益无法使用、价格波动、服务中断等，平台将尽合理范围内协助处理，但不承担由此产生的法律责任。
               </div>
             </div>
 
@@ -62,20 +62,21 @@
               </div>
             </div>
 
-            <div class="policy-section-title">三、钱包与退款规则</div>
+            <div class="policy-section-title">三、服务额度与售后规则</div>
             <div class="policy-section-line"></div>
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
-                <strong>3.1</strong> 如需退款经平台审核确认后，将退回至用户在平台内的钱包余额中。
+                <strong>3.1</strong> 如需申请售后经平台审核确认后，将退回至用户在平台内的服务额度中。
               </div>
               <div class="policy-section-item">
-                <strong>3.2</strong> 平台钱包余额可用于再次购买平台商品，但不可提现或转账至其他人账户。
+                <strong>3.2</strong> 平台服务额度可用于兑换平台其他服务权益，不支持兑换现金或转账至其他人账户。
               </div>
               <div class="policy-section-item">
-                <strong>3.3</strong> 平台有权依据商品类型、发货状态决定是否支持退款或部分退款。
+                <strong>3.3</strong> 平台有权依据权益类型、交付状态决定是否支持返还或部分返还额度。
               </div>
             </div>
+
 
             <div class="policy-section-title">四、售后服务与责任范围</div>
             <div class="policy-section-line"></div>
@@ -154,13 +155,13 @@
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
-                <strong>1.1</strong> Ventura Platform provides users with digital product purchasing and top-up services, including but not limited to membership subscription top-ups, gift card purchases, virtual product forwarding, etc. The platform displays product information in the form of "gift cards", and the actual service content is intermediary agency payment.
+                <strong>1.1</strong> Ventura Platform provides users with digital equity subscription and redemption services, including but not limited to membership subscription redemption, gift card redemption, virtual equity forwarding, etc. The platform displays services in the form of "gift cards/equity packages", and the actual service content is digital equity service assistance.
               </div>
               <div class="policy-section-item">
-                <strong>1.2</strong> The services provided by this platform are not official channels of target service providers. Ventura is a third-party platform, and the services provided are completed based on users' autonomous ordering behavior.
+                <strong>1.2</strong> The services provided by this platform are not official channels of target service providers. Ventura is a third-party service platform, and the services provided are completed based on users' autonomous entrustment behavior.
               </div>
               <div class="policy-section-item">
-                <strong>1.3</strong> This platform does not guarantee that a certain product will be valid for a long time or that the target service provider's policies will remain unchanged. If products cannot be used, prices fluctuate, services are interrupted, etc. due to policy adjustments, the platform will assist in handling within a reasonable scope, but will not bear legal responsibility arising therefrom.
+                <strong>1.3</strong> This platform does not guarantee that a certain equity will be valid for a long time or that the target service provider's policies will remain unchanged. If equities cannot be used, prices fluctuate, services are interrupted, etc. due to policy adjustments, the platform will assist in handling within a reasonable scope, but will not bear legal responsibility arising therefrom.
               </div>
             </div>
 
@@ -182,18 +183,18 @@
               </div>
             </div>
 
-            <div class="policy-section-title">3. Wallet and Refund Rules</div>
+            <div class="policy-section-title">3. Service Quota and After-Sales Rules</div>
             <div class="policy-section-line"></div>
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
-                <strong>3.1</strong> If a refund is requested and approved by the platform, the amount will be returned to the user's wallet balance on the platform.
+                <strong>3.1</strong> If an after-sales application is approved by the platform, the amount will be returned to the user's service quota on the platform.
               </div>
               <div class="policy-section-item">
-                <strong>3.2</strong> The platform wallet balance can be used to purchase platform goods again, but cannot be withdrawn or transferred to other account.
+                <strong>3.2</strong> The platform service quota can be used to redeem other platform service rights, but cannot be exchanged for cash or transferred to other accounts.
               </div>
               <div class="policy-section-item">
-                <strong>3.3</strong> The platform has the right to determine whether to support a refund or partial refund based on the type of goods and delivery status.
+                <strong>3.3</strong> The platform has the right to determine whether to support a full or partial quota return based on the type of equity and delivery status.
               </div>
             </div>
 

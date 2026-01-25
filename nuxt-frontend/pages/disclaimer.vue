@@ -15,7 +15,7 @@
             <div class="panel-content">
 
               <div class="disclaimer-statement">
-                凡图拉平台所展示的所有商品内容（包括但不限于商品名称、图片、说明等）<strong>仅为描述服务功能使用</strong>，不代表平台拥有相关商标、授权或与品牌方存在任何合作关系。
+                凡图拉平台所展示的所有权益内容（包括但不限于名称、图片、说明等）<strong>仅为描述服务适用范围</strong>，不代表平台拥有相关商标、授权或与品牌方存在直接官方合作关系。
               </div>
               
               <div class="disclaimer-section">
@@ -24,8 +24,8 @@
                   <span class="disclaimer-section-title-text">服务性质说明</span>
                 </div>
                 <div class="disclaimer-section-content">
-                  <div class="disclaimer-section-item">本平台所提供的充值服务、礼品卡、会员服务，均为第三方代购代付性质，商品来源于平台根据用户需求代理购买的结果。</div>
-                  <div class="disclaimer-section-quote">平台仅作为服务中介，不直接提供或生产所购商品。</div>
+                  <div class="disclaimer-section-item">本平台所提供的数字化权益服务、订阅支持，均为第三方技术服务性质，旨在协助用户完成跨平台权益配置与管理。</div>
+                  <div class="disclaimer-section-quote">平台仅作为技术服务方，不直接生产或提供核心权益内容。</div>
                 </div>
               </div>
 
@@ -35,8 +35,8 @@
                   <span class="disclaimer-section-title-text">售后服务范围</span>
                 </div>
                 <div class="disclaimer-section-content">
-                  <div class="disclaimer-section-item">平台不参与所涉商品内容的生产、管理、售后维护，也无法代表该品牌进行售后处理。</div>
-                  <div class="disclaimer-section-quote">品牌相关售后问题请直接联系原品牌方。</div>
+                  <div class="disclaimer-section-item">平台不参与基础权益内容的生产、运营维护，也无法代表该品牌方进行官方售后处理。</div>
+                  <div class="disclaimer-section-quote">品牌/平台自身的服务故障问题请直接联系原服务提供商。</div>
                 </div>
               </div>
 
@@ -46,7 +46,7 @@
                   <span class="disclaimer-section-title-text">知识产权声明</span>
                 </div>
                 <div class="disclaimer-section-content">
-                  <div class="disclaimer-section-item">平台展示的任何品牌标识、商标、图像仅为服务识别之用，所有权归属于原品牌方。</div>
+                  <div class="disclaimer-section-item">平台展示的任何品牌标识、商标、图像仅为服务对象识别之用，所有权归属于原品牌方。</div>
                   <div class="disclaimer-section-item">如任何权利人对内容使用有异议，可联系我们申请处理。</div>
                   <div class="disclaimer-section-quote">知识产权侵权投诉渠道：legal@fantula.com</div>
                 </div>
@@ -55,11 +55,11 @@
               <div class="disclaimer-section">
                 <div class="disclaimer-section-title">
                   <div class="section-icon">四</div>
-                  <span class="disclaimer-section-title-text">使用风险提示</span>
+                  <span class="disclaimer-section-title-text">服务风险提示</span>
                 </div>
                 <div class="disclaimer-section-content">
-                  <div class="disclaimer-section-item">因使用本平台服务而产生的因服务商政策变动、内容限制、地区封锁、账号禁用等风险，由用户自行承担，平台将尽力协助处理但不承诺赔偿责任。</div>
-                  <div class="disclaimer-section-quote">平台会提供必要的技术支持，但无法保证第三方服务的稳定性。</div>
+                  <div class="disclaimer-section-item">因使用本平台服务而产生的因目标平台服务政策调整、权益适用范围变更、区域性服务差异等风险，由用户自行承担，平台将尽力协助沟通但不承诺赔偿责任。</div>
+                  <div class="disclaimer-section-quote">平台会提供必要的技术支持，但无法保证第三方服务的永久稳定性。</div>
                 </div>
               </div>
 
@@ -69,7 +69,7 @@
                   <span class="disclaimer-section-title-text">用户责任确认</span>
                 </div>
                 <div class="disclaimer-section-content">
-                  <div class="disclaimer-section-item">用户在下单前应充分知晓所购商品为数字虚拟产品，具备不可撤销、不可逆、无法转售等特性，并完全同意本免责声明内容后进行使用。</div>
+                  <div class="disclaimer-section-item">用户在操作前应充分知晓所订阅服务为即时生效的数字化权益，具备即时消耗、不可逆等特性，并完全同意本免责声明内容后进行使用。</div>
                   <div class="disclaimer-section-quote">点击"同意并继续"即表示您已阅读并接受本免责声明所有条款。</div>
                 </div>
               </div>

@@ -91,5 +91,22 @@ export const ticketApi = {
 
         if (error) return { success: false, error: error.message }
         return { success: true }
+    },
+
+    // 5. Delete Ticket
+    async delete(ticketId: string) {
+        const client = getSupabaseClient()
+
+        // Manual Cascade: Delete messages first
+        await client.from('ticket_messages').delete().eq('ticket_id', ticketId)
+
+        // Then delete ticket
+        const { error } = await client
+            .from('tickets')
+            .delete()
+            .eq('id', ticketId)
+
+        if (error) return { success: false, error: error.message }
+        return { success: true }
     }
 }

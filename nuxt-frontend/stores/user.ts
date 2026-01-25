@@ -3,6 +3,9 @@ import type { User, LoginParams } from '@/types/api'
 import { authApi } from '@/api/auth'
 import { orderApi } from '@/api/order'
 import { favoriteApi } from '@/api/common'
+import { messageApi } from '@/api/message'
+
+// ... (keep interface definitions) ...
 
 // 定义收藏商品类型
 interface FavoriteItem {
@@ -42,16 +45,20 @@ export const useUserStore = defineStore('user', () => {
   const loading = ref(false) // 加载状态，用于骨架屏显示
   const isLoggedIn = computed(() => !!token.value && !!user.value)
 
+  // 消息相关状态
+  const unreadMessageCount = ref(0)
+
   // 收藏相关状态
   const favorites = ref<FavoriteItem[]>([])
   const favoritesKey = 'user_favorites'
 
-  // 订单相关状态
+  // ... (keep rest of state) ...
   const orders = ref<OrderItem[]>([])
   const ordersKey = 'user_orders'
 
-  // 默认订单数据（保留原有静态数据）
+  // ... (keep defaultOrders) ...
   const defaultOrders: OrderItem[] = [
+    // ... (keep default orders content) ...
     {
       id: '2023062012340',
       title: 'XXXXXXXXXXXXXXXXX',
@@ -107,6 +114,7 @@ export const useUserStore = defineStore('user', () => {
       statusClass: 'completed'
     }
   ]
+  // ... (keep rest of existing functions) ...
 
   // 收藏相关API实现
   const loadFavorites = async () => {
@@ -134,7 +142,9 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // ... (keep addToFavorites, removeFromFavorites, checkIsFavorite) ...
   const addToFavorites = async (item: Omit<FavoriteItem, 'addTime'>) => {
+    // ... code ...
     const userId = user.value?.id
     if (!userId) return { success: false, message: '未登录' }
     try {
@@ -150,6 +160,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const removeFromFavorites = async (itemId: number) => {
+    // ... code ...
     const userId = user.value?.id
     if (!userId) return { success: false, message: '未登录' }
     try {
@@ -167,6 +178,7 @@ export const useUserStore = defineStore('user', () => {
   const checkIsFavorite = (itemId: number) => {
     return favorites.value.some(fav => fav.id === itemId)
   }
+
 
   // 从本地存储加载订单数据
   const loadOrders = () => {
@@ -218,7 +230,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // ✅ 新增：订单状态转换函数
+  // ... (keep getOrderStatus helpers) ...
   const getOrderStatus = (status: number): OrderItem['status'] => {
     switch (status) {
       case 0: return 'pending'
@@ -255,7 +267,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 保存收藏数据到本地存储
+  // ... (keep saveFavorites, saveOrders, addOrder, getOrders, getOrdersByStatus, clearOrders, getFavorites, clearFavorites) ...
   const saveFavorites = () => {
     if (process.client) {
       try {
@@ -266,7 +278,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 保存订单数据到本地存储（只保存新增的订单，不包括默认订单）
   const saveOrders = () => {
     if (process.client) {
       try {
@@ -281,7 +292,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 添加新订单
   const addOrder = (orderData: {
     orderId: string
     title: string
@@ -314,12 +324,10 @@ export const useUserStore = defineStore('user', () => {
     return { success: true, order: newOrder }
   }
 
-  // 获取订单列表
   const getOrders = () => {
     return orders.value
   }
 
-  // 根据状态获取订单
   const getOrdersByStatus = (status?: string) => {
     if (!status || status === '全部') {
       return orders.value
@@ -337,24 +345,33 @@ export const useUserStore = defineStore('user', () => {
     return orders.value.filter(order => order.status === targetStatus)
   }
 
-  // 清空订单列表（保留默认订单）
   const clearOrders = () => {
     orders.value = [...defaultOrders]
     saveOrders()
   }
 
-  // 获取收藏列表
   const getFavorites = () => {
     return favorites.value
   }
 
-  // 清空收藏列表
   const clearFavorites = () => {
     favorites.value = []
     saveFavorites()
   }
 
-  // 获取用户信息
+  // 消息相关方法
+  const fetchUnreadMessageCount = async () => {
+    if (!user.value) return
+    try {
+      const res = await messageApi.getUnreadCount()
+      if (res.success && typeof res.data === 'number') {
+        unreadMessageCount.value = res.data
+      }
+    } catch (error) {
+      console.error('获取未读消息数失败', error)
+    }
+  }
+
   const fetchUserInfo = async () => {
     try {
       if (!token.value) return
@@ -362,6 +379,8 @@ export const useUserStore = defineStore('user', () => {
       const response = await authApi.getUserInfo()
       if (response.success) {
         user.value = response.data
+        // 获取用户信息成功后，顺便获取未读消息数
+        fetchUnreadMessageCount()
       }
     } catch (error) {
       console.error('获取用户信息失败:', error)
@@ -372,7 +391,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 用户登录
+  // ... (keep login, register, logout, changePassword, sendEmailCode, resetPassword, init, setUser, mockLogin) ...
   const login = async (params: LoginParams) => {
     try {
       const response = await authApi.login(params)
@@ -381,6 +400,7 @@ export const useUserStore = defineStore('user', () => {
         user.value = response.data.user
         loadFavorites()
         loadOrders()
+        fetchUnreadMessageCount() // 登录成功获取未读消息
         const cartStore = useCartStore()
         await cartStore.initCart()
         return { success: true, data: response.data }
@@ -391,7 +411,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 用户注册
   const register = async (params: {
     username: string
     password: string
@@ -413,7 +432,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 用户登出
   const logout = async () => {
     try {
       if (token.value) {
@@ -426,10 +444,15 @@ export const useUserStore = defineStore('user', () => {
       user.value = null
       favorites.value = []
       orders.value = [...defaultOrders]
+      unreadMessageCount.value = 0
+
+      // 清空购物车状态
+      const cartStore = useCartStore()
+      cartStore.items = []
+      cartStore.miniCartVisible = false
     }
   }
 
-  // 修改密码 - 后端API暂未实现
   const changePassword = async (params: {
     oldPassword: string
     newPassword: string
@@ -443,7 +466,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 发送邮箱验证码
   const sendEmailCode = async (email: string) => {
     try {
       const response = await authApi.getEmailCode(email)
@@ -453,7 +475,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 重置密码 - 后端API暂未实现
   const resetPassword = async (params: {
     email: string
     code: string
@@ -468,7 +489,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 初始化时获取用户信息
   const init = async () => {
     // 尝试从本地存储恢复用户信息 (优化首屏体验，防止闪烁)
     if (process.client && !user.value) {
@@ -505,7 +525,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // 新增：直接设置用户信息和token
   const setUser = (userInfo: any, tokenValue?: string) => {
     user.value = userInfo
     if (tokenValue) {
@@ -517,11 +536,12 @@ export const useUserStore = defineStore('user', () => {
     }
     loadFavorites()
     loadOrders()
+    // 获取未读消息
+    fetchUnreadMessageCount()
     const cartStore = useCartStore()
     cartStore.initCart()
   }
 
-  // 开发用的模拟登录功能
   const mockLogin = () => {
     const mockUser = {
       id: '145e6b60-03db-47f0-a812-41a257e04468',
@@ -542,6 +562,7 @@ export const useUserStore = defineStore('user', () => {
     }
     loadFavorites()
     loadOrders()
+    unreadMessageCount.value = 5 // 模拟未读消息
     const cartStore = useCartStore()
     cartStore.initCart()
     console.log('🚀 模拟登录成功！用户信息:', mockUser)
@@ -552,9 +573,10 @@ export const useUserStore = defineStore('user', () => {
     // 状态
     user: readonly(user),
     isLoggedIn,
-    loading: readonly(loading), // 导出 loading 状态
+    loading: readonly(loading),
     favorites: readonly(favorites),
     orders: readonly(orders),
+    unreadMessageCount: readonly(unreadMessageCount), // 导出未读消息数
 
     // 方法
     login,
@@ -567,6 +589,7 @@ export const useUserStore = defineStore('user', () => {
     init,
     setUser,
     mockLogin,
+    fetchUnreadMessageCount, // 导出获取方法
 
     // 收藏相关方法
     addToFavorites,

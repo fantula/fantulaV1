@@ -121,14 +121,10 @@ const handleGoToHome = () => {
 const handleGoToOrders = () => {
   emits('close')
   try {
-    // Go to specific order detail page
-    if (props.orderId && props.orderId !== 'N/A') {
-      navigateTo(`/profile/order/${props.orderId}`)
-    } else {
-      navigateTo('/profile/orders')
-    }
+    // Navigate to order list page as requested
+    navigateTo('/profile/order')
   } catch (error) {
-    window.location.href = '/profile/orders'
+    window.location.href = '/profile/order'
   }
 }
 </script>

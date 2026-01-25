@@ -79,7 +79,7 @@
               </NuxtLink>
               <NuxtLink 
                 v-else-if="item === '我们的优势'" 
-                to="/community" 
+                to="/advantages" 
                 class="footer-item footer-link"
               >
                 {{ item }}
@@ -93,7 +93,14 @@
               </NuxtLink>
               <button 
                 v-else-if="item === '加入我们'" 
-                @click="openJoinUs" 
+                @click="navigateTo('/join-us')" 
+                class="footer-item footer-link footer-button"
+              >
+                {{ item }}
+              </button>
+              <button 
+                v-else-if="item === '联系我们'" 
+                @click="openContactModal" 
                 class="footer-item footer-link footer-button"
               >
                 {{ item }}
@@ -107,27 +114,21 @@
             </span>
           </div>
           <div v-if="col.extra && !col.partner" class="footer-extra">{{ col.extra }}</div>
-
-          <!-- 合作伙伴板块合并到关注我们下方 -->
-          <template v-if="col.partner">
-            <div class="footer-partner-block">
-              <div class="footer-title">合作伙伴</div>
-              <div class="footer-underline"></div>
-              <div class="footer-partner-list">支付宝 | 顺丰速运 | 京东物流</div>
-            </div>
-          </template>
         </div>
       </div>
       <div class="footer-bottom">
-        © 2019-2025 凡图拉 | 云南凡图拉科技有限公司 | 滇ICP备 2025060486号-1
+        © 2019-2026 凡图拉 | 云南凡图拉科技有限公司 | 滇ICP备 2025060486号-1
       </div>
     </div>
     
-    <!-- 加入我们弹窗 -->
+    <!-- 加入我们弹窗 (保留备用，目前已改为页面) -->
     <JoinUsModal :visible="showJoinUs" @close="closeJoinUs" />
     
     <!-- 登录注册弹窗 -->
     <LoginRegisterModal :visible="showLoginModal" @close="closeLoginModal" />
+    
+    <!-- 联系我们弹窗 -->
+    <ContactModal :visible="showContactModal" @close="closeContactModal" />
   </footer>
 </template>
 
@@ -135,10 +136,12 @@
 import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import LoginRegisterModal from './LoginRegisterModal.vue'
+import ContactModal from './ContactModal.vue'
 import { ChatDotRound, Platform, Bell, VideoPlay } from '@element-plus/icons-vue'
 
 const showJoinUs = ref(false)
 const showLoginModal = ref(false)
+const showContactModal = ref(false)
 const userStore = useUserStore()
 
 function openJoinUs() {
@@ -147,6 +150,14 @@ function openJoinUs() {
 
 function closeJoinUs() {
   showJoinUs.value = false
+}
+
+function openContactModal() {
+  showContactModal.value = true
+}
+
+function closeContactModal() {
+  showContactModal.value = false
 }
 
 function closeLoginModal() {
@@ -174,20 +185,16 @@ watch(() => userStore.isLoggedIn, (newValue) => {
 
 const cols = [
   {
-    title: '功能导航',
-    items: ['个人中心', '我的订单', '邀请推广', '社区帮助']
-  },
-  {
-    title: '条款与政策',
-    items: ['隐私政策', '用户协议', '退款政策', '免责声明']
-  },
-  {
     title: '关于我们',
     items: ['公司简介', '我们的使命', '我们的优势', '加入我们']
   },
   {
-    title: '帮助中心',
-    items: ['联系我们', '商务合作', '发送邮件', '常见问题']
+    title: '服务与支持',
+    items: ['个人中心', '我的订单', '常见问题', '联系我们']
+  },
+  {
+    title: '条款与政策',
+    items: ['隐私政策', '用户协议', '退款政策', '免责声明']
   },
   {
     title: '关注我们',
@@ -198,7 +205,7 @@ const cols = [
       { label: '订阅', icon: Bell },
       { label: '抖音', icon: VideoPlay }
     ],
-    partner: true // 标记此列下方有合作伙伴
+    partner: false
   }
 ]
 </script>

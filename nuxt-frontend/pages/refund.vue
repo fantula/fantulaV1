@@ -5,8 +5,8 @@
     
     <div class="refund-content">
       <div class="refund-header">
-        <div class="refund-header-title">退款与售后政策</div>
-        <div class="refund-header-desc">本政策适用于本平台所售数字商品的退款、售后处理与服务说明</div>
+        <div class="refund-header-title">售后支持与权益保障</div>
+        <div class="refund-header-desc">本政策适用于本平台数字化服务的售后处理与权益保障说明</div>
       </div>
       
       <div class="refund-body">
@@ -20,50 +20,50 @@
               </div>
               <div class="section-content">
                 <div class="welcome-text">
-                  欢迎您使用凡图拉平台。本政策适用于本平台所售数字商品（包括但不限于各类会员订阅、礼品卡、虚拟产品代充服务等）的退款、售后处理与服务说明。
+                  欢迎您使用凡图拉平台。本政策适用于本平台提供的各类数字化权益服务（包括但不限于会员权益订阅、礼品卡兑换、虚拟权益协助等）的售后处理与服务说明。
                 </div>
                 <div class="highlight-notice">
-                  请仔细阅读以下条款，在您购买商品时即表示您已同意本政策的所有内容。
+                  请仔细阅读以下条款，在您订阅服务时即表示您已同意本政策的所有内容。
                 </div>
               </div>
             </div>
 
-            <!-- 退款规则板块 -->
+            <!-- 权益返还规则板块 -->
             <div class="policy-section">
               <div class="section-header">
                 <div class="section-icon"><el-icon><Money /></el-icon></div>
-                <div class="section-title">一、退款规则</div>
+                <div class="section-title">一、权益返还规则</div>
               </div>
               <div class="section-content">
                 <div class="rule-item main-rule">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">凡图拉平台所售商品一律为虚拟数字商品，一经发货视为服务完成，不支持无理由退款或退货。</div>
+                  <div class="rule-text">凡图拉平台所提供服务均为数字化权益服务，一经交付视为服务完成，不支持无理由撤销服务订阅。</div>
                 </div>
                 
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">如遇下列情况，平台可支持退款：</div>
+                  <div class="rule-text">如遇下列情况，平台可支持权益回退：</div>
                 </div>
                 
                 <div class="sub-rules">
                   <div class="sub-rule-item">
                     <span class="sub-rule-dot">-</span>
-                    <span class="sub-rule-text">商品未能成功交付，或因平台操作问题导致下单失败；</span>
+                    <span class="sub-rule-text">权益未能成功交付，或因平台原因导致订阅失败；</span>
                   </div>
                   <div class="sub-rule-item">
                     <span class="sub-rule-dot">-</span>
-                    <span class="sub-rule-text">商品未使用，且平台在核验后确认符合退款条件；</span>
+                    <span class="sub-rule-text">权益码未使用，且平台在核验后确认符合回退条件；</span>
                   </div>
                 </div>
                 
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">所有退款将以平台「钱包余额」形式退回，不支持原路退回或提现。</div>
+                  <div class="rule-text">所有权益回退将以平台「服务额度」形式返还，不具备货币兑换或转账功能。</div>
                 </div>
                 
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">平台钱包余额可继续用于购买本平台商品，不具备法币提现功能。</div>
+                  <div class="rule-text">平台服务额度可继续用于兑换本平台其他服务权益。</div>
                 </div>
               </div>
             </div>
@@ -82,7 +82,7 @@
                 
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">平台将在1-3个工作日内审核并给予答复，如通过审核将直接退回钱包余额；</div>
+                  <div class="rule-text">平台将在1-3个工作日内审核并给予答复，如通过审核将直接返还至服务额度；</div>
                 </div>
                 
                 <div class="rule-item">
@@ -125,23 +125,23 @@
               <div class="section-content">
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">平台为第三方中介平台，代购服务完成后若因目标服务商（如会员平台）封禁、拒绝登录、地区限制等问题导致无法使用，平台将尽力协助申诉，但不承担责任赔偿或再次补发义务。</div>
+                  <div class="rule-text">平台为第三方数字化权益服务平台，服务交付完成后若因目标服务商（如会员平台）封禁、拒绝登录、地区限制等问题导致无法使用，平台将尽力协助申诉，但不承担责任赔偿或再次补发义务。</div>
                 </div>
                 
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">用户因账号自身问题、填错信息、误操作、遗失登录方式等，导致商品失效的，平台不予退款。</div>
+                  <div class="rule-text">用户因账号自身问题、填错信息、误操作、遗失登录方式等，导致权益失效的，平台不予受理。</div>
                 </div>
                 
                 <div class="rule-item">
                   <div class="rule-dot"></div>
-                  <div class="rule-text">虚拟商品价格可能因汇率、地区限制、官方定价变动随时调整，用户应以下单时价格为准。</div>
+                  <div class="rule-text">虚拟权益价值可能因汇率、地区限制、官方政策变动随时调整，用户应以订阅时显示为准。</div>
                 </div>
                 
                 <div class="important-disclaimer">
                   <div class="disclaimer-title">重要免责声明</div>
                   <div class="disclaimer-text">
-                    凡图拉平台作为中介服务商，仅提供代购服务，不直接提供数字商品内容。所有商品内容由目标服务商提供，平台不承担因目标服务商政策变更、服务中断等导致的损失。
+                    凡图拉平台作为服务提供商，仅提供数字化权益协助服务。所有核心权益内容由目标服务商提供，平台不承担因目标服务商政策变更、服务中断等导致的损失。
                   </div>
                 </div>
               </div>

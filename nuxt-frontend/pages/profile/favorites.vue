@@ -38,10 +38,10 @@
       <!-- Empty State -->
       <div v-else-if="filteredFavorites.length === 0" class="empty-state">
         <el-icon class="empty-icon"><StarFilled /></el-icon>
-        <div class="empty-text">暂无收藏商品</div>
+        <div class="empty-text">你还没有收藏商品</div>
         <div class="empty-desc">去探索更多好物，填满您的收藏夹吧</div>
         <button class="go-shopping-btn" @click="goShopping">
-          前往商城
+          去逛逛
           <el-icon><Right /></el-icon>
         </button>
       </div>

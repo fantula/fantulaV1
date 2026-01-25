@@ -22,7 +22,7 @@
         @click="activeTab = tab.key"
       >
         {{ tab.label }}
-        <span v-if="tab.key === 'unread' && unreadCount > 0" class="badge">{{ unreadCount }}</span>
+        <div v-if="tab.key === 'unread' && unreadCount > 0" class="tab-unread-dot"></div>
         <div class="active-indicator" v-if="activeTab === tab.key"></div>
       </div>
     </div>
@@ -103,9 +103,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { messageApi, type UserMessage } from '@/api/message'
+import { useUserStore } from '@/stores/user' 
 import { Bell, ChatDotRound, ShoppingCart, Warning, Right, Loading } from '@element-plus/icons-vue'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 // State
 const loading = ref(true)
@@ -115,7 +117,7 @@ const total = ref(0)
 const currentPage = ref(1)
 const pageSize = 20
 const activeTab = ref('all')
-const unreadCount = ref(0)
+const unreadCount = ref(0) // This local state might be redundant if we fully rely on store, but keeping for now as it tracks tab-specific counts maybe? Actually it tracks global unread from API.
 
 const tabs = [
   { key: 'all', label: '全部' },
@@ -142,6 +144,8 @@ const loadUnreadCount = async () => {
   const res = await messageApi.getUnreadCount()
   if (res.success && res.data !== undefined) {
     unreadCount.value = res.data
+    // Update store as well to keep sidebar in sync
+    userStore.fetchUnreadMessageCount()
   }
 }
 
@@ -164,6 +168,8 @@ const handleMessageClick = async (msg: UserMessage) => {
     await messageApi.markAsRead(msg.id)
     msg.is_read = true
     unreadCount.value = Math.max(0, unreadCount.value - 1)
+    // Update global store for sidebar
+    await userStore.fetchUnreadMessageCount()
   }
   // Navigate if link exists (DISABLED)
   // if (msg.link) {
@@ -179,6 +185,8 @@ const handleMarkAllRead = async () => {
     if (res.success) {
       messages.value.forEach(m => m.is_read = true)
       unreadCount.value = 0
+      // Update global store for sidebar
+      await userStore.fetchUnreadMessageCount()
       ElMessage.success('已全部标记为已读')
     }
   } finally {
@@ -299,13 +307,13 @@ const formatTime = (dateStr: string) => {
 .tab-item:hover { color: #CBD5E1; }
 .tab-item.active { color: #fff; font-weight: 600; }
 
-.badge {
-  background: #EF4444;
-  color: #fff;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 100px;
-  font-weight: 600;
+.tab-unread-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38BDF8; /* Sky Blue */
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+  animation: pulse-dot 3s infinite;
 }
 
 .active-indicator {
@@ -353,8 +361,8 @@ const formatTime = (dateStr: string) => {
 }
 
 .message-card.unread {
-  background: rgba(59, 130, 246, 0.05);
-  border-color: rgba(59, 130, 246, 0.15);
+  background: rgba(56, 189, 248, 0.03); /* Subtle Blue Tint */
+  border-color: rgba(56, 189, 248, 0.1);
 }
 
 .message-card.clickable {
@@ -431,16 +439,22 @@ const formatTime = (dateStr: string) => {
   color: #3B82F6;
 }
 
-/* Unread Dot */
+/* Unread Dot (Replaced Red with Blue Pulse) */
 .unread-dot {
   position: absolute;
   top: 20px;
   right: 20px;
   width: 8px;
   height: 8px;
-  background: #EF4444;
+  background: #38BDF8; /* Sky Blue */
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+  animation: pulse-dot 3s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.8; transform: scale(1); box-shadow: 0 0 5px rgba(56, 189, 248, 0.4); }
+  50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
 }
 
 /* Empty State */

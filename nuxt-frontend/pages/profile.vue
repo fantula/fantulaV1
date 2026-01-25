@@ -70,6 +70,8 @@
                    </el-icon>
                 </div>
                 <span class="menu-text">{{ item?.label }}</span>
+                <!-- Subtle Unread Indicator -->
+                <div v-if="item.key === 'messages' && userStore.unreadMessageCount > 0" class="unread-indicator"></div>
                 <!-- Active Indicator Glow (Visual Only) -->
                 <div v-if="isMenuItemActive(item)" class="active-glow"></div>
               </div>
@@ -111,7 +113,7 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { authApi } from '@/api/auth'
 import LogoutModal from '@/components/LogoutModal.vue'
@@ -140,8 +142,22 @@ const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
 
-// 侧边栏菜单项 - 扁平化 (保留所有功能，去除分组标题)
-const menuGroups = [
+// Define Interfaces for stronger typing
+interface MenuItem {
+  key: string
+  label: string
+  icon: any
+  to: string
+}
+
+interface MenuGroup {
+  key: string
+  label: string
+  items: MenuItem[]
+}
+
+// 侧边栏菜单项 - 扁平化
+const menuGroups: MenuGroup[] = [
   {
     key: 'main',
     label: '', //留空不显示标题
@@ -159,7 +175,7 @@ const menuGroups = [
 ]
 
 // 手动控制高亮逻辑
-const isMenuItemActive = (item: any) => {
+const isMenuItemActive = (item: MenuItem) => {
     const path = route.path
     
     // 1. 个人中心首页 (精确匹配)
@@ -167,16 +183,16 @@ const isMenuItemActive = (item: any) => {
         return path === '/profile'
     } 
     
-    // 2. 订单特殊处理: 订单列表(/profile/orders) 和 订单详情(/profile/order/xxx) 都高亮“我的订单”
+    // 2. 订单特殊处理: 订单列表(/profile/order) 和 订单详情(/profile/order/xxx)
     if (item.key === 'orders') {
-        return path.startsWith('/profile/orders') || path.startsWith('/profile/order/')
+        return path.startsWith('/profile/order')
     }
 
     // 3. 其他默认前缀匹配
     return path.startsWith(item.to)
 }
 
-const handleMenuClick = (item: any) => {
+const handleMenuClick = (item: MenuItem) => {
     // Smart Refresh Logic
     if (route.path === item.to || (item.key === 'profile' && route.path === '/profile')) {
         // Already on page: Force Refresh
@@ -205,11 +221,21 @@ const handleConfirmLogout = async () => {
     router.push('/')
 }
 
-// 每次进入个人中心，强制刷新一次用户信息
+// 登录守卫与初始化
 onMounted(() => {
-  if (userStore.isLoggedIn) {
-    userStore.fetchUserInfo()
+  if (!userStore.isLoggedIn) {
+     // 未登录则踢回首页
+     router.push('/')
+     return
   }
+  userStore.fetchUserInfo()
+})
+
+// 监听登录状态，防止在页面中登出
+watch(() => userStore.isLoggedIn, (loggedIn) => {
+    if (!loggedIn) {
+        router.push('/')
+    }
 })
 </script>
 
@@ -298,22 +324,6 @@ onMounted(() => {
   align-items: stretch;
   margin-top: 0; 
 }
-
-/* --- Ambassador Header --- */
-.ambassador-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; 
-  flex-shrink: 0; 
-  height: auto; 
-  padding: 0; /* Zero padding */
-  margin-top: -25px; /* Aggressive pull up */
-  position: relative;
-  z-index: 5;
-}
-
-
 
 /* --- Ambassador Header --- */
 .ambassador-header {
@@ -584,6 +594,7 @@ onMounted(() => {
 }
 
 /* Hover State - Deepened */
+
 .menu-item:hover {
   background: rgba(255, 255, 255, 0.08); /* Brighter hover */
   color: #F8FAFC;
@@ -618,6 +629,26 @@ onMounted(() => {
 .menu-item:hover .menu-icon {
   opacity: 1;
   color: #E2E8F0;
+}
+
+/* Unread - Subtle Dot Style */
+.unread-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38BDF8; /* Sky Blue - subtle but visible */
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+  /* Position to the right */
+  margin-left: auto; 
+  margin-right: 8px;
+  
+  /* Subtle pulse */
+  animation: pulse-dot 3s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.8; transform: scale(1); box-shadow: 0 0 5px rgba(56, 189, 248, 0.4); }
+  50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
 }
 
 .icon-wrapper {

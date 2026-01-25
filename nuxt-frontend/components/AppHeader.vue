@@ -20,8 +20,8 @@
       <nav class="nav-menu">
         <NuxtLink to="/" class="nav-btn">首页</NuxtLink>
         <button @click="handleOrderClick" class="nav-btn">订单</button>
-        <NuxtLink to="/community" class="nav-btn">社区帮助</NuxtLink>
-        <button class="nav-btn" @click="showServiceModal = true">客服</button>
+        <NuxtLink to="/faq" class="nav-btn">常见问题</NuxtLink>
+        <button class="nav-btn" @click="showServiceModal = true">联系图拉</button>
       </nav>
       <!-- 搜索框+用户区域 -->
       <div class="header-actions">
@@ -127,13 +127,14 @@ const showLoginModal = ref(false)
 const handleOrderClick = () => {
   if (userStore.isLoggedIn) {
     // 已登录，直接跳转
-    navigateTo('/profile/orders')
+    navigateTo('/profile/order')
   } else {
     // 未登录，显示登录弹窗
     showLoginModal.value = true
   }
 }
 
+// 关闭登录弹窗
 // 关闭登录弹窗
 const closeLoginModal = () => {
   showLoginModal.value = false
@@ -154,16 +155,11 @@ const navigateToFavorites = () => {
     navigateTo('/profile/favorites')
 }
 
-// 监听登录状态变化，登录成功后自动关闭弹窗
-// 监听登录状态变化
-watch(() => userStore.isLoggedIn, async (newValue) => {
-  if (newValue) {
-    // 登录成功: 关闭弹窗并加载购物车
-    if (showLoginModal.value) showLoginModal.value = false
-    await cartStore.loadCart()
-  } else {
-    // 退出登录: 清空本地购物车
-    cartStore.items = []
+// 监听登录成功: 关闭弹窗
+// 注: 购物车加载和清空已移至 userStore 统一管理
+watch(() => userStore.isLoggedIn, (newValue) => {
+  if (newValue && showLoginModal.value) {
+    showLoginModal.value = false
   }
 })
 
@@ -190,7 +186,7 @@ onUnmounted(() => {
 
 <style scoped>
 .app-header {
-  width: 100vw;
+  width: 100%; /* Fix: 100vw causes scrollbar issues */
   min-width: 1180px;
   /* 透明/毛玻璃背景效果 */
   background: rgba(255, 255, 255, 0.7);
