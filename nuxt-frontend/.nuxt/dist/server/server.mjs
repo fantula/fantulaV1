@@ -1,1 +1,1 @@
-export { default } from "file:///Users/dalin/fantula/nuxt-frontend/node_modules/@nuxt/vite-builder/dist/runtime/vite-node.mjs"
+export { default } from "file:///Users/dalin/fantula/nuxt-frontend/node_modules/@nuxt/vite-builder/dist/vite-node-entry.mjs"

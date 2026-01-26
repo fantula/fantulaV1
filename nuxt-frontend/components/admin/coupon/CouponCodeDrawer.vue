@@ -72,7 +72,7 @@ import { ref, watch } from 'vue'
 import { Refresh, CopyDocument, Delete, DocumentCopy } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import dayjs from 'dayjs'
-import { adminCouponApi } from '@/api/admin-supabase'
+import { adminCouponApi } from '@/api/admin'
 import { useClipboard } from '@vueuse/core'
 
 const props = defineProps<{

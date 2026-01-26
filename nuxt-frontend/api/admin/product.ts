@@ -1,6 +1,6 @@
 
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
-import type { AdminProduct, ProductCategory } from '@/api/admin-supabase'
+import type { AdminProduct, ProductCategory } from '@/api/admin'
 
 export const adminProductApi = {
     /**

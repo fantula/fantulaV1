@@ -1,9 +1,9 @@
 
 import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { supabasePreOrderApi, type PreOrder } from '@/api/supabase'
-import { type UserCoupon } from '@/api/coupon'
+import { useUserStore } from '@/stores/client/user'
+import { supabasePreOrderApi, type PreOrder } from '@/api/client/supabase'
+import { type UserCoupon } from '@/api/client/coupon'
 import { ElMessage } from 'element-plus'
 
 export function useCheckout() {

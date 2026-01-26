@@ -181,7 +181,7 @@ const handleUpload = async (options: any) => {
         // But I will try to make it functional.
         
         // Let's assume there is a `/api/upload` or similar.
-        // Or checking `pages/_mgmt_9Xfa3/images/index.vue` might reveal how they upload.
+        // Or checking `pages/admin/images/index.vue` might reveal how they upload.
         
          // Placeholder for upload logic:
          ElMessage.info('Upload functionality requires specific R2 integration check.')
@@ -191,7 +191,7 @@ const handleUpload = async (options: any) => {
     }
 }
 
-// Logic: Reuse `pages/_mgmt_9Xfa3/images/index.vue` upload logic if possible.
+// Logic: Reuse `pages/admin/images/index.vue` upload logic if possible.
 // I'll add a TODO comment or try to read that file in next step.
 
 // Selection Logic

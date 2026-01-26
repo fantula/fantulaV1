@@ -70,7 +70,7 @@
 import { ref, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { MagicStick } from '@element-plus/icons-vue'
-import { adminApi } from '@/api/admin-supabase'
+import { adminApi } from '@/api/admin'
 
 const props = defineProps<{
   modelValue: boolean

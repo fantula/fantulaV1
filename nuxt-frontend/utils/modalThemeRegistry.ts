@@ -16,7 +16,7 @@ export const MODAL_THEMES: Record<string, ModalTheme> = {
        ----------------------------------------------------------------------
        说明: 下面这些配置是传给 BaseModal 的 props。
        如果只改文字/图片/位置，改这里即可。
-       如果要改 CSS 样式，请去 components/base/BaseModal.vue 底部
+       如果要改 CSS 样式，请去 components/shared/BaseModal.vue 底部
        ====================================================================== */
     'suit-001': {
         id: 'suit-001',
@@ -32,7 +32,7 @@ export const MODAL_THEMES: Record<string, ModalTheme> = {
     /* ======================================================================
        [方案 SUIT-002] 柔光风格 (Soft Light)
        ----------------------------------------------------------------------
-       修改样式请去 components/base/BaseModal.vue 底部
+       修改样式请去 components/shared/BaseModal.vue 底部
        ====================================================================== */
     'suit-002': {
         id: 'suit-002',
@@ -48,7 +48,7 @@ export const MODAL_THEMES: Record<string, ModalTheme> = {
     /* ======================================================================
        [方案 SUIT-003] 赛博朋克 (Cyberpunk)
        ----------------------------------------------------------------------
-       修改样式请去 components/base/BaseModal.vue 底部
+       修改样式请去 components/shared/BaseModal.vue 底部
        ====================================================================== */
     'suit-003': {
         id: 'suit-003',

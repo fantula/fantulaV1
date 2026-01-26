@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { adminApi, type AdminImage, type AdminImageCategory } from '@/api/admin-supabase'
+import { adminApi, type AdminImage, type AdminImageCategory } from '@/api/admin'
 
 const props = defineProps<{
   modelValue: boolean

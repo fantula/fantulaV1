@@ -1,9 +1,9 @@
 {
-  "_hash": "aStOhro_bptJcfBROvvEmZ0LcVQDWliVPjYes0mHc1k",
+  "_hash": "vuGGlrIZay9-H3mTOyUaLE7nj9fbi_YpqT1wEhMwbgM",
   "project": {
     "rootDir": "/Users/dalin/fantula/nuxt-frontend"
   },
   "versions": {
-    "nuxt": "3.20.2"
+    "nuxt": "3.21.0"
   }
 }

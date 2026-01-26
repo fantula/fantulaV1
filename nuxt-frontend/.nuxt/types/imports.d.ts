@@ -307,6 +307,7 @@ declare global {
   const ErrorHandler: typeof import('../../utils/error-handler').ErrorHandler
   const ID_INJECTION_KEY: typeof import('../../node_modules/element-plus/es/hooks/use-id/index').ID_INJECTION_KEY
   const MODAL_THEMES: typeof import('../../utils/modalThemeRegistry').MODAL_THEMES
+  const PRODUCT_TYPES: typeof import('../../composables/common/useBizConfig').PRODUCT_TYPES
   const SYSTEM_AVATARS: typeof import('../../utils/constants').SYSTEM_AVATARS
   const ZINDEX_INJECTION_KEY: typeof import('../../node_modules/element-plus/es/hooks/use-z-index/index').ZINDEX_INJECTION_KEY
   const abortNavigation: typeof import('../../node_modules/nuxt/dist/app/composables/router').abortNavigation
@@ -427,35 +428,48 @@ declare global {
   const unref: typeof import('vue').unref
   const updateAppConfig: typeof import('../../node_modules/nuxt/dist/app/config').updateAppConfig
   const uploadImageToStorage: typeof import('../../utils/uploadImage').uploadImageToStorage
-  const useAdminStore: typeof import('../../stores/admin').useAdminStore
+  const useAdminCdkList: typeof import('../../composables/admin/useAdminCdkList').useAdminCdkList
+  const useAdminCouponList: typeof import('../../composables/admin/useAdminCouponList').useAdminCouponList
+  const useAdminGlobalSkuList: typeof import('../../composables/admin/useAdminGlobalSkuList').useAdminGlobalSkuList
+  const useAdminOrderList: typeof import('../../composables/admin/useAdminOrderList').useAdminOrderList
+  const useAdminPreOrderList: typeof import('../../composables/admin/useAdminPreOrderList').useAdminPreOrderList
+  const useAdminProductForm: typeof import('../../composables/admin/useAdminProductForm').useAdminProductForm
+  const useAdminProductList: typeof import('../../composables/admin/useAdminProductList').useAdminProductList
+  const useAdminSkuEditor: typeof import('../../composables/admin/useAdminSkuEditor').useAdminSkuEditor
+  const useAdminStore: typeof import('../../stores/admin/admin').useAdminStore
+  const useAdminTicketList: typeof import('../../composables/admin/useAdminTicketList').useAdminTicketList
   const useAppConfig: typeof import('../../node_modules/nuxt/dist/app/config').useAppConfig
   const useAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useAsyncData
   const useAttrs: typeof import('vue').useAttrs
-  const useCartAnimation: typeof import('../../composables/useCartAnimation').useCartAnimation
-  const useCartStore: typeof import('../../stores/cart').useCartStore
+  const useBizConfig: typeof import('../../composables/common/useBizConfig').useBizConfig
+  const useBizFormat: typeof import('../../composables/common/useBizFormat').useBizFormat
+  const useCartAnimation: typeof import('../../composables/client/useCartAnimation').useCartAnimation
+  const useCartStore: typeof import('../../stores/client/cart').useCartStore
+  const useCheckout: typeof import('../../composables/client/useCheckout').useCheckout
   const useCookie: typeof import('../../node_modules/nuxt/dist/app/composables/cookie').useCookie
   const useCssModule: typeof import('vue').useCssModule
   const useCssVars: typeof import('vue').useCssVars
   const useError: typeof import('../../node_modules/nuxt/dist/app/composables/error').useError
-  const useFaqTicker: typeof import('../../composables/useFaqTicker').useFaqTicker
-  const useFavorite: typeof import('../../composables/useFavorite').useFavorite
+  const useFaqTicker: typeof import('../../composables/client/useFaqTicker').useFaqTicker
+  const useFavorite: typeof import('../../composables/client/useFavorite').useFavorite
   const useFetch: typeof import('../../node_modules/nuxt/dist/app/composables/fetch').useFetch
-  const useFlyingAnimation: typeof import('../../composables/useFlyingAnimation').useFlyingAnimation
-  const useGoodsDetail: typeof import('../../composables/useGoodsDetail').useGoodsDetail
+  const useFlyingAnimation: typeof import('../../composables/client/useFlyingAnimation').useFlyingAnimation
+  const useGoodsDetail: typeof import('../../composables/client/useGoodsDetail').useGoodsDetail
   const useHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHead
   const useHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHeadSafe
-  const useHttp: typeof import('../../composables/useHttp').useHttp
+  const useHttp: typeof import('../../composables/shared/useHttp').useHttp
   const useHydration: typeof import('../../node_modules/nuxt/dist/app/composables/hydrate').useHydration
   const useId: typeof import('vue').useId
   const useLazyAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useLazyAsyncData
   const useLazyFetch: typeof import('../../node_modules/nuxt/dist/app/composables/fetch').useLazyFetch
   const useLink: typeof import('vue-router').useLink
   const useLoadingIndicator: typeof import('../../node_modules/nuxt/dist/app/composables/loading-indicator').useLoadingIndicator
-  const useModalStore: typeof import('../../stores/modal').useModalStore
+  const useModalStore: typeof import('../../stores/client/modal').useModalStore
   const useModel: typeof import('vue').useModel
   const useNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt').useNuxtApp
   const useNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useNuxtData
   const useNuxtDevTools: typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools').useNuxtDevTools
+  const useOrderList: typeof import('../../composables/client/useOrderList').useOrderList
   const usePinia: typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables').usePinia
   const usePreviewMode: typeof import('../../node_modules/nuxt/dist/app/composables/preview').usePreviewMode
   const useRequestEvent: typeof import('../../node_modules/nuxt/dist/app/composables/ssr').useRequestEvent
@@ -504,13 +518,13 @@ declare global {
   const useServerHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useServerHeadSafe
   const useServerSeoMeta: typeof import('../../node_modules/nuxt/dist/app/composables/head').useServerSeoMeta
   const useShadowRoot: typeof import('vue').useShadowRoot
-  const useSimpleCache: typeof import('../../composables/useSimpleCache').useSimpleCache
+  const useSimpleCache: typeof import('../../composables/shared/useSimpleCache').useSimpleCache
   const useSlots: typeof import('vue').useSlots
   const useState: typeof import('../../node_modules/nuxt/dist/app/composables/state').useState
-  const useSupabaseUserStore: typeof import('../../stores/supabase-user').useSupabaseUserStore
+  const useSupabaseUserStore: typeof import('../../stores/shared/supabase-user').useSupabaseUserStore
   const useTemplateRef: typeof import('vue').useTemplateRef
   const useTransitionState: typeof import('vue').useTransitionState
-  const useUserStore: typeof import('../../stores/user').useUserStore
+  const useUserStore: typeof import('../../stores/client/user').useUserStore
   const watch: typeof import('vue').watch
   const watchEffect: typeof import('vue').watchEffect
   const watchPostEffect: typeof import('vue').watchPostEffect
@@ -528,9 +542,6 @@ declare global {
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
-  export type { GoodsData } from '../../composables/useGoodsDetail'
-  import('../../composables/useGoodsDetail')
-  // @ts-ignore
   export type { ApiErrorHandler, ErrorHandler, ErrorInfo } from '../../utils/error-handler'
   import('../../utils/error-handler')
   // @ts-ignore
@@ -540,8 +551,17 @@ declare global {
   export type { UploadProgressCallback } from '../../utils/uploadImage'
   import('../../utils/uploadImage')
   // @ts-ignore
-  export type { CartItem } from '../../stores/cart'
-  import('../../stores/cart')
+  export type { DetailModule } from '../../composables/admin/useAdminProductForm'
+  import('../../composables/admin/useAdminProductForm')
+  // @ts-ignore
+  export type { GoodsData } from '../../composables/client/useGoodsDetail'
+  import('../../composables/client/useGoodsDetail')
+  // @ts-ignore
+  export type { ProductTypeKey } from '../../composables/common/useBizConfig'
+  import('../../composables/common/useBizConfig')
+  // @ts-ignore
+  export type { CartItem } from '../../stores/client/cart'
+  import('../../stores/client/cart')
 }
 // for vue template auto import
 import { UnwrapRef } from 'vue'
@@ -853,6 +873,7 @@ declare module 'vue' {
     readonly ErrorHandler: UnwrapRef<typeof import('../../utils/error-handler')['ErrorHandler']>
     readonly ID_INJECTION_KEY: UnwrapRef<typeof import('../../node_modules/element-plus/es/hooks/use-id/index')['ID_INJECTION_KEY']>
     readonly MODAL_THEMES: UnwrapRef<typeof import('../../utils/modalThemeRegistry')['MODAL_THEMES']>
+    readonly PRODUCT_TYPES: UnwrapRef<typeof import('../../composables/common/useBizConfig')['PRODUCT_TYPES']>
     readonly SYSTEM_AVATARS: UnwrapRef<typeof import('../../utils/constants')['SYSTEM_AVATARS']>
     readonly ZINDEX_INJECTION_KEY: UnwrapRef<typeof import('../../node_modules/element-plus/es/hooks/use-z-index/index')['ZINDEX_INJECTION_KEY']>
     readonly abortNavigation: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['abortNavigation']>
@@ -973,35 +994,48 @@ declare module 'vue' {
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly updateAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['updateAppConfig']>
     readonly uploadImageToStorage: UnwrapRef<typeof import('../../utils/uploadImage')['uploadImageToStorage']>
-    readonly useAdminStore: UnwrapRef<typeof import('../../stores/admin')['useAdminStore']>
+    readonly useAdminCdkList: UnwrapRef<typeof import('../../composables/admin/useAdminCdkList')['useAdminCdkList']>
+    readonly useAdminCouponList: UnwrapRef<typeof import('../../composables/admin/useAdminCouponList')['useAdminCouponList']>
+    readonly useAdminGlobalSkuList: UnwrapRef<typeof import('../../composables/admin/useAdminGlobalSkuList')['useAdminGlobalSkuList']>
+    readonly useAdminOrderList: UnwrapRef<typeof import('../../composables/admin/useAdminOrderList')['useAdminOrderList']>
+    readonly useAdminPreOrderList: UnwrapRef<typeof import('../../composables/admin/useAdminPreOrderList')['useAdminPreOrderList']>
+    readonly useAdminProductForm: UnwrapRef<typeof import('../../composables/admin/useAdminProductForm')['useAdminProductForm']>
+    readonly useAdminProductList: UnwrapRef<typeof import('../../composables/admin/useAdminProductList')['useAdminProductList']>
+    readonly useAdminSkuEditor: UnwrapRef<typeof import('../../composables/admin/useAdminSkuEditor')['useAdminSkuEditor']>
+    readonly useAdminStore: UnwrapRef<typeof import('../../stores/admin/admin')['useAdminStore']>
+    readonly useAdminTicketList: UnwrapRef<typeof import('../../composables/admin/useAdminTicketList')['useAdminTicketList']>
     readonly useAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['useAppConfig']>
     readonly useAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
-    readonly useCartAnimation: UnwrapRef<typeof import('../../composables/useCartAnimation')['useCartAnimation']>
-    readonly useCartStore: UnwrapRef<typeof import('../../stores/cart')['useCartStore']>
+    readonly useBizConfig: UnwrapRef<typeof import('../../composables/common/useBizConfig')['useBizConfig']>
+    readonly useBizFormat: UnwrapRef<typeof import('../../composables/common/useBizFormat')['useBizFormat']>
+    readonly useCartAnimation: UnwrapRef<typeof import('../../composables/client/useCartAnimation')['useCartAnimation']>
+    readonly useCartStore: UnwrapRef<typeof import('../../stores/client/cart')['useCartStore']>
+    readonly useCheckout: UnwrapRef<typeof import('../../composables/client/useCheckout')['useCheckout']>
     readonly useCookie: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/cookie')['useCookie']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['useError']>
-    readonly useFaqTicker: UnwrapRef<typeof import('../../composables/useFaqTicker')['useFaqTicker']>
-    readonly useFavorite: UnwrapRef<typeof import('../../composables/useFavorite')['useFavorite']>
+    readonly useFaqTicker: UnwrapRef<typeof import('../../composables/client/useFaqTicker')['useFaqTicker']>
+    readonly useFavorite: UnwrapRef<typeof import('../../composables/client/useFavorite')['useFavorite']>
     readonly useFetch: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/fetch')['useFetch']>
-    readonly useFlyingAnimation: UnwrapRef<typeof import('../../composables/useFlyingAnimation')['useFlyingAnimation']>
-    readonly useGoodsDetail: UnwrapRef<typeof import('../../composables/useGoodsDetail')['useGoodsDetail']>
+    readonly useFlyingAnimation: UnwrapRef<typeof import('../../composables/client/useFlyingAnimation')['useFlyingAnimation']>
+    readonly useGoodsDetail: UnwrapRef<typeof import('../../composables/client/useGoodsDetail')['useGoodsDetail']>
     readonly useHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHead']>
     readonly useHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHeadSafe']>
-    readonly useHttp: UnwrapRef<typeof import('../../composables/useHttp')['useHttp']>
+    readonly useHttp: UnwrapRef<typeof import('../../composables/shared/useHttp')['useHttp']>
     readonly useHydration: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/hydrate')['useHydration']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
     readonly useLazyAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useLazyAsyncData']>
     readonly useLazyFetch: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/fetch')['useLazyFetch']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
     readonly useLoadingIndicator: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/loading-indicator')['useLoadingIndicator']>
-    readonly useModalStore: UnwrapRef<typeof import('../../stores/modal')['useModalStore']>
+    readonly useModalStore: UnwrapRef<typeof import('../../stores/client/modal')['useModalStore']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
     readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
+    readonly useOrderList: UnwrapRef<typeof import('../../composables/client/useOrderList')['useOrderList']>
     readonly usePinia: UnwrapRef<typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['usePinia']>
     readonly usePreviewMode: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/preview')['usePreviewMode']>
     readonly useRequestEvent: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/ssr')['useRequestEvent']>
@@ -1050,13 +1084,13 @@ declare module 'vue' {
     readonly useServerHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useServerHeadSafe']>
     readonly useServerSeoMeta: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useServerSeoMeta']>
     readonly useShadowRoot: UnwrapRef<typeof import('vue')['useShadowRoot']>
-    readonly useSimpleCache: UnwrapRef<typeof import('../../composables/useSimpleCache')['useSimpleCache']>
+    readonly useSimpleCache: UnwrapRef<typeof import('../../composables/shared/useSimpleCache')['useSimpleCache']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useState: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/state')['useState']>
-    readonly useSupabaseUserStore: UnwrapRef<typeof import('../../stores/supabase-user')['useSupabaseUserStore']>
+    readonly useSupabaseUserStore: UnwrapRef<typeof import('../../stores/shared/supabase-user')['useSupabaseUserStore']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
     readonly useTransitionState: UnwrapRef<typeof import('vue')['useTransitionState']>
-    readonly useUserStore: UnwrapRef<typeof import('../../stores/user')['useUserStore']>
+    readonly useUserStore: UnwrapRef<typeof import('../../stores/client/user')['useUserStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>

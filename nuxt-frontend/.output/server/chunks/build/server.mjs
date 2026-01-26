@@ -10056,7 +10056,7 @@ const _sfc_main$b = /* @__PURE__ */ defineComponent({
 const _sfc_setup$b = _sfc_main$b.setup;
 _sfc_main$b.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/base/EmailInput.vue");
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/shared/EmailInput.vue");
   return _sfc_setup$b ? _sfc_setup$b(props, ctx) : void 0;
 };
 const EmailInput = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-9eeafe89"]]);
@@ -10089,7 +10089,7 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
 const _sfc_setup$a = _sfc_main$a.setup;
 _sfc_main$a.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/base/SendCodeButton.vue");
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/shared/SendCodeButton.vue");
   return _sfc_setup$a ? _sfc_setup$a(props, ctx) : void 0;
 };
 const SendCodeButton = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-330e9ca3"]]);
@@ -10662,7 +10662,7 @@ const MODAL_THEMES = {
      ----------------------------------------------------------------------
      说明: 下面这些配置是传给 BaseModal 的 props。
      如果只改文字/图片/位置，改这里即可。
-     如果要改 CSS 样式，请去 components/base/BaseModal.vue 底部
+     如果要改 CSS 样式，请去 components/shared/BaseModal.vue 底部
      ====================================================================== */
   "suit-001": {
     id: "suit-001",
@@ -10678,7 +10678,7 @@ const MODAL_THEMES = {
   /* ======================================================================
      [方案 SUIT-002] 柔光风格 (Soft Light)
      ----------------------------------------------------------------------
-     修改样式请去 components/base/BaseModal.vue 底部
+     修改样式请去 components/shared/BaseModal.vue 底部
      ====================================================================== */
   "suit-002": {
     id: "suit-002",
@@ -10693,7 +10693,7 @@ const MODAL_THEMES = {
   /* ======================================================================
      [方案 SUIT-003] 赛博朋克 (Cyberpunk)
      ----------------------------------------------------------------------
-     修改样式请去 components/base/BaseModal.vue 底部
+     修改样式请去 components/shared/BaseModal.vue 底部
      ====================================================================== */
   "suit-003": {
     id: "suit-003",
@@ -10772,7 +10772,7 @@ const _sfc_main$6 = /* @__PURE__ */ defineComponent({
 const _sfc_setup$6 = _sfc_main$6.setup;
 _sfc_main$6.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/base/BaseModal.vue");
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/shared/BaseModal.vue");
   return _sfc_setup$6 ? _sfc_setup$6(props, ctx) : void 0;
 };
 const BaseModal = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-94782bb7"]]);

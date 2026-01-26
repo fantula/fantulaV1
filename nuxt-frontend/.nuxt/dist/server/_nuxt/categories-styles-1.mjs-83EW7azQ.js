@@ -1,5 +1,0 @@
-const categories_vue_vue_type_style_index_0_scoped_37ee2135_lang = ".admin-page[data-v-37ee2135]{background:var(--el-bg-color);border-radius:8px;min-height:calc(100vh - 100px);padding:20px}.page-header[data-v-37ee2135]{align-items:center;border-bottom:1px solid #ebeef5;display:flex;justify-content:space-between;margin-bottom:20px;padding-bottom:20px}.page-title[data-v-37ee2135]{color:var(--el-text-color-primary);font-size:18px;font-weight:600}";
-export {
-  categories_vue_vue_type_style_index_0_scoped_37ee2135_lang as default
-};
-//# sourceMappingURL=categories-styles-1.mjs-83EW7azQ.js.map

@@ -15,8 +15,19 @@ export default defineNuxtConfig({
   // 组件自动导入
   components: [
     { path: '~/components/admin/base', pathPrefix: false },
+    { path: '~/components/pc', pathPrefix: false },
+    { path: '~/components/mobile', pathPrefix: false },
+    { path: '~/components/shared', pathPrefix: false },
     '~/components'
   ],
+
+  // 自动导入配置 (Composables & Stores)
+  imports: {
+    dirs: [
+      'composables/**',
+      'stores/**'
+    ]
+  },
 
   // 应用配置
   app: {
@@ -139,5 +150,31 @@ export default defineNuxtConfig({
   },
 
   // SEO 优化配置
-  css: ['@/assets/theme-blue-orange.css']
+  css: ['@/assets/theme-blue-orange.css'],
+
+  hooks: {
+    'pages:extend'(pages) {
+      // 1. 找到所有在 pages/pc 下的页面
+      const clientPages = pages.filter(p => p.path.startsWith('/pc'))
+
+      // 2. 为每个 pc 页面创建一个根路径别名
+      clientPages.forEach(p => {
+        // 去掉 path 中的 /pc 前缀
+        // 例如: /pc/about-us -> /about-us
+        // 例如: /pc -> /
+        let newPath = p.path.replace(/^\/pc/, '')
+        if (newPath === '') newPath = '/'
+
+        // 避免重复定义 (虽然 Nuxt 会处理，但最好检查一下)
+        const exists = pages.some(existing => existing.path === newPath)
+        if (!exists) {
+          pages.push({
+            ...p,
+            name: p.name ? 'root-' + p.name : undefined,
+            path: newPath
+          })
+        }
+      })
+    }
+  }
 }) 

@@ -1,5 +1,5 @@
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
-import type { Article, Category } from '@/api/community'
+import type { Article, Category } from '@/api/client/community'
 
 export interface AdminFaqCategory {
     id: string

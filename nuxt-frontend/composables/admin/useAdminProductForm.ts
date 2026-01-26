@@ -1,7 +1,7 @@
 
 import { ref, reactive, computed, nextTick, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { adminProductApi, adminCategoryApi } from '@/api/admin-supabase' // Re-export from index if needed, or import directly
+import { adminProductApi, adminCategoryApi } from '@/api/admin' // Re-export from index if needed, or import directly
 import { adminProductApi as newProductApi } from '@/api/admin/product' // Alias to new API
 import { ElMessage, type FormInstance } from 'element-plus'
 

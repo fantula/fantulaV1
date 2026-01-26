@@ -47,7 +47,7 @@
 import { ref, watch } from 'vue'
 import { Refresh, Picture as IconPicture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { adminSharedSkuApi } from '@/api/admin-supabase'
+import { adminSharedSkuApi } from '@/api/admin'
 
 const props = defineProps<{
   modelValue: boolean

@@ -1,1 +1,0 @@
-import{bQ as a,bR as s,bS as r,b6 as u,bT as o}from"./CEI0siaN.js";function i(e){const t=e||s();return t?.ssrContext?.head||t?.runWithContext(()=>{if(r())return u(o)})}function x(e,t={}){const n=i(t.nuxt);if(n)return a(e,{head:n,...t})}export{x as u};

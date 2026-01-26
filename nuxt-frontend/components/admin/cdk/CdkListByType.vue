@@ -167,7 +167,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { Refresh, Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { adminProductApi, adminCdkApi, adminCategoryApi, type AdminProduct, type AdminCDK, type ProductCategory } from '@/api/admin-supabase'
+import { adminProductApi, adminCdkApi, adminCategoryApi, type AdminProduct, type AdminCDK, type ProductCategory } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizConfig } from '@/composables/common/useBizConfig'
@@ -250,12 +250,12 @@ const handleSearch = () => loadCdks()
 
 // Actions
 const handleAdd = () => {
-    router.push({ path: '/_mgmt_9Xfa3/cdk/post', query: { type: props.type } })
+    router.push({ path: '/admin/cdk/post', query: { type: props.type } })
 }
 
 const handleEdit = (row: AdminCDK) => {
     router.push({
-        path: `/_mgmt_9Xfa3/cdk/edit/${row.id}`,
+        path: `/admin/cdk/edit/${row.id}`,
         query: { type: props.type }
     })
 }

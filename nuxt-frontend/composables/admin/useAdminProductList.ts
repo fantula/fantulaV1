@@ -1,7 +1,7 @@
 
 import { ref, reactive, onMounted } from 'vue'
 import { adminProductApi } from '@/api/admin/product'
-import { adminCategoryApi, type AdminProduct } from '@/api/admin-supabase'
+import { adminCategoryApi, type AdminProduct } from '@/api/admin'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export function useAdminProductList() {

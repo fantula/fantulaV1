@@ -1,4 +1,5 @@
 
+/// <reference path="nitro-layouts.d.ts" />
 /// <reference path="app.config.d.ts" />
 /// <reference path="runtime-config.d.ts" />
 /// <reference types="/Users/dalin/fantula/nuxt-frontend/node_modules/@nuxt/nitro-server/dist/index.mjs" />
@@ -28,6 +29,7 @@ declare module 'nitropack' {
     /** @deprecated Use `noScripts` instead */
     experimentalNoScripts?: boolean
     appMiddleware?: Record<string, boolean>
+    appLayout?: string | false
   }
   interface NitroRuntimeHooks {
     'dev:ssr-logs': (ctx: { logs: LogObject[], path: string }) => void | Promise<void>
