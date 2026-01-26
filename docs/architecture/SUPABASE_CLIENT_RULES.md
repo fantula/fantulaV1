@@ -13,7 +13,7 @@
 
 ## 使用规则
 
-### 客户端页面 (`pages/` 非 `_mgmt_9Xfa3`)
+### 客户端页面 (`pages/pc/` 或 `pages/mobile/`)
 ```typescript
 // ✅ 正确
 import { getSupabaseClient } from '@/utils/supabase'
@@ -22,7 +22,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
 ```
 
-### 后台管理页面 (`pages/_mgmt_9Xfa3/`)
+### 后台管理页面 (`pages/admin/`)
 ```typescript
 // ✅ 正确
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
@@ -34,10 +34,10 @@ import { getAdminSupabaseClient } from '@/utils/supabase'  // 这是错的别名
 
 ### API 层
 ```typescript
-// 后台 API (api/admin-*.ts)
+// 后台 API (api/admin/xxx.ts)
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
 
-// 客户端 API (api/supabase.ts)
+// 客户端 API (api/client/xxx.ts)
 import { getSupabaseClient } from '@/utils/supabase'
 ```
 
@@ -47,10 +47,10 @@ import { getSupabaseClient } from '@/utils/supabase'
 
 ```bash
 # 检查后台页面是否误用客户端 client
-grep -r "from '@/utils/supabase'" pages/_mgmt_9Xfa3/
+grep -r "from '@/utils/supabase'" pages/admin/
 
 # 检查客户端页面是否误用 admin client  
-grep -r "supabase-admin" pages/ --include="*.vue" | grep -v "_mgmt_9Xfa3"
+grep -r "supabase-admin" pages/pc/ pages/mobile/
 ```
 
 ---

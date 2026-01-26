@@ -119,7 +119,7 @@ export default defineNuxtConfig({
     // 预渲染配置
     prerender: {
       crawlLinks: true,
-      routes: ['/community', '/about-us', '/service', '/faq']
+      routes: ['/about-us', '/service', '/faq']
     }
   },
 
@@ -150,7 +150,7 @@ export default defineNuxtConfig({
   },
 
   // SEO 优化配置
-  css: ['@/assets/theme-blue-orange.css'],
+  css: ['@/assets/styles/theme-blue-orange.css'],
 
   hooks: {
     'pages:extend'(pages) {

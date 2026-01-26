@@ -110,7 +110,7 @@
         
         <el-table-column label="创建时间" width="160" align="center">
            <template #default="{ row }">
-              {{ new Date(row.created_at).toLocaleString('zh-CN', { fontSize: '12px' }) }}
+              <span style="font-size: 12px">{{ new Date(row.created_at).toLocaleString('zh-CN') }}</span>
            </template>
         </el-table-column>
 
@@ -163,10 +163,10 @@ const {
 } = useAdminProductList()
 
 // Navigation Logics (still kept in component as they relate to routing)
-const handleAddProduct = () => router.push('/admin/products/post')
-const handleEdit = (r: any) => router.push(`/admin/products/post?id=${r.id}`)
-const handleManageConfigs = (r: any) => router.push(`/admin/products/sku/${r.id}`)
-const handleDuplicate = (r: any) => router.push(`/admin/products/post?copy_from_id=${r.id}`)
+const handleAddProduct = () => router.push('/admin/products/edit')
+const handleEdit = (r: any) => router.push(`/admin/products/edit?id=${r.id}`)
+const handleManageConfigs = (r: any) => router.push(`/admin/products/specs/${r.id}`)
+const handleDuplicate = (r: any) => router.push(`/admin/products/edit?copy_from_id=${r.id}`)
 
 </script>
 

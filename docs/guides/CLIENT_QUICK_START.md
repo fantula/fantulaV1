@@ -6,11 +6,12 @@
 
 ```
 nuxt-frontend/
-├── api/client/          # 客户端 API
+├── api/client/          # 客户端 API (PC/Mobile 共用)
 ├── composables/client/  # 业务逻辑
-├── components/modal/    # 弹窗组件
-│   └── base/            # 4 种基础模板
-└── pages/               # 页面
+├── components/pc/       # PC端组件
+├── components/mobile/   # 移动端组件
+├── pages/pc/            # PC端页面
+└── pages/mobile/        # 移动端页面
 ```
 
 ## 2. API 调用
@@ -54,4 +55,4 @@ const { getOrderStatusLabel } = useBizConfig()
 
 ---
 
-详细规范见 [CLIENT_DEVELOPMENT_GUIDE.md](./CLIENT_DEVELOPMENT_GUIDE.md)
+详细规范见 [FRONTEND_STRUCTURE_RULES.md](../architecture/FRONTEND_STRUCTURE_RULES.md)

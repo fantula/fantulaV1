@@ -6,7 +6,7 @@
 
 ```
 nuxt-frontend/
-├── pages/_mgmt_9Xfa3/       # 后台页面 (路由自动生成)
+├── pages/admin/             # 后台页面 (所有后台页面都在此)
 │   ├── login.vue            # 登录页
 │   ├── index.vue            # 仪表盘
 │   ├── products/            # 商品管理
@@ -34,6 +34,9 @@ nuxt-frontend/
 ├── middleware/
 │   └── admin-auth.global.ts # 后台认证守卫
 │
+├── layouts/
+│   └── mgmt.vue             # 后台布局
+│
 └── components/admin/        # 后台组件
 ```
 
@@ -41,36 +44,17 @@ nuxt-frontend/
 
 ## 二、菜单与路由管理 (Menu & Router)
 
-后台侧边栏菜单配置位于 `pages/_mgmt_9Xfa3.vue` 中。
+后台菜单配置位于 `config/admin-menu.ts` 中。
 
 ### 2.1 添加新菜单
-1. 打开 `pages/_mgmt_9Xfa3.vue`。
-2. 找到 `defaultMenuItems` 数组。
+1. 打开 `config/admin-menu.ts`。
+2. 找到 `ADMIN_MENU_ITEMS` 数组。
 3. 添加新项：
 ```typescript
-{ index: '/_mgmt_9Xfa3/new-module', icon: 'Box', title: '新模块' }
+{ index: '/admin/new-module', path: '/admin/new-module', icon: 'Box', title: '新模块' }
 ```
 
-### 2.2 添加新图标
-1. 顶部导入 Element Plus 图标：
-```typescript
-import { Box } from '@element-plus/icons-vue';
-```
-2. 在 `iconMap` 对象中注册：
-```typescript
-const iconMap = {
-  // ...
-  Box
-};
-```
-
-### 2.3 修改管理后台入口 (Security)
-为了安全，建议定期修改管理后台路径。
-1. 重命名 `pages/_mgmt_9Xfa3/` 文件夹 -> `pages/_secret_admin/`。
-2. 修改 `pages/_mgmt_9Xfa3.vue` 文件名 -> `pages/_secret_admin.vue`。
-3. 全局搜索 `_mgmt_9Xfa3` 并批量替换为 `_secret_admin` (涉及 `middleware`, `nuxt.config` 等)。
-
-### 2.4 多Tab页面布局 (重要!)
+### 2.2 多Tab页面布局 (重要!)
 
 > [!CAUTION]
 > **禁止使用侧边栏下拉子菜单**。多个相关功能必须使用**页面内Tab切换**布局。
@@ -82,33 +66,41 @@ const iconMap = {
 
 **1. 侧边栏单项**:
 ```typescript
-// _mgmt_9Xfa3.vue defaultMenuItems
-{ index: '/_mgmt_9Xfa3/help-center', icon: 'QuestionFilled', title: '帮助中心' }
+// config/admin-menu.ts
+{ index: '/admin/help-center', path: '/admin/help-center', icon: 'QuestionFilled', title: '帮助中心' }
 ```
 
-**2. 父布局 (help-center.vue)**:
+**2. 父布局 (pages/admin/help-center.vue)**:
 ```vue
 <template>
   <AdminModuleLayout 
     title="帮助中心"
     :tabs="tabs"
-  />
+  >
+    <NuxtPage />
+  </AdminModuleLayout>
 </template>
 
 <script setup>
+definePageMeta({
+  layout: 'mgmt',
+  middleware: ["mgmt-auth"]
+})
+import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
+
 const tabs = [
-  { name: 'faq', label: '常见问题', route: '/_mgmt_9Xfa3/help-center/faq' },
-  { name: 'faq-cat', label: 'FAQ分类', route: '/_mgmt_9Xfa3/help-center/faq-categories' },
+  { name: 'faq', label: '常见问题', route: '/admin/help-center/faq' },
+  { name: 'faq-cat', label: 'FAQ分类', route: '/admin/help-center/faq-categories' },
   // ...
 ]
 </script>
 ```
 
-**3. 子页面**: `help-center/faq.vue`, `help-center/articles.vue` 等
+**3. 子页面**: `pages/admin/help-center/faq.vue`, `pages/admin/help-center/articles.vue` 等
 
 #### 参考模块
-- CDK 管理: `cdk.vue` + `cdk/virtual.vue`, `cdk/accounts.vue`
-- 帮助中心: `help-center.vue` + `help-center/faq.vue`, `help-center/articles.vue`
+- CDK 管理: `pages/admin/cdk.vue`
+- 帮助中心: `pages/admin/help-center.vue`
 
 ---
 
@@ -172,7 +164,7 @@ const tabs = [
 |------|------|------|
 | **登录层** | 身份验证 + 角色验证 + 权限加载 | `stores/admin.ts` |
 | **路由层** | 权限过滤，无权限跳转仪表盘 | `middleware/admin-auth.global.ts` |
-| **页面层** | 业务展示，信任登录状态 | `pages/_mgmt_9Xfa3/*.vue` |
+| **页面层** | 业务展示，信任登录状态 | `pages/admin/*.vue` |
 | **API层** | 数据操作，使用 service_role 绕过 RLS | `utils/supabase-admin.ts` |
 
 ### 4.2 登录流程
@@ -191,7 +183,7 @@ Supabase Auth 验证
 
 ### 4.3 路由守卫
 
-`middleware/admin-auth.global.ts` 全局拦截所有 `/_mgmt_9Xfa3/*` 路由：
+`middleware/admin-auth.global.ts` 全局拦截所有 `/admin/*` 路由：
 - 未登录 → 跳转登录页
 - 无权限 → 跳转仪表盘
 
@@ -202,14 +194,9 @@ Supabase Auth 验证
 onMounted(async () => {
   await adminStore.init()  // 不需要！middleware 已处理
 })
-
 // ✅ 正确：直接使用登录状态
 const user = adminStore.adminInfo  // 信任已登录
 ```
-
-- ❌ 页面中不要调用 `adminStore.init()`，middleware 会处理
-- ❌ API 中不要验证身份，service_role 已绕过 RLS
-- ✅ 新增页面路径需要在部门管理添加权限选项
 
 ### 4.5 API 调用
 
@@ -380,7 +367,7 @@ onMounted(() => loadList())
  这里的页面代码是最规范的，开发新功能时请直接参考或复制它们的结构。
  
  ### 10.1 复杂表单 / 编辑页
- **参考对象**: `pages/_mgmt_9Xfa3/products/post.vue`
+ **参考对象**: `pages/admin/products/post.vue`
  *   **特点**:
      *   使用 `StickyFormHeader` 吸顶头。
      *   使用 `AdminImageSelector` 图片选择。
@@ -388,7 +375,7 @@ onMounted(() => loadList())
      *   模块化拆分 (基础信息/详情模块)。
  
  ### 10.2 数据列表页
- **参考对象**: `pages/_mgmt_9Xfa3/orders/recharge/index.vue`
+ **参考对象**: `pages/admin/orders/recharge/index.vue`
  *   **特点**:
      *   使用 `AdminDataTable` (或标准 Table 结构)。
      *   集成 `useAdminOrderList` Composable。
@@ -396,7 +383,7 @@ onMounted(() => loadList())
      *   支持批量操作。
  
  ### 10.3 弹窗交互
- **参考对象**: `pages/_mgmt_9Xfa3/products/categories.vue`
+ **参考对象**: `pages/admin/products/categories.vue`
  *   **特点**:
      *   在列表页直接通过 `el-dialog` 处理轻量级新增/编辑。
  

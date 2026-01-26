@@ -90,6 +90,9 @@
         <!-- 右侧主内容 (Unified Sheer Glass Frame) -->
         <main class="profile-main">
           <div class="profile-content-frame">
+             <!-- Section Loader (Absolute Positioned) -->
+             <GlobalLoader :loading="isLoading && loadingVariant === 'section'" variant="section" />
+
              <!-- Phantom Watermark (Inside Frame) -->
              <div class="phantom-ambassador"></div>
              
@@ -121,6 +124,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { authApi } from '@/api/client/auth'
 import LogoutModal from '@/components/pc/modal/LogoutModal.vue'
+// GlobalLoader is auto-imported
 import { 
   SwitchButton, 
   ArrowLeft, 
@@ -141,6 +145,7 @@ useHead({
   ]
 })
 
+const { isLoading, loadingVariant } = usePageLoading() // Integrate usePageLoading
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()

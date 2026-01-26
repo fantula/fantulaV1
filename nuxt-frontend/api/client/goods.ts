@@ -39,7 +39,7 @@ export const goodsApi = {
     // 排序
     const sortField = params.sortBy === 'price' ? 'display_price'
       : params.sortBy === 'sales' ? 'initial_sales'
-        : 'sort_order'
+        : 'created_at'
     query = query.order(sortField, { ascending: params.sortOrder !== 'desc' })
 
     // 分页

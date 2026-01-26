@@ -10,10 +10,10 @@
 
 | 模板 | 路径 | 用途 | 尺寸 |
 |------|------|------|------|
-| **确认框** | `modal/base/BaseConfirmModal.vue` | 删除、退出确认 | 400px |
-| **表单框** | `modal/base/BaseFormModal.vue` | 修改资料、绑定 | 500px |
-| **结果框** | `modal/base/BaseResultModal.vue` | 成功/失败提示 | 400px |
-| **业务框** | `modal/base/BaseBusinessModal.vue` | 支付、优惠券 | 600px |
+| **确认框** | `components/pc/modal/base/BaseConfirmModal.vue` | 删除、退出确认 | 400px |
+| **表单框** | `components/pc/modal/base/BaseFormModal.vue` | 修改资料、绑定 | 500px |
+| **结果框** | `components/pc/modal/base/BaseResultModal.vue` | 成功/失败提示 | 400px |
+| **业务框** | `components/pc/modal/base/BaseBusinessModal.vue` | 支付、优惠券 | 600px |
 
 ---
 

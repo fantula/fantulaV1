@@ -15,11 +15,32 @@
     <!-- 商品列表区 -->
     <div class="goods-container">
       <Transition :name="slideDirection" mode="out-in">
-        <GoodsSection 
-          :key="activeCategoryId" 
-          :goodsList="currentGoods" 
-          :loading="goodsLoading" 
-        />
+        <div :key="activeCategoryId">
+          <!-- 这里的 key 很重要，确保切换分类时重置组件 -->
+           
+          <GoodsSection 
+            v-if="currentGoods.length > 0 || goodsLoading"
+            :goodsList="currentGoods" 
+            :loading="goodsLoading" 
+          />
+
+          <!-- Empty State -->
+          <div v-else-if="!goodsLoading && currentGoods.length === 0" class="empty-state">
+             <el-empty description="该分类暂无商品" :image-size="120" />
+          </div>
+
+          <!-- Infinite Scroll Trigger -->
+          <div v-if="hasMore && currentGoods.length > 0" class="load-more-trigger" v-intersection-observer="loadMore">
+             <div v-if="isLoadingMore" class="loading-more-spinner">
+                <el-icon class="is-loading"><Loading /></el-icon> 加载更多...
+             </div>
+          </div>
+          
+           <!-- No More Data Text -->
+           <div v-if="!hasMore && currentGoods.length > 0" class="no-more-data">
+              - 到底了 -
+           </div>
+        </div>
       </Transition>
     </div>
 
@@ -64,6 +85,7 @@ useHead({
   ]
 })
 
+// 状态管理
 const banners = ref<Banner[]>([])
 const categories = ref<GoodsCategory[]>([])
 const currentGoods = ref<Goods[]>([])
@@ -71,40 +93,36 @@ const activeCategoryId = ref<string | number>('')
 const goodsLoading = ref(false)
 const slideDirection = ref('slide-right')
 
+// 分页状态
+const currentPage = ref(1)
+const hasMore = ref(true)
+const isLoadingMore = ref(false)
+const PAGE_SIZE = 10 
+
 // ========================================
 // 数据获取函数（带缓存）
 // ========================================
 
-// 获取轮播图数据
+// 获取轮播图数据 (保持不变)
 const fetchBanners = async () => {
-  // 先尝试读取缓存，立即显示
   const cached = getCache<Banner[]>('home_banners')
-  if (cached) {
-    banners.value = cached
-  }
-  
-  // 后台获取最新数据
+  if (cached) banners.value = cached
   try {
     const res = await commonApi.getBannerList()
     if (res?.success && res.data) {
       banners.value = res.data
       setCache('home_banners', res.data)
     }
-  } catch (error) {
-    console.error('获取轮播图失败:', error)
-  }
+  } catch (error) { console.error('获取轮播图失败:', error) }
 }
 
-// 获取分类数据
+// 获取分类数据 (保持不变)
 const fetchCategories = async (): Promise<string | number | null> => {
-  // 先尝试读取缓存，立即显示
   const cached = getCache<GoodsCategory[]>('home_categories')
   if (cached && cached.length > 0) {
     categories.value = cached
-    return cached[0].id // 返回缓存的第一个分类 ID
+    return cached[0].id
   }
-  
-  // 后台获取最新数据
   try {
     const res = await goodsApi.getCategories()
     if (res?.success && res.data && res.data.length > 0) {
@@ -112,33 +130,70 @@ const fetchCategories = async (): Promise<string | number | null> => {
       setCache('home_categories', res.data)
       return res.data[0].id
     }
-  } catch (error) {
-    console.error('获取分类失败:', error)
-  }
+  } catch (error) { console.error('获取分类失败:', error) }
   return null
 }
 
-// 根据分类获取商品（不缓存，保证实时性）
-const fetchGoods = async (categoryId?: string | number) => {
-  goodsLoading.value = true
+// 核心：获取商品列表 (支持分页)
+// isLoadMore: true 表示追加数据，false 表示重置列表
+const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
+  if (!categoryId) return
+  
+  if (isLoadMore) {
+    if (!hasMore.value || isLoadingMore.value) return
+    isLoadingMore.value = true
+  } else {
+    goodsLoading.value = true
+    currentPage.value = 1
+    hasMore.value = true
+    currentGoods.value = [] // 清空列表，避免显示旧数据
+  }
+
+  // Safety: Force stop loading if API hangs for too long (5s)
+  const safetyTimer = setTimeout(() => {
+    if (goodsLoading.value || isLoadingMore.value) {
+        console.warn('⚠️ Fetch timeout: Force stopping spinner')
+        goodsLoading.value = false
+        isLoadingMore.value = false
+    }
+  }, 5000)
+
   try {
     const res = await goodsApi.getGoodsList({ 
       categoryId: categoryId,
-      page: 1, 
-      limit: 12 
+      page: currentPage.value, 
+      limit: PAGE_SIZE 
     })
-    if (res?.success && res.data?.list) {
-      currentGoods.value = res.data.list
+    
+    const newList = res?.success && res.data?.list ? res.data.list : []
+    
+    if (isLoadMore) {
+      currentGoods.value = [...currentGoods.value, ...newList]
     } else {
-      currentGoods.value = []
+      currentGoods.value = newList
     }
+
+    // 判断是否还有更多数据
+    if (newList.length < PAGE_SIZE) {
+      hasMore.value = false
+    } else {
+      currentPage.value++ 
+      hasMore.value = true
+    }
+
   } catch (error) {
     console.error('获取商品列表失败:', error)
-    // TODO: 增加用户界面的错误提示
-    currentGoods.value = []
+    if (!isLoadMore) currentGoods.value = []
   } finally {
+    clearTimeout(safetyTimer)
     goodsLoading.value = false
+    isLoadingMore.value = false
   }
+}
+
+// 滚动加载触发器
+const loadMore = () => {
+  fetchGoods(activeCategoryId.value, true)
 }
 
 // 初始化数据 - 优化版：缓存优先 + 并行获取 + 后台刷新
@@ -189,12 +244,62 @@ onMounted(() => {
   initData()
 })
 
+import { Loading } from '@element-plus/icons-vue'
+
+// Custom Directive for Intersection Observer (Simplest implementation)
+const vIntersectionObserver = {
+  mounted: (el: HTMLElement, binding: any) => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        binding.value()
+      }
+    }, { rootMargin: '100px' }) // Trigger 100px before bottom
+    observer.observe(el)
+    // @ts-ignore
+    el._observer = observer
+  },
+  unmounted: (el: HTMLElement) => {
+    // @ts-ignore
+    if (el._observer) el._observer.disconnect()
+  }
+}
+
 const modal = useModalStore()
 </script>
 
 <style scoped>
 .home-page {
   /* background: #f8f9fa; */
+}
+
+.empty-state {
+  padding: 60px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.load-more-trigger {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #94A3B8;
+  width: 100%;
+}
+
+.loading-more-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.no-more-data {
+  text-align: center;
+  padding: 30px 0;
+  color: #64748B;
+  font-size: 13px;
+  opacity: 0.6;
 }
 
 /* 左右滑动过渡动画 */

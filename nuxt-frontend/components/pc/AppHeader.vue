@@ -4,7 +4,6 @@
   功能包括：
   - Logo和品牌名称展示
   - 主要导航菜单
-  - 全局搜索框
   - 用户登录/注册入口
   - 沉浸式交互：头像点击直接进入个人中心
 -->
@@ -16,7 +15,8 @@
         <img src="/images/shared/logo_v3.png" alt="logo" class="logo-img" />
         <span class="logo-text">凡图拉</span>
       </NuxtLink>
-      <!-- 菜单区 -->
+      
+      <!-- 菜单区 - 居中显示 -->
       <nav class="nav-menu">
         <NuxtLink to="/" class="nav-btn">首页</NuxtLink>
         <button class="nav-btn" @click="showChannelModal = true">频道识别</button>
@@ -24,21 +24,9 @@
         <NuxtLink to="/faq" class="nav-btn">常见问题</NuxtLink>
         <button class="nav-btn" @click="showServiceModal = true">联系图拉</button>
       </nav>
-      <!-- 搜索框+用户区域 -->
+      
+      <!-- 用户区域 -->
       <div class="header-actions">
-        <div class="search-box">
-          <input 
-            class="search-input" 
-            type="text" 
-            placeholder="搜索..." 
-            v-model="searchQuery"
-            @keyup.enter="handleSearch"
-          />
-          <div class="search-icon-bg" @click="handleSearch" style="cursor: pointer">
-            <el-icon :size="18" color="#fff"><Search /></el-icon>
-          </div>
-        </div>
-        
         <!-- 未登录状态：显示登录按钮 -->
         <NuxtLink 
           v-if="!userStore.isLoggedIn" 
@@ -49,47 +37,47 @@
           登录/注册
         </NuxtLink>
         
-          <!-- 已登录状态：显示购物车和用户信息 -->
-          <div v-else class="user-section">
-            <!-- 购物车图标容器 -->
-            <div class="cart-wrapper" style="position: relative;" ref="cartWrapperRef">
-              <div class="cart-icon" title="购物车" @click.stop="toggleMiniCart" id="cart-icon-ref">
-                <div class="cart-icon-wrapper">
-                  <el-icon :size="26" color="#E2E8F0"><ShoppingCart /></el-icon>
-                  <!-- 购物车数量badge -->
-                  <span v-if="cartStore.totalCount > 0" class="cart-badge">{{ cartStore.totalCount }}</span>
-                </div>
+        <!-- 已登录状态：显示购物车和用户信息 -->
+        <div v-else class="user-section">
+          <!-- 购物车图标容器 -->
+          <div class="cart-wrapper" style="position: relative;" ref="cartWrapperRef">
+            <div class="cart-icon" title="购物车" @click.stop="toggleMiniCart" id="cart-icon-ref">
+              <div class="cart-icon-wrapper">
+                <el-icon :size="26" color="#E2E8F0"><ShoppingCart /></el-icon>
+                <!-- 购物车数量badge -->
+                <span v-if="cartStore.totalCount > 0" class="cart-badge">{{ cartStore.totalCount }}</span>
               </div>
-              
-              <MiniCartPopup 
-                :visible="cartStore.miniCartVisible" 
-                @close="cartStore.miniCartVisible = false"
-                class="header-mini-cart"
+            </div>
+            
+            <MiniCartPopup 
+              :visible="cartStore.miniCartVisible" 
+              @close="cartStore.miniCartVisible = false"
+              class="header-mini-cart"
+            />
+          </div>
+
+          <!-- Favorites Icon -->
+          <div class="favorites-wrapper" @click="navigateToFavorites" id="favorites-icon-ref" title="我的收藏">
+            <el-icon :size="24" color="#E2E8F0" class="fav-icon"><Star /></el-icon>
+          </div>
+
+          <div class="user-info-container">
+            <!-- 加载状态：骨架屏 -->
+            <div v-if="userStore.loading" class="user-info user-info--loading">
+              <div class="avatar-skeleton"></div>
+              <div class="name-skeleton"></div>
+            </div>
+            <!-- 已加载：真实头像 -->
+            <div v-else @click="navigateToProfile" class="user-info" title="进入个人中心">
+              <img 
+                :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
+                :alt="userStore.user?.nickName || userStore.user?.nickname || '用户头像'"
+                class="user-avatar"
               />
-            </div>
-
-            <!-- Favorites Icon -->
-            <div class="favorites-wrapper" @click="navigateToFavorites" id="favorites-icon-ref" title="我的收藏">
-              <el-icon :size="24" color="#E2E8F0" class="fav-icon"><Star /></el-icon>
-            </div>
-
-            <div class="user-info-container">
-              <!-- 加载状态：骨架屏 -->
-              <div v-if="userStore.loading" class="user-info user-info--loading">
-                <div class="avatar-skeleton"></div>
-                <div class="name-skeleton"></div>
-              </div>
-              <!-- 已加载：真实头像 -->
-              <div v-else @click="navigateToProfile" class="user-info" title="进入个人中心">
-                <img 
-                  :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
-                  :alt="userStore.user?.nickName || userStore.user?.nickname || '用户头像'"
-                  class="user-avatar"
-                />
-                <span class="user-name">{{ userStore.user?.nickName || userStore.user?.nickname || '用户' }}</span>
-              </div>
+              <span class="user-name">{{ userStore.user?.nickName || userStore.user?.nickname || '用户' }}</span>
             </div>
           </div>
+        </div>
       </div>
     </div>
   </header>
@@ -108,19 +96,13 @@ import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
 import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
 import ChannelRecognitionModal from '@/components/pc/modal/ChannelRecognitionModal.vue'
 import MiniCartPopup from '@/components/pc/cart/MiniCartPopup.vue'
-import { Shop, ShoppingCart, Search, Star } from '@element-plus/icons-vue'
+import { ShoppingCart, Star } from '@element-plus/icons-vue'
 
 
 const modal = useModalStore()
 const userStore = useUserStore()
 const cartStore = useCartStore()
 const route = useRoute()
-
-const searchQuery = ref('')
-const handleSearch = () => {
-  if (!searchQuery.value.trim()) return
-  navigateTo(`/search?q=${encodeURIComponent(searchQuery.value.trim())}`)
-}
 
 // 用户菜单状态
 const showServiceModal = ref(false)
@@ -138,7 +120,6 @@ const handleOrderClick = () => {
   }
 }
 
-// 关闭登录弹窗
 // 关闭登录弹窗
 const closeLoginModal = () => {
   showLoginModal.value = false
@@ -220,20 +201,19 @@ onUnmounted(() => {
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.2s;
+  /* 防止Logo被挤压 */
+  flex-shrink: 0;
+  width: 200px; /* 固定宽度确保菜单居中 */
 }
 .logo-img {
-  height: 50px; /* Increased from 32px to fill header */
+  height: 50px;
   width: auto;
   object-fit: contain;
-  /* border-radius: 50%; Removed for custom shape */
   transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-  /* filter: drop-shadow removed for clean look */
 }
 .logo-area:hover .logo-img {
   transform: rotate(15deg) scale(1.1);
-  /* box-shadow removed */
 }
-/* Removed old logo-img styles */
 .logo-text {
   font-family: PingFang SC, sans-serif;
   font-weight: 700;
@@ -246,7 +226,10 @@ onUnmounted(() => {
   display: flex;
   gap: 40px;
   flex: 1;
-  margin-left: 40px;
+  /* 居中核心逻辑 */
+  justify-content: center;
+  align-items: center;
+  margin: 0 20px;
 }
 .nav-btn {
   font-family: PingFang SC, sans-serif;
@@ -266,6 +249,7 @@ onUnmounted(() => {
   transition: color 0.2s, background 0.2s;
   white-space: nowrap;
   height: 48px;
+  cursor: pointer;
 }
 .nav-btn.router-link-active::after,
 .nav-btn.router-link-exact-active::after,
@@ -284,61 +268,20 @@ onUnmounted(() => {
 .nav-btn.router-link-exact-active,
 .nav-btn:hover {
   color: #222;
-  /* 移除背景色，保持透明风格 */
   background: transparent;
-  cursor: pointer;
 }
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 28px; /* 原为18px，提升间距 */
+  gap: 20px;
+  /* 右侧对齐逻辑 */
+  justify-content: flex-end;
+  /* 固定宽度确保菜单居中 */
+  width: 200px;
 }
-.search-box {
-  width: 260px;
-  height: 39px;
-  background: rgba(255, 255, 255, 0.1); /* Dark Glass */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 28px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px 0 16px;
-  position: relative;
-  transition: all 0.3s;
-}
-.search-box:focus-within {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
-}
-.search-input {
-  flex: 1;
-  height: 30px;
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  outline: none;
-  color: #fff; /* White text */
-  font-family: PingFang SC, sans-serif;
-  white-space: nowrap;
-}
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-.search-icon-bg {
-  width: 32px;
-  height: 32px;
-  background: transparent; /* Remove white circle */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 8px;
-  transition: transform 0.2s;
-}
-.search-box:focus-within .search-icon-bg {
-  transform: scale(1.1);
-  color: var(--active-orange);
-}
+
+/* Removed Search Box Styles */
+
 .login-btn {
   width: 113px;
   height: 39px;
@@ -368,6 +311,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 20px;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 /* 购物车样式 */
@@ -378,7 +323,7 @@ onUnmounted(() => {
   justify-content: center;
   cursor: pointer;
   text-decoration: none;
-  color: #E2E8F0 !important; /* Force to match global nav */
+  color: #E2E8F0 !important;
   padding: 0;
   background: none;
   border: none;
@@ -391,7 +336,6 @@ onUnmounted(() => {
   color: var(--active-orange) !important;
 }
 
-/* 移除悬停效果 */
 .cart-icon:hover {
   opacity: 1;
   background: none;
@@ -518,6 +462,11 @@ onUnmounted(() => {
   
   .user-name {
     font-size: 14px;
+  }
+  
+  /* 响应式调整宽度 */
+  .logo-area, .header-actions {
+    width: auto;
   }
 }
 

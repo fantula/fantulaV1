@@ -79,7 +79,10 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'pc'
+  layout: 'pc',
+  middleware: () => {
+    return navigateTo('/')
+  }
 })
 
 import { ref, onMounted, computed } from 'vue'

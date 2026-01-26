@@ -14,12 +14,15 @@ import { adminCouponApi } from './coupon'
 import { adminImageApi, adminImageCategoryApi, adminBannerApi, adminSettingsApi } from './media'
 import { adminFaqApi } from './help-center'
 import { adminOrderApi } from './order'
+import { adminSchedulerApi } from './scheduler'
 
 // 重新导出已拆分的模块 (Backward Compatibility)
 export { adminCdkApi, type AdminCDK } from './cdk'
 export { adminCouponApi, type AdminCoupon as AdminCouponNew } from './coupon'
 export { adminOrderApi, type AdminOrder, type AdminOrderDelivery } from './order'
 export { adminFaqApi } from './help-center'
+export { adminSettingsApi, adminBannerApi, adminImageApi, adminImageCategoryApi } from './media'
+export { adminSchedulerApi, type SchedulerStatus, type SchedulerLog } from './scheduler'
 
 
 // ========================================

@@ -140,7 +140,7 @@ export function useAdminProductForm() {
         })
     }
 
-    const goBack = () => router.push('/_mgmt_9Xfa3/products')
+    const goBack = () => router.push('/admin/products')
 
     // 3. Detail Module Actions
     const addDetailText = () => form.detailModules.push({ type: 'text', content: '' })
