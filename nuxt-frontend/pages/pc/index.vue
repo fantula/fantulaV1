@@ -14,34 +14,35 @@
 
     <!-- 商品列表区 -->
     <div class="goods-container">
-      <Transition :name="slideDirection" mode="out-in">
-        <div :key="activeCategoryId">
-          <!-- 这里的 key 很重要，确保切换分类时重置组件 -->
-           
-          <GoodsSection 
-            v-if="currentGoods.length > 0 || goodsLoading"
-            :goodsList="currentGoods" 
-            :loading="goodsLoading" 
-          />
+      <!-- 
+         Mature Architecture: 
+         No Transition Component here to avoid layout jumping.
+         We simply swap the data. Use :key to force re-render if needed, 
+         but ideally GoodsSection handles updates gracefully.
+      -->
+      
+      <!-- List / Skeleton -->
+      <GoodsSection 
+        :goodsList="currentGoods" 
+        :loading="goodsLoading" 
+      />
 
-          <!-- Empty State -->
-          <div v-else-if="!goodsLoading && currentGoods.length === 0" class="empty-state">
-             <el-empty description="该分类暂无商品" :image-size="120" />
-          </div>
+      <!-- Empty State (Only if not loading and empty) -->
+      <div v-if="!goodsLoading && currentGoods.length === 0" class="empty-state">
+          <el-empty description="该分类暂无商品" :image-size="120" />
+      </div>
 
-          <!-- Infinite Scroll Trigger -->
-          <div v-if="hasMore && currentGoods.length > 0" class="load-more-trigger" v-intersection-observer="loadMore">
-             <div v-if="isLoadingMore" class="loading-more-spinner">
-                <el-icon class="is-loading"><Loading /></el-icon> 加载更多...
-             </div>
+      <!-- Infinite Scroll Trigger -->
+      <div v-if="hasMore && currentGoods.length > 0" class="load-more-trigger" v-intersection-observer="loadMore">
+          <div v-if="isLoadingMore" class="loading-more-spinner">
+            <el-icon class="is-loading"><Loading /></el-icon> 加载更多...
           </div>
-          
-           <!-- No More Data Text -->
-           <div v-if="!hasMore && currentGoods.length > 0" class="no-more-data">
-              - 到底了 -
-           </div>
-        </div>
-      </Transition>
+      </div>
+      
+      <!-- No More Data Text -->
+      <div v-if="!hasMore && currentGoods.length > 0" class="no-more-data">
+          - 到底了 -
+      </div>
     </div>
 
     <!-- 关于我们区域 -->
@@ -143,20 +144,15 @@ const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
     if (!hasMore.value || isLoadingMore.value) return
     isLoadingMore.value = true
   } else {
+    // Mature Logic: Do NOT clear currentGoods immediately if we want to support smooth transition,
+    // OR clear it to show Skeleton. 
+    // New Strategy: "Skeleton Switch"
+    // We clear currentGoods so the UI switches to the Skeleton State immediately.
     goodsLoading.value = true
     currentPage.value = 1
     hasMore.value = true
-    currentGoods.value = [] // 清空列表，避免显示旧数据
+    currentGoods.value = [] 
   }
-
-  // Safety: Force stop loading if API hangs for too long (5s)
-  const safetyTimer = setTimeout(() => {
-    if (goodsLoading.value || isLoadingMore.value) {
-        console.warn('⚠️ Fetch timeout: Force stopping spinner')
-        goodsLoading.value = false
-        isLoadingMore.value = false
-    }
-  }, 5000)
 
   try {
     const res = await goodsApi.getGoodsList({ 
@@ -165,6 +161,9 @@ const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
       limit: PAGE_SIZE 
     })
     
+    // Artificial Delay for Testing Skeleton (Optional, remove in prod)
+    // await new Promise(r => setTimeout(r, 600))
+
     const newList = res?.success && res.data?.list ? res.data.list : []
     
     if (isLoadMore) {
@@ -173,7 +172,6 @@ const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
       currentGoods.value = newList
     }
 
-    // 判断是否还有更多数据
     if (newList.length < PAGE_SIZE) {
       hasMore.value = false
     } else {
@@ -185,7 +183,6 @@ const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
     console.error('获取商品列表失败:', error)
     if (!isLoadMore) currentGoods.value = []
   } finally {
-    clearTimeout(safetyTimer)
     goodsLoading.value = false
     isLoadingMore.value = false
   }

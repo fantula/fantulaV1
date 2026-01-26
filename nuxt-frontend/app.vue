@@ -1,4 +1,5 @@
 <template>
+  <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="0" />
   <GlobalLoader :loading="isLoading && loadingVariant !== 'section'" :variant="loadingVariant" />
   <NuxtLayout>
     <NuxtPage />

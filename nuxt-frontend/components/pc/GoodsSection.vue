@@ -21,13 +21,14 @@
       </div>
 
       <div class="goods-grid" v-else-if="goodsList && goodsList.length > 0">
+        <!-- Goods items render loop... (omitted for brevity, keep existing logic) -->
         <div 
           v-for="item in goodsList" 
           :key="item.id" 
           class="goods-card"
           @click="navigateToGoods(item.id)"
         >
-          <!-- 1. Corner Badge -->
+          <!-- ...existing card content... -->
           <div 
             v-if="item.badge_label && item.badge_label !== '不展示'" 
             class="badge-label"
@@ -35,8 +36,6 @@
           >
             {{ item.badge_label }}
           </div>
-
-          <!-- 2. Main Image -->
           <div class="goods-image-container">
             <el-image 
               :src="item.image" 
@@ -51,21 +50,12 @@
               </template>
             </el-image>
           </div>
-
-          <!-- 3. Content Info -->
           <div class="goods-card-content">
-            <!-- Product Name -->
-            <h3 class="goods-title" :title="item.product_name">
-              {{ item.product_name }}
-            </h3>
-
-            <!-- Price -->
+            <h3 class="goods-title" :title="item.product_name">{{ item.product_name }}</h3>
             <div class="goods-price-row">
               <span class="price-val">{{ formatPrice(item.display_price) }}</span>
               <span class="price-unit">/起</span>
             </div>
-
-            <!-- Tags (Selling Points) -->
             <div class="selling-tags" v-if="parseTags(item.tags).length">
               <span 
                 v-for="(tag, tIdx) in parseTags(item.tags).slice(0, 3)" 
@@ -75,30 +65,27 @@
                 {{ tag }}
               </span>
             </div>
-
-            <!-- Stats: Sales & Rating -->
             <div class="goods-stats">
-              <div class="stat-item">
-                <span class="stat-label">销量</span>
-                <span class="stat-value">{{ formatSales(item.initial_sales || 0) }}</span>
-              </div>
-              <div class="stat-item rating">
-                <span class="stat-label">好评度</span>
-                <span class="stat-value">{{ item.rating }}%</span>
-              </div>
+              <div class="stat-item"><span class="stat-label">销量</span> <span class="stat-value">{{ formatSales(item.initial_sales || 0) }}</span></div>
+              <div class="stat-item rating"><span class="stat-label">好评度</span> <span class="stat-value">{{ item.rating }}%</span></div>
             </div>
-
-            <!-- Large Action Button -->
              <div class="action-btn-wrap">
-               <div class="select-btn">
-                 查看详情
-                 <el-icon class="btn-icon"><ArrowRight /></el-icon>
-               </div>
+               <div class="select-btn">查看详情<el-icon class="btn-icon"><ArrowRight /></el-icon></div>
              </div>
           </div>
         </div>
       </div>
+      
+      <!-- Error State -->
+      <div v-else-if="error" class="error-state">
+         <el-result icon="error" title="加载失败" sub-title="请检查网络后重试">
+            <template #extra>
+              <el-button type="primary" @click="$emit('retry')">重试</el-button>
+            </template>
+         </el-result>
+      </div>
 
+      <!-- Empty State -->
       <div v-else class="empty-state">
         <el-empty description="暂无相关商品" />
       </div>
@@ -124,6 +111,11 @@ interface GoodsDisplayItem {
 defineProps<{
   goodsList: GoodsDisplayItem[]
   loading?: boolean
+  error?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'retry'): void
 }>()
 
 const navigateToGoods = (id: number | string) => {

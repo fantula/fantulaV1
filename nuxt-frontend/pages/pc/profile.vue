@@ -90,8 +90,8 @@
         <!-- 右侧主内容 (Unified Sheer Glass Frame) -->
         <main class="profile-main">
           <div class="profile-content-frame">
-             <!-- Section Loader (Absolute Positioned) -->
-             <GlobalLoader :loading="isLoading && loadingVariant === 'section'" variant="section" />
+             <!-- Mature Arch: No Overlay Spinner. NProgress handles the transition visual. -->
+             <!-- We just need to ensure the background remains visible. -->
 
              <!-- Phantom Watermark (Inside Frame) -->
              <div class="phantom-ambassador"></div>
@@ -145,7 +145,7 @@ useHead({
   ]
 })
 
-const { isLoading, loadingVariant } = usePageLoading() // Integrate usePageLoading
+// Mature Arch: No local loading state needed here
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()

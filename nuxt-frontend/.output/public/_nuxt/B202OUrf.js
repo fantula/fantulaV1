@@ -1,1 +1,0 @@
-import{f as e,c as o,o as t,_ as a}from"./CEI0siaN.js";const s={class:"page-placeholder"},c=e({__name:"about",setup(_){return(n,p)=>(t(),o("div",s,"关于我们页面建设中…"))}}),d=a(c,[["__scopeId","data-v-5e234de2"]]);export{d as default};
