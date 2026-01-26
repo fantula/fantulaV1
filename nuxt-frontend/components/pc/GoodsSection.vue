@@ -70,7 +70,12 @@
               <div class="stat-item rating"><span class="stat-label">好评度</span> <span class="stat-value">{{ item.rating }}%</span></div>
             </div>
              <div class="action-btn-wrap">
-               <div class="select-btn">查看详情<el-icon class="btn-icon"><ArrowRight /></el-icon></div>
+               <BaseButton themeId="marketing-buy" block class="product-action-btn">
+                 查看详情
+                 <template #icon>
+                   <el-icon class="btn-icon"><ArrowRight /></el-icon>
+                 </template>
+               </BaseButton>
              </div>
           </div>
         </div>
@@ -95,6 +100,7 @@
 
 <script setup lang="ts">
 import { ArrowRight } from '@element-plus/icons-vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 // Prop type matches the fields defined in AdminProduct for high fidelity
 interface GoodsDisplayItem {
@@ -317,29 +323,12 @@ const formatPrice = (price: number | string | undefined) => {
 .action-btn-wrap {
   margin-top: auto;
 }
-.select-btn {
-  width: 100%;
-  height: 42px;
-  box-sizing: border-box;
-  background: var(--primary-blue);
-  color: #fff;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px; /* Increased from 14px */
-  transition: all 0.4s;
-  gap: 6px;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
-}
+/* Removed .select-btn styles as replaced by BaseButton */
 
-.goods-card:hover .select-btn {
-  width: 100%;
-  height: 42px;
-  box-sizing: border-box;
+.goods-card:hover .product-action-btn {
   background: var(--active-orange) !important;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4) !important;
+  border-color: transparent;
 }
 
 .btn-icon {

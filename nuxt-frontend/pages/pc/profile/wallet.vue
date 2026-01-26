@@ -61,62 +61,70 @@
           <div 
             class="pill-tab" 
             :class="{ active: activeTab === 'all' }"
-            @click="activeTab = 'all'"
+            @click="switchTab('all')"
           >全部</div>
           <div 
             class="pill-tab income" 
             :class="{ active: activeTab === 'income' }"
-            @click="activeTab = 'income'"
+            @click="switchTab('income')"
           >获取</div>
           <div 
             class="pill-tab expense" 
             :class="{ active: activeTab === 'expense' }"
-            @click="activeTab = 'expense'"
+            @click="switchTab('expense')"
           >消耗</div>
         </div>
       </div>
 
       <!-- Glass List -->
       <div class="ledger-stream">
-        <div v-if="loading" class="stream-loading">
-           <el-skeleton animated :rows="3" />
-        </div>
+        
+        <BaseInfiniteList 
+          :loading="loading" 
+          :finished="finished"
+          :error="error" 
+          @load="loadMore"
+          :offset="100"
+        >
+          <!-- Empty State -->
+          <div v-if="displayList.length === 0 && !loading" class="stream-empty">
+             <div class="empty-bubble">
+               <el-icon><Document /></el-icon>
+             </div>
+             <span>暂无{{ activeTab === 'all' ? '' : activeTab === 'income' ? '获取' : '消耗' }}记录</span>
+          </div>
 
-        <div v-else-if="filteredTransactions.length === 0" class="stream-empty">
-           <div class="empty-bubble">
-             <el-icon><Document /></el-icon>
-           </div>
-           <span>暂无{{ activeTab === 'all' ? '' : activeTab === 'income' ? '获取' : '消耗' }}记录</span>
-        </div>
+          <!-- Stream List -->
+          <div v-else class="stream-list">
+            <transition-group name="list-fade">
+              <div 
+                v-for="(item, index) in displayList" 
+                :key="item.id" 
+                class="glass-stream-item"
+                :style="{ animationDelay: `${index * 0.05}s` }"
+              >
+                <!-- Icon -->
+                <div class="stream-icon-box" :class="getTypeClass(item.amount)">
+                  <el-icon v-if="item.amount > 0"><Top /></el-icon>
+                  <el-icon v-else><Bottom /></el-icon>
+                </div>
 
-        <div v-else class="stream-list">
-          <transition-group name="list-fade">
-            <div 
-              v-for="(item, index) in filteredTransactions" 
-              :key="item.id" 
-              class="glass-stream-item"
-              :style="{ animationDelay: `${index * 0.05}s` }"
-            >
-              <!-- Icon -->
-              <div class="stream-icon-box" :class="getTypeClass(item.amount)">
-                <el-icon v-if="item.amount > 0"><Top /></el-icon>
-                <el-icon v-else><Bottom /></el-icon>
+                <!-- Content -->
+                <div class="stream-content">
+                  <div class="stream-title">{{ item.description || item.type }}</div>
+                  <div class="stream-date">{{ formatDate(item.created_at) }}</div>
+                </div>
+
+                <!-- Amount -->
+                <div class="stream-amount" :class="getTypeClass(item.amount)">
+                  {{ item.amount > 0 ? '+' : '' }}{{ formatAmount(item.amount) }}
+                  <span class="stream-unit">点</span>
+                </div>
               </div>
+            </transition-group>
+          </div>
+        </BaseInfiniteList>
 
-              <!-- Content -->
-              <div class="stream-content">
-                <div class="stream-title">{{ item.description || item.type }}</div>
-                <div class="stream-date">{{ formatDate(item.created_at) }}</div>
-              </div>
-
-              <!-- Amount -->
-              <div class="stream-amount" :class="getTypeClass(item.amount)">
-                {{ item.amount > 0 ? '+' : '' }}{{ formatAmount(item.amount) }}
-                <span class="stream-unit">点</span>
-              </div>
-            </div>
-          </transition-group>
-        </div>
       </div>
     </div>
 
@@ -139,6 +147,8 @@ import { useRoute, useRouter } from 'vue-router'
 import WalletRechargeModal from '@/components/pc/modal/business/WalletRechargeModal.vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
+import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
+import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { Lightning, Top, Bottom, Wallet, Warning, Document } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
@@ -147,7 +157,7 @@ const router = useRouter()
 
 const showRechargeModal = ref(false)
 const balance = ref(0)
-const transactions = ref<any[]>([])
+const transactions = ref<any[]>([]) // Raw data
 const loading = ref(true)
 
 // Tabs state
@@ -156,7 +166,9 @@ const activeTab = ref<'all' | 'income' | 'expense'>('all')
 const balanceInteger = computed(() => Math.floor(balance.value).toLocaleString())
 const balanceDecimal = computed(() => (balance.value % 1).toFixed(2).split('.')[1])
 
-// Filtered Data
+// === Infinite Scroll Logic (Client Mode) ===
+
+// 1. Computed Filtered Source
 const filteredTransactions = computed(() => {
   if (activeTab.value === 'all') return transactions.value
   if (activeTab.value === 'income') return transactions.value.filter(t => t.amount > 0)
@@ -164,7 +176,12 @@ const filteredTransactions = computed(() => {
   return transactions.value
 })
 
-// Data Fetching
+// 2. Initialize Composable
+const { displayList, loading: listLoading, finished, error, loadMore, reset } = useInfiniteScroll<any>({
+    data: filteredTransactions,
+    pageSize: 10
+})
+
 const fetchWallet = async () => {
   loading.value = true
   try {
@@ -176,6 +193,18 @@ const fetchWallet = async () => {
   } finally {
     setTimeout(() => { loading.value = false }, 300) // Small delay for smooth transition
   }
+}
+
+onMounted(async () => {
+    await fetchWallet()
+    if (route.query.amount) {
+        showRechargeModal.value = true
+    }
+})
+
+const switchTab = (tab: 'all' | 'income' | 'expense') => {
+    activeTab.value = tab
+    // Auto reset by composable
 }
 
 // Helpers
@@ -201,12 +230,6 @@ const handleModalClose = () => {
     fetchWallet()
 }
 
-onMounted(async () => {
-    await fetchWallet()
-    if (route.query.amount) {
-        showRechargeModal.value = true
-    }
-})
 </script>
 
 <style scoped>

@@ -20,7 +20,7 @@
             </div>
             <div class="card-info">
                <div class="info-top">
-                  <span class="order-no">订单号 #{{ orderDetail.order_no }}</span>
+                  <span class="order-no">订单号 {{ orderDetail.order_no }}</span>
                   <span class="status-badge">{{ formatStatus(orderDetail.status) }}</span>
                </div>
                <div class="product-name">{{ orderDetail.product_snapshot?.product_name }}</div>
@@ -131,7 +131,8 @@ const formatStatus = (status: string) => {
     'pending': '处理中',
     'expired': '已过期',
     'refunding': '退款中',
-    'refunded': '已退款'
+    'refunded': '已退款',
+    'pending_delivery': '待发货'
   }
   return map[status] || status
 }

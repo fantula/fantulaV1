@@ -1,6 +1,6 @@
 <template>
   <BaseConfirmModal
-    :visible="visible"
+    :visible="true"
     title="退出登录"
     message="确定要退出当前账号吗？"
     confirm-text="确认退出"

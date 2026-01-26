@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch } from 'vue'
+import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/client/auth'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
@@ -74,7 +74,10 @@ const emit = defineEmits<{
 
 const loading = ref(false)
 const countdown = ref(0)
-const timer = ref<any>(null)
+let timerInterval: any = null
+
+const TIMER_KEY = 'otp_change_pwd_timer_end'
+const COOLDOWN_SECONDS = 300
 
 const form = reactive({
   code: '',
@@ -88,27 +91,52 @@ const canSubmit = computed(() => {
          form.newPassword === form.confirmPassword
 })
 
+const startTimer = (seconds: number, isNew = true) => {
+  countdown.value = seconds
+  if (isNew) {
+    const endTime = Date.now() + seconds * 1000
+    localStorage.setItem(TIMER_KEY, endTime.toString())
+  }
+
+  if (timerInterval) clearInterval(timerInterval)
+  timerInterval = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timerInterval)
+      localStorage.removeItem(TIMER_KEY)
+    }
+  }, 1000)
+}
+
+const restoreTimer = () => {
+  const endTimeStr = localStorage.getItem(TIMER_KEY)
+  if (endTimeStr) {
+    const endTime = parseInt(endTimeStr, 10)
+    const now = Date.now()
+    if (endTime > now) {
+      const remaining = Math.ceil((endTime - now) / 1000)
+      startTimer(remaining, false)
+    } else {
+      localStorage.removeItem(TIMER_KEY)
+    }
+  }
+}
+
 watch(() => props.visible, (val) => {
   if (val) {
     form.code = ''
     form.newPassword = ''
     form.confirmPassword = ''
-    countdown.value = 0
-    if (timer.value) clearInterval(timer.value)
+    restoreTimer()
   }
 })
+
+onMounted(() => { restoreTimer() })
+onUnmounted(() => { if (timerInterval) clearInterval(timerInterval) })
 
 const handleClose = () => {
   emit('update:visible', false)
   emit('close')
-}
-
-const startCountdown = () => {
-  countdown.value = 60
-  timer.value = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) clearInterval(timer.value)
-  }, 1000)
 }
 
 const sendCode = async () => {
@@ -117,11 +145,10 @@ const sendCode = async () => {
   
   loading.value = true
   try {
-    // 使用通用的 sendOtp，它会发送验证码到邮箱
     const res = await authApi.sendOtp(props.email)
     if (res.success) {
       ElMessage.success('验证码已发送')
-      startCountdown()
+      startTimer(COOLDOWN_SECONDS)
     } else {
       ElMessage.error(res.msg || '发送失败')
     }

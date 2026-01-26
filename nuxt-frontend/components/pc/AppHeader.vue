@@ -56,9 +56,18 @@
             />
           </div>
 
-          <!-- Favorites Icon -->
-          <div class="favorites-wrapper" @click="navigateToFavorites" id="favorites-icon-ref" title="我的收藏">
-            <el-icon :size="24" color="#E2E8F0" class="fav-icon"><Star /></el-icon>
+          <!-- Favorites Icon (Dynamic) -->
+          <div 
+            class="favorites-wrapper" 
+            :class="{ 'is-active': isPageFavorited }"
+            @click="navigateToFavorites" 
+            id="favorites-icon-ref" 
+            title="我的收藏"
+          >
+            <el-icon :size="24" class="fav-icon">
+              <StarFilled v-if="isPageFavorited" />
+              <Star v-else />
+            </el-icon>
           </div>
 
           <div class="user-info-container">
@@ -96,7 +105,9 @@ import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
 import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
 import ChannelRecognitionModal from '@/components/pc/modal/ChannelRecognitionModal.vue'
 import MiniCartPopup from '@/components/pc/cart/MiniCartPopup.vue'
-import { ShoppingCart, Star } from '@element-plus/icons-vue'
+import { ShoppingCart, Star, StarFilled } from '@element-plus/icons-vue'
+
+const isPageFavorited = useState('is-current-page-favorited', () => false)
 
 
 const modal = useModalStore()
@@ -380,7 +391,12 @@ onUnmounted(() => {
   color: var(--active-orange) !important;
   transform: scale(1.1);
 }
+.favorites-wrapper.is-active .fav-icon {
+  color: #fbbf24 !important; /* Gold */
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+}
 .fav-icon {
+  color: #E2E8F0;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 

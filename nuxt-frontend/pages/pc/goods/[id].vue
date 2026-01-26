@@ -631,6 +631,10 @@ const checkFavoriteStatus = async () => {
   const { favoriteApi } = await import('@/api/client/common')
   const res = await favoriteApi.checkFavorite(String(goodsId.value), matchedSku.value?.id)
   isFavorited.value = res.data || false
+  
+  // Sync with Global Header State
+  const globalFavState = useState('is-current-page-favorited', () => false)
+  globalFavState.value = isFavorited.value
 }
 
 // 动画 composable
@@ -661,6 +665,8 @@ const toggleFavorite = async (event: MouseEvent) => {
       const res = await favoriteApi.addFavorite(String(goodsId.value), matchedSku.value?.id)
       if (res.success) {
         isFavorited.value = true
+        // Sync Global
+        useState('is-current-page-favorited').value = true
         // 触发飞入动画
         const btnEl = event.target as HTMLElement
         // 找到按钮元素
@@ -718,6 +724,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (tickerTimer) clearInterval(tickerTimer)
+  // Reset Global Fav State
+  useState('is-current-page-favorited').value = false
 })
 </script>
 

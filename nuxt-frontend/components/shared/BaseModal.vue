@@ -22,14 +22,17 @@
         <!-- Footer Actions -->
           <div v-if="showFooter" class="base-modal-actions">
             <slot name="footer">
-              <button class="base-modal-cancel" @click="handleClose">{{ cancelText }}</button>
-              <button 
-                class="base-modal-confirm" 
+              <BaseButton themeId="secondary" @click="handleClose">
+                {{ cancelText }}
+              </BaseButton>
+              <BaseButton 
+                themeId="primary" 
                 :disabled="confirmDisabled || loading"
+                :loading="loading"
                 @click="$emit('confirm')"
               >
                 {{ loading ? loadingText : confirmText }}
-              </button>
+              </BaseButton>
             </slot>
           </div>
 
@@ -55,6 +58,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { getTheme } from '@/utils/modalThemeRegistry'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 interface Props {
   visible: boolean
@@ -344,50 +348,6 @@ const handleClose = () => {
   color: #64748B;
   margin-top: 6px;
   margin-left: 4px;
-}
-
-/* Global Modal Button Styles (Moved from Scoped) */
-.base-modal-cancel {
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.03);
-  color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.base-modal-cancel:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.base-modal-confirm {
-  padding: 12px 32px;
-  background: linear-gradient(135deg, #3B82F6, #2563eb);
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-}
-.base-modal-confirm:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
-}
-.base-modal-confirm:active { transform: scale(0.98); }
-
-.base-modal-confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  background: #334155;
 }
 </style>
 

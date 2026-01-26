@@ -36,7 +36,7 @@
         v-for="tab in tabs" 
         :key="tab.key"
         :class="['tab-item', { active: activeTab === tab.key }]"
-        @click="activeTab = tab.key"
+        @click="switchTab(tab.key)"
       >
         {{ tab.label }}
         <div class="active-indicator" v-if="activeTab === tab.key"></div>
@@ -45,18 +45,25 @@
 
     <!-- Coupon List (Scrollable Area) -->
     <div class="coupon-list-container">
-      <div class="coupon-list">
+      
+      <BaseInfiniteList 
+        :loading="loading" 
+        :finished="finished"
+        :error="error" 
+        @load="loadMore"
+        :offset="150"
+      >
         <!-- Empty State -->
-        <div v-if="filteredCoupons.length === 0" class="empty-state">
+        <div v-if="displayList.length === 0 && !loading" class="empty-state">
           <el-icon class="empty-icon"><Ticket /></el-icon>
           <div class="empty-text">暂无优惠券</div>
           <div class="empty-desc">快去兑换或参与活动获取吧~</div>
         </div>
 
         <!-- Coupon Cards -->
-        <template v-else>
+        <div v-else class="coupon-list">
           <component
-            v-for="coupon in filteredCoupons"
+            v-for="coupon in displayList"
             :key="coupon.id"
             :is="getCouponComponent(coupon.coupon.type)"
             :coupon-data="coupon"
@@ -64,8 +71,9 @@
             @click="handleCouponClick"
             @use="handleUseBalance"
           />
-        </template>
-      </div>
+        </div>
+      </BaseInfiniteList>
+
     </div>
 
     <!-- Standard Modals -->
@@ -122,6 +130,8 @@ import { ref, onMounted, computed, defineAsyncComponent } from 'vue'
 import { useUserStore } from '@/stores/client/user'
 import { useRouter } from 'vue-router'
 import { couponApi, type UserCoupon } from '@/api/client/coupon'
+import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
+import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { ElMessage } from 'element-plus'
 import { Ticket } from '@element-plus/icons-vue'
 
@@ -137,7 +147,7 @@ import CouponProduct from '@/components/pc/exchange/coupon/CouponProduct.vue'
 const userStore = useUserStore()
 const router = useRouter()
 
-const couponList = ref<UserCoupon[]>([])
+const couponList = ref<UserCoupon[]>([]) // Raw data
 const redeemCode = ref('')
 const redeeming = ref(false)
 const activeTab = ref('all')
@@ -149,17 +159,10 @@ const tabs = [
   { key: 'expired', label: '已过期' }
 ]
 
-// Data Fetching
-const fetchCoupons = async () => {
-    const res = await couponApi.getUserCoupons()
-    if (res.success && res.data) {
-        couponList.value = res.data
-    }
-}
-onMounted(fetchCoupons)
+// === Infinite Scroll Logic (Client Mode) ===
 
-// Filtering
-const filteredCoupons = computed(() => {
+// 1. Computed Filtered Source
+const filteredSource = computed(() => {
   const now = new Date()
   let list = couponList.value
 
@@ -174,6 +177,31 @@ const filteredCoupons = computed(() => {
   }
   return list
 })
+
+// 2. Composable
+const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<UserCoupon>({
+    data: filteredSource,
+    pageSize: 10
+})
+
+const fetchCoupons = async () => {
+    loading.value = true
+    try {
+        const res = await couponApi.getUserCoupons()
+        if (res.success && res.data) {
+            couponList.value = res.data
+        }
+    } finally {
+        loading.value = false
+    }
+}
+onMounted(fetchCoupons)
+
+const switchTab = (tab: string) => {
+    activeTab.value = tab
+    // Auto reset by composable
+}
+
 
 // Component Mapping
 const getCouponComponent = (type: string) => {
@@ -235,7 +263,7 @@ const confirmUseBalance = async () => {
           ElMessage.success('金额已成功存入您的钱包')
           showBalanceModal.value = false
           fetchCoupons()
-          userStore.getUserInfo()
+          userStore.fetchUserInfo()
       } else {
           ElMessage.error(res.msg || '操作失败')
       }
@@ -263,7 +291,8 @@ const confirmDelete = async () => {
       if (res.success) {
           ElMessage.success('删除成功')
           showDeleteModal.value = false
-          fetchCoupons()
+          // Need to update source data to trigger reactive update
+          couponList.value = couponList.value.filter(c => c.id !== currentCoupon.value?.id)
       } else {
           ElMessage.error(res.msg || '删除失败')
       }
@@ -364,7 +393,8 @@ const isExpired = (coupon: UserCoupon) => {
 
 /* Coupon List */
 .coupon-list-container {
-  flex: 1; overflow-y: auto; padding: 24px 32px 64px 32px; min-height: 0;
+  flex: 1; overflow-y: auto; padding: 24px 32px 0; /* Let BaseInfiniteList handle bottom spacing */
+  min-height: 0;
 }
 .coupon-list { display: flex; flex-direction: column; gap: 16px; }
 

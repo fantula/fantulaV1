@@ -13,7 +13,7 @@
         :key="cat.id"
         class="tab-item"
         :class="{ active: activeTab === cat.id }"
-        @click="activeTab = cat.id"
+        @click="switchTab(cat.id)"
       >
         {{ cat.name }}
         <div class="active-indicator" v-if="activeTab === cat.id"></div>
@@ -22,73 +22,86 @@
 
     <!-- Scrollable Content Area -->
     <div class="favorites-list-container">
-      <!-- Loading -->
-      <div v-if="loading" class="loading-grid">
-        <el-skeleton animated class="skeleton-item" v-for="i in 6" :key="i">
-          <template #template>
-            <el-skeleton-item variant="image" class="skeleton-img" />
-            <div style="padding: 14px">
-              <el-skeleton-item variant="h3" style="width: 50%" />
-              <div style="margin-top: 10px"><el-skeleton-item variant="text" style="width: 30%" /></div>
+      
+      <BaseInfiniteList 
+        :loading="loading" 
+        :finished="finished"
+        :error="error" 
+        @load="loadMore"
+        :offset="200"
+      >
+        <!-- Loading (Initial) -->
+        <template #loading>
+            <div class="loading-grid" v-if="displayList.length === 0 && loading">
+                <el-skeleton animated class="skeleton-item" v-for="i in 6" :key="i">
+                <template #template>
+                    <el-skeleton-item variant="image" class="skeleton-img" />
+                    <div style="padding: 14px">
+                    <el-skeleton-item variant="h3" style="width: 50%" />
+                    <div style="margin-top: 10px"><el-skeleton-item variant="text" style="width: 30%" /></div>
+                    </div>
+                </template>
+                </el-skeleton>
             </div>
-          </template>
-        </el-skeleton>
-      </div>
+            <!-- Default spinner for appending will be shown by BaseInfiniteList default slot -->
+        </template>
 
-      <!-- Empty State -->
-      <div v-else-if="filteredFavorites.length === 0" class="empty-state">
-        <el-icon class="empty-icon"><StarFilled /></el-icon>
-        <div class="empty-text">你还没有收藏商品</div>
-        <div class="empty-desc">去探索更多好物，填满您的收藏夹吧</div>
-        <button class="go-shopping-btn" @click="goShopping">
-          去逛逛
-          <el-icon><Right /></el-icon>
-        </button>
-      </div>
+        <!-- Empty State -->
+        <div v-if="displayList.length === 0 && !loading" class="empty-state">
+          <el-icon class="empty-icon"><StarFilled /></el-icon>
+          <div class="empty-text">你还没有收藏商品</div>
+          <div class="empty-desc">去探索更多好物，填满您的收藏夹吧</div>
+          <button class="go-shopping-btn" @click="goShopping">
+            去逛逛
+            <el-icon><Right /></el-icon>
+          </button>
+        </div>
 
-      <!-- List Grid -->
-      <div v-else class="favorites-grid">
-        <transition-group name="list">
-          <div 
-            v-for="item in filteredFavorites" 
-            :key="item.id" 
-            class="favorite-card"
-            @click="goToProduct(item.productId)"
-          >
-            <!-- Image Area (Homepage Style) -->
-            <div class="card-image-container">
-              <img :src="item.productImage" :alt="item.productName" class="product-img" />
-            </div>
-
-            <!-- Content Area -->
-            <div class="card-content">
-              <h3 class="product-title">{{ item.productName }}</h3>
-              
-              <!-- Specs -->
-              <div class="spec-row" v-if="item.specName">
-                <el-icon class="spec-icon"><Operation /></el-icon>
-                <span class="spec-text">{{ item.specName }}</span>
-              </div>
-              
-              <!-- Price -->
-              <div class="price-row">
-                <span class="amount">{{ Number(item.price).toFixed(2) }}</span>
-                <span class="unit">点</span>
+        <!-- List Grid -->
+        <div v-else class="favorites-grid">
+          <transition-group name="list">
+            <div 
+              v-for="item in displayList" 
+              :key="item.id" 
+              class="favorite-card"
+              @click="goToProduct(item.productId)"
+            >
+              <!-- Image Area (Homepage Style) -->
+              <div class="card-image-container">
+                <img :src="item.productImage" :alt="item.productName" class="product-img" />
               </div>
 
-              <!-- Actions -->
-              <div class="card-actions">
-                <button class="action-btn cancel-btn" @click.stop="removeFavorite(item.id)">
-                  取消收藏
-                </button>
-                <button class="action-btn buy-btn" @click.stop="buyNow(item)" :disabled="submitting">
-                  {{ submitting ? '处理中...' : '立即购买' }}
-                </button>
+              <!-- Content Area -->
+              <div class="card-content">
+                <h3 class="product-title">{{ item.productName }}</h3>
+                
+                <!-- Specs -->
+                <div class="spec-row" v-if="item.specName">
+                  <el-icon class="spec-icon"><Operation /></el-icon>
+                  <span class="spec-text">{{ item.specName }}</span>
+                </div>
+                
+                <!-- Price -->
+                <div class="price-row">
+                  <span class="amount">{{ Number(item.price).toFixed(2) }}</span>
+                  <span class="unit">点</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="card-actions">
+                  <button class="action-btn cancel-btn" @click.stop="removeFavorite(item.id)">
+                    取消收藏
+                  </button>
+                  <button class="action-btn buy-btn" @click.stop="goToProduct(item.productId)">
+                    立即查看
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </transition-group>
-      </div>
+          </transition-group>
+        </div>
+      </BaseInfiniteList>
+
     </div>
   </div>
 </template>
@@ -100,7 +113,7 @@ definePageMeta({
 
 /**
  * 收藏页面
- * 重构版 - 使用 clientOrderApi
+ * 重构版 - 使用 useInfiniteScroll (Client Mode)
  */
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -108,6 +121,8 @@ import { favoriteApi } from '@/api/client/common'
 import { clientOrderApi } from '@/api/client'
 import { useUserStore } from '@/stores/client/user'
 import { useModalStore } from '@/stores/client/modal'
+import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
+import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { ElMessage } from 'element-plus'
 import { StarFilled, Right, Operation } from '@element-plus/icons-vue'
 
@@ -115,31 +130,54 @@ const router = useRouter()
 const userStore = useUserStore()
 const modal = useModalStore()
 
-const loading = ref(true)
-const submitting = ref(false)
+
 const categories = ref<any[]>([])
-const favorites = ref<any[]>([])
+const allFavorites = ref<any[]>([]) // Raw data
 const activeTab = ref('all')
 
+// === Infinite Scroll Logic (Client Mode) ===
+
+// 1. Computed Filtered Source
+const filteredSource = computed(() => {
+  if (activeTab.value === 'all') return allFavorites.value
+  return allFavorites.value.filter(item => item.categoryId === activeTab.value)
+})
+
+// 2. Initialize Composable
+const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<any>({
+    data: filteredSource,
+    pageSize: 10
+})
+
 const fetchFavorites = async () => {
-  loading.value = true
+  // Manual loading state for initial fetch (composable handles subsequent loading)
+  loading.value = true 
   try {
     const res = await favoriteApi.getFavoritesData()
     if (res.success && res.data) {
       categories.value = res.data.categories
-      favorites.value = res.data.favorites
+      allFavorites.value = res.data.favorites
+      // No need to manually trigger loadMore, watcher in composable will handle it since data updated?
+      // Actually `allFavorites` update triggers `filteredSource` update which triggers watcher.
     }
   } finally {
+    // We let the composable manage loading state after initial fetch
+    // But composable.loading is for "appending".
+    // Init state:
     loading.value = false
   }
 }
 
 onMounted(fetchFavorites)
 
-const filteredFavorites = computed(() => {
-  if (activeTab.value === 'all') return favorites.value
-  return favorites.value.filter(item => item.categoryId === activeTab.value)
-})
+const switchTab = (tab: string) => {
+    activeTab.value = tab
+    // Composable watcher will handle reset, but explicit is fine too if we didn't watch
+    // Since we watch `data`, it should be auto.
+}
+
+
+// === Actions ===
 
 const goToProduct = (id: string) => {
   router.push(`/goods/${id}`)
@@ -148,48 +186,20 @@ const goToProduct = (id: string) => {
 const removeFavorite = async (favoriteId: string) => {
   const res = await favoriteApi.removeFavorite(favoriteId)
   if (res.success) {
-    favorites.value = favorites.value.filter(item => item.id !== favoriteId)
+    // Remove from source data
+    allFavorites.value = allFavorites.value.filter(item => item.id !== favoriteId)
+    // Composable watcher will see source change and might reset or re-evaluate?
+    // Resetting full list on delete is jarring. 
+    // Ideally we just remove from displayList too to avoid full reload.
+    // Client Side hack:
+    const idx = displayList.value.findIndex((i: any) => i.id === favoriteId)
+    if (idx !== -1) displayList.value.splice(idx, 1)
+    
     ElMessage.success('已取消收藏')
   }
 }
 
-const buyNow = async (item: any) => {
-  if (!userStore.isLoggedIn) {
-    modal.showLogin = true
-    return
-  }
-  if (!item.skuId) {
-    ElMessage.warning('请先选择商品规格')
-    router.push(`/goods/${item.productId}`)
-    return
-  }
-  
-  if (submitting.value) return
-  submitting.value = true
-  
-  try {
-    const result = await clientOrderApi.createPreOrder(
-      item.skuId,
-      1,
-      'buy_now'
-    )
-    
-    if (!result.success) {
-      if (result.error?.includes('DUPLICATE_ORDER') || result.error?.includes('未支付')) {
-        ElMessage.warning('您已经下过该商品的订单了')
-        router.push('/profile/orders?tab=待支付')
-        return
-      }
-      ElMessage.error(result.error || '创建订单失败')
-      return
-    }
-    router.push(`/checkout/${result.preOrderId}`)
-  } catch (e) {
-    ElMessage.error('创建订单失败')
-  } finally {
-    submitting.value = false
-  }
-}
+
 
 const goShopping = () => {
   router.push('/')
@@ -272,7 +282,7 @@ const goShopping = () => {
 .favorites-list-container {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 32px 64px 32px;
+  padding: 24px 32px 0; /* Let BaseInfiniteList handle bottom spacing */
   min-height: 0;
 }
 

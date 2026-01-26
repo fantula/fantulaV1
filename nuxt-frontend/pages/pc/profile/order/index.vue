@@ -12,7 +12,7 @@
         v-for="tab in tabs" 
         :key="tab.value"
         :class="['tab-item', { active: currentTab === tab.value }]"
-        @click="currentTab = tab.value"
+        @click="switchTab(tab.value)"
       >
         <span>{{ tab.label }}</span>
         <!-- Glow Indicator -->
@@ -23,102 +23,116 @@
     <!-- Content Area -->
     <div class="orders-scroll-area">
       <div class="orders-container">
-        <!-- Loading -->
-        <div v-if="loading" class="loading-state">
-          <div class="glass-loader"></div>
-          <p>正在加载订单...</p>
-        </div>
-
-        <!-- Empty -->
-        <div v-else-if="filteredList.length === 0" class="empty-state">
-          <div class="empty-icon-wrapper">
-            <el-icon class="empty-icon"><Box /></el-icon>
-          </div>
-          <div class="empty-text">暂无{{ getCurrentTabLabel() }}记录</div>
-          <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
-        </div>
         
-        <!-- List -->
-        <div v-else class="order-list">
-          <div 
-            v-for="item in filteredList" 
-            :key="item.id" 
-            class="order-card"
-            :class="['status-' + (item.isPending ? 'pending' : item.status)]"
-            @click="handleItemClick(item)"
-          >
-            <!-- Card Status Line (Left Border) -->
-            <div class="status-line"></div>
-
-            <!-- Card Content -->
-            <div class="card-inner">
-              <!-- Top Row: No & Status -->
-              <div class="card-header">
-                <div class="order-no-group">
-                  <span class="label">NO.</span>
-                  <span class="value">{{ item.order_no }}</span>
-                </div>
-                
-                <!-- Premium Status Pill -->
-                <div class="status-pill" :class="item.isPending ? 'pending' : item.status">
-                  <div class="dot"></div>
-                  <span>{{ item.isPending ? '待支付' : getStatusText(item.status) }}</span>
-                </div>
+        <BaseInfiniteList 
+            :loading="loading" 
+            :finished="finished"
+            :error="error" 
+            @load="loadMore"
+            :offset="200"
+        >
+          <!-- Loading (Initial) -->
+          <template #loading>
+              <div v-if="displayList.length === 0 && loading" class="loading-state">
+                <div class="glass-loader"></div>
+                <p>正在加载订单...</p>
               </div>
+          </template>
 
-              <!-- Main Row: Image & Info -->
-              <div class="card-body">
-                <div class="product-thumb">
-                  <img v-if="item.product_image" :src="item.product_image" class="thumb-img" />
-                  <div v-else class="placeholder-img"><el-icon><Picture /></el-icon></div>
-                </div>
-
-                <div class="product-info">
-                  <div class="name-row">
-                    <h3 class="product-name">{{ item.product_name }}</h3>
-                    <span class="spec-tag">{{ item.spec_text || '标准规格' }}</span>
-                  </div>
-                  
-                  <div class="price-row">
-              <div class="price">
-                <span class="amount">{{ Number(item.total_amount).toFixed(2) }}</span>
-                <span class="unit">点</span>
-              </div>
-              <div class="qty">x{{ item.quantity }}</div>
+          <!-- Empty -->
+          <div v-if="displayList.length === 0 && !loading" class="empty-state">
+            <div class="empty-icon-wrapper">
+              <el-icon class="empty-icon"><Box /></el-icon>
             </div>
-                </div>
-              </div>
-
-              <!-- Card Footer: Time & Actions -->
-              <div class="card-footer">
-                <div class="order-time">{{ formatTime(item.created_at) }}</div>
-                
-                <!-- Actions -->
-                 <div class="card-actions">
-                   <!-- 待支付: 删除/去支付 -->
-                   <template v-if="item.isPending || item.status === 'pending'">
-                      <button class="action-btn delete" @click.stop="openConfirmModal(item, true)">
-                        <el-icon><Delete /></el-icon>
-                      </button>
-                      <button class="action-btn pay" @click.stop="handleItemClick(item)">去支付</button>
-                   </template>
-
-                   <!-- 无效订单: 清理按钮 -->
-                   <template v-else-if="['expired', 'refunded', 'cancelled'].includes(item.status)">
-                      <button class="action-btn cleanup" @click.stop="openConfirmModal(item, false)">
-                         <el-icon><Delete /></el-icon> 清理记录
-                      </button>
-                   </template>
-
-                   <!-- 有效订单: 查看详情 -->
-                   <template v-else>
-                      <button class="action-btn view">查看详情 <el-icon><ArrowRight /></el-icon></button>
-                   </template>
-                 </div>
-              </div>
-            </div>
+            <div class="empty-text">暂无{{ getCurrentTabLabel() }}记录</div>
+            <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
           </div>
-        </div>
+          
+          <!-- List -->
+          <div v-else class="order-list">
+            <transition-group name="list">
+              <div 
+                v-for="item in displayList" 
+                :key="item.id" 
+                class="order-card"
+                :class="['status-' + (item.isPending ? 'pending' : item.status)]"
+                @click="handleItemClick(item)"
+              >
+                <!-- Card Status Line (Left Border) -->
+                <div class="status-line"></div>
+
+                <!-- Card Content -->
+                <div class="card-inner">
+                  <!-- Top Row: No & Status -->
+                  <div class="card-header">
+                    <div class="order-no-group">
+                      <span class="label">NO.</span>
+                      <span class="value">{{ item.order_no }}</span>
+                    </div>
+                    
+                    <!-- Premium Status Pill -->
+                    <div class="status-pill" :class="item.isPending ? 'pending' : item.status">
+                      <div class="dot"></div>
+                      <span>{{ item.isPending ? '待支付' : getStatusText(item.status) }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Main Row: Image & Info -->
+                  <div class="card-body">
+                    <div class="product-thumb">
+                      <img v-if="item.product_image" :src="item.product_image" class="thumb-img" />
+                      <div v-else class="placeholder-img"><el-icon><Picture /></el-icon></div>
+                    </div>
+
+                    <div class="product-info">
+                      <div class="name-row">
+                        <h3 class="product-name">{{ item.product_name }}</h3>
+                        <span class="spec-tag">{{ item.spec_text || '标准规格' }}</span>
+                      </div>
+                      
+                      <div class="price-row">
+                        <div class="price">
+                          <span class="amount">{{ Number(item.total_amount).toFixed(2) }}</span>
+                          <span class="unit">点</span>
+                        </div>
+                        <div class="qty">x{{ item.quantity }}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Card Footer: Time & Actions -->
+                  <div class="card-footer">
+                    <div class="order-time">{{ formatTime(item.created_at) }}</div>
+                    
+                    <!-- Actions -->
+                    <div class="card-actions">
+                      <!-- 待支付: 删除/去支付 -->
+                      <template v-if="item.isPending || item.status === 'pending'">
+                          <button class="action-btn delete" @click.stop="openConfirmModal(item, true)">
+                            <el-icon><Delete /></el-icon>
+                          </button>
+                          <button class="action-btn pay" @click.stop="handleItemClick(item)">去支付</button>
+                      </template>
+
+                      <!-- 无效订单: 清理按钮 -->
+                      <template v-else-if="['expired', 'refunded', 'cancelled'].includes(item.status)">
+                          <button class="action-btn cleanup" @click.stop="openConfirmModal(item, false)">
+                            <el-icon><Delete /></el-icon> 清理记录
+                          </button>
+                      </template>
+
+                      <!-- 有效订单: 查看详情 -->
+                      <template v-else>
+                          <button class="action-btn view">查看详情 <el-icon><ArrowRight /></el-icon></button>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </transition-group>
+          </div>
+        </BaseInfiniteList>
+
       </div>
     </div>
 
@@ -148,6 +162,7 @@
 /**
  * 我的订单页面 (Premium Refactor)
  * 2026-01-21: 视觉升级 & 无效订单拦截逻辑
+ * 2026-01-26: 集成 useInfiniteScroll (Client Mode)
  * 优化: 使用 BaseModal 替代 ElMessageBox，限制最大宽度
  */
 import { onMounted, ref, computed } from 'vue'
@@ -155,6 +170,8 @@ import { useRouter } from 'vue-router'
 import { Box, Picture, Delete, ArrowRight, Warning } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useOrderList } from '@/composables/client/useOrderList'
+import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
+import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import BaseModal from '@/components/shared/BaseModal.vue'
 
 definePageMeta({
@@ -163,7 +180,7 @@ definePageMeta({
 const router = useRouter()
 
 const {
-  loading,
+  loading: listLoading, // Rename because useInfiniteScroll has 'loading'
   filteredList,
   currentTab,
   tabs,
@@ -176,10 +193,26 @@ const {
   getOrderStatusLabel
 } = useOrderList()
 
-// --- Lifecycle ---
-onMounted(() => {
-  loadList()
+// === Infinite Scroll Logic (Client Mode) ===
+
+// 1. Initialize Composable
+// The source data is 'filteredList' from useOrderList composable
+const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<any>({
+    data: filteredList,
+    pageSize: 10
 })
+
+// 2. Integration
+onMounted(async () => {
+  // Let legacy composable fetch data first
+  await loadList()
+  // Data update will trigger filteredList change, which triggers composable watch -> reset -> load first page
+})
+
+const switchTab = (tabValue: string) => {
+    changeTab(tabValue)
+    // Composable should auto-reset because filteredList changes
+}
 
 // --- Methods ---
 const getStatusText = (status: string) => getOrderStatusLabel(status)
@@ -234,6 +267,7 @@ const handleConfirmDelete = async () => {
       if (success) {
         ElMessage.success('订单已取消')
         confirmModalVisible.value = false
+        // Data update done in useOrderList, filteredList updates, composable auto-updates
       } else {
         ElMessage.error('操作失败')
       }

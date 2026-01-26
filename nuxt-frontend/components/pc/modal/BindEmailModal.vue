@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch } from 'vue'
+import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/client/auth'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
@@ -100,7 +100,10 @@ const emit = defineEmits<{
 const step = ref(1)
 const loading = ref(false)
 const countdown = ref(0)
-const timer = ref<any>(null)
+let timerInterval: any = null
+
+const TIMER_KEY = 'otp_bind_email_timer_end'
+const COOLDOWN_SECONDS = 300
 
 // 旧邮箱验证码
 const oldCode = ref('')
@@ -120,39 +123,71 @@ const canSubmit = computed(() => {
   return isEmailValid.value && form.code.length >= 4
 })
 
+const startTimer = (seconds: number, isNew = true) => {
+  countdown.value = seconds
+  if (isNew) {
+    const endTime = Date.now() + seconds * 1000
+    localStorage.setItem(TIMER_KEY, endTime.toString())
+  }
+
+  if (timerInterval) clearInterval(timerInterval)
+  timerInterval = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timerInterval)
+      localStorage.removeItem(TIMER_KEY)
+    }
+  }, 1000)
+}
+
+const restoreTimer = () => {
+  const endTimeStr = localStorage.getItem(TIMER_KEY)
+  if (endTimeStr) {
+    const endTime = parseInt(endTimeStr, 10)
+    const now = Date.now()
+    if (endTime > now) {
+      const remaining = Math.ceil((endTime - now) / 1000)
+      startTimer(remaining, false)
+    } else {
+      localStorage.removeItem(TIMER_KEY)
+    }
+  }
+}
+
 watch(() => props.visible, (val) => {
   if (val) {
     step.value = props.currentEmail ? 1 : 2
     oldCode.value = ''
     form.email = ''
     form.code = ''
-    countdown.value = 0
-    if (timer.value) clearInterval(timer.value)
+    restoreTimer()
+  } else {
+    // Clear timer on close if desired, BUT user asked for standard logic like DeleteAccount
+    // DeleteAccount maintains timer even if closed? 
+    // Usually persistence means it survives close/refresh.
+    // So we DON'T clear it here.
   }
 })
+
+onMounted(() => { restoreTimer() })
+onUnmounted(() => { if (timerInterval) clearInterval(timerInterval) })
 
 const handleClose = () => {
   emit('update:visible', false)
   emit('close')
 }
 
-const startCountdown = () => {
-  countdown.value = 60
-  timer.value = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) clearInterval(timer.value)
-  }, 1000)
-}
-
 // 发送旧邮箱验证码
 const sendOldCode = async () => {
   if (!props.currentEmail) return
+  if (countdown.value > 0) return
+
   loading.value = true
   try {
     const res = await authApi.sendOtp(props.currentEmail)
     if (res.success) {
       ElMessage.success('验证码已发送到当前邮箱')
-      startCountdown()
+      startTimer(COOLDOWN_SECONDS)
     } else {
       ElMessage.error(res.msg || '发送失败')
     }
@@ -172,8 +207,20 @@ const verifyOldEmail = async () => {
     if (res.success) {
       ElMessage.success('当前邮箱验证通过')
       step.value = 2
-      countdown.value = 0 // Reset countdown for next step
-      if (timer.value) clearInterval(timer.value)
+      // Reset logic for step 2? 
+      // Usually verification codes are separate. 
+      // If we use the SAME timer for both steps, it's confusing.
+      // But typically "Send Code" is one global throttling action.
+      // Let's assume the timer applies to ANY code sending action for this modal context.
+      // Or we should clear it? 
+      // If step 2 requires sending a NEW code to NEW email, we should probably allow it?
+      // Logic: Changing target email usually resets throttle or has separate throttle.
+      // For simplicity and user request "like DeleteAccount", let's keep it shared or reset if logical.
+      // Step 2 needs code for NEW email. 
+      // Let's reset timer for Step 2 so user can send code to new email immediately.
+      clearInterval(timerInterval)
+      localStorage.removeItem(TIMER_KEY)
+      countdown.value = 0
     } else {
       ElMessage.error(res.msg || '验证码错误')
     }
@@ -187,6 +234,7 @@ const verifyOldEmail = async () => {
 // 发送新邮箱验证码
 const sendNewCode = async () => {
   if (!isEmailValid.value) return
+  if (countdown.value > 0) return
   
   // 检查邮箱是否已被占用
   try {
@@ -196,7 +244,7 @@ const sendNewCode = async () => {
       return
     }
   } catch (e) {
-    // ignore or handle? proceed to try sending code anyway usually safest but user wanted check
+    // ignore
   }
 
   loading.value = true
@@ -204,7 +252,7 @@ const sendNewCode = async () => {
     const res = await authApi.sendOtp(form.email)
     if (res.success) {
       ElMessage.success('验证码已发送到新邮箱')
-      startCountdown()
+      startTimer(COOLDOWN_SECONDS)
     } else {
       ElMessage.error(res.msg || '发送失败')
     }

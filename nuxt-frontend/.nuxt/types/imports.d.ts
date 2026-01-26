@@ -3,8 +3,10 @@ export {}
 declare global {
   const AVATAR_CONFIG: typeof import('../../utils/constants').AVATAR_CONFIG
   const ApiErrorHandler: typeof import('../../utils/error-handler').ApiErrorHandler
+  const BUTTON_THEMES: typeof import('../../utils/buttonThemeRegistry').BUTTON_THEMES
   const CLIENT_MESSAGES: typeof import('../../utils/clientMessages').CLIENT_MESSAGES
   const DEFAULT_AVATAR: typeof import('../../utils/constants').DEFAULT_AVATAR
+  const DEFAULT_BUTTON_THEME_ID: typeof import('../../utils/buttonThemeRegistry').DEFAULT_BUTTON_THEME_ID
   const DEFAULT_THEME_ID: typeof import('../../utils/modalThemeRegistry').DEFAULT_THEME_ID
   const EDGE_FUNCTIONS_URL: typeof import('../../utils/supabase').EDGE_FUNCTIONS_URL
   const ElIconAddLocation: typeof import('../../node_modules/@element-plus/icons-vue/dist/index').AddLocation
@@ -344,6 +346,7 @@ declare global {
   const getAdminSupabaseClient: typeof import('../../utils/supabase-admin').getAdminSupabaseClient
   const getAppManifest: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getAppManifest
   const getAuthToken: typeof import('../../utils/supabase').getAuthToken
+  const getButtonTheme: typeof import('../../utils/buttonThemeRegistry').getButtonTheme
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getRouteRules: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getRouteRules
@@ -460,6 +463,7 @@ declare global {
   const useHttp: typeof import('../../composables/shared/useHttp').useHttp
   const useHydration: typeof import('../../node_modules/nuxt/dist/app/composables/hydrate').useHydration
   const useId: typeof import('vue').useId
+  const useInfiniteScroll: typeof import('../../composables/client/useInfiniteScroll').useInfiniteScroll
   const useLazyAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useLazyAsyncData
   const useLazyFetch: typeof import('../../node_modules/nuxt/dist/app/composables/fetch').useLazyFetch
   const useLink: typeof import('vue-router').useLink
@@ -543,6 +547,9 @@ declare global {
   export type { Component, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
   // @ts-ignore
+  export type { ButtonTheme } from '../../utils/buttonThemeRegistry'
+  import('../../utils/buttonThemeRegistry')
+  // @ts-ignore
   export type { ApiErrorHandler, ErrorHandler, ErrorInfo } from '../../utils/error-handler'
   import('../../utils/error-handler')
   // @ts-ignore
@@ -570,8 +577,10 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     readonly AVATAR_CONFIG: UnwrapRef<typeof import('../../utils/constants')['AVATAR_CONFIG']>
     readonly ApiErrorHandler: UnwrapRef<typeof import('../../utils/error-handler')['ApiErrorHandler']>
+    readonly BUTTON_THEMES: UnwrapRef<typeof import('../../utils/buttonThemeRegistry')['BUTTON_THEMES']>
     readonly CLIENT_MESSAGES: UnwrapRef<typeof import('../../utils/clientMessages')['CLIENT_MESSAGES']>
     readonly DEFAULT_AVATAR: UnwrapRef<typeof import('../../utils/constants')['DEFAULT_AVATAR']>
+    readonly DEFAULT_BUTTON_THEME_ID: UnwrapRef<typeof import('../../utils/buttonThemeRegistry')['DEFAULT_BUTTON_THEME_ID']>
     readonly DEFAULT_THEME_ID: UnwrapRef<typeof import('../../utils/modalThemeRegistry')['DEFAULT_THEME_ID']>
     readonly EDGE_FUNCTIONS_URL: UnwrapRef<typeof import('../../utils/supabase')['EDGE_FUNCTIONS_URL']>
     readonly ElIconAddLocation: UnwrapRef<typeof import('../../node_modules/@element-plus/icons-vue/dist/index')['AddLocation']>
@@ -911,6 +920,7 @@ declare module 'vue' {
     readonly getAdminSupabaseClient: UnwrapRef<typeof import('../../utils/supabase-admin')['getAdminSupabaseClient']>
     readonly getAppManifest: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']>
     readonly getAuthToken: UnwrapRef<typeof import('../../utils/supabase')['getAuthToken']>
+    readonly getButtonTheme: UnwrapRef<typeof import('../../utils/buttonThemeRegistry')['getButtonTheme']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
@@ -1027,6 +1037,7 @@ declare module 'vue' {
     readonly useHttp: UnwrapRef<typeof import('../../composables/shared/useHttp')['useHttp']>
     readonly useHydration: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/hydrate')['useHydration']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
+    readonly useInfiniteScroll: UnwrapRef<typeof import('../../composables/client/useInfiniteScroll')['useInfiniteScroll']>
     readonly useLazyAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useLazyAsyncData']>
     readonly useLazyFetch: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/fetch')['useLazyFetch']>
     readonly useLink: UnwrapRef<typeof import('vue-router')['useLink']>
