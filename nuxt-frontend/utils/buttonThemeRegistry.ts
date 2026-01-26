@@ -10,6 +10,15 @@ export const BUTTON_THEMES: Record<string, ButtonTheme> = {
         id: 'primary',
         variantClass: 'btn-primary'
     },
+    // [Suite 001] Classic Phantom - Neon Glass
+    'suit-001-primary': {
+        id: 'suit-001-primary',
+        variantClass: 'btn-suit-001-primary'
+    },
+    'suit-001-secondary': {
+        id: 'suit-001-secondary',
+        variantClass: 'btn-suit-001-secondary'
+    },
     // [Secondary] Ghost/Outline (Cancel, Back)
     'secondary': {
         id: 'secondary',

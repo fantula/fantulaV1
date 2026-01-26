@@ -6,6 +6,8 @@
     submit-text="保存修改"
     :loading="loading"
     :submit-disabled="!hasChange"
+    confirm-theme-id="suit-001-primary"
+    cancel-theme-id="suit-001-secondary"
     @close="handleClose"
     @submit="handleConfirm"
   >

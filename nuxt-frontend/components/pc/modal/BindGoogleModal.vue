@@ -4,6 +4,8 @@
     title="绑定谷歌邮箱"
     :show-footer="false"
     theme-id="suit-001"
+    confirm-theme-id="suit-001-primary"
+    cancel-theme-id="suit-001-secondary"
     @close="$emit('close')"
     @update:visible="$emit('update:visible', $event)"
   >

@@ -135,6 +135,34 @@ const handleClick = (e: MouseEvent) => {
 }
 .btn-primary:active { transform: scale(0.98); }
 
+/* [Suite 001] Classic Phantom - Neon Glass */
+.btn-suit-001-primary {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60A5FA; /* Brighter Blue */
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.1), inset 0 0 10px rgba(59, 130, 246, 0.05);
+  backdrop-filter: blur(4px);
+  text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+.btn-suit-001-primary:not(.is-disabled):hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #fff; /* White on hover */
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1);
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+}
+
+.btn-suit-001-secondary {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #64748B;
+}
+.btn-suit-001-secondary:not(.is-disabled):hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #94A3B8;
+}
+
 /* [Secondary] - Ghost/Glass */
 .btn-secondary {
   background: rgba(255, 255, 255, 0.03);

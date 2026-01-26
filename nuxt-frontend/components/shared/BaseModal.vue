@@ -22,11 +22,11 @@
         <!-- Footer Actions -->
           <div v-if="showFooter" class="base-modal-actions">
             <slot name="footer">
-              <BaseButton themeId="secondary" @click="handleClose">
+              <BaseButton :themeId="cancelThemeId" @click="handleClose">
                 {{ cancelText }}
               </BaseButton>
               <BaseButton 
-                themeId="primary" 
+                :themeId="confirmThemeId" 
                 :disabled="confirmDisabled || loading"
                 :loading="loading"
                 @click="$emit('confirm')"
@@ -73,6 +73,9 @@ interface Props {
   loading?: boolean
   // Theme ID replaces manual configuration
   themeId?: string 
+  // Button overrides
+  confirmThemeId?: string
+  cancelThemeId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -84,7 +87,9 @@ const props = withDefaults(defineProps<Props>(), {
   loadingText: '处理中...',
   confirmDisabled: false,
   loading: false,
-  themeId: 'suit-001' // Default Suit
+  themeId: 'suit-001', // Default Suit
+  confirmThemeId: 'primary',
+  cancelThemeId: 'secondary'
 })
 
 const currentTheme = computed(() => getTheme(props.themeId))

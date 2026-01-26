@@ -6,6 +6,8 @@
     submit-text="确认绑定"
     :loading="loading"
     :submit-disabled="!canSubmit"
+    confirm-theme-id="suit-001-primary"
+    cancel-theme-id="suit-001-secondary"
     @close="handleClose"
     @submit="handleConfirm"
   >

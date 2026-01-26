@@ -10,6 +10,8 @@
     :loading="loading"
     :confirm-disabled="submitDisabled"
     :theme-id="themeId"
+    :confirm-theme-id="confirmThemeId"
+    :cancel-theme-id="cancelThemeId"
     @close="handleClose"
     @confirm="handleSubmit"
   >
@@ -47,6 +49,8 @@ const props = withDefaults(defineProps<{
   submitDisabled?: boolean
   showFooter?: boolean
   themeId?: string
+  confirmThemeId?: string
+  cancelThemeId?: string
 }>(), {
   title: '表单',
   width: '500px', // Standard Form Width
@@ -55,7 +59,9 @@ const props = withDefaults(defineProps<{
   loading: false,
   submitDisabled: false,
   showFooter: true,
-  themeId: 'suit-001'
+  themeId: 'suit-001',
+  confirmThemeId: 'primary',
+  cancelThemeId: 'secondary'
 })
 
 const emit = defineEmits<{

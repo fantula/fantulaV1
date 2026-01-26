@@ -1,5 +1,10 @@
 <template>
   <div class="mobile-layout">
+    <!-- Particle Background (PC Style) -->
+    <ClientOnly>
+      <ParticleBackground />
+    </ClientOnly>
+
     <!-- Main Content Area -->
     <main class="mobile-content">
       <slot />
@@ -13,6 +18,7 @@
 <script setup lang="ts">
 import '@/assets/styles/mobile.css'
 import MobileTabBar from '@/components/mobile/MobileTabBar.vue'
+import ParticleBackground from '@/components/pc/ParticleBackground.vue'
 import { onMounted } from 'vue'
 
 // Set mobile-specific meta
@@ -30,9 +36,10 @@ useHead({
 <style scoped>
 .mobile-layout {
   min-height: 100vh;
-  background: #0F172A; /* Global Dark Background */
+  /* background: #0F172A; Removed to show ParticleBackground */
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .mobile-content {
@@ -40,5 +47,8 @@ useHead({
   padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* Add space for fixed tab bar */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  /* Ensure content is above background */
+  position: relative; 
+  z-index: 1;
 }
 </style>
