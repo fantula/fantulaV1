@@ -72,7 +72,7 @@
             v-for="item in currentGoods" 
             :key="item.id" 
             class="goods-card-row"
-            @click="router.push(`/goods/${item.id}`)"
+            @click="openDetail(item.id)"
           >
             <!-- Left: Image -->
             <div class="goods-thumb">
@@ -125,6 +125,12 @@
       <div class="tab-bar-spacer"></div>
 
     </div>
+
+    <!-- Detail Sheet -->
+    <ProductDetailSheet 
+      v-model:visible="showDetailSheet" 
+      :goods-id="selectedGoodsId" 
+    />
   </div>
 </template>
 
@@ -137,6 +143,7 @@ import { goodsApi } from '@/api/client/goods'
 import { useSimpleCache } from '@/composables/shared/useSimpleCache'
 import { usePageLoading } from '@/composables/usePageLoading'
 import type { Banner, Goods, GoodsCategory } from '@/types/api'
+import ProductDetailSheet from '@/components/mobile/goods/ProductDetailSheet.vue'
 
 definePageMeta({
   layout: 'mobile'
@@ -159,6 +166,15 @@ const scrollThreshold = 10;
 const isBannerCollapsed = ref(false)
 const categoryScrollRef = ref<HTMLElement | null>(null)
 const categoryItemRefs = ref<HTMLElement[]>([])
+
+// Sheet State
+const showDetailSheet = ref(false)
+const selectedGoodsId = ref<string | number>('')
+
+const openDetail = (id: string | number) => {
+    selectedGoodsId.value = id
+    showDetailSheet.value = true
+}
 
 // Helper: Parse Tags
 const parseTags = (tags: string | string[] | undefined): string[] => {
