@@ -1,0 +1,130 @@
+<template>
+  <div class="mobile-favorites-page">
+     <div class="page-header">
+       <div class="back-btn" @click="router.back()">
+         <el-icon><ArrowLeft /></el-icon>
+       </div>
+       <div class="title">我的收藏</div>
+       <div class="placeholder"></div>
+    </div>
+
+    <div class="fav-container">
+        <div v-if="loading" class="loading-state">Loading...</div>
+        <div v-else-if="favorites.length === 0" class="empty-state">
+             <el-icon class="empty-icon"><Star /></el-icon>
+             <p>暂无收藏</p>
+        </div>
+        <div v-else class="fav-grid">
+            <div 
+              v-for="item in favorites" 
+              :key="item.id" 
+              class="fav-card"
+              @click="goToDetail(item.id)"
+            >
+                <div class="thumb">
+                    <img :src="item.image || item.coverImage || '/images/placeholder.png'" />
+                    <div class="remove-btn" @click.stop="removeFav(item.id)">
+                        <el-icon><Delete /></el-icon>
+                    </div>
+                </div>
+                <div class="info">
+                    <div class="title">{{ item.name || item.title }}</div>
+                    <div class="price">
+                        <span class="val">{{ item.price || '0.00' }}</span>
+                        <span class="unit">点</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ArrowLeft, Star, Delete } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/client/user'
+import { goodsApi } from '@/api/client/goods'
+import { ElMessage } from 'element-plus'
+
+definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
+
+const router = useRouter()
+const userStore = useUserStore()
+const loading = ref(false)
+
+const favorites = computed(() => userStore.favorites || [])
+
+const goToDetail = (goodsId: string) => {
+    // Mobile detail is a sheet, this might need a different approach if we want to 
+    // open the sheet from a different page. 
+    // Ideally, we navigate to home with query or just open a page if we weren't using a sheet.
+    // Given the sheet architecture, maybe just navigate to home page? 
+    // Or for now, navigate to home implies we lose the detail link.
+    // Implementation Plan didn't specify, but I'll assume we can pass query to home to open sheet.
+    // router.push({ path: '/mobile', query: { goodsId } }) -> Index would need to handle this.
+    // For now, let's just assume we want to view it.
+    router.push({ path: '/mobile', query: { open: goodsId } })
+}
+
+const removeFav = async (id: string) => {
+    try {
+        const res = await goodsApi.toggleFavorite(id as any) // Type inconsistency in api sometimes
+        if (res.success) {
+            ElMessage.success('已取消收藏')
+            userStore.loadFavorites() // Reload
+        }
+    } catch(e) { ElMessage.error('操作失败') }
+}
+
+onMounted(() => {
+    if (userStore.isLoggedIn) {
+        loading.value = true
+        userStore.loadFavorites().finally(() => loading.value = false)
+    }
+})
+</script>
+
+<style scoped>
+.mobile-favorites-page { min-height: 100vh; display: flex; flex-direction: column; }
+.page-header {
+    height: 50px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 100;
+}
+.back-btn { color: #fff; font-size: 20px; }
+.title { color: #fff; font-weight: 700; font-size: 17px; }
+.placeholder { width: 20px; }
+
+.fav-container { padding: 16px; flex: 1; }
+.empty-state { text-align: center; color: #64748B; padding-top: 50px; }
+.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+
+.fav-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+}
+.fav-card {
+    background: rgba(30, 41, 59, 0.4); border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.thumb {
+    height: 140px; position: relative; background: #1E293B;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.remove-btn {
+    position: absolute; top: 8px; right: 8px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(0,0,0,0.5); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.info { padding: 10px; }
+.title {
+    font-size: 13px; color: #fff; margin-bottom: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.price { display: flex; align-items: baseline; gap: 2px; color: #F97316; }
+.val { font-size: 16px; font-weight: 700; }
+.unit { font-size: 11px; }
+</style>

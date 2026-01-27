@@ -57,6 +57,24 @@ export const useUserStore = defineStore('user', () => {
   const ordersKey = 'user_orders'
 
   // ... (keep defaultOrders) ...
+  // ... (keep defaultOrders) ...
+  const transactions = ref<any[]>([])
+
+  const fetchWalletData = async () => {
+    try {
+      const res = await authApi.getWalletData()
+      if (res.success && res.data) {
+        // Update balance if returned (optional, depends on API)
+        if (res.data.balance !== undefined && user.value) {
+          user.value.balance = res.data.balance
+        }
+        transactions.value = res.data.transactions || []
+      }
+    } catch (e) {
+      console.error('Fetch wallet data failed', e)
+    }
+  }
+
   const defaultOrders: OrderItem[] = [
     // ... (keep default orders content) ...
     {
@@ -598,6 +616,10 @@ export const useUserStore = defineStore('user', () => {
     getFavorites,
     clearFavorites,
     loadFavorites,
+
+    // 额度变动相关
+    transactions: readonly(transactions),
+    fetchWalletData,
 
     // 订单相关方法
     addOrder,

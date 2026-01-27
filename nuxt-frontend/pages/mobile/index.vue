@@ -3,11 +3,17 @@
     <!-- Header -->
     <header class="mobile-header" :class="{ 'is-scrolled': isScrolled }">
       <div class="logo-area">
-        <!-- Use an Icon or Image here if available, defaulting to Text with premium font -->
-        <span class="logo-text">FANTULA</span>
+         <span class="logo-text">FANTULA</span>
       </div>
       <div class="header-actions">
-        <!-- Removed Search as requested -->
+         <template v-if="!userStore.isLoggedIn">
+            <button class="login-btn-header" @click="showLoginSheet = true">登录</button>
+         </template>
+         <template v-else>
+            <div class="header-avatar" @click="router.push('/mobile/profile')">
+               <img :src="userStore.user?.avatar || '/images/default-avatar.png'" />
+            </div>
+         </template>
       </div>
     </header>
 
@@ -19,13 +25,14 @@
         <!-- Collapsed Placeholder (Show when hidden) -->
         <div v-if="isBannerCollapsed" class="banner-placeholder-strip" @click="isBannerCollapsed = false">
              <span class="placeholder-text">展开轮播图</span>
-             <el-icon><ArrowDown /></el-icon>
+             <el-icon><ArrowDown></ArrowDown></el-icon>
         </div>
 
         <!-- Main Banner Wrapper (Hidden when collapsed) -->
         <div v-else class="banner-outer-container" @click="handleBannerClick">
           <div class="banner-gradient-border"></div>
           <div class="banner-inner-content">
+             <!-- Carousel -->
              <div class="banner-carousel" v-if="banners.length > 0">
                 <div 
                   v-for="banner in banners" 
@@ -126,32 +133,41 @@
 
     </div>
 
-    <!-- Detail Sheet -->
+    <!-- Sheets -->
     <ProductDetailSheet 
       v-model:visible="showDetailSheet" 
       :goods-id="selectedGoodsId" 
-    />
+    ></ProductDetailSheet>
+    
+    <MobileLoginSheet 
+      :visible="showLoginSheet" 
+      @close="showLoginSheet = false" 
+    ></MobileLoginSheet>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Plus, ArrowDown } from '@element-plus/icons-vue' 
+import { Plus, ArrowDown, Search } from '@element-plus/icons-vue' 
 import { commonApi } from '@/api/client/common'
 import { goodsApi } from '@/api/client/goods'
 import { useSimpleCache } from '@/composables/shared/useSimpleCache'
 import { usePageLoading } from '@/composables/usePageLoading'
+import { useUserStore } from '@/stores/client/user'
 import type { Banner, Goods, GoodsCategory } from '@/types/api'
 import ProductDetailSheet from '@/components/mobile/goods/ProductDetailSheet.vue'
+import MobileLoginSheet from '@/components/mobile/auth/MobileLoginSheet.vue'
 
 definePageMeta({
   layout: 'mobile'
 })
 
 const router = useRouter()
+const route = useRoute()
+const userStore = useUserStore()
 const { getCache, setCache } = useSimpleCache()
-const { startLoading, stopLoading } = usePageLoading()
+const { loading: pageLoading, startLoading, stopLoading } = usePageLoading()
 
 // State
 const banners = ref<Banner[]>([])
@@ -169,8 +185,10 @@ const categoryItemRefs = ref<HTMLElement[]>([])
 
 // Sheet State
 const showDetailSheet = ref(false)
+const showLoginSheet = ref(false)
 const selectedGoodsId = ref<string | number>('')
 
+// Interactions
 const openDetail = (id: string | number) => {
     selectedGoodsId.value = id
     showDetailSheet.value = true
@@ -306,22 +324,27 @@ const handleScroll = (e: Event) => {
 
 // Init
 onMounted(async () => {
-  startLoading('initial')
-
-  await Promise.all([
-      fetchBanners(),
-      fetchCategories().then(id => {
-          if (id) {
-              activeCategoryId.value = id
-              centerActiveCategory(id) // Center initial
-              return fetchGoods(id)
-          }
-      })
-  ])
-
-  setTimeout(() => {
-    stopLoading()
-  }, 500)
+    startLoading('initial')
+    try {
+        await Promise.all([
+          fetchBanners(),
+          fetchCategories().then(id => {
+              if (id) {
+                  activeCategoryId.value = id
+                  centerActiveCategory(id) // Center initial
+                  return fetchGoods(id)
+              }
+          })
+        ])
+        
+        // Handle open param
+        if (route.query.open) {
+            openDetail(route.query.open as string)
+            router.replace({ query: { ...route.query, open: undefined } })
+        }
+    } finally {
+        setTimeout(() => stopLoading(), 500)
+    }
 })
 </script>
 
@@ -358,15 +381,23 @@ onMounted(async () => {
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.logo-text { 
-    font-weight: 900; 
-    font-size: 22px; 
-    letter-spacing: -1px; 
-    background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+.logo-text {
+  font-family: 'DIN Alternates', sans-serif;
+  font-weight: 700; font-size: 20px; letter-spacing: 1px;
+  background: linear-gradient(90deg, #fff, #94A3B8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
+
+.login-btn-header {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; font-size: 12px; font-weight: 600; padding: 6px 14px;
+  border-radius: 20px; backdrop-filter: blur(4px);
+}
+.header-avatar {
+  width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.header-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 /* Scroll Area */
 .content-scroll {

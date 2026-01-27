@@ -11,7 +11,7 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <MobileTabBar />
+    <MobileTabBar v-if="!route.meta.hideTabBar" />
   </div>
 </template>
 
@@ -19,7 +19,10 @@
 import '@/assets/styles/mobile.css'
 import MobileTabBar from '@/components/mobile/MobileTabBar.vue'
 import ParticleBackground from '@/components/pc/ParticleBackground.vue'
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 // Set mobile-specific meta
 useHead({
@@ -44,7 +47,7 @@ useHead({
 
 .mobile-content {
   flex: 1;
-  padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* Add space for fixed tab bar */
+  padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* Default space */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
   /* Ensure content is above background */
