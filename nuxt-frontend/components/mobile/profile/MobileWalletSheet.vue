@@ -41,7 +41,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   visible: boolean
-  transactions: any[]
+  transactions: any[] | readonly any[]
   loading?: boolean
 }>()
 

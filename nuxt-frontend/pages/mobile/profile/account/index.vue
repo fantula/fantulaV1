@@ -26,7 +26,7 @@
        </div>
 
        <!-- Nickname Section -->
-       <div class="setting-item" @click="openNicknameEdit">
+       <div class="setting-item" @click="activeModal = 'nickname'">
           <span class="label">昵称</span>
           <div class="value-wrap">
              <span class="text-val">{{ userStore.user?.nickName || userStore.user?.nickname || '未设置' }}</span>
@@ -38,14 +38,36 @@
        <div class="setting-item">
           <span class="label">UID</span>
           <div class="value-wrap">
-             <span class="text-val muted">{{ userStore.user?.uid || userStore.user?.id?.slice(0,8) || '---' }}</span>
+             <span class="text-val muted">{{ userStore.user?.uid || userStore.user?.id?.toString().slice(0,8) || '---' }}</span>
           </div>
        </div>
 
-       <div class="setting-item">
+       <div class="divider"></div>
+
+       <!-- Security Section -->
+       <div class="setting-item" @click="activeModal = 'email'">
           <span class="label">邮箱</span>
           <div class="value-wrap">
-             <span class="text-val muted">{{ userStore.user?.email }}</span>
+             <span class="text-val">{{ userStore.user?.email }}</span>
+             <el-icon class="arrow"><ArrowRight /></el-icon>
+          </div>
+       </div>
+
+       <div class="setting-item" @click="activeModal = 'password'">
+          <span class="label">登录密码</span>
+          <div class="value-wrap">
+             <span class="text-val muted">修改</span>
+             <el-icon class="arrow"><ArrowRight /></el-icon>
+          </div>
+       </div>
+
+       <div class="divider"></div>
+
+       <!-- Danger Zone -->
+       <div class="setting-item" @click="activeModal = 'delete'">
+          <span class="label text-danger">注销账号</span>
+          <div class="value-wrap">
+             <el-icon class="arrow"><ArrowRight /></el-icon>
           </div>
        </div>
 
@@ -55,20 +77,30 @@
        </div>
     </div>
 
-    <!-- Nickname Dialog -->
-    <div class="dialog-overlay" v-if="showNicknameDialog" @click.self="showNicknameDialog = false">
-        <div class="dialog-box">
-            <div class="dialog-title">修改昵称</div>
-            <input v-model="newNickname" class="dialog-input" placeholder="请输入新昵称" />
-            <div class="dialog-footer">
-                <button class="btn cancel" @click="showNicknameDialog = false">取消</button>
-                <button class="btn confirm" @click="confirmNickname" :disabled="loading">
-                    <span v-if="loading">...</span>
-                    <span v-else>保存</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Modals -->
+    <EditNicknameModal 
+        :visible="activeModal === 'nickname'"
+        :current-nickname="userStore.user?.nickName"
+        @close="activeModal = null"
+        @success="handleSuccess('昵称已更新')"
+    />
+
+    <ChangePasswordModal 
+        :visible="activeModal === 'password'"
+        @close="activeModal = null"
+        @success="handleSuccess('密码已修改')"
+    />
+
+    <ChangeEmailModal 
+        :visible="activeModal === 'email'"
+        @close="activeModal = null"
+        @success="handleSuccess('请查收确认邮件')"
+    />
+
+    <DeleteAccountModal 
+        :visible="activeModal === 'delete'"
+        @close="activeModal = null"
+    />
 
   </div>
 </template>
@@ -80,8 +112,14 @@ import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { commonApi } from '@/api/client/common'
 import { clientUserApi } from '@/api/client/user'
-import { authApi } from '@/api/client/auth'
+import { authApi } from '@/api/client/auth' // Add missing authApi import if not present
 import { ElMessage } from 'element-plus'
+
+// Modal Imports
+import EditNicknameModal from '@/components/mobile/profile/modals/EditNicknameModal.vue'
+import ChangePasswordModal from '@/components/mobile/profile/modals/ChangePasswordModal.vue'
+import ChangeEmailModal from '@/components/mobile/profile/modals/ChangeEmailModal.vue'
+import DeleteAccountModal from '@/components/mobile/profile/modals/DeleteAccountModal.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -93,9 +131,7 @@ const userStore = useUserStore()
 const fileInput = ref<HTMLInputElement | null>(null)
 const loading = ref(false)
 
-// Nickname State
-const showNicknameDialog = ref(false)
-const newNickname = ref('')
+const activeModal = ref<string | null>(null)
 
 const triggerUpload = () => {
     fileInput.value?.click()
@@ -139,27 +175,9 @@ const handleFileChange = async (e: Event) => {
     }
 }
 
-const openNicknameEdit = () => {
-    newNickname.value = userStore.user?.nickName ||  userStore.user?.nickname || ''
-    showNicknameDialog.value = true
-}
-
-const confirmNickname = async () => {
-    if (!newNickname.value.trim() || loading.value) return
-    
-    loading.value = true
-    try {
-        const res = await clientUserApi.updateNickname(newNickname.value)
-        if (res.success) {
-            ElMessage.success({ message: '昵称已更新', offset: 100, customClass: 'mobile-message' })
-            showNicknameDialog.value = false
-            userStore.fetchUserInfo()
-        } else {
-             ElMessage.error(res.error || '更新失败')
-        }
-    } finally {
-        loading.value = false
-    }
+const handleSuccess = (msg: string) => {
+    ElMessage.success({ message: msg, offset: 100, customClass: 'mobile-message' })
+    userStore.fetchUserInfo()
 }
 
 const handleLogout = async () => {
@@ -227,27 +245,9 @@ const handleLogout = async () => {
 }
 .logout-btn:active { background: rgba(239, 68, 68, 0.2); }
 
-/* Dialog */
-.dialog-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-    z-index: 100; display: flex; align-items: center; justify-content: center;
-    padding: 40px;
+.text-danger { color: #EF4444; }
+
+.divider {
+    height: 12px;
 }
-.dialog-box {
-    background: #1E293B; width: 100%; max-width: 320px;
-    border-radius: 16px; padding: 24px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.dialog-title { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 20px; }
-.dialog-input {
-    width: 100%; height: 44px; background: #0F172A;
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
-    padding: 0 16px; color: #fff; font-size: 15px;
-    margin-bottom: 20px;
-}
-.dialog-footer { display: flex; gap: 12px; }
-.btn { flex: 1; height: 40px; border-radius: 8px; font-size: 14px; font-weight: 500; border: none; }
-.btn.cancel { background: rgba(255,255,255,0.05); color: #94A3B8; }
-.btn.confirm { background: #3B82F6; color: #fff; }
-.btn:disabled { opacity: 0.5; }
 </style>

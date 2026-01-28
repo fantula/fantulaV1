@@ -477,10 +477,40 @@ export const useUserStore = defineStore('user', () => {
     confirmPassword: string
   }) => {
     try {
-      console.warn('修改密码功能暂未实现，使用模拟返回')
-      return { success: true }
+      // 1. Validate confirm password
+      if (params.newPassword !== params.confirmPassword) {
+        return { success: false, message: '两次密码输入不一致' }
+      }
+
+      // 2. Call API (Supabase directly updates password for logged in user)
+      // Note: Ideally we verify oldPassword first, but Supabase standard flow for logged-in users 
+      // often just requires the new password if the session is valid. 
+      // If stricter security is needed, we would need a custom RPC or re-auth flow.
+      const response = await authApi.updatePassword(params.newPassword)
+
+      if (response.success) {
+        return { success: true, message: '密码修改成功' }
+      }
+      return { success: false, message: response.msg }
     } catch (error: any) {
       return { success: false, message: error.message || '修改密码失败' }
+    }
+  }
+
+  const updateProfile = async (updates: { nickname?: string; avatar?: string }) => {
+    try {
+      const response = await authApi.updateProfile(updates)
+      if (response.success) {
+        // Update local state immediately for better UX
+        if (user.value) {
+          if (updates.nickname) user.value.nickName = updates.nickname
+          if (updates.avatar) user.value.avatar = updates.avatar
+        }
+        return { success: true }
+      }
+      return { success: false, message: response.msg }
+    } catch (error: any) {
+      return { success: false, message: error.message || '更新失败' }
     }
   }
 
@@ -601,6 +631,7 @@ export const useUserStore = defineStore('user', () => {
     register,
     logout,
     changePassword,
+    updateProfile,
     sendEmailCode,
     resetPassword,
     fetchUserInfo,

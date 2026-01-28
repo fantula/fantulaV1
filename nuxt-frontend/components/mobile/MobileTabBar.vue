@@ -37,9 +37,9 @@ const currentPath = computed(() => {
     return route.path
 })
 
-const tabs = computed(() => [
+const tabs = computed<Array<{name: string, path: string, icon: any, badge?: number}>>(() => [
   { name: '首页', path: '/mobile', icon: HomeFilled },
-  { name: '功能', path: '/mobile/category', icon: Grid },
+  { name: '功能', path: '/mobile/channel', icon: Grid },
   { name: '帮助', path: '/mobile/help', icon: Service },
   { name: '我的', path: '/mobile/profile', icon: User }
 ])

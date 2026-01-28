@@ -36,13 +36,17 @@
         >
           <template #loading>
              <div v-if="displayList.length === 0 && loading" class="loading-state">
-                Loading...
+                <div class="spinner"></div>
+                <span>正在加载订单...</span>
              </div>
           </template>
 
           <div v-if="displayList.length === 0 && !loading" class="empty-state">
-             <el-icon class="empty-icon"><Box /></el-icon>
-             <p>暂无相关订单</p>
+             <div class="empty-icon-wrapper">
+                <el-icon class="empty-icon"><Box /></el-icon>
+             </div>
+             <p class="empty-text">暂无相关订单</p>
+             <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
           </div>
 
           <div v-else class="order-list">
@@ -50,28 +54,39 @@
                v-for="item in displayList" 
                :key="item.id" 
                class="mobile-order-card"
+               :class="'status-' + (item.isPending ? 'pending' : item.status)"
                @click="handleItemClick(item)"
              >
                 <!-- Card Header -->
                 <div class="card-header">
-                   <span class="order-no">No. {{ item.order_no.slice(-8) }}</span>
-                   <span class="status-text" :class="item.isPending ? 'pending' : item.status">
-                      {{ item.isPending ? '待支付' : getOrderStatusLabel(item.status) }}
-                   </span>
+                   <div class="order-no-group">
+                      <span class="label">NO.</span>
+                      <span class="value">{{ item.order_no.slice(-8) }}</span>
+                   </div>
+                   <!-- Status Pill (PC Style) -->
+                   <div class="status-pill" :class="item.isPending ? 'pending' : item.status">
+                      <div class="dot"></div>
+                      <span>{{ item.isPending ? '待支付' : getOrderStatusLabel(item.status) }}</span>
+                   </div>
                 </div>
 
                 <!-- Card Body -->
                 <div class="card-body">
                    <div class="thumb">
-                      <img :src="item.product_image || '/images/placeholder.png'" />
+                      <el-image :src="item.product_image || '/images/placeholder.png'" fit="cover" />
                    </div>
                    <div class="info">
-                      <div class="name">{{ item.product_name }}</div>
-                      <div class="spec">{{ item.spec_text || '标准规格' }}</div>
+                      <div class="name-row">
+                          <div class="name">{{ item.product_name }}</div>
+                          <span class="spec-tag">{{ item.spec_text || '标准规格' }}</span>
+                      </div>
+                      
                       <div class="price-row">
-                         <span class="price">{{ Number(item.total_amount).toFixed(2) }}</span>
-                         <span class="unit">点</span>
-                         <span class="qty">x{{ item.quantity }}</span>
+                         <div class="price">
+                            <span class="amount">{{ Number(item.total_amount).toFixed(2) }}</span>
+                            <span class="unit">点</span>
+                         </div>
+                         <div class="qty">x{{ item.quantity }}</div>
                       </div>
                    </div>
                 </div>
@@ -81,14 +96,16 @@
                    <div class="time">{{ formatDate(item.created_at) }}</div>
                    <div class="actions">
                       <template v-if="item.isPending || item.status === 'pending'">
-                         <button class="btn delete" @click.stop="openConfirmModal(item, true)">删除</button>
+                         <button class="btn delete" @click.stop="openConfirmModal(item, true)">
+                             <el-icon><Delete /></el-icon>
+                         </button>
                          <button class="btn pay" @click.stop="handleItemClick(item)">去支付</button>
                       </template>
                       <template v-else-if="['expired', 'refunded', 'cancelled'].includes(item.status)">
-                          <button class="btn delete" @click.stop="openConfirmModal(item, false)">清理</button>
+                          <button class="btn delete" @click.stop="openConfirmModal(item, false)">清理记录</button>
                       </template>
                       <template v-else>
-                          <button class="btn view">详情</button>
+                          <button class="btn view" @click.stop="handleItemClick(item)">查看详情</button>
                       </template>
                    </div>
                 </div>
@@ -97,15 +114,18 @@
         </BaseInfiniteList>
     </div>
 
-    <!-- Confirm Modal (Simple Mobile Version) -->
+    <!-- Confirm Modal -->
     <div v-if="confirmModalVisible" class="modal-mask" @click="confirmModalVisible = false">
         <div class="modal-box" @click.stop>
+            <div class="m-icon-wrapper">
+                <el-icon class="m-icon"><WarningFilled /></el-icon>
+            </div>
             <div class="m-title">{{ confirmModalType === 'pending' ? '取消订单' : '清理记录' }}</div>
             <div class="m-content">{{ confirmModalMessage }}</div>
             <div class="m-actions">
                 <button class="m-btn cancel" @click="confirmModalVisible = false">取消</button>
                 <button class="m-btn confirm" @click="handleConfirmDelete" :disabled="confirmLoading">
-                    {{ confirmLoading ? '处理中...' : '确认' }}
+                    {{ confirmLoading ? '处理中...' : '确认删除' }}
                 </button>
             </div>
         </div>
@@ -116,7 +136,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft, Box } from '@element-plus/icons-vue'
+import { ArrowLeft, Box, Delete, WarningFilled } from '@element-plus/icons-vue'
 import { useOrderList } from '@/composables/client/useOrderList'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
@@ -150,14 +170,9 @@ onMounted(async () => {
 // Interaction Logic
 const handleItemClick = (item: any) => {
     if (item.status === 'pending' || item.isPending) {
-        // Mobile Checkout (Assuming /mobile/checkout exists, or reuse PC checkout adapted)
-        // For now, redirect to PC checkout or show message if mobile checkout not ready
-        // But requested to reuse logic, ideally responsive checkout.
-        // Let's assume /checkout/[id] is responsive or we make it responsive later.
         router.push(`/checkout/${item.id}`) 
     } else {
-        // Detail page (to be implemented or just show toast)
-        // router.push(`/mobile/profile/order/${item.id}`)
+        router.push(`/mobile/profile/order/${item.id}`)
     }
 }
 
@@ -168,7 +183,9 @@ const confirmModalType = ref<'pending' | 'cleanup'>('cleanup')
 const confirmTargetItem = ref<any>(null)
 
 const confirmModalMessage = computed(() => 
-  confirmModalType.value === 'pending' ? '确定要取消这个订单吗？' : '确认移除该记录吗？'
+  confirmModalType.value === 'pending'
+    ? '确定要取消这个订单吗？取消后将释放锁定库存。'
+    : '该订单已无效(过期或退款)，确认要从列表中移除吗？'
 )
 
 const openConfirmModal = (item: any, isPreOrder: boolean) => {
@@ -184,13 +201,13 @@ const handleConfirmDelete = async () => {
         if (confirmModalType.value === 'pending') {
             const success = await deletePreOrder(confirmTargetItem.value.id)
             if (success) {
-                ElMessage.success('已取消')
+                ElMessage.success('订单已取消')
                 confirmModalVisible.value = false
-            } else ElMessage.error('失败')
+            } else ElMessage.error('操作失败')
         } else {
             // Mock cleanup
             setTimeout(() => {
-                ElMessage.success('已清理')
+                ElMessage.success('记录已清理')
                 confirmModalVisible.value = false
                 loadList()
             }, 500)
@@ -204,6 +221,7 @@ const handleConfirmDelete = async () => {
 .mobile-order-page {
     min-height: 100vh;
     display: flex; flex-direction: column;
+    background: #0F172A; /* Global BG */
 }
 
 .page-header {
@@ -211,9 +229,12 @@ const handleConfirmDelete = async () => {
     padding: 0 16px; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
     position: sticky; top: 0; z-index: 100;
 }
-.back-btn { color: #fff; font-size: 20px; }
+.back-btn { 
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,0.05); color: #fff; font-size: 16px;
+}
 .title { color: #fff; font-weight: 700; font-size: 17px; }
-.placeholder { width: 20px; }
+.placeholder { width: 32px; }
 
 /* Tabs */
 .tabs-wrapper {
@@ -235,72 +256,130 @@ const handleConfirmDelete = async () => {
 .active-line {
     position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 20px; height: 3px; background: #3B82F6; border-radius: 2px;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
-/* List */
-.list-container { flex: 1; padding: 12px; }
-.empty-state, .loading-state {
-    padding: 40px; text-align: center; color: #64748B; font-size: 14px;
+/* List Container */
+.list-container { flex: 1; padding: 16px; }
+
+/* Loading & Empty */
+.loading-state, .empty-state {
+    padding: 60px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: #64748B;
 }
-.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+.spinner {
+    width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #3B82F6;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.order-list { display: flex; flex-direction: column; gap: 12px; }
+.empty-icon-wrapper {
+    width: 64px; height: 64px; background: rgba(255,255,255,0.03); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 8px;
+}
+.empty-icon { font-size: 28px; opacity: 0.5; }
+.empty-text { font-size: 14px; margin-bottom: 16px; }
 
-/* Card */
+.go-shopping-btn {
+    background: linear-gradient(135deg, #3B82F6, #2563eb); border: none; color: #fff;
+    padding: 8px 24px; border-radius: 20px; font-size: 14px; font-weight: 600;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.order-list { display: flex; flex-direction: column; gap: 16px; }
+
+/* Mobile Order Card */
 .mobile-order-card {
     background: rgba(30, 41, 59, 0.4);
     border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 16px;
+    padding: 16px;
+    position: relative; overflow: hidden;
 }
+/* Left Status Line */
+.mobile-order-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #64748B; opacity: 0.6;
+}
+.mobile-order-card.status-pending::before { background: #F97316; }
+.mobile-order-card.status-active::before { background: #22C55E; }
+.mobile-order-card.status-pending_delivery::before { background: #3B82F6; }
 
+/* Card Header */
 .card-header {
-    display: flex; justify-content: space-between; margin-bottom: 12px;
-    font-size: 12px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
 }
-.order-no { color: #64748B; font-family: 'Monaco', monospace; }
-.status-text { color: #94A3B8; font-weight: 600; }
-.status-text.pending { color: #F97316; }
+.order-no-group { font-size: 12px; font-family: 'Monaco', monospace; color: #64748B; display: flex; gap: 4px; }
+.order-no-group .value { color: #94A3B8; }
 
+.status-pill {
+    display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px;
+    background: rgba(255,255,255,0.05); color: #94A3B8; font-size: 11px; font-weight: 600;
+}
+.status-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 5px currentColor; }
+.status-pill.pending { color: #F97316; background: rgba(249, 115, 22, 0.1); }
+.status-pill.active { color: #22C55E; background: rgba(34, 197, 94, 0.1); }
+.status-pill.pending_delivery { color: #3B82F6; background: rgba(59, 130, 246, 0.1); }
+.status-pill.refunding { color: #EAB308; background: rgba(234, 179, 8, 0.1); }
+
+/* Card Body */
 .card-body { display: flex; gap: 12px; margin-bottom: 12px; }
 .thumb {
-    width: 60px; height: 60px; border-radius: 8px; overflow: hidden; background: #1E293B;
+    width: 64px; height: 64px; border-radius: 8px; overflow: hidden; background: #1E293B; flex-shrink: 0;
 }
-.thumb img { width: 100%; height: 100%; object-fit: cover; }
-.info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.name { color: #fff; font-size: 14px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
-.spec { color: #64748B; font-size: 11px; margin-bottom: 4px; }
-.price-row { display: flex; align-items: baseline; gap: 4px; }
-.price { color: #fff; font-size: 16px; font-weight: 700; }
-.unit { color: #F59E0B; font-size: 11px; }
-.qty { color: #64748B; font-size: 12px; margin-left: auto; }
+.thumb .el-image { width: 100%; height: 100%; }
+.info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
+.name-row { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.name { color: #fff; font-size: 14px; font-weight: 500; line-height: 1.3; }
+.spec-tag {
+    font-size: 10px; color: #94A3B8; background: rgba(255,255,255,0.08);
+    padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);
+}
 
+.price-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 4px; }
+.price { color: #fff; font-family: 'DIN Alternate'; font-weight: 700; display: flex; align-items: baseline; gap: 2px; }
+.price .amount { font-size: 18px; }
+.price .unit { font-size: 11px; color: #F59E0B; }
+.qty { font-size: 12px; color: #64748B; }
+
+/* Card Footer */
 .card-footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;
 }
 .time { font-size: 11px; color: #475569; }
 .actions { display: flex; gap: 8px; }
+
 .btn {
-    padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 14px; font-size: 12px; font-weight: 500;
     border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94A3B8;
+    display: flex; align-items: center; justify-content: center;
 }
-.btn.pay { background: linear-gradient(135deg, #F97316, #EA580C); color: #fff; border: none; }
-.btn.delete { color: #EF4444; border-color: rgba(239,68,68,0.3); }
+.btn.pay { 
+    background: linear-gradient(135deg, #F97316, #EA580C); color: #fff; border: none; 
+    box-shadow: 0 4px 10px rgba(249, 115, 22, 0.2);
+}
+.btn.delete { color: #64748B; padding: 6px 10px; }
+.btn.view { color: #fff; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
 
 /* Confirm Modal */
 .modal-mask {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000;
-    display: flex; align-items: center; justify-content: center;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000;
+    display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
 }
 .modal-box {
-    width: 80%; background: #1E293B; border-radius: 16px; padding: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
+    width: 80%; max-width: 320px; background: #1E293B; border-radius: 16px; padding: 24px;
+    border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center;
 }
-.m-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 12px; text-align: center; }
-.m-content { font-size: 14px; color: #CBD5E1; text-align: center; margin-bottom: 20px; }
-.m-actions { display: flex; gap: 12px; }
-.m-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 14px; border: none; }
+.m-icon-wrapper {
+    width: 48px; height: 48px; border-radius: 50%; background: rgba(239, 68, 68, 0.1);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+    color: #EF4444; font-size: 24px;
+}
+.m-title { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.m-content { font-size: 14px; color: #CBD5E1; text-align: center; margin-bottom: 24px; line-height: 1.5; }
+.m-actions { display: flex; gap: 12px; width: 100%; }
+.m-btn { 
+    flex: 1; padding: 10px; border-radius: 10px; font-size: 14px; border: none; font-weight: 600;
+}
 .m-btn.cancel { background: rgba(255,255,255,0.1); color: #fff; }
-.m-btn.confirm { background: #3B82F6; color: #fff; }
+.m-btn.confirm { background: #EF4444; color: #fff; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
 </style>

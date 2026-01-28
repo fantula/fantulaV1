@@ -1,6 +1,14 @@
 <template>
   <div class="mobile-profile-minimal">
     
+    <!-- Top Bar with Settings -->
+    <div class="top-nav">
+        <div class="page-title">个人中心</div>
+        <button class="settings-btn" @click="router.push('/mobile/profile/account')">
+            <Setting class="w-6 h-6" />
+        </button>
+    </div>
+    
     <!-- 1. Premium Member Card (Header) -->
     <div class="header-container">
         <div class="member-card" @click="router.push('/mobile/profile/account')"> <!-- Placeholder route for details -->
@@ -129,13 +137,7 @@
              <ArrowRight class="w-4 h-4 text-arrow" />
         </div>
         
-         <div class="menu-item" @click="handleLogout">
-            <div class="menu-left">
-                <SwitchButton class="w-5 h-5 text-red-400" />
-                <span class="menu-text text-red-400">退出登录</span>
-            </div>
-             <ArrowRight class="w-4 h-4 text-arrow" />
-        </div>
+        <!-- Logout item removed from list, moved to settings -->
 
     </div>
 
@@ -147,6 +149,19 @@
         @close="showWalletSheet = false" 
     />
 
+    <!-- Settings Sheet -->
+    <MobileSettingsSheet
+        :visible="showSettings"
+        @close="showSettings = false"
+    />
+
+    <!-- Recharge Modal -->
+    <RechargeModal
+        :visible="showRecharge"
+        @close="showRecharge = false"
+        @success="userStore.fetchUserInfo()"
+    />
+
   </div>
 </template>
 
@@ -155,10 +170,12 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
     ArrowRight, Wallet, Box, CircleCheck, Service, 
-    WalletFilled, Ticket, Star, Headset, Bell, List, SwitchButton, CircleCheckFilled
+    WalletFilled, Ticket, Star, Headset, Bell, List, SwitchButton, CircleCheckFilled, Setting
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import MobileWalletSheet from '@/components/mobile/profile/MobileWalletSheet.vue'
+import MobileSettingsSheet from '@/components/mobile/profile/MobileSettingsSheet.vue'
+import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -168,12 +185,15 @@ definePageMeta({
 const router = useRouter()
 const userStore = useUserStore()
 const showWalletSheet = ref(false)
+const showSettings = ref(false)
+const showRecharge = ref(false)
 const loadingWallet = ref(false)
 
 const userInfo = computed(() => {
-  const u = userStore.user || {}
+  const u = userStore.user
+  if (!u) return { nickname: '用户', avatar: '', uid: '---' }
   return {
-    nickname: u.nickName || u.nickname || u.email?.split('@')[0] || '用户',
+    nickname: u.nickName || (u as any).nickname || u.email?.split('@')[0] || '用户',
     avatar: u.avatar || '',
     uid: u.uid || u.id?.toString().slice(0, 8) || '---'
   }
@@ -190,7 +210,7 @@ const navigateToOrder = (tab: string) => {
 }
 
 const handleNotImplemented = () => {
-   // alert('功能暂未开放 / Feature Coming Soon')
+   showRecharge.value = true
 }
 
 const openWalletSheet = async () => {
@@ -204,12 +224,7 @@ const handleContactService = () => {
     // alert('请联系客服 / Contact Support')
 }
 
-const handleLogout = () => {
-    if (confirm('确定要退出登录吗?')) {
-        userStore.logout()
-        router.push('/mobile')
-    }
-}
+// Logout logic moved to SettingsSheet
 
 onMounted(() => {
     if(!userStore.isLoggedIn) {
@@ -405,4 +420,27 @@ onMounted(() => {
 .w-5 { width: 20px; } .h-5 { height: 20px; }
 .w-6 { width: 24px; } .h-6 { height: 24px; }
 .ml-1 { margin-left: 4px; }
+.mr-1 { margin-right: 4px; } /* Added mr-1 */
+
+/* Top Nav */
+.top-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 20px 0 20px;
+    margin-bottom: 10px;
+}
+.page-title {
+    font-size: 24px; font-weight: 800; color: #fff;
+}
+.settings-btn {
+    width: 40px; height: 40px; 
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; cursor: pointer;
+    transition: all 0.2s;
+}
+.settings-btn:active {
+    background: rgba(255,255,255,0.1); transform: scale(0.95);
+}
 </style>
