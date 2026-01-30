@@ -11,13 +11,13 @@
           <!-- Top Marketing Strip -->
           <div class="marketing-strip">
              <div class="ms-item">
-                <el-icon><CircleCheckFilled /></el-icon> 官方正品
+                <CircleCheckFilled class="ms-icon" /> 官方正品
              </div>
              <div class="ms-item">
-                <el-icon><Lightning /></el-icon> 自动发货
+                <Lightning class="ms-icon" /> 自动发货
              </div>
              <div class="ms-item">
-                <el-icon><Umbrella /></el-icon> 售后无忧
+                <Umbrella class="ms-icon" /> 售后无忧
              </div>
           </div>
 
@@ -25,9 +25,7 @@
           <div class="sheet-header">
              <div class="header-left">
                 <div class="thumb-box">
-                  <el-image :src="selectedSkuImage || goodsInfo.image" fit="cover">
-                     <template #placeholder><div class="img-ph"></div></template>
-                  </el-image>
+                  <img :src="selectedSkuImage || goodsInfo.image" class="sheet-thumb-img" loading="lazy" />
                 </div>
                 <div class="info-box">
                    <div class="h-title">{{ goodsInfo.name || '加载中...' }}</div>
@@ -46,7 +44,7 @@
              <!-- Detail Button (Top Right) -->
              <button class="detail-btn" @click="showDetailViewer = true">
                 <div class="d-icon-circle">
-                   <el-icon><Document /></el-icon>
+                   <Document class="d-icon" />
                 </div>
                 <span>图文详情</span>
              </button>
@@ -85,7 +83,7 @@
               
               <!-- SKU Intro -->
               <div class="sku-intro-box" v-if="matchedSku && matchedSku.intro">
-                 <el-icon><InfoFilled /></el-icon>
+                 <InfoFilled class="info-icon" />
                  <span>{{ matchedSku.intro }}</span>
               </div>
 
@@ -104,11 +102,11 @@
           <div class="sheet-footer">
               <div class="icon-btns">
                  <div class="ib-item" @click="handleToggleFavorite">
-                    <el-icon :class="{ active: isFavorited }"><StarFilled v-if="isFavorited"/><Star v-else/></el-icon>
+                    <component :is="isFavorited ? StarFilled : Star" class="action-icon" :class="{ active: isFavorited }" />
                     <span>收藏</span>
                  </div>
                  <div class="ib-item" @click="contactService">
-                    <el-icon><Service /></el-icon>
+                    <Service class="action-icon" />
                     <span>客服</span>
                  </div>
               </div>
@@ -143,12 +141,13 @@
                <div class="dm-header">
                   <span>商品详情</span>
                   <div class="dm-close" @click="showDetailViewer = false">
-                     <el-icon><Close /></el-icon>
+                     <Close class="close-icon" />
                   </div>
                </div>
                <div class="dm-content">
                   <div v-if="detailModules.length === 0" class="empty-detail">
-                     <el-empty description="暂无详情" :image-size="60" />
+                     <div class="empty-icon">📦</div>
+                     <span>暂无详情</span>
                   </div>
                   <div v-else v-for="(mod, idx) in detailModules" :key="idx" class="dm-mod">
                      <img v-if="mod.type === 'image'" :src="mod.content" loading="lazy" />
@@ -344,6 +343,7 @@ watch(() => props.visible, (val) => {
 .ms-item {
   color: #F59E0B; font-size: 11px; display: flex; align-items: center; gap: 4px; font-weight: 500;
 }
+.ms-icon { width: 14px; height: 14px; }
 
 /* Header */
 .sheet-header {
@@ -355,7 +355,7 @@ watch(() => props.visible, (val) => {
    background: #000; border: 1px solid rgba(255,255,255,0.1); 
    flex-shrink: 0;
 }
-.thumb-box .el-image { width: 100%; height: 100%; }
+.sheet-thumb-img { width: 100%; height: 100%; object-fit: cover; }
 .info-box { display: flex; flex-direction: column; justify-content: center; padding-top: 4px; }
 .h-title { 
    color: #fff; font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; 
@@ -380,6 +380,7 @@ watch(() => props.visible, (val) => {
    width: 24px; height: 24px; border-radius: 50%; background: rgba(249, 115, 22, 0.2);
    display: flex; align-items: center; justify-content: center; color: #F97316;
 }
+.d-icon { width: 14px; height: 14px; }
 .detail-btn span { color: #94A3B8; font-size: 10px; }
 
 /* Body */
@@ -431,6 +432,9 @@ watch(() => props.visible, (val) => {
 .q-btn.disabled { opacity: 0.2; cursor: not-allowed; }
 .q-num { width: 32px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; }
 
+/* Icon sizes */
+.info-icon { width: 14px; height: 14px; margin-top: 2px; color: #3B82F6; }
+
 /* Footer */
 .sheet-footer {
   padding: 12px 16px;
@@ -440,9 +444,10 @@ watch(() => props.visible, (val) => {
   display: flex; gap: 16px; align-items: center;
 }
 .icon-btns { display: flex; gap: 16px; }
+.icon-btns { display: flex; gap: 16px; }
 .ib-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; font-size: 10px; cursor: pointer; }
-.ib-item .el-icon { font-size: 20px; }
-.ib-item .el-icon.active { color: #F59E0B; }
+.action-icon { width: 20px; height: 20px; color: #94A3B8; }
+.action-icon.active { color: #F59E0B; }
 
 .main-btns { flex: 1; display: flex; gap: 10px; }
 .btn-cart, .btn-buy {
@@ -475,6 +480,11 @@ watch(() => props.visible, (val) => {
    width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; 
    display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer;
 }
+.close-icon { width: 16px; height: 16px; }
+
+/* Empty Detail */
+.empty-detail { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: #64748B; gap: 10px; }
+.empty-icon { font-size: 32px; opacity: 0.5; }
 .dm-content { flex: 1; overflow-y: auto; background: #000; padding-bottom: 20px; }
 .dm-mod img { width: 100%; display: block; }
 .dm-text { color: #ccc; padding: 16px; font-size: 14px; line-height: 1.6; }

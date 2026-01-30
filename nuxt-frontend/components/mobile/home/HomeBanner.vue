@@ -3,7 +3,7 @@
     <!-- Collapsed State -->
     <div v-if="isCollapsed" class="banner-placeholder-glass" @click="isCollapsed = false">
          <span class="placeholder-text">查看推荐活动</span>
-         <el-icon><ArrowDown /></el-icon>
+         <ArrowDown class="icon-down" />
     </div>
 
     <!-- Expanded State -->

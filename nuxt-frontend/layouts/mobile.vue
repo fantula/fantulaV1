@@ -1,9 +1,7 @@
 <template>
   <div class="mobile-layout">
-    <!-- Particle Background (PC Style) -->
-    <ClientOnly>
-      <ParticleBackground />
-    </ClientOnly>
+    <!-- CSS Background Fallback -->
+    <div class="mobile-bg-layer"></div>
 
     <!-- Main Content Area -->
     <main class="mobile-content">
@@ -18,8 +16,6 @@
 <script setup lang="ts">
 import '@/assets/styles/mobile.css'
 import MobileTabBar from '@/components/mobile/MobileTabBar.vue'
-import ParticleBackground from '@/components/pc/ParticleBackground.vue'
-import { onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -39,10 +35,16 @@ useHead({
 <style scoped>
 .mobile-layout {
   min-height: 100vh;
-  /* background: #0F172A; Removed to show ParticleBackground */
   display: flex;
   flex-direction: column;
   position: relative;
+  background: #0F172A; /* Fallback color */
+}
+
+.mobile-bg-layer {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(circle at top, #1e293b, #0f172a);
+  pointer-events: none;
 }
 
 .mobile-content {

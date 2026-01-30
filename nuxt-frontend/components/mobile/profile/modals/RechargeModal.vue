@@ -4,7 +4,7 @@
       <div class="modal-header">
         <h3 class="modal-title">购置额度</h3>
         <button class="close-btn" @click="close">
-            <el-icon><Close /></el-icon>
+            <Close class="w-5 h-5" />
         </button>
       </div>
 

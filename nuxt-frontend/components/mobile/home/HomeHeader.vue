@@ -18,21 +18,12 @@
          </template>
       </div>
     </div>
-
-    <!-- Search Placeholder (Visible only when not scrolled or simplified when scrolled) -->
-    <div class="search-trigger" :class="{ 'compact': isScrolled }">
-      <div class="search-bar">
-        <el-icon class="search-icon"><Search /></el-icon>
-        <span class="search-text">搜索优质商品...</span>
-      </div>
-    </div>
   </header>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/client/user'
-import { Search } from '@element-plus/icons-vue'
 
 defineProps<{
   isScrolled: boolean
@@ -53,18 +44,16 @@ const userStore = useUserStore()
   z-index: 100;
   padding: var(--safe-area-top) 16px 12px;
   background: transparent;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .mobile-header.is-scrolled {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.95); /* More solid for clarity */
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  padding-bottom: 12px;
 }
 
 /* Top Row */
@@ -83,7 +72,7 @@ const userStore = useUserStore()
   background: linear-gradient(90deg, #fff, #94A3B8);
   -webkit-background-clip: text; 
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(255,255,255,0.1);
+  /* Removed extreme text shadow */
 }
 
 /* Actions */
@@ -110,36 +99,6 @@ const userStore = useUserStore()
   top: -2px; left: -2px; right: -2px; bottom: -2px;
   border-radius: 50%;
   border: 1px solid var(--primary-color);
-  opacity: 0.5;
+  opacity: 0.3; /* Subtle ring */
 }
-
-/* Search Trigger */
-.search-trigger {
-  width: 100%;
-  transition: all 0.3s ease;
-  height: 36px;
-}
-.search-trigger.compact {
-  height: 0;
-  opacity: 0;
-  overflow: hidden;
-  margin-top: -12px; /* Pull up */
-}
-
-.search-bar {
-  width: 100%;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.08); /* Lighter than bg */
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  backdrop-filter: blur(4px);
-}
-
-.search-icon { margin-right: 8px; font-size: 16px; }
-
 </style>

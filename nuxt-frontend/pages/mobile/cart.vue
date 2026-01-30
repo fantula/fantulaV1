@@ -7,7 +7,7 @@
 
     <div class="cart-content">
       <div v-if="cartStore.items.length === 0" class="empty-cart">
-        <el-icon class="empty-icon"><ShoppingCart /></el-icon>
+        <ShoppingCart class="empty-icon" />
         <p>购物车还是空的</p>
         <button class="go-btn" @click="router.push('/mobile')">去逛逛</button>
       </div>

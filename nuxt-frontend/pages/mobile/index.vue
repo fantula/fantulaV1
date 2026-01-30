@@ -20,15 +20,7 @@
 
       <!-- 3. Goods List -->
       <div class="goods-list-section">
-        <!-- Section Title -->
-        <div class="section-header" v-if="currentGoods.length > 0">
-           <h3 class="section-title">
-             <span class="text-gradient">热销推荐</span>
-             <span class="section-dot"></span>
-           </h3>
-           <span class="section-subtitle">精选优质好物</span>
-        </div>
-
+        
         <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
           <div class="spinner-premium"></div>
           <span>正在加载好物...</span>

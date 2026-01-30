@@ -9,8 +9,6 @@
         @click="handleCategoryClick(cat.id)"
       >
         <span class="pill-text">{{ cat.name }}</span>
-        <!-- Active Glow Background -->
-        <div v-if="modelValue === cat.id" class="pill-glow"></div>
       </div>
     </div>
   </div>
@@ -67,59 +65,39 @@ watch(() => props.modelValue, () => {
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  padding: 4px 4px 12px; /* Extra bottom padding for shadow/glow */
+  padding: 4px 4px 12px; /* Extra bottom padding for shadow */
 }
 
-/* Premium Pill */
+/* Simplified Pill - High End, No "Flash" */
 .category-pill {
   position: relative;
   flex-shrink: 0;
   padding: 8px 20px;
   border-radius: 99px;
   background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-secondary);
   font-size: 14px;
   backdrop-filter: blur(8px);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.category-pill:active { 
+    transform: scale(0.96); 
 }
 
 .category-pill.active {
   color: #fff;
-  border-color: rgba(255,255,255,0.2);
-  transform: translateY(-1px) scale(1.02);
+  background: var(--primary-color); /* Solid Primary Color */
+  border-color: transparent;
   font-weight: 600;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); /* Clean shadow */
 }
 
 .pill-text {
   position: relative;
   z-index: 2;
-}
-
-.pill-glow {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--gradient-primary);
-  opacity: 0.8;
-  z-index: 1;
-}
-
-/* Add shimmer to active pill */
-.pill-glow::after {
-  content: '';
-  position: absolute;
-  top: -50%; left: -50%; right: -50%; bottom: -50%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-  transform: rotate(45deg);
-  animation: shine 3s infinite;
-}
-
-@keyframes shine {
-  0% { transform: translateX(-100%) rotate(45deg); }
-  20%, 100% { transform: translateX(100%) rotate(45deg); }
 }
 </style>
 
