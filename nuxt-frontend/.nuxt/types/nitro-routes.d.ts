@@ -3,6 +3,39 @@ import type { Serialize, Simplify } from "nitropack/types";
 declare module "nitropack/types" {
   type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T
   interface InternalApi {
+    '/api/auth/bind-wechat': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/bind-wechat.post').default>>>>
+    }
+    '/api/test': {
+      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/test').default>>>>
+    }
+    '/api/wechat/check-scan': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/check-scan.get').default>>>>
+    }
+    '/api/wechat/event-callback': {
+      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/event-callback').default>>>>
+    }
+    '/api/wechat/get-openid': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/get-openid.post').default>>>>
+    }
+    '/api/wechat/jsapi-pay': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/jsapi-pay.post').default>>>>
+    }
+    '/api/wechat/login-qrcode': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/login-qrcode.get').default>>>>
+    }
+    '/api/wechat/native-pay': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/native-pay.post').default>>>>
+    }
+    '/api/wechat/notify': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/notify.post').default>>>>
+    }
+    '/api/wechat/oauth-login': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/oauth-login.post').default>>>>
+    }
+    '/api/wechat/query-order': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/query-order.post').default>>>>
+    }
     '/__nuxt_error': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>
     }

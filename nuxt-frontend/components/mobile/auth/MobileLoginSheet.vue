@@ -124,6 +124,12 @@
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
                   <span>Google</span>
                </button>
+               <button class="wechat-btn" @click="onWechatLogin">
+                  <svg class="wechat-icon" viewBox="0 0 24 24" width="22" height="22">
+                     <path fill="#07C160" d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.045c.134 0 .24-.11.24-.245 0-.06-.023-.118-.04-.177l-.325-1.233a.49.49 0 0 1 .177-.554c1.525-1.122 2.502-2.779 2.502-4.608-.001-3.248-2.913-5.935-7.061-6.135zm-2.344 3.363c.534 0 .967.44.967.982a.975.975 0 0 1-.967.981.976.976 0 0 1-.967-.981c0-.542.433-.982.967-.982zm4.726 0c.534 0 .967.44.967.982a.975.975 0 0 1-.967.981.976.976 0 0 1-.967-.981c0-.542.433-.982.967-.982z"/>
+                  </svg>
+                  <span>微信</span>
+               </button>
             </div>
          </div>
       </div>
@@ -139,6 +145,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 import EmailInput from '@/components/shared/EmailInput.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 import { ElMessage } from 'element-plus'
+import { wechatLoginApi } from '@/api/client/wechat-login'
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits(['close'])
@@ -249,6 +256,22 @@ const oauth = (provider: string) => {
     const client = getSupabaseClient()
     client.auth.signInWithOAuth({ provider: provider as any })
 }
+
+// 微信登录（移动端 OAuth 授权）
+const onWechatLogin = () => {
+    // 检测是否在微信浏览器内
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent)
+    
+    if (!isWechat) {
+        ElMessage.warning('请在微信内打开此页面使用微信登录')
+        return
+    }
+    
+    // 构建 OAuth 授权 URL 并跳转
+    const redirectUri = window.location.origin + '/mobile/wechat-callback'
+    const authUrl = wechatLoginApi.getOAuthUrl(redirectUri, 'login')
+    window.location.href = authUrl
+}
 </script>
 
 <style scoped>
@@ -342,6 +365,28 @@ const oauth = (provider: string) => {
    font-size: 15px; font-weight: 600; color: #333;
 }
 .google-btn img { width: 22px; height: 22px; }
+
+.social-login {
+   display: flex;
+   gap: 12px;
+}
+.google-btn, .wechat-btn {
+   flex: 1;
+}
+
+.wechat-btn {
+   height: 50px;
+   background: #07C160;
+   border-radius: 25px;
+   border: none;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 10px;
+   font-size: 15px;
+   font-weight: 600;
+   color: #fff;
+}
 
 /* Transitions */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }

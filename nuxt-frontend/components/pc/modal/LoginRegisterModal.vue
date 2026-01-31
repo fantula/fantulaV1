@@ -20,6 +20,7 @@
             <div v-if="mode==='login'" class="modal-form-tabs">
               <button :class="['form-tab', {active: loginType==='code'}]" @click="loginType='code'">验证码登录</button>
               <button :class="['form-tab', {active: loginType==='password'}]" @click="loginType='password'">密码登录</button>
+              <button :class="['form-tab', {active: loginType==='wechat'}]" @click="startWechatLogin">微信登录</button>
             </div>
             <form v-if="mode==='login' && loginType==='password'" @submit.prevent="onLogin">
               <div class="form-group">
@@ -76,6 +77,56 @@
                  </BaseButton>
               </div>
             </form>
+            <!-- WeChat QR Code Login -->
+            <div v-else-if="mode==='login' && loginType==='wechat'" class="wechat-login-area">
+              <!-- 状态：加载中 -->
+              <div v-if="wechatState==='loading'" class="wechat-loading">
+                <div class="spinner"></div>
+                <p>正在加载二维码...</p>
+              </div>
+              <!-- 状态：显示二维码 -->
+              <div v-else-if="wechatState==='qrcode'" class="wechat-qrcode">
+                <p class="qrcode-tip">请使用微信扫描二维码登录</p>
+                <img :src="wechatQrcodeUrl" alt="WeChat QR Code" class="qrcode-img" />
+                <p class="qrcode-hint">{{ wechatPollingHint }}</p>
+                <button class="refresh-btn" @click="refreshWechatQr">刷新二维码</button>
+              </div>
+              <!-- 状态：需要绑定邮箱 -->
+              <div v-else-if="wechatState==='bind'" class="wechat-bind-form">
+                <p class="bind-tip">🎉 扫码成功！请绑定邮箱以完成登录</p>
+                <form @submit.prevent="onWechatBind">
+                  <div class="form-group">
+                    <label>邮箱地址</label>
+                    <EmailInput v-model="wechatBindForm.email" :required="true" />
+                  </div>
+                  <div class="form-group code-group">
+                    <input v-model="wechatBindForm.code" type="text" placeholder="请输入验证码" required />
+                    <SendCodeButton 
+                      :loading="loading" 
+                      :countdown="wechatBindCodeTimer" 
+                      @click="sendWechatBindCode"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>设置密码（可选）</label>
+                    <input v-model="wechatBindForm.password" type="password" placeholder="设置密码后可用密码登录" />
+                  </div>
+                  <div class="form-row">
+                    <label><input type="checkbox" v-model="wechatBindForm.agree" required /> 我已阅读并同意 <NuxtLink to="/privacy" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink to="/policy" target="_blank">《用户政策》</NuxtLink></label>
+                  </div>
+                  <BaseButton themeId="primary" block class="submit-action" type="submit" :loading="loading" :disabled="loading || !wechatBindForm.agree">{{ loading ? '绑定中...' : '绑定并登录' }}</BaseButton>
+                </form>
+              </div>
+              <!-- 状态：已登录（自动跳转） -->
+              <div v-else-if="wechatState==='logged_in'" class="wechat-success">
+                <p>✅ 登录成功，正在跳转...</p>
+              </div>
+              <!-- 状态：错误 -->
+              <div v-else-if="wechatState==='error'" class="wechat-error">
+                <p>{{ wechatErrorMsg }}</p>
+                <button class="refresh-btn" @click="startWechatLogin">重试</button>
+              </div>
+            </div>
             <form v-else-if="mode==='register'" @submit.prevent="onRegister">
               <div class="form-group">
                 <label>邮箱地址</label>
@@ -179,6 +230,7 @@ import { useRouter, useRoute } from 'vue-router'
 import EmailInput from '@/components/shared/EmailInput.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 import BaseButton from '@/components/shared/BaseButton.vue'
+import { wechatLoginApi } from '@/api/client/wechat-login'
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits(['close'])
@@ -186,9 +238,22 @@ const router = useRouter()
 const route = useRoute()
 
 const mode = ref<'login'|'register'>('login')
-const loginType = ref<'password'|'code'>('code')
+const loginType = ref<'password'|'code'|'wechat'>('code')
 const codeTimer = ref(0)
 let codeInterval: any = null
+
+// WeChat Login States
+const wechatState = ref<'loading'|'qrcode'|'bind'|'logged_in'|'error'>('loading')
+const wechatQrcodeUrl = ref('')
+const wechatSceneStr = ref('')
+const wechatBindToken = ref('')
+const wechatPollingHint = ref('等待扫码...')
+const wechatErrorMsg = ref('')
+let wechatPollTimer: any = null
+
+const wechatBindForm = ref({ email: '', code: '', password: '', agree: false })
+const wechatBindCodeTimer = ref(0)
+let wechatBindCodeInterval: any = null
 
 const loginForm = ref({ email: '', password: '', remember: false, agree: false })
 const loginCodeForm = ref({ email: '', code: '', password: '', remember: false, agree: false })
@@ -467,6 +532,139 @@ function closeDialog(type: string) {
   if (type==='policy') showPolicyDialog.value = false
   if (type==='forgot') showForgotDialog.value = false
 }
+
+// ========== WeChat Login Functions ==========
+
+async function startWechatLogin() {
+  loginType.value = 'wechat'
+  wechatState.value = 'loading'
+  stopWechatPolling()
+  
+  try {
+    const res = await wechatLoginApi.getLoginQrCode()
+    if (res.success && res.data) {
+      wechatQrcodeUrl.value = res.data.qrcodeUrl
+      wechatSceneStr.value = res.data.sceneStr
+      wechatState.value = 'qrcode'
+      wechatPollingHint.value = '等待扫码...'
+      // Start polling
+      startWechatPolling()
+    } else {
+      wechatState.value = 'error'
+      wechatErrorMsg.value = res.msg || '获取二维码失败'
+    }
+  } catch (err: any) {
+    wechatState.value = 'error'
+    wechatErrorMsg.value = err.message || '获取二维码失败'
+  }
+}
+
+function refreshWechatQr() {
+  startWechatLogin()
+}
+
+function startWechatPolling() {
+  stopWechatPolling()
+  wechatPollTimer = setInterval(pollWechatStatus, 2000)
+}
+
+function stopWechatPolling() {
+  if (wechatPollTimer) {
+    clearInterval(wechatPollTimer)
+    wechatPollTimer = null
+  }
+}
+
+async function pollWechatStatus() {
+  if (!wechatSceneStr.value) return
+  
+  try {
+    const res = await wechatLoginApi.checkScanStatus(wechatSceneStr.value)
+    if (!res.success || !res.data) return
+    
+    const status = res.data.status
+    
+    if (status === 'expired') {
+      stopWechatPolling()
+      wechatPollingHint.value = '二维码已过期，请刷新'
+    } else if (status === 'waiting') {
+      wechatPollingHint.value = '等待扫码...'
+    } else if (status === 'need_bind') {
+      // 需要绑定邮箱
+      stopWechatPolling()
+      wechatBindToken.value = res.data.bindToken || ''
+      wechatState.value = 'bind'
+    } else if (status === 'logged_in') {
+      // 已登录
+      stopWechatPolling()
+      wechatState.value = 'logged_in'
+      // TODO: 需要后端返回登录凭证完成前端登录
+      ElMessage.success('登录成功')
+      // 刷新页面以获取登录状态
+      setTimeout(() => location.reload(), 1000)
+    }
+  } catch (err) {
+    console.error('Poll error:', err)
+  }
+}
+
+function sendWechatBindCode() {
+  if (wechatBindCodeTimer.value > 0) return
+  if (!wechatBindForm.value.email) { ElMessage.warning('请输入邮箱'); return }
+  if (!isValidEmail(wechatBindForm.value.email)) { ElMessage.warning('邮箱格式不正确'); return }
+  
+  loading.value = true
+  authApi.getEmailCode(wechatBindForm.value.email)
+    .then((res) => {
+      if (res.success) {
+        ElMessage.success('验证码已发送')
+        wechatBindCodeInterval = startTimer(wechatBindCodeTimer, wechatBindCodeInterval, COOLDOWN_SECONDS, 'wechat_bind_timer')
+      } else {
+        ElMessage.error(res.msg || '发送失败')
+      }
+    })
+    .catch(err => { ElMessage.error(err.message || '发送失败') })
+    .finally(() => { loading.value = false })
+}
+
+async function onWechatBind() {
+  if (!wechatBindForm.value.email || !wechatBindForm.value.code) { ElMessage.warning('请填写完整'); return }
+  if (!isValidEmail(wechatBindForm.value.email)) { ElMessage.warning('邮箱格式不正确'); return }
+  if (!wechatBindForm.value.agree) { ElMessage.warning('请勾选协议'); return }
+  if (!wechatBindToken.value) { ElMessage.error('绑定凭证无效，请重新扫码'); startWechatLogin(); return }
+  
+  loading.value = true
+  try {
+    const res = await wechatLoginApi.bindWechatToEmail({
+      bindToken: wechatBindToken.value,
+      email: wechatBindForm.value.email,
+      code: wechatBindForm.value.code,
+      password: wechatBindForm.value.password || undefined,
+    })
+    
+    if (res.success && res.data) {
+      await handleLoginSuccess(res.data, '绑定成功')
+    } else {
+      ElMessage.error(res.msg || '绑定失败')
+    }
+  } catch (err: any) {
+    ElMessage.error(err.message || '绑定失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// Cleanup on close
+watch(() => props.visible, (val) => {
+  if (!val) {
+    stopWechatPolling()
+    // Reset WeChat state when modal closes
+    wechatState.value = 'loading'
+    wechatQrcodeUrl.value = ''
+    wechatSceneStr.value = ''
+    wechatBindToken.value = ''
+  }
+})
 </script>
 
 <style scoped>
@@ -763,5 +961,118 @@ function closeDialog(type: string) {
   border: none;
   cursor: pointer;
   z-index: 2;
+}
+
+/* WeChat Login Styles */
+.wechat-login-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 20px;
+}
+
+.wechat-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.wechat-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #07C160;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.wechat-loading p {
+  color: #94A3B8;
+  font-size: 14px;
+}
+
+.wechat-qrcode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.qrcode-tip {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.qrcode-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px;
+}
+
+.qrcode-hint {
+  color: #94A3B8;
+  font-size: 14px;
+}
+
+.refresh-btn {
+  margin-top: 8px;
+  padding: 8px 24px;
+  background: rgba(7, 193, 96, 0.15);
+  color: #07C160;
+  border: 1px solid #07C160;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background: rgba(7, 193, 96, 0.25);
+}
+
+.wechat-bind-form {
+  width: 100%;
+}
+
+.bind-tip {
+  text-align: center;
+  color: #07C160;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.wechat-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.wechat-success p {
+  color: #07C160;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.wechat-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.wechat-error p {
+  color: #EF4444;
+  font-size: 14px;
 }
 </style>

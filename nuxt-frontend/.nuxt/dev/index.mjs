@@ -1,10 +1,11 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { tmpdir } from 'node:os';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getResponseStatusText } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getHeader, getMethod, readRawBody, getResponseStatusText } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
 import { Server } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
-import nodeCrypto from 'node:crypto';
+import crypto$1 from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
 import { escapeHtml } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@vue/shared/dist/shared.cjs.js';
+import { createClient } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue-bundle-renderer/dist/runtime.mjs';
 import { parseURL, withoutBase, joinURL, getQuery, withQuery, withTrailingSlash, decodePath, withLeadingSlash, withoutTrailingSlash, joinRelativeURL } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ufo/dist/index.mjs';
 import { renderToString } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue/server-renderer/index.mjs';
@@ -650,9 +651,19 @@ const _inlineRuntimeConfig = {
   "public": {
     "apiBase": "http://127.0.0.1:54321",
     "appName": "凡图拉",
-    "siteUrl": "http://localhost:3000"
+    "siteUrl": "https://www.fantula.com",
+    "wechatAppid": "wxc2042fae927b28b8"
   },
-  "apiSecret": ""
+  "apiSecret": "",
+  "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+  "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU",
+  "wechatPayMchid": "1716074381",
+  "wechatPayAppid": "wxc2042fae927b28b8",
+  "wechatPayApiV3Key": "lWm9tNYwCIDsnzhedfqz1QVvK4pmAoBb",
+  "wechatPaySerialNo": "53245181B4BB24F7AC58047FED958C04057735F9",
+  "wechatPayPrivateKey": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMTogoAZexax27\\nMxWMyhMfFf6Vnc1kUJMHv0FTNDddobb7kVBgEMIDtsAB/zE9M8f5cWWKfrFR0dYr\\njaMyUCJE/PO9THno6/M9W2wesjDnezP3zCVqy0/dIFsvWK+811RbBNOndGxZ+9Eg\\nNGVdukHaorFNRWjuNz8WwvnyVYnVWgP8j6Q16b+KDI6+DGhObBLxWB8VikG5Nh7I\\n9GVz8QN7XfO2SDFcE9hakkLkf+olDI4hC7PpYpOy/w54tKeuKaGifKwwsEaB1By1\\nD31t/l2IS75831cuG2u9prz5knud86JuCSgb234jUoF5BPwc1GFJDMKaTXVsi+rY\\nHDYZLgaVAgMBAAECggEAMCk/DXc6pBclHhDvvo2QLl7H8csONNyNnGDobE2903Og\\np/LcaJjqs2dsIcxfdhbzyAiEMD6nXCtD+mZcFysuuOaMKo6RmmesokUf2qiUwKyZ\\nVouoMmGVBQJwnFuiqbh06TPdFPdr51ZmONpBHvQePAToGNgI4Ubit2Hk+8xQPpua\\nrNL8ivHL0k57y6acC1qN8+vW0K9Grd3ZQeVYUxu6s7frqhucBDrn2sE3rEIHCMZL\\nEXtU/auWGw/RLE6ZusErCZ+tqybXUIrtwzDyKMJZBTaBRG6eJbd/m0xa8L4+1SU0\\nXn6FIE1E29r6NGyQ5bUvGq/Sq8T/XW3kbF98yzeuwQKBgQDv4FpemUNdnV1W8FtA\\nX40e3YqkoC//ym5JuylQJ2Nj6hExX4cA4L6ixpRjEU7urh5LgfxKREG0xcc2gBZf\\nmLUpZh5bMjK+mhW4Ckr6ZpibuTF8oIly/6xSGZDRp/s9n9JiT4lBGy6jKiv0Doy1\\n2Wh2t8p7w3IAFmxoNkpg1bjEJQKBgQDaCh5ZP9DGLN/Er1gtOECdow8zsWtvbvIi\\nk1v9achvidUt0M89Pmugw0AALfhnvZDjIN45IEnajszCnAqz5zU9UGP2TkUEaSgP\\nKRctUFVF3igV91B/C48ChzyblEBeh+5JhQpn+ZfO12pbx7d4OCbzzKY5luqmwnUu\\n2LQAzKv1sQKBgQCZocF/UP3aWU1Mv0hSZGBH4nBHm+jiFM6qHlsJYRDBD0rPqnUW\\n1NqD+ldTU+SP7aith6UEE89Zbkp213Z855sv1p2envntJVa/tqfq1AbtxaCyR0eB\\nBctiEcm03beF8nSWToaD0lr+WaYo+6CXX5UOZAwlVDoRYEsyO4NLndZmmQKBgBPg\\n7klmxwr6VmBhOCHPShzVG/Kzjz72l37NfoqJFWwN3fCyY+KKiVd71Z7ukgIrR0Vd\\n3sTIi9MwR7zKazNhtfnkFWkEU8iGKc/QCDvqYgvfqDnwdVdP33b0i3MHviKgM/ph\\n9cPq/osuGpVJjRGZ1PtPQixn9PbFLdfai/aysk7RAoGAcg4IyQkEsMwBfstMoxHc\\nv9OEvpV8I3FxVZTmcSpud/Vsn8XFNCt5L0MuFV3EEKSgB2GKAzfCVcUNORWguxFg\\nOLxc12Rz6UncsrRyGCGhetxUJpKMi1ByBqR8A6G3y7JdKUGFNt72BTa6oOZbn8HS\\nqaapcC5n2bY7cKyXTpGKUlw=\\n-----END PRIVATE KEY-----",
+  "wechatPayNotifyUrl": "https://www.fantula.com/api/wechat/notify",
+  "wechatAppSecret": "521970d6155d6f7ee3045f05b7cc3eb3"
 };
 const envOptions = {
   prefix: "NITRO_",
@@ -2588,10 +2599,32 @@ async function getIslandContext(event) {
 	return ctx;
 }
 
+const _lazy_dcHuVB = () => Promise.resolve().then(function () { return bindWechat_post$1; });
+const _lazy_rPysyX = () => Promise.resolve().then(function () { return test$1; });
+const _lazy_oZR3Aq = () => Promise.resolve().then(function () { return checkScan_get$1; });
+const _lazy_ZV1bkv = () => Promise.resolve().then(function () { return eventCallback$1; });
+const _lazy_jIi_6F = () => Promise.resolve().then(function () { return getOpenid_post$1; });
+const _lazy_fT5JcP = () => Promise.resolve().then(function () { return jsapiPay_post$1; });
+const _lazy_NZc0rV = () => Promise.resolve().then(function () { return loginQrcode_get$1; });
+const _lazy_fyb9pU = () => Promise.resolve().then(function () { return nativePay_post$1; });
+const _lazy_Oqk9lo = () => Promise.resolve().then(function () { return notify_post$1; });
+const _lazy_6k__qZ = () => Promise.resolve().then(function () { return oauthLogin_post$1; });
+const _lazy_pbVeyW = () => Promise.resolve().then(function () { return queryOrder_post$1; });
 const _lazy_8EFkQE = () => Promise.resolve().then(function () { return renderer$1; });
 
 const handlers = [
   { route: '', handler: _2qpWSd, lazy: false, middleware: true, method: undefined },
+  { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },
+  { route: '/api/test', handler: _lazy_rPysyX, lazy: true, middleware: false, method: undefined },
+  { route: '/api/wechat/check-scan', handler: _lazy_oZR3Aq, lazy: true, middleware: false, method: "get" },
+  { route: '/api/wechat/event-callback', handler: _lazy_ZV1bkv, lazy: true, middleware: false, method: undefined },
+  { route: '/api/wechat/get-openid', handler: _lazy_jIi_6F, lazy: true, middleware: false, method: "post" },
+  { route: '/api/wechat/jsapi-pay', handler: _lazy_fT5JcP, lazy: true, middleware: false, method: "post" },
+  { route: '/api/wechat/login-qrcode', handler: _lazy_NZc0rV, lazy: true, middleware: false, method: "get" },
+  { route: '/api/wechat/native-pay', handler: _lazy_fyb9pU, lazy: true, middleware: false, method: "post" },
+  { route: '/api/wechat/notify', handler: _lazy_Oqk9lo, lazy: true, middleware: false, method: "post" },
+  { route: '/api/wechat/oauth-login', handler: _lazy_6k__qZ, lazy: true, middleware: false, method: "post" },
+  { route: '/api/wechat/query-order', handler: _lazy_pbVeyW, lazy: true, middleware: false, method: "post" },
   { route: '/__nuxt_error', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: _SxA8c9, lazy: false, middleware: false, method: undefined },
   { route: '/**', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined }
@@ -2815,7 +2848,7 @@ async function runTask(name, {
 }
 
 if (!globalThis.crypto) {
-  globalThis.crypto = nodeCrypto.webcrypto;
+  globalThis.crypto = crypto$1.webcrypto;
 }
 const { NITRO_NO_UNIX_SOCKET, NITRO_DEV_WORKER_ID } = process.env;
 trapUnhandledNodeErrors();
@@ -2932,6 +2965,1101 @@ const styles = {};
 const styles$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: styles
+}, Symbol.toStringTag, { value: 'Module' }));
+
+function getSupabaseClient(event) {
+  const config = useRuntimeConfig();
+  const supabaseUrl = config.public.apiBase || "http://127.0.0.1:54321";
+  const supabaseKey = String(config.supabaseKey || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0");
+  const authHeader = getHeader(event, "authorization");
+  return createClient(supabaseUrl, supabaseKey, {
+    global: {
+      headers: authHeader ? { Authorization: authHeader } : {}
+    }
+  });
+}
+function getSupabaseServiceClient() {
+  const config = useRuntimeConfig();
+  const supabaseUrl = config.public.apiBase || "http://127.0.0.1:54321";
+  const serviceKey = String(config.supabaseServiceKey || config.supabaseKey || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU");
+  return createClient(supabaseUrl, serviceKey);
+}
+async function getCurrentUser(event) {
+  const supabase = getSupabaseClient(event);
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    return null;
+  }
+  return user;
+}
+
+function getWechatPayConfig() {
+  const config = useRuntimeConfig();
+  const privateKeyRaw = String(config.wechatPayPrivateKey || "");
+  const privateKey = privateKeyRaw.replace(/\\n/g, "\n");
+  return {
+    mchid: String(config.wechatPayMchid || ""),
+    appid: String(config.wechatPayAppid || ""),
+    apiV3Key: String(config.wechatPayApiV3Key || ""),
+    privateKey,
+    serialNo: String(config.wechatPaySerialNo || ""),
+    notifyUrl: String(config.wechatPayNotifyUrl || "https://www.fantula.com/api/wechat/notify"),
+    appSecret: String(config.wechatAppSecret || "")
+  };
+}
+function generateNonceStr(length = 32) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const randomBytes = crypto$1.randomBytes(length);
+  for (let i = 0; i < length; i++) {
+    result += chars[randomBytes[i] % chars.length];
+  }
+  return result;
+}
+function getTimestamp() {
+  return Math.floor(Date.now() / 1e3);
+}
+function signWithPrivateKey(message, privateKeyPem) {
+  const sign = crypto$1.createSign("RSA-SHA256");
+  sign.update(message);
+  sign.end();
+  return sign.sign(privateKeyPem, "base64");
+}
+function buildAuthHeader(method, url, body, config) {
+  const timestamp = getTimestamp();
+  const nonceStr = generateNonceStr();
+  const signMessage = `${method}
+${url}
+${timestamp}
+${nonceStr}
+${body}
+`;
+  const signature = signWithPrivateKey(signMessage, config.privateKey);
+  return `WECHATPAY2-SHA256-RSA2048 mchid="${config.mchid}",nonce_str="${nonceStr}",signature="${signature}",timestamp="${timestamp}",serial_no="${config.serialNo}"`;
+}
+function decryptCallback(ciphertext, nonce, associatedData, apiV3Key) {
+  const ciphertextBuffer = Buffer.from(ciphertext, "base64");
+  const authTag = ciphertextBuffer.slice(-16);
+  const encryptedData = ciphertextBuffer.slice(0, -16);
+  const decipher = crypto$1.createDecipheriv(
+    "aes-256-gcm",
+    Buffer.from(apiV3Key),
+    Buffer.from(nonce)
+  );
+  decipher.setAuthTag(authTag);
+  decipher.setAAD(Buffer.from(associatedData));
+  const decrypted = Buffer.concat([
+    decipher.update(encryptedData),
+    decipher.final()
+  ]);
+  return decrypted.toString("utf8");
+}
+function verifyCallbackSignature(timestamp, nonce, body, signature, wechatPublicKey) {
+  const message = `${timestamp}
+${nonce}
+${body}
+`;
+  console.log("[Verify] Message to verify:", message.substring(0, 50) + "...");
+  return true;
+}
+async function wechatPayRequest(method, path, body, config) {
+  const baseUrl = "https://api.mch.weixin.qq.com";
+  const url = baseUrl + path;
+  const bodyString = body ? JSON.stringify(body) : "";
+  const authorization = buildAuthHeader(method, path, bodyString, config);
+  const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Authorization": authorization
+  };
+  const options = {
+    method,
+    headers
+  };
+  if (body && method === "POST") {
+    options.body = bodyString;
+  }
+  console.log(`[WechatPay] ${method} ${path}`);
+  const response = await fetch(url, options);
+  const responseText = await response.text();
+  if (!response.ok) {
+    console.error("[WechatPay] Error response:", responseText);
+    throw new Error(`WeChat Pay API error: ${response.status} - ${responseText}`);
+  }
+  return JSON.parse(responseText);
+}
+function generateOutTradeNo(prefix = "FTL") {
+  const now = /* @__PURE__ */ new Date();
+  const dateStr = now.toISOString().replace(/[-:T.Z]/g, "").slice(0, 14);
+  const random = generateNonceStr(6);
+  return `${prefix}${dateStr}${random}`;
+}
+function generateJsapiPaySign(appId, timeStamp, nonceStr, prepayId, privateKey) {
+  const signMessage = `${appId}
+${timeStamp}
+${nonceStr}
+prepay_id=${prepayId}
+`;
+  return signWithPrivateKey(signMessage, privateKey);
+}
+
+const wechatPay = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  buildAuthHeader: buildAuthHeader,
+  decryptCallback: decryptCallback,
+  generateJsapiPaySign: generateJsapiPaySign,
+  generateNonceStr: generateNonceStr,
+  generateOutTradeNo: generateOutTradeNo,
+  getTimestamp: getTimestamp,
+  getWechatPayConfig: getWechatPayConfig,
+  verifyCallbackSignature: verifyCallbackSignature,
+  wechatPayRequest: wechatPayRequest
+}, Symbol.toStringTag, { value: 'Module' }));
+
+let accessTokenCache = null;
+async function getWechatAccessToken() {
+  if (accessTokenCache && accessTokenCache.expiresAt > Date.now()) {
+    return accessTokenCache.token;
+  }
+  const config = getWechatPayConfig();
+  if (!config.appid || !config.appSecret) {
+    throw new Error("\u5FAE\u4FE1\u914D\u7F6E\u7F3A\u5931: appid \u6216 appSecret");
+  }
+  const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${config.appid}&secret=${config.appSecret}`;
+  const response = await fetch(url);
+  const result = await response.json();
+  if (result.errcode) {
+    console.error("[WechatLogin] Get access_token failed:", result);
+    throw new Error(result.errmsg || "\u83B7\u53D6 access_token \u5931\u8D25");
+  }
+  accessTokenCache = {
+    token: result.access_token,
+    expiresAt: Date.now() + (result.expires_in - 300) * 1e3
+  };
+  return result.access_token;
+}
+async function createParametricQrCode(sceneStr, expireSeconds = 300) {
+  const accessToken = await getWechatAccessToken();
+  const apiUrl = `https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${accessToken}`;
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      expire_seconds: expireSeconds,
+      action_name: "QR_STR_SCENE",
+      action_info: {
+        scene: {
+          scene_str: sceneStr
+        }
+      }
+    })
+  });
+  const result = await response.json();
+  if (result.errcode) {
+    console.error("[WechatLogin] Create QR code failed:", result);
+    throw new Error(result.errmsg || "\u521B\u5EFA\u4E8C\u7EF4\u7801\u5931\u8D25");
+  }
+  return {
+    ticket: result.ticket,
+    url: result.url,
+    expireSeconds: result.expire_seconds
+  };
+}
+function getQrCodeImageUrl(ticket) {
+  return `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${encodeURIComponent(ticket)}`;
+}
+function generateLoginScene() {
+  const timestamp = Date.now().toString(36);
+  const random = crypto$1.randomBytes(8).toString("hex");
+  return `login_${timestamp}_${random}`;
+}
+function parseWechatEventXml(xml) {
+  const result = {};
+  const matches = xml.matchAll(/<(\w+)><!\[CDATA\[(.*?)\]\]><\/\1>|<(\w+)>(.*?)<\/\3>/g);
+  for (const match of matches) {
+    const key = match[1] || match[3];
+    const value = match[2] || match[4];
+    if (key && value !== void 0) {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+function generateBindToken(openid, expiresInSeconds = 600) {
+  const config = getWechatPayConfig();
+  const payload = {
+    openid,
+    exp: Math.floor(Date.now() / 1e3) + expiresInSeconds,
+    iat: Math.floor(Date.now() / 1e3)
+  };
+  const payloadStr = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const data = `${header}.${payloadStr}`;
+  const signature = crypto$1.createHmac("sha256", config.apiV3Key || "wechat_login_secret").update(data).digest("base64url");
+  return `${data}.${signature}`;
+}
+function verifyBindToken(token) {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) {
+      return { valid: false, error: "Invalid token format" };
+    }
+    const [header, payloadStr, signature] = parts;
+    const config = getWechatPayConfig();
+    const expectedSig = crypto$1.createHmac("sha256", config.apiV3Key || "wechat_login_secret").update(`${header}.${payloadStr}`).digest("base64url");
+    if (signature !== expectedSig) {
+      return { valid: false, error: "Invalid signature" };
+    }
+    const payload = JSON.parse(Buffer.from(payloadStr, "base64url").toString());
+    if (payload.exp < Math.floor(Date.now() / 1e3)) {
+      return { valid: false, error: "Token expired" };
+    }
+    return { valid: true, openid: payload.openid };
+  } catch (err) {
+    return { valid: false, error: "Token parse error" };
+  }
+}
+
+const bindWechat_post = defineEventHandler(async (event) => {
+  try {
+    const body = await readBody(event);
+    const supabase = getSupabaseServiceClient();
+    const currentUser = await getCurrentUser(event);
+    if (currentUser && body.wechatCode) {
+      return await bindWechatToExistingUser(supabase, currentUser.id, body.wechatCode);
+    }
+    if (!body.bindToken) {
+      throw createError({
+        statusCode: 400,
+        message: "\u7F3A\u5C11\u7ED1\u5B9A\u51ED\u8BC1"
+      });
+    }
+    const tokenResult = verifyBindToken(body.bindToken);
+    if (!tokenResult.valid || !tokenResult.openid) {
+      throw createError({
+        statusCode: 400,
+        message: tokenResult.error || "\u7ED1\u5B9A\u51ED\u8BC1\u65E0\u6548\u6216\u5DF2\u8FC7\u671F"
+      });
+    }
+    const openid = tokenResult.openid;
+    if (!body.email) {
+      throw createError({
+        statusCode: 400,
+        message: "\u8BF7\u8F93\u5165\u90AE\u7BB1\u5730\u5740"
+      });
+    }
+    if (!body.code) {
+      throw createError({
+        statusCode: 400,
+        message: "\u8BF7\u8F93\u5165\u9A8C\u8BC1\u7801"
+      });
+    }
+    const { data: existingProfile } = await supabase.from("profiles").select("id, email").eq("wechat_openid", openid).single();
+    if (existingProfile) {
+      throw createError({
+        statusCode: 400,
+        message: "\u6B64\u5FAE\u4FE1\u5DF2\u7ED1\u5B9A\u5176\u4ED6\u8D26\u53F7"
+      });
+    }
+    const { createClient } = await import('file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs');
+    const config = useRuntimeConfig();
+    const anonClient = createClient(
+      config.public.supabaseUrl,
+      config.public.supabaseKey
+    );
+    const { data: authData, error: verifyError } = await anonClient.auth.verifyOtp({
+      email: body.email,
+      token: body.code,
+      type: "email"
+    });
+    if (verifyError) {
+      throw createError({
+        statusCode: 400,
+        message: verifyError.message || "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6216\u5DF2\u8FC7\u671F"
+      });
+    }
+    if (!authData.user) {
+      throw createError({
+        statusCode: 500,
+        message: "\u9A8C\u8BC1\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
+      });
+    }
+    if (body.password) {
+      await anonClient.auth.updateUser({
+        password: body.password
+      });
+    }
+    const { error: updateError } = await supabase.from("profiles").update({
+      wechat_openid: openid
+    }).eq("id", authData.user.id);
+    if (updateError) {
+      console.error("[BindWechat] Update profile failed:", updateError);
+      throw createError({
+        statusCode: 500,
+        message: "\u7ED1\u5B9A\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
+      });
+    }
+    console.log("[BindWechat] Successfully bound:", { userId: authData.user.id, openid });
+    return {
+      success: true,
+      message: "\u7ED1\u5B9A\u6210\u529F",
+      data: {
+        user: authData.user,
+        session: authData.session
+      }
+    };
+  } catch (err) {
+    console.error("[BindWechat] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u7ED1\u5B9A\u5931\u8D25"
+    });
+  }
+});
+async function bindWechatToExistingUser(supabase, userId, wechatCode) {
+  const { getWechatPayConfig } = await Promise.resolve().then(function () { return wechatPay; });
+  const config = getWechatPayConfig();
+  const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.appid}&secret=${config.appSecret}&code=${wechatCode}&grant_type=authorization_code`;
+  const response = await fetch(url);
+  const result = await response.json();
+  if (result.errcode || !result.openid) {
+    throw createError({
+      statusCode: 400,
+      message: result.errmsg || "\u5FAE\u4FE1\u6388\u6743\u5931\u8D25"
+    });
+  }
+  const { data: existingProfile } = await supabase.from("profiles").select("id").eq("wechat_openid", result.openid).single();
+  if (existingProfile && existingProfile.id !== userId) {
+    throw createError({
+      statusCode: 400,
+      message: "\u6B64\u5FAE\u4FE1\u5DF2\u7ED1\u5B9A\u5176\u4ED6\u8D26\u53F7"
+    });
+  }
+  const { error } = await supabase.from("profiles").update({
+    wechat_openid: result.openid
+  }).eq("id", userId);
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      message: "\u7ED1\u5B9A\u5931\u8D25"
+    });
+  }
+  return {
+    success: true,
+    message: "\u5FAE\u4FE1\u7ED1\u5B9A\u6210\u529F",
+    data: {
+      openid: result.openid
+    }
+  };
+}
+
+const bindWechat_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: bindWechat_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const test = defineEventHandler(async (event) => {
+  return { message: "API is working!", timestamp: (/* @__PURE__ */ new Date()).toISOString() };
+});
+
+const test$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: test
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const checkScan_get = defineEventHandler(async (event) => {
+  try {
+    const query = getQuery$1(event);
+    const sceneStr = query.scene;
+    if (!sceneStr) {
+      throw createError({
+        statusCode: 400,
+        message: "\u7F3A\u5C11 scene \u53C2\u6570"
+      });
+    }
+    const supabase = getSupabaseServiceClient();
+    const { data: session, error } = await supabase.from("wechat_login_sessions").select("*").eq("scene_str", sceneStr).single();
+    if (error || !session) {
+      return {
+        success: true,
+        data: {
+          status: "expired",
+          message: "\u4F1A\u8BDD\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F"
+        }
+      };
+    }
+    if (new Date(session.expires_at) < /* @__PURE__ */ new Date()) {
+      return {
+        success: true,
+        data: {
+          status: "expired",
+          message: "\u4E8C\u7EF4\u7801\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u5237\u65B0"
+        }
+      };
+    }
+    if (session.status === "waiting") {
+      return {
+        success: true,
+        data: {
+          status: "waiting",
+          message: "\u7B49\u5F85\u626B\u7801"
+        }
+      };
+    }
+    if (session.status === "scanned" && session.openid) {
+      const { data: profile } = await supabase.from("profiles").select("id, email, nickname").eq("wechat_openid", session.openid).single();
+      if (profile) {
+        return {
+          success: true,
+          data: {
+            status: "logged_in",
+            message: "\u767B\u5F55\u6210\u529F",
+            userId: profile.id,
+            email: profile.email,
+            nickname: profile.nickname
+          }
+        };
+      } else {
+        const bindToken = generateBindToken(session.openid);
+        return {
+          success: true,
+          data: {
+            status: "need_bind",
+            message: "\u8BF7\u7ED1\u5B9A\u90AE\u7BB1\u4EE5\u5B8C\u6210\u767B\u5F55",
+            bindToken
+          }
+        };
+      }
+    }
+    if (session.status === "bound") {
+      return {
+        success: true,
+        data: {
+          status: "bound",
+          message: "\u7ED1\u5B9A\u5B8C\u6210"
+        }
+      };
+    }
+    return {
+      success: true,
+      data: {
+        status: session.status,
+        message: "\u672A\u77E5\u72B6\u6001"
+      }
+    };
+  } catch (err) {
+    console.error("[CheckScan] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u67E5\u8BE2\u72B6\u6001\u5931\u8D25"
+    });
+  }
+});
+
+const checkScan_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: checkScan_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const eventCallback = defineEventHandler(async (event) => {
+  const method = getMethod(event);
+  if (method === "GET") {
+    const query = getQuery$1(event);
+    const echostr = query.echostr;
+    console.log("[WechatCallback] URL verification, echostr:", echostr);
+    return echostr || "ok";
+  }
+  try {
+    const rawBody = await readRawBody(event) || "";
+    console.log("[WechatCallback] Received event:", rawBody.substring(0, 200));
+    const eventData = parseWechatEventXml(rawBody);
+    console.log("[WechatCallback] Parsed event:", eventData);
+    const msgType = eventData.MsgType;
+    const eventType = eventData.Event;
+    const fromUser = eventData.FromUserName;
+    const eventKey = eventData.EventKey;
+    if (msgType !== "event") {
+      return "success";
+    }
+    if (eventType === "SCAN" || eventType === "subscribe") {
+      let sceneStr = eventKey;
+      if (eventType === "subscribe" && (eventKey == null ? void 0 : eventKey.startsWith("qrscene_"))) {
+        sceneStr = eventKey.replace("qrscene_", "");
+      }
+      if (!sceneStr || !sceneStr.startsWith("login_")) {
+        console.log("[WechatCallback] Not a login scan, ignoring");
+        return "success";
+      }
+      console.log("[WechatCallback] Login scan detected:", { sceneStr, openid: fromUser });
+      const supabase = getSupabaseServiceClient();
+      const { error } = await supabase.from("wechat_login_sessions").update({
+        openid: fromUser,
+        status: "scanned"
+      }).eq("scene_str", sceneStr).eq("status", "waiting");
+      if (error) {
+        console.error("[WechatCallback] Update session failed:", error);
+      } else {
+        console.log("[WechatCallback] Session updated to scanned");
+      }
+    }
+    return "success";
+  } catch (err) {
+    console.error("[WechatCallback] Error:", err);
+    return "success";
+  }
+});
+
+const eventCallback$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: eventCallback
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const getOpenid_post = defineEventHandler(async (event) => {
+  try {
+    const user = await getCurrentUser(event);
+    if (!user) {
+      throw createError({
+        statusCode: 401,
+        message: "\u672A\u767B\u5F55"
+      });
+    }
+    const body = await readBody(event);
+    const { code } = body;
+    if (!code) {
+      throw createError({
+        statusCode: 400,
+        message: "\u7F3A\u5C11\u6388\u6743 code"
+      });
+    }
+    const config = getWechatPayConfig();
+    if (!config.appid || !config.appSecret) {
+      throw createError({
+        statusCode: 500,
+        message: "\u5FAE\u4FE1\u914D\u7F6E\u9519\u8BEF"
+      });
+    }
+    const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.appid}&secret=${config.appSecret}&code=${code}&grant_type=authorization_code`;
+    const response = await fetch(url);
+    const result = await response.json();
+    if (result.errcode) {
+      console.error("[GetOpenId] WeChat API error:", result);
+      throw createError({
+        statusCode: 400,
+        message: result.errmsg || "\u83B7\u53D6 OpenID \u5931\u8D25"
+      });
+    }
+    console.log("[GetOpenId] Got openid:", result.openid);
+    const supabase = getSupabaseServiceClient();
+    await supabase.from("profiles").update({
+      wechat_openid: result.openid,
+      updated_at: (/* @__PURE__ */ new Date()).toISOString()
+    }).eq("id", user.id);
+    return {
+      success: true,
+      data: {
+        openid: result.openid
+      }
+    };
+  } catch (err) {
+    console.error("[GetOpenId] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u83B7\u53D6 OpenID \u5931\u8D25"
+    });
+  }
+});
+
+const getOpenid_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: getOpenid_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const jsapiPay_post = defineEventHandler(async (event) => {
+  try {
+    const user = await getCurrentUser(event);
+    if (!user) {
+      throw createError({
+        statusCode: 401,
+        message: "\u672A\u767B\u5F55"
+      });
+    }
+    const body = await readBody(event);
+    const { amount, openid, description } = body;
+    if (!amount || amount <= 0) {
+      throw createError({
+        statusCode: 400,
+        message: "\u5145\u503C\u91D1\u989D\u5FC5\u987B\u5927\u4E8E0"
+      });
+    }
+    if (!openid) {
+      throw createError({
+        statusCode: 400,
+        message: "\u7F3A\u5C11 OpenID"
+      });
+    }
+    const config = getWechatPayConfig();
+    if (!config.mchid || !config.privateKey) {
+      throw createError({
+        statusCode: 500,
+        message: "\u652F\u4ED8\u914D\u7F6E\u9519\u8BEF\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
+      });
+    }
+    const outTradeNo = generateOutTradeNo("JSAPI");
+    const amountInCents = Math.round(amount * 100);
+    const supabase = getSupabaseClient(event);
+    await supabase.from("recharge_orders").insert({
+      out_trade_no: outTradeNo,
+      user_id: user.id,
+      amount,
+      amount_cents: amountInCents,
+      status: "pending",
+      pay_type: "wechat_jsapi",
+      description: description || `\u5145\u503C${amount}\u70B9`,
+      payer_openid: openid,
+      created_at: (/* @__PURE__ */ new Date()).toISOString()
+    });
+    const requestBody = {
+      appid: config.appid,
+      mchid: config.mchid,
+      description: description || `\u51E1\u56FE\u62C9-\u5145\u503C${amount}\u70B9`,
+      out_trade_no: outTradeNo,
+      notify_url: config.notifyUrl,
+      amount: {
+        total: amountInCents,
+        currency: "CNY"
+      },
+      payer: {
+        openid
+      },
+      attach: JSON.stringify({ userId: user.id, type: "recharge" })
+    };
+    console.log("[JsapiPay] Request:", JSON.stringify(requestBody, null, 2));
+    const result = await wechatPayRequest(
+      "POST",
+      "/v3/pay/transactions/jsapi",
+      requestBody,
+      config
+    );
+    const timeStamp = String(getTimestamp());
+    const nonceStr = generateNonceStr();
+    const paySign = generateJsapiPaySign(
+      config.appid,
+      timeStamp,
+      nonceStr,
+      result.prepay_id,
+      config.privateKey
+    );
+    return {
+      success: true,
+      data: {
+        appId: config.appid,
+        timeStamp,
+        nonceStr,
+        package: `prepay_id=${result.prepay_id}`,
+        signType: "RSA",
+        paySign,
+        out_trade_no: outTradeNo,
+        amount
+      }
+    };
+  } catch (err) {
+    console.error("[JsapiPay] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u652F\u4ED8\u4E0B\u5355\u5931\u8D25"
+    });
+  }
+});
+
+const jsapiPay_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: jsapiPay_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const loginQrcode_get = defineEventHandler(async (event) => {
+  try {
+    const sceneStr = generateLoginScene();
+    const qrResult = await createParametricQrCode(sceneStr, 300);
+    const supabase = getSupabaseServiceClient();
+    const expiresAt = new Date(Date.now() + 300 * 1e3).toISOString();
+    const { error: insertError } = await supabase.from("wechat_login_sessions").insert({
+      scene_str: sceneStr,
+      ticket: qrResult.ticket,
+      status: "waiting",
+      expires_at: expiresAt
+    });
+    if (insertError) {
+      console.error("[LoginQrCode] Insert session failed:", insertError);
+      throw createError({
+        statusCode: 500,
+        message: "\u521B\u5EFA\u767B\u5F55\u4F1A\u8BDD\u5931\u8D25"
+      });
+    }
+    return {
+      success: true,
+      data: {
+        sceneStr,
+        ticket: qrResult.ticket,
+        qrcodeUrl: getQrCodeImageUrl(qrResult.ticket),
+        expiresIn: qrResult.expireSeconds
+      }
+    };
+  } catch (err) {
+    console.error("[LoginQrCode] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u751F\u6210\u4E8C\u7EF4\u7801\u5931\u8D25"
+    });
+  }
+});
+
+const loginQrcode_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: loginQrcode_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const nativePay_post = defineEventHandler(async (event) => {
+  try {
+    const user = await getCurrentUser(event);
+    if (!user) {
+      throw createError({
+        statusCode: 401,
+        message: "\u672A\u767B\u5F55"
+      });
+    }
+    const body = await readBody(event);
+    const { amount, bonus = 0, description } = body;
+    if (!amount || amount <= 0) {
+      throw createError({
+        statusCode: 400,
+        message: "\u5145\u503C\u91D1\u989D\u5FC5\u987B\u5927\u4E8E0"
+      });
+    }
+    const config = getWechatPayConfig();
+    if (!config.mchid || !config.privateKey) {
+      console.error("[NativePay] Missing WeChat Pay config");
+      throw createError({
+        statusCode: 500,
+        message: "\u652F\u4ED8\u914D\u7F6E\u9519\u8BEF\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
+      });
+    }
+    const outTradeNo = generateOutTradeNo("RECHARGE");
+    const amountInCents = Math.round(amount * 100);
+    const supabase = getSupabaseClient(event);
+    const { error: insertError } = await supabase.from("recharge_orders").insert({
+      out_trade_no: outTradeNo,
+      user_id: user.id,
+      amount,
+      bonus,
+      // 赠送金额
+      amount_cents: amountInCents,
+      status: "pending",
+      pay_type: "wechat_native",
+      description: description || `\u5145\u503C${amount}\u70B9`,
+      created_at: (/* @__PURE__ */ new Date()).toISOString()
+    });
+    if (insertError) {
+      console.error("[NativePay] Failed to create order:", insertError);
+      if (!insertError.message.includes("does not exist")) {
+        throw insertError;
+      }
+    }
+    const requestBody = {
+      appid: config.appid,
+      mchid: config.mchid,
+      description: description || `\u51E1\u56FE\u62C9-\u5145\u503C${amount}\u70B9`,
+      out_trade_no: outTradeNo,
+      notify_url: config.notifyUrl,
+      amount: {
+        total: amountInCents,
+        currency: "CNY"
+      },
+      attach: JSON.stringify({ userId: user.id, type: "recharge", bonus })
+    };
+    console.log("[NativePay] Request:", JSON.stringify(requestBody, null, 2));
+    const result = await wechatPayRequest(
+      "POST",
+      "/v3/pay/transactions/native",
+      requestBody,
+      config
+    );
+    console.log("[NativePay] Response:", result);
+    return {
+      success: true,
+      data: {
+        code_url: result.code_url,
+        out_trade_no: outTradeNo,
+        amount
+      }
+    };
+  } catch (err) {
+    console.error("[NativePay] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u652F\u4ED8\u4E0B\u5355\u5931\u8D25"
+    });
+  }
+});
+
+const nativePay_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: nativePay_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const notify_post = defineEventHandler(async (event) => {
+  var _a;
+  try {
+    const timestamp = getHeader(event, "Wechatpay-Timestamp") || "";
+    const nonce = getHeader(event, "Wechatpay-Nonce") || "";
+    const signature = getHeader(event, "Wechatpay-Signature") || "";
+    const rawBody = await readRawBody(event);
+    const body = JSON.parse(rawBody || "{}");
+    console.log("[Notify] Received notification:", body.event_type, body.id);
+    const isValid = verifyCallbackSignature(
+      timestamp,
+      nonce,
+      rawBody || "",
+      signature,
+      ""
+    );
+    if (!isValid) ;
+    if (body.event_type !== "TRANSACTION.SUCCESS") {
+      return { code: "SUCCESS", message: "\u975E\u652F\u4ED8\u6210\u529F\u4E8B\u4EF6" };
+    }
+    const config = getWechatPayConfig();
+    const decryptedStr = decryptCallback(
+      body.resource.ciphertext,
+      body.resource.nonce,
+      body.resource.associated_data,
+      config.apiV3Key
+    );
+    const payment = JSON.parse(decryptedStr);
+    console.log("[Notify] Decrypted payment:", payment.out_trade_no, payment.trade_state);
+    let attach = {};
+    try {
+      attach = JSON.parse(payment.attach || "{}");
+    } catch (e) {
+      console.error("[Notify] Failed to parse attach:", payment.attach);
+    }
+    if (!attach.userId) {
+      console.error("[Notify] Missing userId in attach");
+      return { code: "FAIL", message: "\u7F3A\u5C11\u7528\u6237ID" };
+    }
+    const supabase = getSupabaseServiceClient();
+    const { data: order, error: orderError } = await supabase.from("recharge_orders").select("*").eq("out_trade_no", payment.out_trade_no).single();
+    if (orderError || !order) {
+      console.error("[Notify] Order not found:", payment.out_trade_no);
+      return { code: "FAIL", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" };
+    }
+    if (order.status === "paid") {
+      console.log("[Notify] Order already processed:", payment.out_trade_no);
+      return { code: "SUCCESS", message: "\u5DF2\u5904\u7406" };
+    }
+    await supabase.from("recharge_orders").update({
+      status: "paid",
+      transaction_id: payment.transaction_id,
+      payer_openid: (_a = payment.payer) == null ? void 0 : _a.openid,
+      paid_at: payment.success_time,
+      updated_at: (/* @__PURE__ */ new Date()).toISOString()
+    }).eq("out_trade_no", payment.out_trade_no);
+    const { data: profile } = await supabase.from("profiles").select("balance").eq("id", attach.userId).single();
+    if (profile) {
+      const currentBalance = profile.balance || 0;
+      const bonus = order.bonus || attach.bonus || 0;
+      const totalAmount = order.amount + bonus;
+      const newBalance = currentBalance + totalAmount;
+      await supabase.from("profiles").update({
+        balance: newBalance,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      }).eq("id", attach.userId);
+      await supabase.from("wallet_transactions").insert({
+        user_id: attach.userId,
+        type: "\u5FAE\u4FE1\u5145\u503C",
+        amount: totalAmount,
+        balance_after: newBalance,
+        description: `\u5FAE\u4FE1\u652F\u4ED8\u5145\u503C ${order.amount.toFixed(2)}\u70B9 \u8D60\u9001${bonus.toFixed(2)}\u70B9`,
+        created_at: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      console.log(`[Notify] Success: User ${attach.userId} recharged ${totalAmount} (amount: ${order.amount}, bonus: ${bonus})`);
+    }
+    return { code: "SUCCESS", message: "\u6210\u529F" };
+  } catch (err) {
+    console.error("[Notify] Error:", err);
+    return { code: "FAIL", message: err.message || "\u5904\u7406\u5931\u8D25" };
+  }
+});
+
+const notify_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: notify_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const oauthLogin_post = defineEventHandler(async (event) => {
+  try {
+    const body = await readBody(event);
+    const { code } = body;
+    if (!code) {
+      throw createError({
+        statusCode: 400,
+        message: "\u7F3A\u5C11\u6388\u6743 code"
+      });
+    }
+    const config = getWechatPayConfig();
+    if (!config.appid || !config.appSecret) {
+      throw createError({
+        statusCode: 500,
+        message: "\u5FAE\u4FE1\u914D\u7F6E\u9519\u8BEF"
+      });
+    }
+    const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.appid}&secret=${config.appSecret}&code=${code}&grant_type=authorization_code`;
+    const response = await fetch(url);
+    const result = await response.json();
+    if (result.errcode || !result.openid) {
+      console.error("[OAuthLogin] WeChat API error:", result);
+      throw createError({
+        statusCode: 400,
+        message: result.errmsg || "\u5FAE\u4FE1\u6388\u6743\u5931\u8D25"
+      });
+    }
+    const openid = result.openid;
+    console.log("[OAuthLogin] Got openid:", openid);
+    const supabase = getSupabaseServiceClient();
+    const { data: profile } = await supabase.from("profiles").select("id, email, nickname").eq("wechat_openid", openid).single();
+    if (profile) {
+      return {
+        success: true,
+        data: {
+          status: "logged_in",
+          message: "\u767B\u5F55\u6210\u529F",
+          userId: profile.id,
+          email: profile.email,
+          nickname: profile.nickname,
+          openid
+        }
+      };
+    } else {
+      const bindToken = generateBindToken(openid);
+      return {
+        success: true,
+        data: {
+          status: "need_bind",
+          message: "\u8BF7\u7ED1\u5B9A\u90AE\u7BB1\u4EE5\u5B8C\u6210\u767B\u5F55",
+          bindToken
+        }
+      };
+    }
+  } catch (err) {
+    console.error("[OAuthLogin] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u767B\u5F55\u5931\u8D25"
+    });
+  }
+});
+
+const oauthLogin_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: oauthLogin_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const queryOrder_post = defineEventHandler(async (event) => {
+  try {
+    const user = await getCurrentUser(event);
+    if (!user) {
+      throw createError({
+        statusCode: 401,
+        message: "\u672A\u767B\u5F55"
+      });
+    }
+    const body = await readBody(event);
+    const { out_trade_no } = body;
+    if (!out_trade_no) {
+      throw createError({
+        statusCode: 400,
+        message: "\u7F3A\u5C11\u8BA2\u5355\u53F7"
+      });
+    }
+    const supabase = getSupabaseClient(event);
+    const { data: order, error: orderError } = await supabase.from("recharge_orders").select("*").eq("out_trade_no", out_trade_no).eq("user_id", user.id).single();
+    if (orderError || !order) {
+      throw createError({
+        statusCode: 404,
+        message: "\u8BA2\u5355\u4E0D\u5B58\u5728"
+      });
+    }
+    if (order.status === "paid") {
+      return {
+        success: true,
+        data: {
+          trade_state: "SUCCESS",
+          trade_state_desc: "\u652F\u4ED8\u6210\u529F",
+          out_trade_no,
+          amount: order.amount,
+          paid: true
+        }
+      };
+    }
+    const config = getWechatPayConfig();
+    const path = `/v3/pay/transactions/out-trade-no/${out_trade_no}?mchid=${config.mchid}`;
+    console.log("[QueryOrder] Querying:", out_trade_no);
+    const result = await wechatPayRequest(
+      "GET",
+      path,
+      null,
+      config
+    );
+    console.log("[QueryOrder] Result:", result.trade_state);
+    if (result.trade_state === "SUCCESS" && order.status !== "paid") {
+      const supabaseService = getSupabaseServiceClient();
+      await supabaseService.from("recharge_orders").update({
+        status: "paid",
+        transaction_id: result.transaction_id,
+        paid_at: result.success_time,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      }).eq("out_trade_no", out_trade_no);
+      const { data: profile } = await supabaseService.from("profiles").select("balance").eq("id", user.id).single();
+      if (profile) {
+        const currentBalance = profile.balance || 0;
+        const bonus = order.bonus || 0;
+        const totalAmount = order.amount + bonus;
+        const newBalance = currentBalance + totalAmount;
+        await supabaseService.from("profiles").update({
+          balance: newBalance,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString()
+        }).eq("id", user.id);
+        await supabaseService.from("wallet_transactions").insert({
+          user_id: user.id,
+          type: "\u5FAE\u4FE1\u5145\u503C",
+          amount: totalAmount,
+          balance_after: newBalance,
+          description: `\u5FAE\u4FE1\u652F\u4ED8\u5145\u503C ${order.amount.toFixed(2)}\u70B9 \u8D60\u9001${bonus.toFixed(2)}\u70B9`,
+          created_at: (/* @__PURE__ */ new Date()).toISOString()
+        });
+      }
+    }
+    return {
+      success: true,
+      data: {
+        trade_state: result.trade_state,
+        trade_state_desc: result.trade_state_desc,
+        out_trade_no,
+        transaction_id: result.transaction_id,
+        amount: order.amount,
+        paid: result.trade_state === "SUCCESS"
+      }
+    };
+  } catch (err) {
+    console.error("[QueryOrder] Error:", err);
+    throw createError({
+      statusCode: err.statusCode || 500,
+      message: err.message || "\u67E5\u8BE2\u5931\u8D25"
+    });
+  }
+});
+
+const queryOrder_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: queryOrder_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function renderPayloadResponse(ssrContext) {

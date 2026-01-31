@@ -45,16 +45,12 @@
          <!-- 2. Payment Method -->
          <div class="section-title mt-4">支付方式</div>
          <div class="pay-methods">
-             <div 
-                :class="['pay-item', { active: payType === 'alipay' }]"
-                @click="payType = 'alipay'"
-             >
+             <!-- 支付宝暂未开通 -->
+             <div class="pay-item disabled">
                 <div class="pay-left">
                     <img src="/images/client/pc/zhifu2.png" class="pay-icon" alt="Alipay" />
                     <span>支付宝</span>
-                </div>
-                <div class="pay-radio" :class="{ checked: payType === 'alipay' }">
-                    <div class="radio-dot" v-if="payType === 'alipay'"></div>
+                    <span class="coming-soon">即将开通</span>
                 </div>
              </div>
 
@@ -71,6 +67,12 @@
                 </div>
              </div>
          </div>
+
+         <!-- 非微信浏览器提示 -->
+         <div v-if="!isWechatBrowser" class="wechat-tip">
+           <div class="tip-icon">💡</div>
+           <div class="tip-text">请在微信中打开本页面以使用微信支付</div>
+         </div>
       </div>
 
       <div class="modal-footer">
@@ -80,8 +82,13 @@
               <span class="bonus-hint" v-if="currentBonus > 0">(含赠送 {{ currentBonus }})</span>
           </div>
 
-          <button class="pay-btn" @click="handleRecharge" :disabled="loading || !isValidAmount">
+          <button 
+            class="pay-btn" 
+            @click="handleRecharge" 
+            :disabled="loading || !isValidAmount || !isWechatBrowser"
+          >
               <span v-if="loading" class="spinner"></span>
+              <span v-else-if="!isWechatBrowser">请在微信内打开</span>
               <span v-else>立即支付 ¥{{ payAmount.toFixed(2) }}</span>
           </button>
       </div>
@@ -92,25 +99,32 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { Close } from '@element-plus/icons-vue'
-import { authApi } from '@/api/client/auth' // Using authApi as per PC implementation
+import { authApi } from '@/api/client/auth'
+import { wechatPayApi } from '@/api/client/wechat-payment'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/client/user'
 
 const props = defineProps<{
   visible: boolean
 }>()
 
 const emit = defineEmits(['close', 'success'])
+const userStore = useUserStore()
 
 interface RechargeOption {
   value: number
   bonus: number
 }
 
+// 检测是否在微信浏览器内
+const isWechatBrowser = ref(false)
+const userOpenId = ref<string | null>(null)
+
 const options = ref<RechargeOption[]>([])
 const loading = ref(false)
 const selectedIdx = ref(0)
 const customValue = ref<number | null>(null)
-const payType = ref<'alipay' | 'wechat'>('alipay')
+const payType = ref<'wechat'>('wechat')
 
 // Computed
 const payAmount = computed(() => {
@@ -141,25 +155,159 @@ const selectOption = (idx: number) => {
     if (idx !== -1) customValue.value = null
 }
 
+// 检查微信浏览器
+function checkWechatBrowser() {
+  const ua = navigator.userAgent.toLowerCase()
+  isWechatBrowser.value = ua.includes('micromessenger')
+}
+
+// 获取用户 OpenID（从 URL 参数或缓存）
+async function getOpenId(): Promise<string | null> {
+  // 检查是否已有 OpenID
+  if (userOpenId.value) return userOpenId.value
+  
+  // 从 localStorage 获取缓存的 OpenID
+  const cached = localStorage.getItem('wechat_openid')
+  if (cached) {
+    userOpenId.value = cached
+    return cached
+  }
+  
+  // 检查 URL 中是否有授权回调的 code
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
+  
+  if (code) {
+    try {
+      const res = await wechatPayApi.getOpenId(code)
+      if (res.success && res.data?.openid) {
+        userOpenId.value = res.data.openid
+        localStorage.setItem('wechat_openid', res.data.openid)
+        
+        // 清除 URL 中的 code 参数
+        const newUrl = window.location.origin + window.location.pathname
+        window.history.replaceState({}, '', newUrl)
+        
+        return res.data.openid
+      }
+    } catch (e) {
+      console.error('Get OpenID failed:', e)
+    }
+  }
+  
+  return null
+}
+
+// 发起微信授权获取 OpenID
+function redirectToWechatAuth() {
+  // 公众号 AppID
+  const appId = 'wxc2042fae927b28b8'
+  const redirectUri = encodeURIComponent(window.location.href)
+  const scope = 'snsapi_base'  // 静默授权
+  const state = 'recharge'
+  
+  const authUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${state}#wechat_redirect`
+  
+  window.location.href = authUrl
+}
+
+// 调用微信 JSAPI 支付
+function invokeWechatPay(params: {
+  appId: string
+  timeStamp: string
+  nonceStr: string
+  package: string
+  signType: string
+  paySign: string
+}) {
+  return new Promise<boolean>((resolve) => {
+    // 检查 WeixinJSBridge 是否可用
+    if (typeof WeixinJSBridge === 'undefined') {
+      ElMessage.error('请在微信浏览器中使用')
+      resolve(false)
+      return
+    }
+    
+    WeixinJSBridge.invoke(
+      'getBrandWCPayRequest',
+      {
+        appId: params.appId,
+        timeStamp: params.timeStamp,
+        nonceStr: params.nonceStr,
+        package: params.package,
+        signType: params.signType,
+        paySign: params.paySign,
+      },
+      (res: { err_msg: string }) => {
+        if (res.err_msg === 'get_brand_wcpay_request:ok') {
+          resolve(true)
+        } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+          ElMessage.warning('已取消支付')
+          resolve(false)
+        } else {
+          ElMessage.error('支付失败')
+          resolve(false)
+        }
+      }
+    )
+  })
+}
+
 const handleRecharge = async () => {
-    if (!isValidAmount.value) return 
+    if (!isValidAmount.value || loading.value) return 
+    
+    if (!isWechatBrowser.value) {
+      ElMessage.warning('请在微信中打开本页面')
+      return
+    }
     
     loading.value = true
     
-    // Simulate API call as per user instruction and PC logic (Mock)
     try {
-        // In a real scenario, this would call createOrder -> getPayParams
-        await new Promise(resolve => setTimeout(resolve, 800))
+        // 获取用户 OpenID
+        let openid = await getOpenId()
         
-        ElMessage.success({
-            message: `已发起充值 ¥${payAmount.value.toFixed(2)} (${payType.value === 'alipay' ? '支付宝' : '微信'})`,
-            offset: 100,
-            customClass: 'mobile-message'
+        if (!openid) {
+          // 需要授权获取 OpenID
+          ElMessage.info('正在跳转微信授权...')
+          redirectToWechatAuth()
+          return
+        }
+        
+        // 调用 JSAPI 下单
+        const res = await wechatPayApi.jsapiPayRecharge(
+          payAmount.value,
+          openid,
+          `凡图拉-充值${payAmount.value}点`
+        )
+        
+        if (!res.success || !res.data) {
+          ElMessage.error(res.error || '支付发起失败')
+          return
+        }
+        
+        // 调起微信支付
+        const paySuccess = await invokeWechatPay({
+          appId: res.data.appId,
+          timeStamp: res.data.timeStamp,
+          nonceStr: res.data.nonceStr,
+          package: res.data.package,
+          signType: res.data.signType,
+          paySign: res.data.paySign,
         })
-        emit('success')
-        close()
-    } catch (e) {
-        ElMessage.error('支付发起失败')
+        
+        if (paySuccess) {
+          ElMessage.success('充值成功！')
+          
+          // 刷新用户余额
+          await userStore.fetchUserInfo()
+          
+          emit('success')
+          close()
+        }
+        
+    } catch (e: any) {
+        ElMessage.error(e.message || '支付失败')
     } finally {
         loading.value = false
     }
@@ -167,6 +315,15 @@ const handleRecharge = async () => {
 
 // Fetch Logic
 onMounted(async () => {
+    // 检查微信浏览器
+    checkWechatBrowser()
+    
+    // 尝试获取 OpenID
+    if (isWechatBrowser.value) {
+      await getOpenId()
+    }
+    
+    // 加载充值档位
     try {
         const res = await authApi.getActiveTiers()
         if (res.success && res.data) {
@@ -179,6 +336,15 @@ onMounted(async () => {
         console.error('Fetch tiers failed', e)
     }
 })
+
+// 声明 WeixinJSBridge 类型
+declare const WeixinJSBridge: {
+  invoke: (
+    method: string,
+    params: object,
+    callback: (res: { err_msg: string }) => void
+  ) => void
+}
 </script>
 
 <style scoped>
@@ -251,9 +417,11 @@ onMounted(async () => {
     border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
 }
 .pay-item.active { border-color: #F97316; background: rgba(249, 115, 22, 0.05); }
+.pay-item.disabled { opacity: 0.5; cursor: not-allowed; }
 
 .pay-left { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 15px; }
 .pay-icon { width: 24px; height: 24px; object-fit: contain; }
+.coming-soon { font-size: 11px; color: #94A3B8; margin-left: 8px; }
 
 .pay-radio {
     width: 20px; height: 20px; border-radius: 50%; border: 2px solid #64748B;
@@ -261,6 +429,15 @@ onMounted(async () => {
 }
 .pay-radio.checked { border-color: #F97316; }
 .radio-dot { width: 10px; height: 10px; background: #F97316; border-radius: 50%; }
+
+/* WeChat Tip */
+.wechat-tip {
+    margin-top: 16px; padding: 12px 16px;
+    background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2);
+    border-radius: 12px; display: flex; align-items: center; gap: 12px;
+}
+.tip-icon { font-size: 20px; }
+.tip-text { font-size: 13px; color: #F97316; }
 
 /* Footer */
 .modal-footer { margin-top: 32px; }

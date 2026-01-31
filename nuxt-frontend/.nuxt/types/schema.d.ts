@@ -13,6 +13,24 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
 
    apiSecret: string,
 
+   supabaseKey: string,
+
+   supabaseServiceKey: string,
+
+   wechatPayMchid: string,
+
+   wechatPayAppid: string,
+
+   wechatPayApiV3Key: string,
+
+   wechatPaySerialNo: string,
+
+   wechatPayPrivateKey: string,
+
+   wechatPayNotifyUrl: string,
+
+   wechatAppSecret: string,
+
    nitro: {
       envPrefix: string,
    },
@@ -23,6 +41,8 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
    appName: string,
 
    siteUrl: string,
+
+   wechatAppid: string,
   }
 declare module '@nuxt/schema' {
   interface ModuleDependencies {

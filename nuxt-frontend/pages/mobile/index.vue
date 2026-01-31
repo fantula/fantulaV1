@@ -6,7 +6,7 @@
     />
 
     <!-- Content Scroll -->
-    <div class="content-scroll no-scrollbar" @scroll="handleScroll">
+    <div class="content-scroll no-scrollbar" ref="scrollContainer" @scroll="handleScroll">
       
       <!-- 1. Banners -->
       <HomeBanner :banners="banners" />
@@ -15,7 +15,7 @@
       <HomeCategoryNav 
         :categories="categories"
         v-model="activeCategoryId"
-        @change="fetchGoods"
+        @change="handleCategoryChange"
       />
 
       <!-- 3. Goods List -->
@@ -42,9 +42,16 @@
            />
         </div>
 
-        <!-- Load More -->
-        <div v-if="goodsLoading && currentGoods.length > 0" class="loading-more">
-          <div class="spinner-mini"></div> 加载更多...
+        <!-- Load More Trigger -->
+        <div v-if="hasMore && currentGoods.length > 0" class="load-more-trigger" ref="loadMoreTrigger">
+           <div v-if="isLoadingMore" class="loading-more">
+             <div class="spinner-mini"></div> 加载更多...
+           </div>
+        </div>
+        
+        <!-- No More Data -->
+        <div v-if="!hasMore && currentGoods.length > 0" class="no-more-data">
+           - 到底了 -
         </div>
       </div>
       
@@ -67,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { commonApi } from '@/api/client/common'
 import { goodsApi } from '@/api/client/goods'
@@ -101,12 +108,23 @@ const currentGoods = ref<Goods[]>([])
 const activeCategoryId = ref<string | number>('')
 const goodsLoading = ref(false)
 
+// Pagination State (与 PC 端一致)
+const currentPage = ref(1)
+const hasMore = ref(true)
+const isLoadingMore = ref(false)
+const PAGE_SIZE = 10
+
 // UI State
 const isScrolled = ref(false)
-const scrollThreshold = 20;
+const scrollThreshold = 20
 const showDetailSheet = ref(false)
 const showLoginSheet = ref(false)
 const selectedGoodsId = ref<string | number>('')
+
+// Refs for IntersectionObserver
+const scrollContainer = ref<HTMLElement | null>(null)
+const loadMoreTrigger = ref<HTMLElement | null>(null)
+let observer: IntersectionObserver | null = null
 
 // Interactions
 const openDetail = (id: string | number) => {
@@ -146,23 +164,85 @@ const fetchCategories = async () => {
   return null
 }
 
-const fetchGoods = async (categoryId?: string | number) => {
-  goodsLoading.value = true
+// 核心：获取商品列表 (支持分页，与 PC 端逻辑一致)
+const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
+  if (!categoryId) return
   
+  if (isLoadMore) {
+    if (!hasMore.value || isLoadingMore.value) return
+    isLoadingMore.value = true
+  } else {
+    // 重置列表
+    goodsLoading.value = true
+    currentPage.value = 1
+    hasMore.value = true
+    currentGoods.value = []
+  }
+
   try {
     const res = await goodsApi.getGoodsList({ 
-        categoryId: categoryId || activeCategoryId.value, 
-        page: 1, 
-        limit: 10,
+        categoryId: categoryId,
+        page: currentPage.value, 
+        limit: PAGE_SIZE,
     })
     
-    currentGoods.value = res?.success && res.data?.list ? res.data.list : []
+    const newList = res?.success && res.data?.list ? res.data.list : []
+    
+    if (isLoadMore) {
+      currentGoods.value = [...currentGoods.value, ...newList]
+    } else {
+      currentGoods.value = newList
+    }
+
+    if (newList.length < PAGE_SIZE) {
+      hasMore.value = false
+    } else {
+      currentPage.value++
+      hasMore.value = true
+    }
   } catch (e) {
     console.error(e)
-    currentGoods.value = []
+    if (!isLoadMore) currentGoods.value = []
   } finally {
     goodsLoading.value = false
+    isLoadingMore.value = false
   }
+}
+
+// 滚动加载触发器
+const loadMore = () => {
+  fetchGoods(activeCategoryId.value, true)
+}
+
+// 分类切换处理
+const handleCategoryChange = async (categoryId: string | number) => {
+  activeCategoryId.value = categoryId
+  await fetchGoods(categoryId)
+  // 切换分类后重新设置 Observer
+  setupObserver()
+}
+
+// 设置 IntersectionObserver
+const setupObserver = () => {
+  if (observer) observer.disconnect()
+  
+  // 等待 DOM 更新后设置
+  setTimeout(() => {
+    if (loadMoreTrigger.value) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore.value && !isLoadingMore.value) {
+            loadMore()
+          }
+        },
+        { 
+          root: scrollContainer.value,
+          rootMargin: '100px'
+        }
+      )
+      observer.observe(loadMoreTrigger.value)
+    }
+  }, 100)
 }
 
 const handleScroll = (e: Event) => {
@@ -184,6 +264,9 @@ onMounted(async () => {
            })
         ])
         
+        // 设置滚动加载监听
+        setupObserver()
+        
         if (route.query.open) {
             openDetail(route.query.open as string)
             router.replace({ query: { ...route.query, open: undefined } })
@@ -191,6 +274,10 @@ onMounted(async () => {
     } finally {
         setTimeout(() => stopLoading(), 500)
     }
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
 })
 </script>
 
@@ -274,6 +361,22 @@ onMounted(async () => {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.load-more-trigger {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.no-more-data {
+  text-align: center;
+  padding: 24px 0;
+  color: #64748B;
+  font-size: 12px;
+  opacity: 0.6;
+}
 
 .tab-bar-spacer { height: 80px; }
 </style>

@@ -376,6 +376,22 @@ verify_jwt = false
 [functions.upload-r2]
 verify_jwt = false
 
+# WeChat Pay Edge Functions
+[functions.wechat-notify]
+verify_jwt = false  # Called by WeChat servers, no JWT
+
+[functions.wechat-native-pay]
+verify_jwt = false  # Temporarily disabled for testing
+
+[functions.wechat-query-order]
+verify_jwt = false  # Temporarily disabled for testing
+
+[functions.wechat-jsapi-pay]
+verify_jwt = false  # Temporarily disabled for testing
+
+[functions.wechat-get-openid]
+verify_jwt = false  # Temporarily disabled for testing
+
 [analytics]
 enabled = true
 port = 54327
