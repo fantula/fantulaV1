@@ -179,8 +179,8 @@ export const adminImageApi = {
                 const token = await getAdminAuthToken()
 
                 if (token) {
-                    const { EDGE_FUNCTIONS_URL } = await import('@/utils/supabase')
-                    const response = await fetch(`${EDGE_FUNCTIONS_URL}/delete-r2`, {
+                    const { getEdgeFunctionsUrl } = await import('@/utils/supabase')
+                    const response = await fetch(`${getEdgeFunctionsUrl()}/delete-r2`, {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,

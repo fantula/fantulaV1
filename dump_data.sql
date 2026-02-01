@@ -1,0 +1,1570 @@
+SET session_replication_role = replica;
+
+--
+-- PostgreSQL database dump
+--
+
+-- \restrict u51f5mVD9s5cBqeFKh8hXRPdY4I1PnikadYx5tvtBq6MBuLLhmlT7nT90IFRaax
+
+-- Dumped from database version 17.6
+-- Dumped by pg_dump version 17.6
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Data for Name: audit_log_entries; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created_at", "ip_address") VALUES
+	('00000000-0000-0000-0000-000000000000', '7af21936-97d1-46d9-8795-5289c09a1439', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:05:48.35635+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd7783972-c7d3-4c64-a72b-8cdbe3645aeb', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:06:15.689417+00', ''),
+	('00000000-0000-0000-0000-000000000000', '732dda28-887e-47c1-96a9-3b309424c971', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:09:14.835909+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e695681a-d403-4d85-b5f7-c502902a0624', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:11:12.15722+00', ''),
+	('00000000-0000-0000-0000-000000000000', '231848cf-6984-4fcf-81b1-ebd6c3285f5e', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:14:03.611348+00', ''),
+	('00000000-0000-0000-0000-000000000000', '70483eba-636c-4c6c-a1ae-4f55b73fa7fc', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:17:05.193996+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1ed64c5f-cc8a-4cb1-a692-e4a7fb7371c0', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:19:12.295756+00', ''),
+	('00000000-0000-0000-0000-000000000000', '18bd3899-74bd-450d-92f5-2bd020319cc8', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:24:15.681085+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0c614e46-c0ab-4d74-8f55-ee10b8a51f0d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:26:51.181154+00', ''),
+	('00000000-0000-0000-0000-000000000000', '80fa6749-b69c-403e-9c75-efa5306be7c4', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:31:42.655478+00', ''),
+	('00000000-0000-0000-0000-000000000000', '537a2751-680f-474e-9c6d-c1444faa502d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:32:17.551482+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4dcdc77c-cb79-4130-873b-2215b2fa5484', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:34:46.516399+00', ''),
+	('00000000-0000-0000-0000-000000000000', '04e48377-5c30-452f-a5bf-092a59b7ec46', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 09:37:32.090497+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6e7082fc-68dd-4784-9cfb-42490b062104', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:02:06.931762+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7607bcd6-43b6-4cfd-bebb-a573ee52e846', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:05:05.598808+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f2b5eca8-a248-49e2-a586-f2dea1ad1eda', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:07:13.52992+00', ''),
+	('00000000-0000-0000-0000-000000000000', '906340ed-a5b8-46de-869b-aa0cc2ab5105', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:12:57.424337+00', ''),
+	('00000000-0000-0000-0000-000000000000', '12f65ac1-4f96-472b-b20d-629edd53ff3f', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:20:25.397191+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a766c531-d697-44db-ba49-995961dfd09e', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:34:52.220441+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6ad746e5-b223-437c-b8db-2f76f8cb0a5f', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:35:28.052615+00', ''),
+	('00000000-0000-0000-0000-000000000000', '382028d7-dc43-4a08-9866-e65c75fb8397', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:35:58.935373+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9be63e46-c8ef-4d4a-b637-67676b972724', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 10:37:18.421452+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cb00a107-68ec-4fcd-a06e-85775ecc994a', '{"action":"user_signedup","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2026-01-20 11:00:36.553867+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ac671445-3ecb-40f4-bc38-9103b871baae', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 11:00:36.561501+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5285f1dc-8715-44ab-b91f-0f140965d1a4', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-20 11:00:36.588523+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c817cc2c-1e49-4d82-82ae-39d5cfd98c88', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-20 11:05:29.692953+00', ''),
+	('00000000-0000-0000-0000-000000000000', '15d560bd-e4a2-491d-b029-1172da763b1f', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-20 11:07:32.090279+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4d42e7f9-e2c3-4d25-937b-d4adb9d10170', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-20 12:05:45.208154+00', ''),
+	('00000000-0000-0000-0000-000000000000', '75f236fe-95cf-4a61-b4c4-344f293233ef', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-20 12:05:45.208684+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fc9aa517-29ba-439d-b7ae-6042cb66f907', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-20 12:32:49.442688+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c17f43a3-1e4b-4d65-865e-046efb190df0', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-20 12:32:49.443366+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd7145ed0-2365-44e9-a5db-3828b2eae87e', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-20 13:04:05.50816+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd9940020-740c-49d9-98d6-85fbdcef8cd5', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-20 13:04:05.5089+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f1002153-91a6-44e3-a7de-d59a04369d36', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 04:09:38.083954+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dc6513db-5fe3-45b3-968a-e25f96b0369a', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-21 04:10:29.01282+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a3014eb4-9af9-4084-a5b0-8d14245f5b83', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 04:57:01.633994+00', ''),
+	('00000000-0000-0000-0000-000000000000', '782c6911-6025-4337-a7bb-ae38b59a128f', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 05:08:59.805379+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7f99f3a-a515-44a5-8ddd-2607702d3062', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 05:08:59.805981+00', ''),
+	('00000000-0000-0000-0000-000000000000', '47e0015e-d709-46ca-957e-8e15f844f33d', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 06:07:13.761116+00', ''),
+	('00000000-0000-0000-0000-000000000000', '536f046d-1967-4672-98b8-ad95564f0482', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 06:07:13.761692+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a82c0d09-ff68-450c-990c-c2909a804ea2', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 06:33:45.302267+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cd8dbb0d-dd90-4743-b4b2-3369b905e6d5', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-21 06:34:35.322182+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e0c3585c-a9b2-4c37-86eb-9ec29c0ac2a7', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 06:47:52.650431+00', ''),
+	('00000000-0000-0000-0000-000000000000', '23cfbe8c-872a-4c75-a663-2c6ce77da95f', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 06:48:07.191613+00', ''),
+	('00000000-0000-0000-0000-000000000000', '837f0de0-5142-4131-ad15-253ff9a2c11e', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 06:48:14.992938+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f696c40b-e950-441e-8eab-b635cc23cb2f', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 06:56:42.107273+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2483f037-115b-46d3-bd62-8e10226dc404', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 07:02:43.705092+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f790508b-8ab7-40ff-a9e1-c3dc139b5fc8', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 07:36:51.027107+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1ac8b322-cdbe-40cb-b4a8-4ed01a62942a', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-21 07:37:09.242541+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4b4096e4-8ab5-4837-a1d7-84dba4312f11', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 08:15:14.456833+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8b766d99-f5c3-4e7a-9d30-264c1ff26710', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 08:47:10.949885+00', ''),
+	('00000000-0000-0000-0000-000000000000', '964e10ba-0336-41df-b6b8-fa8bdea86025', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 08:47:10.951637+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3b4abc78-fe14-4f5c-8d46-797941c2655e', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 08:47:36.764234+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ca265048-fe12-40e6-b61c-83d6be227c22', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 09:39:12.952934+00', ''),
+	('00000000-0000-0000-0000-000000000000', '40cd9856-c534-4455-9aa7-6203330e74ce', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 09:45:21.323251+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c23f0d80-fcdb-40db-8e06-afbcf361044d', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 09:45:21.323887+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8ef11dee-00c4-4702-9ea0-744a62f48be4', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 10:00:02.459469+00', ''),
+	('00000000-0000-0000-0000-000000000000', '55d25234-e755-47a5-a607-f8d4d6f62378', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 10:42:48.324636+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3b4fd09d-28e1-43b5-b57d-830d95c82216', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 10:43:21.815507+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6a515813-8261-4086-a455-2cf8e12c01db', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 10:43:21.815956+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8d8c5967-5a43-453f-9f39-010757b74bbd', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-21 10:44:27.448809+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3a3ad84e-5151-4321-8a38-4f3a9d3a54cd', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-21 10:44:53.175764+00', ''),
+	('00000000-0000-0000-0000-000000000000', '653d97fe-7bc2-4bb8-bb25-03019d229732', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 11:43:07.848075+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c7485c6c-d65c-4876-886d-63a6751a30e5', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 11:43:07.848542+00', ''),
+	('00000000-0000-0000-0000-000000000000', '81cf554e-e6a2-4829-a7d0-0906e256bcce', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 12:33:25.880762+00', ''),
+	('00000000-0000-0000-0000-000000000000', '36cf72e8-23a2-4faa-9bd7-089d9afe7c3d', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 12:41:09.406342+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b21b7213-3c58-40d8-a723-f8ac6bcbfb61', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-21 12:41:09.406967+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e031e25f-50d1-4761-b3e7-aeb738c40a05', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 12:46:28.000856+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eba12ea9-2f0a-4d15-b3ba-da2af52f918f', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-21 13:10:53.306602+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6e0cf043-a0db-4467-b921-f3501e40d7ab', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 03:18:38.242553+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2326fbdf-9fc7-4df1-b84f-33e21ab5d117', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 03:18:38.244315+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e1e82448-3aca-404c-8f16-b5d0e0f64eb5', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 03:18:38.366608+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1bebf74e-9ae8-4877-9642-ca5629e3ac71', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 03:18:38.367157+00', ''),
+	('00000000-0000-0000-0000-000000000000', '34c8444b-3c27-44b0-a1b4-9b56791a17db', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 03:18:52.912502+00', ''),
+	('00000000-0000-0000-0000-000000000000', '08adefd9-7b8c-4790-95b9-393b30bcfb11', '{"action":"user_signedup","actor_id":"af1c7310-2665-4f7b-800b-a1a5b3946852","actor_username":"jiangdalin1988@gmail.cpom","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2026-01-22 03:19:11.419944+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8507ed14-c768-40ea-8ba4-e83cb107d09d', '{"action":"login","actor_id":"af1c7310-2665-4f7b-800b-a1a5b3946852","actor_username":"jiangdalin1988@gmail.cpom","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 03:19:11.426661+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ebbd3d96-c4e1-4781-be04-12a23bc95c37', '{"action":"user_recovery_requested","actor_id":"af1c7310-2665-4f7b-800b-a1a5b3946852","actor_username":"jiangdalin1988@gmail.cpom","actor_via_sso":false,"log_type":"user"}', '2026-01-22 03:19:11.44933+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e3dd5fdf-d8b6-45b0-8664-b5cb17a363bf', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 03:40:15.345784+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a913a85e-9a4d-4a11-9b12-70d6d4f2bd69', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 03:40:38.953945+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e7fca3b8-abe4-4930-9ad0-2ebeba14f902', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 03:41:00.509126+00', ''),
+	('00000000-0000-0000-0000-000000000000', '96c3a6b4-2be9-4c07-b505-2a10572ce20f', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 03:51:11.754436+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd4a99290-0b28-49e2-924d-3b3162983690', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 03:51:32.341564+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4d29c612-ac10-4fff-b9b5-302ce0180840', '{"action":"user_signedup","actor_id":"ec57b0a4-ad47-4807-becf-2e0ae0c9eacc","actor_username":"jiangdalin@gmail.com","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2026-01-22 04:05:42.948974+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e5bf84de-98d9-486c-8325-9f687d6469ab', '{"action":"login","actor_id":"ec57b0a4-ad47-4807-becf-2e0ae0c9eacc","actor_username":"jiangdalin@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 04:05:42.956407+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dec93153-9462-4e7e-9de9-a65ecf7a9457', '{"action":"user_recovery_requested","actor_id":"ec57b0a4-ad47-4807-becf-2e0ae0c9eacc","actor_username":"jiangdalin@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 04:05:42.984298+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8a4d5d58-531d-4745-959a-3d88005a93d7', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 04:19:04.445565+00', ''),
+	('00000000-0000-0000-0000-000000000000', '60ed9186-2743-4b74-955b-f6220ea1d7cb', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 04:19:26.150715+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e07b9515-19ba-4564-8896-b7f5d39afccd', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 04:19:37.283112+00', ''),
+	('00000000-0000-0000-0000-000000000000', '48b51e72-78a9-4bf1-b9a5-9947bfff29d9', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 04:20:11.660264+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4ce007f3-f028-45b7-848b-47233c95ba19', '{"action":"user_modified","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 04:20:29.93607+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2f02ceab-10ed-4301-9967-2a4cebfd6dbb', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 04:59:56.623428+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3d3b97c6-ac33-4fa0-b52f-9fe3cf24a871', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 05:18:36.759171+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c6e23c14-372b-423a-95b2-5d65e49b74a9', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 05:18:36.759835+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f290289d-eb72-483a-8725-579d8e01b8a7', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:33:16.617246+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7adcf673-53e2-4f2d-a3c9-135ef039a811', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:38:22.829775+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c6a7629c-59cd-4020-b106-7f4218bffc05', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:42:45.22201+00', ''),
+	('00000000-0000-0000-0000-000000000000', '683fa96e-75a1-414e-b45c-06d3fc2d5724', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:44:12.922625+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a738f76a-5793-4c8a-bf98-6cc5f00d2cec', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:47:51.997874+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8307dffa-e6d5-4097-9f8a-5a925a6e29a2', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:48:20.880877+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0562435f-ee5d-46ff-9ebd-249d314a3721', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:49:42.771578+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f99d4f56-fd27-42ed-a168-4aa8933f3850', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:50:59.735852+00', ''),
+	('00000000-0000-0000-0000-000000000000', '25dc5111-24b2-4dc0-859b-450109ab73e2', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:53:08.285227+00', ''),
+	('00000000-0000-0000-0000-000000000000', '94356dbb-891c-424c-ad3f-cd7bb18ac5b8', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:53:50.803467+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6af5110c-797f-4592-943a-a857c6090cb0', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 05:59:41.391388+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'af86b9c3-fc0b-4376-baa6-f4b188e15cc0', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 06:02:26.861586+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c5fcfd01-1792-46e2-96a0-8b938a08464d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 06:05:37.853326+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f827110a-702a-4678-b4fd-5f71f8a3fd9a', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 06:07:00.901024+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f3210f81-e9a4-4155-b4aa-5c1dc7d6a7a3', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 06:07:31.64557+00', ''),
+	('00000000-0000-0000-0000-000000000000', '100464d2-cf2e-40c8-ad96-708314752ba9', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 06:29:36.158612+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c775188e-3cb9-4c67-9434-0d536c78939f', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 06:39:43.555485+00', ''),
+	('00000000-0000-0000-0000-000000000000', '834e10b7-b3e5-46b8-a512-b7632d99f0c9', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 07:05:42.929124+00', ''),
+	('00000000-0000-0000-0000-000000000000', '568061f0-0d71-49c0-a2f6-d2cf52c542b8', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 07:05:42.929665+00', ''),
+	('00000000-0000-0000-0000-000000000000', '98d040fc-6d3f-4b7c-9356-5724390ccfdf', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 07:48:19.777563+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3bf44779-0e8e-4516-b68f-12d1e67ce64a', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 07:48:19.778136+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd72de54c-257a-4863-a0f8-1fd5e6475a4f', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 08:04:03.71394+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e394c2ce-a4bf-4fb3-930e-3dca4096d688', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 08:04:03.7149+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9822cca2-0ef3-45f0-863b-84eaa7eb3d81', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 08:16:20.065135+00', ''),
+	('00000000-0000-0000-0000-000000000000', '33b74d38-4627-4d2d-a269-445aed992623', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 08:17:09.892832+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1f3c144c-7c96-48f7-9396-30c18165983b', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 12:20:31.351544+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0f86d83f-0dc1-4c0d-9616-76a31403e39b', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-22 12:20:31.354822+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1626e05b-885f-41f2-b634-ef702d8390f8', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-22 12:20:34.435198+00', ''),
+	('00000000-0000-0000-0000-000000000000', '887e4b0b-c070-41ed-9a86-06d072f2185a', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-22 12:33:05.653397+00', ''),
+	('00000000-0000-0000-0000-000000000000', '64ba1e3f-d3a3-40b5-b0cb-1cff7635d18f', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-22 12:33:30.748041+00', ''),
+	('00000000-0000-0000-0000-000000000000', '45158706-aa2a-47df-94cf-4570651e9491', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 04:37:31.239068+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0372799a-0217-4dfa-9034-9c988b24f9a2', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 04:37:31.24112+00', ''),
+	('00000000-0000-0000-0000-000000000000', '87731840-d03e-4c07-851a-35f7a796cdbb', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 04:37:31.332061+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2bf88ac5-7459-4163-a2bf-c3d5a132cb4f', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 04:37:31.332602+00', ''),
+	('00000000-0000-0000-0000-000000000000', '20f25e17-9724-40d2-8ff8-264048e09dba', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 04:37:47.103251+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a0b095dd-9a4c-4d38-b260-e8bbc4d02cd9', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 04:38:39.617417+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c4130220-36c1-466d-a624-9788af8c28f9', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 05:08:32.400505+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'be37c14f-a036-4df8-8e35-fb3bf95c8972', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 05:09:20.537484+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fdd42c15-b101-4107-892e-6057e2f13e5a', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 05:30:37.798611+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b5bbec92-7a5e-43e0-a5e6-da6a918effbd', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 05:35:51.03523+00', ''),
+	('00000000-0000-0000-0000-000000000000', '32683760-2550-45a1-bbf7-77dd3baea0d6', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 05:35:51.035829+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6c3437da-6207-4427-87c9-d3ab836798bd', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 05:36:50.877593+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6077388f-abfc-45b6-bbfc-0f13968ca8c7', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 05:36:50.878223+00', ''),
+	('00000000-0000-0000-0000-000000000000', '344c8790-b2f0-4a32-88aa-cee46698679d', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 05:46:38.955847+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ff2132b4-77ef-421c-82f0-6b44a2787f73', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 05:47:07.468834+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4db22b42-9bd1-40a2-8ca1-fdac2adf13ae', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 06:45:35.357473+00', ''),
+	('00000000-0000-0000-0000-000000000000', '858d3fdc-ce0f-42e9-ab91-321b1ae200bd', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 06:45:35.358266+00', ''),
+	('00000000-0000-0000-0000-000000000000', '674be660-547a-405e-b9fe-a19494aec2ab', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 07:43:35.340109+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0da9bf56-5419-466c-9521-c4d056e2885b', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 07:43:35.34082+00', ''),
+	('00000000-0000-0000-0000-000000000000', '780c8757-f421-431c-9e52-23e8148e12c8', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:41:51.736285+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8f1bf080-c205-4e6c-b692-1ede2d4cefa1', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:41:51.737178+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cd12baf3-a21b-4e6c-82c9-6952ed8033df', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:44:53.849576+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2f826960-cbf9-4e65-bedc-40b78bd244fe', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:44:53.850299+00', ''),
+	('00000000-0000-0000-0000-000000000000', '17369add-3401-4a8f-a87e-0821312b75c4', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:45:00.922528+00', ''),
+	('00000000-0000-0000-0000-000000000000', '265b5d1b-9864-4738-b85c-73abeb8a7b49', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:45:00.923141+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5697f03c-666e-4f36-9a3b-5b8c345d5fd4', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:45:08.650084+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0b2dcb05-28b0-40a1-92d8-cab83b83514b', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 08:45:08.650786+00', ''),
+	('00000000-0000-0000-0000-000000000000', '93acaed7-96a5-427b-ba65-7fc99bb7b9a3', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 08:45:09.730845+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4df9005f-c85f-4972-9ecd-ff92ff4d4651', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 09:12:22.924737+00', ''),
+	('00000000-0000-0000-0000-000000000000', '08c17c87-10a3-40a3-8cbe-31ac9ed952f4', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 09:23:19.020619+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ae5239e3-b929-4322-8c5e-7130ef227f0d', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 09:26:35.847566+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5d3df9ab-50c2-4819-9d03-2ee6700471fa', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 09:26:54.25123+00', ''),
+	('00000000-0000-0000-0000-000000000000', '72ff3385-b9e5-43bb-8d2e-3840a26c6210', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 09:40:07.997281+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6a139e3a-df0f-451e-9349-2e27a05629fb', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 09:40:07.997784+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1175b06a-9e97-4d4d-8cda-550e2b3b6dd8', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 09:43:07.988207+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7ebc7b47-f71c-456a-9e13-cb516bf6f486', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 09:43:07.98876+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4836a303-cf94-44a1-9146-914329b4463f', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:24:55.608392+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b8d66ffb-ac25-4e6a-8759-9b3fde090b70', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:24:55.608921+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ac5ef917-b9c3-4597-98d1-c9205bcb996c', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:38:37.997003+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4c33c6e9-a248-418b-90cd-c168ef044ee3', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:38:37.997708+00', ''),
+	('00000000-0000-0000-0000-000000000000', '49b3307e-d4f6-42af-a473-8046de6f1abd', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:41:07.994703+00', ''),
+	('00000000-0000-0000-0000-000000000000', '71c1935c-3ad2-41e6-b11c-aebcbdeaf9d9', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:41:07.995201+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ca6f21cc-625b-4a90-b4f0-a168485e5d39', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:44:16.102915+00', ''),
+	('00000000-0000-0000-0000-000000000000', '73474e0f-2fe7-47a7-8c6f-4417459d6b6f', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 10:44:16.103395+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6ec30ce0-f69f-4035-a693-5736081144fa', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 10:44:21.605152+00', ''),
+	('00000000-0000-0000-0000-000000000000', '61ac2015-1ae7-4868-916f-5ab047c66ed2', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 11:09:19.3485+00', ''),
+	('00000000-0000-0000-0000-000000000000', '10a8c62f-d402-4db6-9077-9b84307de17d', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 11:23:12.552844+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f79124d7-459b-41a4-a134-d6ec39a0aa45', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 11:23:12.553516+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e4b2b961-5d58-496d-be85-5dba572b0a81', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 11:36:37.991895+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1c7941ed-a26e-498c-9a20-22c80eb93b41', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 11:36:37.992404+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9ab48cf9-2589-420a-a69f-2e8602549722', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 11:39:07.995225+00', ''),
+	('00000000-0000-0000-0000-000000000000', '719114a2-70a7-42dd-ae92-c711d47bff1c', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 11:39:07.995822+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1e6d33df-f741-442a-8423-778948711723', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 12:21:16.506994+00', ''),
+	('00000000-0000-0000-0000-000000000000', '81feebff-cf2d-46d1-ac21-9513c25a324f', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 12:21:16.507673+00', ''),
+	('00000000-0000-0000-0000-000000000000', '20a90728-f6b6-4774-9dbb-d54db308fbe7', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 12:29:10.870887+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2f52ffd8-9ae6-4eae-a458-45b4fb98c340', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-23 12:29:10.871501+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f0a624f9-3c18-4d7f-956c-c409d4ef37cb', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 12:29:15.509471+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b95f2412-7f7e-417c-819c-955e2e6000fb', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 12:41:42.60816+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c0040e85-cff1-4f2f-911f-c4f6b1263d00', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 17:19:19.951317+00', ''),
+	('00000000-0000-0000-0000-000000000000', '76c2c03e-4c24-462a-8f8a-6025e5a43f84', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 17:33:16.679974+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ede7e5ff-fac8-47f1-aac1-e971c0ed1c6e', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 17:41:37.93141+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0df7cfc0-73a9-4b20-ae91-dc6324c84774', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 17:44:20.581859+00', ''),
+	('00000000-0000-0000-0000-000000000000', '475fbcd9-f055-4bfa-9f83-e9b043dac489', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 17:44:29.689469+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b78d105f-33d4-464b-b4ef-ef8f7f2b2af3', '{"action":"user_signedup","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"provider":"email","user_email":"liumeiti1108@gmail.com","user_id":"5edb3620-404a-4ea8-9d2c-4ff5d4cfa8bb","user_phone":""}}', '2026-01-23 17:44:56.032761+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3ff2bed8-60a3-433e-b838-c6f78fc2e64a', '{"action":"user_deleted","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"user_email":"liumeiti1108@gmail.com","user_id":"5edb3620-404a-4ea8-9d2c-4ff5d4cfa8bb","user_phone":""}}', '2026-01-23 17:44:56.061339+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a3d28ba0-64b2-4d7b-b5e7-285f78d004a9', '{"action":"user_signedup","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"provider":"email","user_email":"liumeiti1108@gmail.com","user_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","user_phone":""}}', '2026-01-23 17:46:29.197571+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1dba26cc-99a6-4557-a690-0fe5096d5ae2', '{"action":"login","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 17:46:52.242596+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fa3baec4-f5b7-4ab3-a4ca-bf363896e0c1', '{"action":"user_recovery_requested","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 17:47:06.89507+00', ''),
+	('00000000-0000-0000-0000-000000000000', '01e947c3-c375-428f-8fcb-2d364617c7c7', '{"action":"login","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 17:47:45.933566+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a306f3c1-fffa-4062-97cd-5696d200ebe2', '{"action":"user_recovery_requested","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 17:54:21.061839+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fa8fd7ae-99c4-4c51-b222-dd0d18138d57', '{"action":"login","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 17:54:48.524001+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9a0f8b0c-3ba7-472d-ba5f-b96462ef2f4c', '{"action":"user_recovery_requested","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 17:55:42.533858+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'da4b42f3-01e9-4c19-8a56-ad0d66a1ae6e', '{"action":"login","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 17:56:04.440046+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd10723a1-6afa-4820-b906-d160a36ee579', '{"action":"user_recovery_requested","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 17:58:47.334833+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0ab75e25-f8ed-4bd0-95f9-f1f2ab7ab808', '{"action":"login","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 17:59:10.074508+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd56b2b90-51dd-4cff-bc8b-f430e5019b2e', '{"action":"user_recovery_requested","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-23 18:10:30.005493+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e5fc4709-34d1-43b0-990c-3d0fac4ba661', '{"action":"login","actor_id":"94316d2d-636c-46c2-b5dd-b9a55a8424a5","actor_username":"liumeiti1108@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-23 18:11:01.958022+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8ab0c7f1-4695-4b80-8248-b6d1b2778ec0', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 18:14:00.290416+00', ''),
+	('00000000-0000-0000-0000-000000000000', '87b44cc4-9818-4dba-96c0-f0977285e87e', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-23 18:16:43.921224+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f665b05a-93af-4aa4-b54f-5897393254ae', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 04:37:30.988655+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0cc2a405-1631-4855-873c-39a8cfadda2e', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 04:38:38.093014+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd480fd49-2820-4b25-af33-301e2dd55770', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-24 04:38:59.341937+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2d306c23-73b1-4530-b037-895542e0a348', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 04:56:38.930064+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6f4d0173-8415-43fb-b389-4725367b3bb2', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 04:57:48.837447+00', ''),
+	('00000000-0000-0000-0000-000000000000', '69e3e708-fa4b-4ef1-80c1-af9606ba9c2f', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 04:58:29.074262+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2e547b3b-4e21-479e-a8d0-5a41cc080f63', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:00:24.387335+00', ''),
+	('00000000-0000-0000-0000-000000000000', '75216d40-988c-407f-90e7-8cc0f56b698c', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:02:39.497974+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a6104dbe-b728-49ec-b3f5-07182ddc816b', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:20:19.146541+00', ''),
+	('00000000-0000-0000-0000-000000000000', '98659213-1e5f-4845-81db-d7fd5b3f102c', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:29:37.793302+00', ''),
+	('00000000-0000-0000-0000-000000000000', '012ae0cc-e0b3-418d-a151-4772a16502f7', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:31:12.456353+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b4f5ec74-f6b1-4ab5-842c-5bf3cdeb338a', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:46:03.277466+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd1e4a280-1790-4d4a-82cf-eb87fd955197', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:47:06.619859+00', ''),
+	('00000000-0000-0000-0000-000000000000', '53a65368-fc36-4794-bb3f-ca3d27f10ead', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:47:48.705548+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dc124e03-0695-43c5-986f-b0f5e41d1c75', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:48:40.333517+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd46474c4-4a11-46c2-a92d-4112d3e412c5', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 05:56:03.719487+00', ''),
+	('00000000-0000-0000-0000-000000000000', '65713acd-1204-4937-b706-d0157e004491', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 06:17:55.967516+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a21e5429-f1fc-4353-b515-65b6f5b67e9a', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-24 06:18:15.750118+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5be84f8c-497b-4ae8-9f1d-e49d46ca42ac', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 06:19:43.053312+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4bd3ae35-c6ab-4ef3-b838-0a7858b6f09b', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 06:19:43.054046+00', ''),
+	('00000000-0000-0000-0000-000000000000', '00ac401a-3718-4691-99dd-49c63473f349', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 07:16:49.107562+00', ''),
+	('00000000-0000-0000-0000-000000000000', '25c60873-690a-4f8b-9d92-e3fbeb7b7902', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 07:16:49.108056+00', ''),
+	('00000000-0000-0000-0000-000000000000', '30532a35-9ead-427f-8ce6-943ef5fad503', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 07:20:01.355215+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bb964664-d8bb-4425-b0e3-4dc0417d24e9', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-24 07:20:29.265985+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dd5c09c8-f389-4b3b-b0b0-cabc14b7826b', '{"action":"user_updated_password","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 07:20:29.459527+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c8c7e5c5-874f-4e1c-9282-83704c83b0aa', '{"action":"user_modified","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 07:20:29.460074+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3972571a-3068-4a4c-909e-046f7212fc1f', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 07:42:13.317633+00', ''),
+	('00000000-0000-0000-0000-000000000000', '45e6751e-4241-48b9-8313-9b6db0734d31', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 07:42:13.318389+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c92d0d68-e8dd-422b-ab0f-548144631ddc', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 07:43:44.563752+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a812b91c-5b02-449b-a8b1-9913d2e481b1', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 08:18:51.166899+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7d5b3e66-de9e-4d0b-8360-b41ec59c9604', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 08:18:51.167598+00', ''),
+	('00000000-0000-0000-0000-000000000000', '11c8e204-217a-4f52-9e85-83b591f1e804', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 09:15:16.324016+00', ''),
+	('00000000-0000-0000-0000-000000000000', '339638a9-5fce-44e0-8b2f-2280fcb73d7c', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 09:15:16.324629+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0ec68243-4bc3-4019-8fe9-19e141008693', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 09:17:14.677661+00', ''),
+	('00000000-0000-0000-0000-000000000000', '86ae9802-bb49-4593-b783-186bdbb178bf', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 09:17:14.678225+00', ''),
+	('00000000-0000-0000-0000-000000000000', '289ec2f8-5479-49f4-9220-0eddcbb29ba6', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 09:48:53.070495+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ebf87b28-c995-473a-bacc-3f5060a1f85d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 11:28:32.170784+00', ''),
+	('00000000-0000-0000-0000-000000000000', '16775157-d00b-4b6c-ad2c-0abbc605234a', '{"action":"user_signedup","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"team","traits":{"provider":"email"}}', '2026-01-24 11:34:20.312148+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a7acfef5-3ef7-45d4-a284-6c785777bb2f', '{"action":"login","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 11:34:20.319589+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2ce133f9-ce52-4eb1-8c29-49185beb3dea', '{"action":"user_recovery_requested","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 11:34:20.342395+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e4605b93-64ca-49c0-91ee-fbeef483cdd5', '{"action":"login","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-24 11:34:48.573642+00', ''),
+	('00000000-0000-0000-0000-000000000000', '91373bf4-63bf-48c7-83fa-61b6da7c8a30', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 11:42:06.636952+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ea8974ef-1f47-4c71-af52-3e073ef09b4b', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 11:46:27.746006+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e11e32db-0003-42ad-985b-3fd8f64c66b3', '{"action":"user_recovery_requested","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 11:51:36.48443+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ffae5cf3-08e3-456e-a394-7a6016985aae', '{"action":"login","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-24 11:51:56.885814+00', ''),
+	('00000000-0000-0000-0000-000000000000', '27b6d815-720b-4f40-b6bd-ca43e85de933', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 12:03:45.240823+00', ''),
+	('00000000-0000-0000-0000-000000000000', '34b2cb0d-f956-488a-bfcd-293326a3a054', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 12:19:38.000755+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4a6bcc23-e169-485b-86a7-18aca5a01089', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 12:38:29.298472+00', ''),
+	('00000000-0000-0000-0000-000000000000', '33f828aa-cbf3-4668-8d99-e7c9d87dbc7b', '{"action":"token_refreshed","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 12:50:23.637344+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1320c90b-e15f-47b4-83ac-59055c2f7da6', '{"action":"token_revoked","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 12:50:23.63807+00', ''),
+	('00000000-0000-0000-0000-000000000000', '318109b7-1ef2-4be1-8ed6-171b5b6ee6c3', '{"action":"token_refreshed","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 17:11:01.679101+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8b53dc64-fccd-4ece-9c3a-7b4ddc9b8584', '{"action":"token_revoked","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 17:11:01.68071+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9eabb41d-2aee-42cd-8231-630ca31d79f1', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 17:11:02.279858+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a70bfd91-6987-4ed0-888e-388d6da5d2b9', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-24 17:11:02.280331+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'adb5cb64-434f-4be4-9100-c646d206db48', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 17:11:07.113353+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ab518d1a-1553-4d6b-b6d5-3055c54a561e', '{"action":"user_recovery_requested","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 17:15:50.730555+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9f035fc7-d89b-42b0-99d8-e33d06e45a5d', '{"action":"user_recovery_requested","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 17:18:42.461319+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ebf49ddd-49e6-490e-83e1-f35af22dbb1e', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-24 17:20:59.501128+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'abce09a1-432a-4141-8515-865fd7de8d8c', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 17:23:01.479814+00', ''),
+	('00000000-0000-0000-0000-000000000000', '57d64887-9eff-48f6-a31c-e3c5adf9c9b7', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 17:42:39.615163+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1c1eedb8-ec5b-4689-847f-3ea006ccc5c8', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 17:45:33.774195+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ac983aa7-63c5-4870-82d2-c8be6a37c05a', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-24 17:55:49.926444+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fdf1510a-ef51-4e3f-8911-2458b4984a5d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 06:53:31.051473+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd6886f0f-11d4-41fd-b62b-2594623e2de7', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-25 06:53:51.950048+00', ''),
+	('00000000-0000-0000-0000-000000000000', '866c6f4d-a5ea-46c5-9da2-2da11c3f75ae', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-25 06:54:17.897623+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b9b691bc-134c-4059-bcc0-8443a0395e97', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 07:52:19.556702+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7f6dd63d-2bf2-4846-baec-ad6711531de8', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 07:52:19.55739+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c5ac8ece-8745-4bae-b652-19dd871fdb52', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 07:54:17.660911+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2e0a4b3c-c946-46be-90ad-c08033d0afb6', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 07:54:17.661431+00', ''),
+	('00000000-0000-0000-0000-000000000000', '29af91c7-2af3-4799-959d-031751a6bd13', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 08:50:43.894412+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2b9eb49a-d9df-4086-ba09-3999f56317f4', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 08:50:43.895039+00', ''),
+	('00000000-0000-0000-0000-000000000000', '93901eec-ef60-4feb-925d-5d7d0f8b6b55', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 09:29:52.217818+00', ''),
+	('00000000-0000-0000-0000-000000000000', '51b05c76-f664-40cc-801a-f5f17623c734', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 09:29:52.21857+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9686f5e1-d21f-4e3a-abda-b38d2b6b2da0', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 09:29:53.968185+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7c8d8f3e-0ed3-4634-b792-56cb3212ae0c', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 09:53:31.091881+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e14416c4-0c8f-4114-8a6a-530c19446528', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 09:53:31.092509+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1c54aaf4-f259-461c-a3a5-b6a2e45a4bf5', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 09:54:45.603756+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cb1818c5-7840-4eb6-af5e-e002ef1abb30', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 09:56:45.043247+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ec72906c-f2ed-43e4-a012-b220c209ba90', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 10:06:47.633919+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0d859f57-11fb-4b7b-beab-e46fb9b7f28b', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 10:51:46.038748+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1dacdb47-ac23-40da-be0a-a2d94d5f99a3', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 10:51:46.039276+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cd4dabaa-1250-46ad-b8e0-ed90706c013e', '{"action":"token_refreshed","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 11:22:44.016503+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c2721e71-838f-49b4-b3b2-9b6b4a8702e3', '{"action":"token_revoked","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 11:22:44.016995+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9b7e105e-fca5-4e4d-a592-e35efb7b3b37', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 11:22:52.049975+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f8bfc50b-060d-4b87-989b-a6623e7077bb', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-25 11:46:49.478055+00', ''),
+	('00000000-0000-0000-0000-000000000000', '04e412fb-c8c9-48c2-8988-45fd43b1d23d', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-25 11:48:08.971413+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9a23485b-8193-4552-8519-188a90250996', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 12:12:21.30631+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0e0ad2ac-afa7-4247-a572-c4653598156c', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 12:46:36.80746+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8a8cf264-7b0f-4d56-9f96-68625cb30763', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-25 12:46:36.808224+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'db5d9bf5-1d1d-4e7d-869b-17379c3fa63d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 13:00:53.691043+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a16fb096-a9ba-4e62-874e-2a31d086fd11', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 13:01:29.72488+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cb4c4e02-2603-465b-9cb8-990bf9412c82', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 13:02:52.210148+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eb1caf07-854f-46eb-99ef-84a0d0bae22d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 13:03:22.763509+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ad8a90e3-ffe2-4661-af63-5d8a16bde5fc', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-25 13:06:04.66989+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9bbabc3b-d872-4831-bb3d-6ec2f46c3dcb', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 03:40:53.968682+00', ''),
+	('00000000-0000-0000-0000-000000000000', '417224c4-9bfe-48a6-84b8-1d2f05f9b98a', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-26 03:41:20.022649+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fdaf849e-a6e0-40ec-93df-a8cf19d2221b', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 03:45:41.801572+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fcb0f743-f632-40ce-9311-aab0b1c735d4', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 04:15:34.062836+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4faeb3af-8d4d-480a-a1b1-70f32c790ce8', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 04:18:42.504821+00', ''),
+	('00000000-0000-0000-0000-000000000000', '47011982-5f02-44b6-993d-3c0881eba4dd', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-26 04:39:41.474136+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c5e0c7ae-a231-4a7e-8537-558126e61e2e', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-26 04:39:41.474664+00', ''),
+	('00000000-0000-0000-0000-000000000000', '55ef5c30-e2c1-4161-8661-5bd68c0e092d', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:03:22.504437+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'dc7ac0ab-776c-4ac8-b6bb-b5c9d87e32d0', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:09:09.419866+00', ''),
+	('00000000-0000-0000-0000-000000000000', '64a25378-18eb-4e4d-bd6e-494cc1d27179', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:21:04.48884+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'acb2d38d-2c4f-4200-9067-9d1e1d9995f3', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:23:26.041043+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9e92680d-5942-4398-af4e-44dd754eef8a', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:24:50.101557+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3309bfbd-d2f4-4edb-9a76-f2cc5b80a455', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:31:04.94971+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8fc411ea-04b8-4ac4-a305-ea656b514e61', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 05:31:49.934484+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'eba98d44-82a2-404d-b27f-81d23210abbb', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 05:58:40.090846+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6853d62d-282c-412c-b33f-cb67239f14de', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-26 05:59:05.977146+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'af83604e-49ef-4ecd-aaf1-69a8b74eb9e6', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 06:13:01.902416+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6711b6db-1f07-4902-b135-d110d5ee5dec', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 07:46:53.366585+00', ''),
+	('00000000-0000-0000-0000-000000000000', '36f9de7f-3e23-4e7c-887c-4beddec80d3e', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-26 07:47:31.413725+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a1f12b47-3713-4da2-bf0c-0bf0657e7683', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 08:20:01.054306+00', ''),
+	('00000000-0000-0000-0000-000000000000', '670bbb46-679e-4902-83dd-6915f44c1ce2', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-26 08:20:09.339487+00', ''),
+	('00000000-0000-0000-0000-000000000000', '37647439-2dfa-46ad-8314-524a5e1496c9', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 08:42:59.159082+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'd12ccb85-aeb8-492b-9f1a-8239218d1db0', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-26 08:43:58.548412+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ce4725f3-edf1-4c1a-b727-7b4664e08b28', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 09:08:35.82985+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'bdf1a220-c9fd-4488-ae15-e9197a45f5c6', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-26 09:09:20.702919+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b6d8a320-955e-462b-9e8d-2e56aea8e167', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 09:14:11.551715+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7d5804e6-9de0-4f1b-853c-a12747d34ea6', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 09:14:35.956926+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f0cdeb28-4867-49e5-8685-48d1c3524ac2', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 09:14:49.219795+00', ''),
+	('00000000-0000-0000-0000-000000000000', '692b1077-9928-470f-8a80-7c90aede0c3d', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-26 10:07:42.215211+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'da426700-56dd-4470-8a09-fb33a1e09a6c', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-26 10:07:42.215813+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ad2f9fb3-33fb-475e-8198-b5d1638432ea', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-26 10:08:11.2968+00', ''),
+	('00000000-0000-0000-0000-000000000000', '4c690b2e-93e3-4170-84f1-0166d2e42cc5', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-26 10:08:33.282204+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2ecd1b48-6e0c-4032-a3b7-601f3155ce89', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-26 11:07:06.604724+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e17154ef-fa85-4dae-9824-06ef76032ae6', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-26 11:07:06.605227+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6b866497-b501-4df5-a99d-a68bdec52880', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-27 05:30:59.982501+00', ''),
+	('00000000-0000-0000-0000-000000000000', '5fa01e67-b0ea-4b86-8f4d-ad4e9ca69846', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-27 05:31:38.962586+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ac5226d3-31e3-45dd-8674-af5cdae637e2', '{"action":"logout","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-27 06:10:26.209943+00', ''),
+	('00000000-0000-0000-0000-000000000000', '876d4b88-524e-452d-9a32-be2f1cb13441', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-27 06:18:35.354439+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9cbbc8d5-7cf7-41b7-9681-de878f77eda6', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-27 06:18:58.545227+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e0dde01b-a76f-4387-8481-175d68168d8b', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 07:17:06.960027+00', ''),
+	('00000000-0000-0000-0000-000000000000', '81a8900e-9bf9-4ee9-8d89-d0e3513fe10c', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 07:17:06.960689+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3bffafb9-a1a7-4943-bf0e-010d03f98193', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-27 10:00:55.739033+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0c899f96-5360-4db7-93a6-6d91b44373ff', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-27 10:01:34.028319+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'a2e6c05f-ca24-4889-aea2-8febaefc34bf', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 10:59:53.442806+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3e5ad2e7-a28e-47b2-bebb-49fd75332170', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 10:59:53.443482+00', ''),
+	('00000000-0000-0000-0000-000000000000', '13db8405-d0ae-4b10-8f5f-4c65c292fb4c', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 11:58:03.682309+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'ba083ac6-4819-42bb-9827-d580a51bb14b', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 11:58:03.682879+00', ''),
+	('00000000-0000-0000-0000-000000000000', '01e21068-c30a-4de3-ab7f-8431c62314c8', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 17:33:22.027341+00', ''),
+	('00000000-0000-0000-0000-000000000000', '109d14d1-b589-4cf9-b267-a8b7a5132021', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-27 17:33:22.029371+00', ''),
+	('00000000-0000-0000-0000-000000000000', '64452159-ef14-43c3-8ba6-c1cb3fa76236', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-27 17:34:33.146693+00', ''),
+	('00000000-0000-0000-0000-000000000000', '04b92684-70fd-4f37-b5ec-e8aca3929326', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-27 17:35:08.800627+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f53f87cf-4f04-4ec1-91d7-352d031eb432', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-27 17:41:54.023156+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2a079ea4-789e-4867-8f14-fcbdee9a20aa', '{"action":"login","actor_id":"8ed241f2-00ba-4948-9f37-2ea13358c0a0","actor_username":"admin@fantula.com","actor_via_sso":false,"log_type":"account","traits":{"provider":"email"}}', '2026-01-27 17:42:01.542562+00', ''),
+	('00000000-0000-0000-0000-000000000000', '14c8e8cd-2f2a-408e-b542-eb91a688dcab', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-28 04:48:18.465515+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fcfd51bf-00c1-4a93-ad00-d657cc38fdad', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-28 04:48:18.467289+00', ''),
+	('00000000-0000-0000-0000-000000000000', '74b0c925-bdec-443e-9fa5-6b23e47a9c7e', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-28 05:46:45.152302+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c19dc2a5-3869-40eb-aa02-9acbf0385d1f', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-28 05:46:45.152926+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7d839b95-ea86-41f7-a5e1-4749bad37101', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-28 10:42:35.569883+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e9d294d3-8f55-48f7-8c00-fe5ed04a692a', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-28 10:42:35.572107+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'aadedc43-4d2f-42c8-8d23-05294bfb76bd', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-30 10:24:18.283941+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2c8889c6-301d-4962-a380-7c55ced37aaa', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-30 10:24:18.285338+00', ''),
+	('00000000-0000-0000-0000-000000000000', '23f9aff4-1e7a-453e-9430-39726f08bf22', '{"action":"token_refreshed","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-30 12:41:05.87919+00', ''),
+	('00000000-0000-0000-0000-000000000000', '47747510-4dc1-4015-ab33-b2da3570e7d7', '{"action":"token_revoked","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-30 12:41:05.87972+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c36f040f-2138-4af6-9d7b-917f0556e0ce', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-30 12:41:33.132245+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'db8149a1-dd45-4eda-ae6d-fef26b05a205', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-30 12:41:55.976386+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c5ee5a25-a501-478c-b683-6a442e6355c9', '{"action":"logout","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-30 12:55:00.475365+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'c1e63833-3fc9-4281-adf1-a812b58b48bc', '{"action":"user_recovery_requested","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-30 12:55:12.474583+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b752f037-755c-46e6-aa4c-0a9b91b629ef', '{"action":"login","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-30 12:55:34.683329+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cc3da83c-8e94-4db1-b689-c9019ba37168', '{"action":"token_refreshed","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-31 06:01:29.238588+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b3abadde-1b6d-4456-9f62-8aa0d090cafa', '{"action":"token_revoked","actor_id":"35b40b94-ca65-44e6-a9ce-0cb8fba42b7e","actor_username":"jiangdalin1999@gmail.com","actor_via_sso":false,"log_type":"token"}', '2026-01-31 06:01:29.240353+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'cf8ed8b6-b974-4d57-a0b0-fcaa3332baf5', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-31 06:03:12.355693+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'acaf5e60-3548-41bf-8a77-96054532a5bd', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-31 06:03:37.936496+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6608f256-f35e-44a7-b959-b8b01cddcd0a', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-31 06:16:48.066428+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1fddebc3-0fea-4b87-8872-3c0792e555bc', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-31 06:17:22.43674+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'fefbef03-eb06-4faf-bc35-196e1e912d3d', '{"action":"logout","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-31 06:33:21.524228+00', ''),
+	('00000000-0000-0000-0000-000000000000', '78e91116-fe43-4ff7-89f0-c058f668fb5e', '{"action":"user_recovery_requested","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"user"}', '2026-01-31 06:33:55.879883+00', ''),
+	('00000000-0000-0000-0000-000000000000', '53c5b66a-ab75-4b13-b7fb-7539b3bf7890', '{"action":"login","actor_id":"71b19525-6151-49d3-ab87-ee38158e2f67","actor_username":"jiangdalin1988@gmail.com","actor_via_sso":false,"log_type":"account"}', '2026-01-31 06:35:00.717801+00', '');
+
+
+--
+-- Data for Name: flow_state; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at", "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token", "recovery_sent_at", "email_change_token_new", "email_change", "email_change_sent_at", "last_sign_in_at", "raw_app_meta_data", "raw_user_meta_data", "is_super_admin", "created_at", "updated_at", "phone", "phone_confirmed_at", "phone_change", "phone_change_token", "phone_change_sent_at", "email_change_token_current", "email_change_confirm_status", "banned_until", "reauthentication_token", "reauthentication_sent_at", "is_sso_user", "deleted_at", "is_anonymous") VALUES
+	('00000000-0000-0000-0000-000000000000', 'af1c7310-2665-4f7b-800b-a1a5b3946852', 'authenticated', 'authenticated', 'jiangdalin1988@gmail.cpom', '$2a$10$d/h3yNt/VjaaJ9aly3JOVOJIEtS3UEbFqY229cLQ4okiqJaj.goZu', '2026-01-22 03:19:11.420284+00', NULL, '', NULL, '61f354f341520422044d2c25cf3f9450708ffc1604bc96bcaf61c517', '2026-01-22 03:19:11.449945+00', '', '', NULL, '2026-01-22 03:19:11.427389+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "af1c7310-2665-4f7b-800b-a1a5b3946852", "email": "jiangdalin1988@gmail.cpom", "email_verified": true, "phone_verified": false}', NULL, '2026-01-22 03:19:11.413436+00', '2026-01-22 03:19:16.565679+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', 'ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', 'authenticated', 'authenticated', 'jiangdalin@gmail.com', '$2a$10$mPPkvpvHill6nFwD.Xtj.uGO2vO2VJ963TBWVnqgHmnSG5fiDd00q', '2026-01-22 04:05:42.949521+00', NULL, '', NULL, '9794debe859567318080d5bfe79a4915b2c461fb67392a43262eb9bb', '2026-01-22 04:05:42.985195+00', '', '', NULL, '2026-01-22 04:05:42.957215+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "ec57b0a4-ad47-4807-becf-2e0ae0c9eacc", "email": "jiangdalin@gmail.com", "email_verified": true, "phone_verified": false}', NULL, '2026-01-22 04:05:42.942993+00', '2026-01-22 04:05:47.75004+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', 'authenticated', 'authenticated', 'liumeiti1108@gmail.com', '$2a$10$XWFGQSwGLZnCWi.G0vtUCeNwIJnHKLTxmt2b/nEt6MzSW9kRiLEu6', '2026-01-23 17:46:29.198439+00', NULL, '', NULL, '', '2026-01-23 18:10:30.006209+00', '', '', NULL, '2026-01-23 18:11:01.960834+00', '{"provider": "email", "providers": ["email"]}', '{"name": "啊啊啊", "role": "admin", "email_verified": true}', NULL, '2026-01-23 17:46:29.194314+00', '2026-01-23 18:11:01.963937+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 'authenticated', 'authenticated', 'jiangdalin1999@gmail.com', '$2a$10$Impsm1bCMp7EEz7oiGQ3.eVF4uOODZ5WgA7zR7CrdD0z3mscX6ysm', '2026-01-24 11:34:20.312597+00', NULL, '', NULL, '', '2026-01-30 12:55:12.475497+00', '', '', NULL, '2026-01-30 12:55:34.685664+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "35b40b94-ca65-44e6-a9ce-0cb8fba42b7e", "email": "jiangdalin1999@gmail.com", "email_verified": true, "phone_verified": false}', NULL, '2026-01-24 11:34:20.304971+00', '2026-01-31 06:01:29.24338+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', 'authenticated', 'authenticated', 'admin@fantula.com', '$2a$06$5SAnt48JY4JpBw2D7uetbuIfm65WihnUbWaw065ArDEkiCslzQACG', '2026-01-20 08:55:28.809587+00', NULL, '', NULL, '', NULL, '', '', NULL, '2026-01-27 17:42:01.543912+00', '{"provider": "email", "providers": ["email"]}', '{}', NULL, '2026-01-20 08:55:28.809587+00', '2026-01-27 17:42:01.547362+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false),
+	('00000000-0000-0000-0000-000000000000', '71b19525-6151-49d3-ab87-ee38158e2f67', 'authenticated', 'authenticated', 'jiangdalin1988@gmail.com', '$2a$10$e2azIqKuCoNs1xP22bIP/.oVUDwZ6gJqRhzpYs4d7z4mL4xVdUq5W', '2026-01-20 11:00:36.554332+00', NULL, '', NULL, '', '2026-01-31 06:33:55.880853+00', '', 'jiangdalin1999@gmail.com', NULL, '2026-01-31 06:35:00.720043+00', '{"provider": "email", "providers": ["email"]}', '{"sub": "71b19525-6151-49d3-ab87-ee38158e2f67", "email": "jiangdalin1988@gmail.com", "email_verified": true, "phone_verified": false}', NULL, '2026-01-20 11:00:36.547459+00', '2026-01-31 06:35:00.723838+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false);
+
+
+--
+-- Data for Name: identities; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."identities" ("provider_id", "user_id", "identity_data", "provider", "last_sign_in_at", "created_at", "updated_at", "id") VALUES
+	('admin@fantula.com', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '{"sub": "8ed241f2-00ba-4948-9f37-2ea13358c0a0", "email": "admin@fantula.com"}', 'email', '2026-01-20 08:55:28.809587+00', '2026-01-20 08:55:28.809587+00', '2026-01-20 08:55:28.809587+00', 'f0e9d273-c8af-48e3-bf0a-0829b2d783bb'),
+	('71b19525-6151-49d3-ab87-ee38158e2f67', '71b19525-6151-49d3-ab87-ee38158e2f67', '{"sub": "71b19525-6151-49d3-ab87-ee38158e2f67", "email": "jiangdalin1988@gmail.com", "email_verified": false, "phone_verified": false}', 'email', '2026-01-20 11:00:36.55248+00', '2026-01-20 11:00:36.552503+00', '2026-01-20 11:00:36.552503+00', '3a1607b4-0888-477d-979b-be0bfe40736f'),
+	('af1c7310-2665-4f7b-800b-a1a5b3946852', 'af1c7310-2665-4f7b-800b-a1a5b3946852', '{"sub": "af1c7310-2665-4f7b-800b-a1a5b3946852", "email": "jiangdalin1988@gmail.cpom", "email_verified": false, "phone_verified": false}', 'email', '2026-01-22 03:19:11.418887+00', '2026-01-22 03:19:11.418908+00', '2026-01-22 03:19:11.418908+00', '11ed5256-7642-4ca4-b435-526a9c8c83f5'),
+	('ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', 'ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', '{"sub": "ec57b0a4-ad47-4807-becf-2e0ae0c9eacc", "email": "jiangdalin@gmail.com", "email_verified": false, "phone_verified": false}', 'email', '2026-01-22 04:05:42.94705+00', '2026-01-22 04:05:42.947072+00', '2026-01-22 04:05:42.947072+00', '033b9a22-3081-4c62-a426-012afba3d86e'),
+	('94316d2d-636c-46c2-b5dd-b9a55a8424a5', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '{"sub": "94316d2d-636c-46c2-b5dd-b9a55a8424a5", "email": "liumeiti1108@gmail.com", "email_verified": false, "phone_verified": false}', 'email', '2026-01-23 17:46:29.19675+00', '2026-01-23 17:46:29.19678+00', '2026-01-23 17:46:29.19678+00', 'f6e08ae1-daec-4a7a-ac16-3ac5d2942efa'),
+	('35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '{"sub": "35b40b94-ca65-44e6-a9ce-0cb8fba42b7e", "email": "jiangdalin1999@gmail.com", "email_verified": false, "phone_verified": false}', 'email', '2026-01-24 11:34:20.310808+00', '2026-01-24 11:34:20.310835+00', '2026-01-24 11:34:20.310835+00', '2f3f7d29-be0a-4a49-83f4-4b290afa9109');
+
+
+--
+-- Data for Name: instances; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_clients; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: sessions; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "factor_id", "aal", "not_after", "refreshed_at", "user_agent", "ip", "tag", "oauth_client_id", "refresh_token_hmac_key", "refresh_token_counter", "scopes") VALUES
+	('7d73aa93-b88f-4cc9-a17a-98e0f7b61749', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:05:48.357547+00', '2026-01-20 09:05:48.357547+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('220fd48d-8444-4163-baf2-3427712289a2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:06:15.6904+00', '2026-01-20 09:06:15.6904+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('2d1752de-cdcb-464e-a302-5151a066408f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:09:14.836823+00', '2026-01-20 09:09:14.836823+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('a1166950-f432-4b97-a3ac-fc7712a1daaf', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:11:12.158321+00', '2026-01-20 09:11:12.158321+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('c23289e5-0c77-4b7e-8dd6-c47170a5faa7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:14:03.612735+00', '2026-01-20 09:14:03.612735+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('57b57ee4-9f4f-422c-8c71-d51650df5230', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:17:05.194981+00', '2026-01-20 09:17:05.194981+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('ce7fc29e-142a-4c08-af28-f01a544542db', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:19:12.297263+00', '2026-01-20 09:19:12.297263+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('14078374-259e-4562-b376-c4556abfc59b', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:24:15.682187+00', '2026-01-20 09:24:15.682187+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('0d63b357-8b2e-430a-b527-68a09498d970', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:26:51.182124+00', '2026-01-20 09:26:51.182124+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('55d24cb7-7c5b-4ba9-b7e3-9a7b715aee74', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:31:42.656752+00', '2026-01-20 09:31:42.656752+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('28b491a6-d267-4f67-9a24-faa9d7641f30', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:32:17.552227+00', '2026-01-20 09:32:17.552227+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('0783e298-4c5b-437a-b2f6-2a5747366083', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:34:46.517369+00', '2026-01-20 09:34:46.517369+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('61683c04-156a-4be9-9be9-d704bdfe55c1', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 09:37:32.091309+00', '2026-01-20 09:37:32.091309+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('9de33ad7-42e8-4070-a6c0-04aacf47af87', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:02:06.932707+00', '2026-01-20 10:02:06.932707+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.64.66.1', NULL, NULL, NULL, NULL, NULL),
+	('6fdddfc5-8822-4ba2-9fea-8e8109abeca0', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:05:05.599786+00', '2026-01-20 10:05:05.599786+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('f3084e44-3ea5-4e61-8d57-389df92138af', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:07:13.530734+00', '2026-01-20 10:07:13.530734+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('9d325e1b-34e2-445a-a591-a4379a467b65', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:12:57.425428+00', '2026-01-20 10:12:57.425428+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('6aef64ee-532f-4e2f-95c9-8acd31001124', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:20:25.398101+00', '2026-01-20 10:20:25.398101+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('e14d66a9-af30-44ac-a8b4-5a09937922f7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:34:52.221366+00', '2026-01-20 10:34:52.221366+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('a3ccbcbd-9d32-43df-b9a6-cd2649398a62', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:35:28.053744+00', '2026-01-20 10:35:28.053744+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('23b409c5-677b-4641-8d02-fb544fb7f170', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:35:58.936322+00', '2026-01-20 10:35:58.936322+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('985d5de2-5ab2-4eb6-bb00-0dd55d259e99', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 10:37:18.422591+00', '2026-01-20 10:37:18.422591+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.64.66.1', NULL, NULL, NULL, NULL, NULL),
+	('07068b6c-a112-40cf-b30f-03acec5e22ca', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 10:42:48.325562+00', '2026-01-21 10:42:48.325562+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('b52b1b71-e4d1-4b5b-a70c-a97d22465bc3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-20 11:05:29.693922+00', '2026-01-20 12:32:49.446065+00', NULL, 'aal1', NULL, '2026-01-20 12:32:49.446025', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.64.66.1', NULL, NULL, NULL, NULL, NULL),
+	('ee4c1eac-1f3c-4afb-abb3-6733cda0e05f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 08:47:36.765186+00', '2026-01-21 08:47:36.765186+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('712806ac-93fd-4567-9a7c-363bcec8b17e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 08:15:14.457737+00', '2026-01-21 08:15:14.457737+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('20f99697-d6ea-4dc1-b785-00e2b40d5974', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 09:39:12.953742+00', '2026-01-21 09:39:12.953742+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('7d232808-7eee-4d1d-84db-9599e2a69bf2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 10:00:02.460363+00', '2026-01-21 10:00:02.460363+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('503ee2a4-094c-4e7d-8a46-5cbb1499b34b', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 12:46:28.001714+00', '2026-01-21 12:46:28.001714+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('ebc09685-e6b9-437c-958e-b49ee39df7e7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 12:33:25.881947+00', '2026-01-21 12:33:25.881947+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('0f85c23c-69c8-46ed-8617-0878f38e922f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-21 13:10:53.30764+00', '2026-01-22 03:18:38.369702+00', NULL, 'aal1', NULL, '2026-01-22 03:18:38.369646', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('5e24b2d0-8872-431e-8301-0b4f73044e17', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 03:18:52.913785+00', '2026-01-22 03:18:52.913785+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('0cb3bb5a-bd54-47c0-868b-fd60f139b13c', 'af1c7310-2665-4f7b-800b-a1a5b3946852', '2026-01-22 03:19:11.427439+00', '2026-01-22 03:19:11.427439+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('08b9e363-4aac-4bb5-a2d6-d3d41f6b4092', 'ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', '2026-01-22 04:05:42.957273+00', '2026-01-22 04:05:42.957273+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('15976c5f-bc8b-48b2-8c97-fb4a27301b23', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 04:59:56.62486+00', '2026-01-22 04:59:56.62486+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('c559907b-92e6-4383-94d3-e87fb47bcf12', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:33:16.618094+00', '2026-01-22 05:33:16.618094+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('c82bdde5-929b-40e9-8a44-6b045e3f09fa', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:38:22.830769+00', '2026-01-22 05:38:22.830769+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('0bac077a-943c-48e3-9124-e4a33f9dae6c', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:42:45.224218+00', '2026-01-22 05:42:45.224218+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('da2abd26-9ada-4ca5-8308-ee712e558487', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:44:12.923435+00', '2026-01-22 05:44:12.923435+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('49211c60-1d88-4ec3-b75d-f886426c5470', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:47:51.998978+00', '2026-01-22 05:47:51.998978+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('e8a53a6b-b843-4029-a886-ab5bbf4f37b1', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:48:20.881997+00', '2026-01-22 05:48:20.881997+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('c36b675e-7b2c-4f02-9ab9-266bf446c2f0', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:49:42.772596+00', '2026-01-22 05:49:42.772596+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('4ae822c6-7b71-4eb4-82ed-1b75eccf694a', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:50:59.73684+00', '2026-01-22 05:50:59.73684+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('65cee9fc-03dd-439e-a868-6badf38337d4', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:53:08.286223+00', '2026-01-22 05:53:08.286223+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('214ad58e-4762-4b90-a8a9-c4e426310369', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:53:50.804377+00', '2026-01-22 05:53:50.804377+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('13ff54ca-ba68-46c8-acb5-b92b47ec9d9d', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 05:59:41.39217+00', '2026-01-22 05:59:41.39217+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('6eac276b-f1b7-464a-9426-06c9a558b64e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 06:02:26.86273+00', '2026-01-22 06:02:26.86273+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('7abc3e23-bce6-4215-b4f1-1ec5a2b9140e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 06:05:37.854361+00', '2026-01-22 06:05:37.854361+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('202234ea-99ab-4d52-af53-2ca7db57f3d7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 06:29:36.159606+00', '2026-01-22 06:29:36.159606+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('87360bce-514a-4fba-8cda-a6b3328b6309', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 06:39:43.557405+00', '2026-01-22 07:48:19.781306+00', NULL, 'aal1', NULL, '2026-01-22 07:48:19.781252', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('680d842c-4d93-4c76-865b-31c4116f0f5c', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-22 12:20:34.436261+00', '2026-01-23 08:45:08.653265+00', NULL, 'aal1', NULL, '2026-01-23 08:45:08.653221', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('cde0ef20-706f-4fe9-baa4-dffd9080e579', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 09:12:22.925684+00', '2026-01-23 09:12:22.925684+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('86f541d2-0667-4c4c-95f3-f4a6ded4994a', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 09:23:19.021677+00', '2026-01-23 10:44:16.105505+00', NULL, 'aal1', NULL, '2026-01-23 10:44:16.105464', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('7bf21705-ed2d-4ad9-8f65-3d6e2c7d56d2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 08:45:09.731923+00', '2026-01-23 08:45:09.731923+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('455005c3-dfd4-4554-ae32-2e74513b416e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 05:30:37.799519+00', '2026-01-23 11:39:07.998127+00', NULL, 'aal1', NULL, '2026-01-23 11:39:07.998084', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('038a78c3-a511-4fca-97e4-553738f32693', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:31:12.457274+00', '2026-01-24 05:31:12.457274+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('011fc172-3e69-4933-a938-73cc08d2a585', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:46:03.278381+00', '2026-01-24 05:46:03.278381+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('758a092a-21d4-4845-a9ca-28bcae0abc8f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 10:44:21.60608+00', '2026-01-23 10:44:21.60608+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('8afd8a0b-3869-48f3-99a6-9c02760164c2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:47:06.620662+00', '2026-01-24 05:47:06.620662+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('2baf3d76-249b-4033-8add-41bd7efcd488', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:20:19.14788+00', '2026-01-24 07:42:13.320588+00', NULL, 'aal1', NULL, '2026-01-24 07:42:13.320537', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('b8b1c8bf-50d1-4b32-88be-081f298a0ed9', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 11:09:19.350725+00', '2026-01-23 12:29:10.874031+00', NULL, 'aal1', NULL, '2026-01-23 12:29:10.873985', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('3580dd61-3326-4e3c-80fc-963dae52296d', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 12:29:15.510511+00', '2026-01-23 12:29:15.510511+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('1546b299-3ccf-4f8e-ae0a-23f8a3cafbb0', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 12:41:42.609122+00', '2026-01-23 12:41:42.609122+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('5adfe8c2-5d7b-4619-85f4-591843090075', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 17:19:19.955328+00', '2026-01-23 17:19:19.955328+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('7637f5d7-a5e0-45fc-85cc-9118c2814395', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 17:33:16.680825+00', '2026-01-23 17:33:16.680825+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('383be3e6-dd73-4d3b-bc9e-0fba796bff91', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 17:41:37.932387+00', '2026-01-23 17:41:37.932387+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('96dbd3b2-8309-4507-919a-6473a0efa18a', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 17:44:20.582753+00', '2026-01-23 17:44:20.582753+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('46102734-3fbf-4360-b805-9b68c1fbbd09', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 17:44:29.690291+00', '2026-01-23 17:44:29.690291+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('a8c65cc2-d3fb-4880-bc59-0e632884ea02', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '2026-01-23 17:46:52.2434+00', '2026-01-23 17:46:52.2434+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('31d69aa6-d32d-4653-8e8c-d7dadf0531f8', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '2026-01-23 17:47:45.936646+00', '2026-01-23 17:47:45.936646+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('edbc0ef0-10b0-480b-b2a1-91fc1b2e83d1', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '2026-01-23 17:54:48.528402+00', '2026-01-23 17:54:48.528402+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('61626af3-b4d9-4c85-af87-659078cad0a9', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '2026-01-23 17:56:04.443094+00', '2026-01-23 17:56:04.443094+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('316cd111-ea98-4c5e-8075-ffd63b7023a4', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '2026-01-23 17:59:10.07709+00', '2026-01-23 17:59:10.07709+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('4e23e4a4-9f3f-4219-ab9e-d6c1bd5727dd', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', '2026-01-23 18:11:01.960944+00', '2026-01-23 18:11:01.960944+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('b5ebb113-1e05-4a52-9ef8-a6c3ab0ad8dc', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 18:14:00.291358+00', '2026-01-23 18:14:00.291358+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('a2361f44-d9c4-42f7-952a-1dd25da8e09a', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-23 18:16:43.922233+00', '2026-01-23 18:16:43.922233+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '192.168.65.1', NULL, NULL, NULL, NULL, NULL),
+	('8d137107-11c7-4da0-98e4-4be81e78369a', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 04:37:30.991529+00', '2026-01-24 04:37:30.991529+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('52cf7744-c779-4909-9214-ad54db23b088', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 04:56:38.930983+00', '2026-01-24 04:56:38.930983+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('27a94a0f-1ed0-4abe-a8b0-16fa24c72872', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 04:57:48.838581+00', '2026-01-24 04:57:48.838581+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('55a647f0-5533-4f69-9f56-c172829abf25', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 04:58:29.075319+00', '2026-01-24 04:58:29.075319+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('b32439fe-9399-439e-bd68-9420808bedf0', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:00:24.388253+00', '2026-01-24 05:00:24.388253+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('b60ede31-bd34-4537-8a45-272cdc71449f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:02:39.499168+00', '2026-01-24 05:02:39.499168+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('3b24e756-b10c-4e5d-913a-922d106340a4', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:29:37.794242+00', '2026-01-24 05:29:37.794242+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('ee558190-37e3-4790-a235-486c7034cf8c', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:47:48.706474+00', '2026-01-24 05:47:48.706474+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('4e0c387f-7c43-4bf4-bb1d-600b2308d95d', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:48:40.334503+00', '2026-01-24 05:48:40.334503+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('354e4ca1-a64a-4b4c-962d-f7c88d875f89', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 05:56:03.721284+00', '2026-01-24 05:56:03.721284+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('e49d3f8d-8c27-41d8-9450-d86fb37fa5cc', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 09:48:53.0715+00', '2026-01-24 09:48:53.0715+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('643f984d-dbca-44cb-b257-94cf09688d8a', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 07:43:44.564905+00', '2026-01-24 09:15:16.327127+00', NULL, 'aal1', NULL, '2026-01-24 09:15:16.327082', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('937f5320-de2a-4889-853a-cab7f9e96d9e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 11:28:32.172967+00', '2026-01-24 11:28:32.172967+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('68b6b5e5-b145-4949-a4d6-4e2bdea9bee8', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '2026-01-24 11:34:20.320375+00', '2026-01-24 11:34:20.320375+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('6836879f-a910-45ba-a7d0-e0b6d1cdc874', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '2026-01-24 11:34:48.57609+00', '2026-01-24 11:34:48.57609+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('ac8cffed-2624-43f7-9aed-6c01f9b16ff8', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 11:42:06.637936+00', '2026-01-24 11:42:06.637936+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('62d2a4f9-649c-4d83-b39b-310425f30c79', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 11:46:27.747132+00', '2026-01-24 11:46:27.747132+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('1a2f61d8-f1b7-4a83-b49f-aae322e091bd', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 12:03:45.241931+00', '2026-01-24 12:03:45.241931+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('dae7ed16-960f-4bcd-b23f-c43689e5c3e1', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 12:19:38.001783+00', '2026-01-24 12:19:38.001783+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('387746f3-21a8-44ce-b6a0-a84f1ce55e22', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 13:01:29.72588+00', '2026-01-25 13:01:29.72588+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('6e32e5fe-5d57-4ea3-9d96-50b07988f109', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '2026-01-24 11:51:56.887527+00', '2026-01-24 17:11:01.68399+00', NULL, 'aal1', NULL, '2026-01-24 17:11:01.68394', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('60714f91-fdaa-4c8a-a3a9-e251b55df708', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 12:38:29.299491+00', '2026-01-24 17:11:02.282344+00', NULL, 'aal1', NULL, '2026-01-24 17:11:02.282302', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('63f16876-2370-4a20-99bb-9ccb8cdd0001', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 17:11:07.114164+00', '2026-01-24 17:11:07.114164+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('759174ac-128b-4462-b1a8-81cd5c9d2320', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 17:42:39.616631+00', '2026-01-24 17:42:39.616631+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('97ecdf27-17eb-4c64-9c87-c75de6977e62', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 17:45:33.775331+00', '2026-01-24 17:45:33.775331+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('c4bc401b-f4fb-438b-a483-45e69c64a62b', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-24 17:55:49.927432+00', '2026-01-24 17:55:49.927432+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('d2f51412-2634-4c6b-9b2f-f20e0b8f57f0', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 13:02:52.21106+00', '2026-01-25 13:02:52.21106+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('343ce498-49a3-4cd2-b45b-dc6f5e50aa22', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 13:03:22.765024+00', '2026-01-25 13:03:22.765024+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('4c101548-afe2-4092-b3a1-155c643ad0e4', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 13:06:04.670889+00', '2026-01-25 13:06:04.670889+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('8ae76c68-c3f6-4930-9716-2e7cd9e4c380', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 06:53:31.053515+00', '2026-01-25 09:29:52.221634+00', NULL, 'aal1', NULL, '2026-01-25 09:29:52.22159', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('20f8ec57-44f9-4ff7-87ac-f5b4c9fd03fa', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 09:29:53.969519+00', '2026-01-25 09:29:53.969519+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('99e0143d-0152-46fc-93dd-3973587e1aea', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 09:54:45.604684+00', '2026-01-25 09:54:45.604684+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('e20df2b8-fd02-492a-ae05-4e19437ceb9f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 09:56:45.045114+00', '2026-01-25 09:56:45.045114+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('7e5aeaef-59ef-4f6d-92f9-43b53f70fb4e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 10:06:47.634852+00', '2026-01-25 11:22:44.018906+00', NULL, 'aal1', NULL, '2026-01-25 11:22:44.018865', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('f03a70c1-a082-4cd3-88d5-3e1140e0502d', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 11:22:52.051464+00', '2026-01-25 11:22:52.051464+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('68d9fea0-3487-4e9d-b48c-3633ae597770', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 12:12:21.307262+00', '2026-01-25 12:12:21.307262+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('acd65afc-bbd8-4acb-ba56-25616fce24f2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-25 13:00:53.69297+00', '2026-01-25 13:00:53.69297+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('35b23bfd-c2d4-416a-a7cb-1000bc02ddd4', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 03:45:41.802545+00', '2026-01-26 03:45:41.802545+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('f01479fd-b6cb-4b6b-a32c-973d2174bf9e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 04:15:34.063674+00', '2026-01-26 04:15:34.063674+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('10c82662-29d9-4e4f-943e-953c0ef2c366', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 04:18:42.50588+00', '2026-01-26 04:18:42.50588+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('f725a465-d4f4-45e2-9819-c3ae6e79b090', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:03:22.505385+00', '2026-01-26 05:03:22.505385+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('6b85bd23-2e5c-4422-a64d-c5287ab46713', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:09:09.420939+00', '2026-01-26 05:09:09.420939+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('743b3bb8-9e70-4d64-ae24-7c86ff691a24', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:21:04.49028+00', '2026-01-26 05:21:04.49028+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('514a4548-9456-4eae-8ca0-dca4e077f1d3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:23:26.042129+00', '2026-01-26 05:23:26.042129+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('2bce0558-d522-4146-aea9-6d2678020d76', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:24:50.102595+00', '2026-01-26 05:24:50.102595+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('cb00a0bb-52a6-4dea-9934-bdc46e75aa68', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:31:04.950641+00', '2026-01-26 05:31:04.950641+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('3aae31fd-c18d-4236-b8c0-4d945f4ca20f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 05:31:49.935701+00', '2026-01-26 05:31:49.935701+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('843849ba-2baf-4c49-99bb-ba4ea7f9c4f3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 06:13:01.903451+00', '2026-01-26 06:13:01.903451+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('ed76f111-62a2-46a8-be44-5ccb776b2ecc', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 08:20:01.055449+00', '2026-01-26 08:20:01.055449+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('2d359fb7-a7c4-4cf9-871c-04f6e170c488', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-26 08:20:09.340597+00', '2026-01-26 08:20:09.340597+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('98e6cf21-8fe7-433b-8897-af2201bc5a19', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-27 17:41:54.024179+00', '2026-01-27 17:41:54.024179+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('3559293e-1d3a-4738-a36b-81a83243ce93', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', '2026-01-27 17:42:01.544+00', '2026-01-27 17:42:01.544+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('0acca816-8b94-4b27-a879-ba0eb4f62545', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '2026-01-30 12:55:34.685732+00', '2026-01-31 06:01:29.244893+00', NULL, 'aal1', NULL, '2026-01-31 06:01:29.244829', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL),
+	('164b5490-4c7b-4bd9-9917-9ce9db051589', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-31 06:35:00.720121+00', '2026-01-31 06:35:00.720121+00', NULL, 'aal1', NULL, NULL, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '172.18.0.1', NULL, NULL, NULL, NULL, NULL);
+
+
+--
+-- Data for Name: mfa_amr_claims; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."mfa_amr_claims" ("session_id", "created_at", "updated_at", "authentication_method", "id") VALUES
+	('7d73aa93-b88f-4cc9-a17a-98e0f7b61749', '2026-01-20 09:05:48.360474+00', '2026-01-20 09:05:48.360474+00', 'password', '613ad951-889b-42e3-9321-e75d1b28de49'),
+	('220fd48d-8444-4163-baf2-3427712289a2', '2026-01-20 09:06:15.69347+00', '2026-01-20 09:06:15.69347+00', 'password', '9d57033f-4c55-411d-b927-3cc963f92e81'),
+	('2d1752de-cdcb-464e-a302-5151a066408f', '2026-01-20 09:09:14.839716+00', '2026-01-20 09:09:14.839716+00', 'password', '8a77ee81-c6ef-4499-bd3a-4a2735e62059'),
+	('a1166950-f432-4b97-a3ac-fc7712a1daaf', '2026-01-20 09:11:12.161236+00', '2026-01-20 09:11:12.161236+00', 'password', '828c36e6-2e3e-4934-81f3-87c606a8ba3c'),
+	('c23289e5-0c77-4b7e-8dd6-c47170a5faa7', '2026-01-20 09:14:03.616185+00', '2026-01-20 09:14:03.616185+00', 'password', 'a50767cb-ab35-4d10-b3eb-79a90bff7bd6'),
+	('57b57ee4-9f4f-422c-8c71-d51650df5230', '2026-01-20 09:17:05.199289+00', '2026-01-20 09:17:05.199289+00', 'password', '81de0bf6-196d-44f8-892f-e76d696fe048'),
+	('ce7fc29e-142a-4c08-af28-f01a544542db', '2026-01-20 09:19:12.300168+00', '2026-01-20 09:19:12.300168+00', 'password', 'b8aedeaf-b0be-4a6e-bc3a-610e708ff49a'),
+	('14078374-259e-4562-b376-c4556abfc59b', '2026-01-20 09:24:15.684921+00', '2026-01-20 09:24:15.684921+00', 'password', 'ff73e246-3792-49a0-bbd8-4214c6c64861'),
+	('0d63b357-8b2e-430a-b527-68a09498d970', '2026-01-20 09:26:51.18548+00', '2026-01-20 09:26:51.18548+00', 'password', 'e2386923-d0c5-4623-97a1-990b1d872d3d'),
+	('55d24cb7-7c5b-4ba9-b7e3-9a7b715aee74', '2026-01-20 09:31:42.659714+00', '2026-01-20 09:31:42.659714+00', 'password', '4b074d14-bec3-4d9b-9ddc-9908a3e6dbd0'),
+	('28b491a6-d267-4f67-9a24-faa9d7641f30', '2026-01-20 09:32:17.554644+00', '2026-01-20 09:32:17.554644+00', 'password', 'f7563d22-af06-4fb8-ac6e-e9b9e6bbb49c'),
+	('0783e298-4c5b-437a-b2f6-2a5747366083', '2026-01-20 09:34:46.519823+00', '2026-01-20 09:34:46.519823+00', 'password', 'ad77932a-e28b-4191-bd64-b09f8b7ece81'),
+	('61683c04-156a-4be9-9be9-d704bdfe55c1', '2026-01-20 09:37:32.093758+00', '2026-01-20 09:37:32.093758+00', 'password', '77cf6281-4683-4789-bd77-a6845754d9d3'),
+	('9de33ad7-42e8-4070-a6c0-04aacf47af87', '2026-01-20 10:02:06.935181+00', '2026-01-20 10:02:06.935181+00', 'password', 'e10da382-232e-4f85-82fa-54c5c30edf20'),
+	('6fdddfc5-8822-4ba2-9fea-8e8109abeca0', '2026-01-20 10:05:05.602681+00', '2026-01-20 10:05:05.602681+00', 'password', '4f39ea5a-59db-417e-ae48-d03cc032a66f'),
+	('f3084e44-3ea5-4e61-8d57-389df92138af', '2026-01-20 10:07:13.532923+00', '2026-01-20 10:07:13.532923+00', 'password', 'e001f115-af2d-4584-ad2f-1f6486b507e8'),
+	('9d325e1b-34e2-445a-a591-a4379a467b65', '2026-01-20 10:12:57.427869+00', '2026-01-20 10:12:57.427869+00', 'password', '1d7052e7-4cae-4b33-9349-9d401834b1de'),
+	('6aef64ee-532f-4e2f-95c9-8acd31001124', '2026-01-20 10:20:25.401355+00', '2026-01-20 10:20:25.401355+00', 'password', '67a369cd-4879-4d84-9be7-d4e7ca71b479'),
+	('e14d66a9-af30-44ac-a8b4-5a09937922f7', '2026-01-20 10:34:52.224002+00', '2026-01-20 10:34:52.224002+00', 'password', '990fc9f0-edd7-46a0-b2fa-66e031ffadd1'),
+	('a3ccbcbd-9d32-43df-b9a6-cd2649398a62', '2026-01-20 10:35:28.05802+00', '2026-01-20 10:35:28.05802+00', 'password', '19b01c0e-a559-4546-8e9d-2acf594c940b'),
+	('23b409c5-677b-4641-8d02-fb544fb7f170', '2026-01-20 10:35:58.938961+00', '2026-01-20 10:35:58.938961+00', 'password', '9832389d-d0f7-4cb2-96e8-59de57147946'),
+	('985d5de2-5ab2-4eb6-bb00-0dd55d259e99', '2026-01-20 10:37:18.426611+00', '2026-01-20 10:37:18.426611+00', 'password', '40a772a6-cfe9-4fd2-bfee-fbffa1910078'),
+	('b52b1b71-e4d1-4b5b-a70c-a97d22465bc3', '2026-01-20 11:05:29.696554+00', '2026-01-20 11:05:29.696554+00', 'password', '6a33a355-b863-4607-88be-ec4016cace94'),
+	('712806ac-93fd-4567-9a7c-363bcec8b17e', '2026-01-21 08:15:14.46035+00', '2026-01-21 08:15:14.46035+00', 'password', '7efb8a44-210a-4c0e-997a-6c525660a1ca'),
+	('ee4c1eac-1f3c-4afb-abb3-6733cda0e05f', '2026-01-21 08:47:36.767925+00', '2026-01-21 08:47:36.767925+00', 'password', 'f28ae8dd-8a99-477e-bcbe-f4b9491cb421'),
+	('20f99697-d6ea-4dc1-b785-00e2b40d5974', '2026-01-21 09:39:12.956394+00', '2026-01-21 09:39:12.956394+00', 'password', 'ef23da78-a240-4d8a-83d5-11fe5d87dbeb'),
+	('7d232808-7eee-4d1d-84db-9599e2a69bf2', '2026-01-21 10:00:02.462646+00', '2026-01-21 10:00:02.462646+00', 'password', '6aa9f8a2-5fba-45a9-b83d-21c0b559cfb6'),
+	('07068b6c-a112-40cf-b30f-03acec5e22ca', '2026-01-21 10:42:48.32864+00', '2026-01-21 10:42:48.32864+00', 'password', 'a71bf75c-5ecb-44f3-a69f-903572fc5c05'),
+	('ebc09685-e6b9-437c-958e-b49ee39df7e7', '2026-01-21 12:33:25.884521+00', '2026-01-21 12:33:25.884521+00', 'password', 'c96fd804-cb70-40e5-bfb8-5041f8f925a2'),
+	('503ee2a4-094c-4e7d-8a46-5cbb1499b34b', '2026-01-21 12:46:28.004418+00', '2026-01-21 12:46:28.004418+00', 'password', '2244e1f1-47bb-420f-bccb-e242d42ed589'),
+	('0f85c23c-69c8-46ed-8617-0878f38e922f', '2026-01-21 13:10:53.310414+00', '2026-01-21 13:10:53.310414+00', 'password', '8b4b7e1b-1803-4459-a44b-83ca6a726ef7'),
+	('5e24b2d0-8872-431e-8301-0b4f73044e17', '2026-01-22 03:18:52.917455+00', '2026-01-22 03:18:52.917455+00', 'password', 'bd7a52cf-45a2-4d51-b330-d6cb64c56473'),
+	('0cb3bb5a-bd54-47c0-868b-fd60f139b13c', '2026-01-22 03:19:11.429351+00', '2026-01-22 03:19:11.429351+00', 'password', 'eb7351f2-4b35-45c2-8244-4d70f062de4c'),
+	('08b9e363-4aac-4bb5-a2d6-d3d41f6b4092', '2026-01-22 04:05:42.959639+00', '2026-01-22 04:05:42.959639+00', 'password', 'd9af316f-bb09-4eb4-af90-b4ffd7306b54'),
+	('15976c5f-bc8b-48b2-8c97-fb4a27301b23', '2026-01-22 04:59:56.628194+00', '2026-01-22 04:59:56.628194+00', 'password', 'ec8ea896-05cf-4c8c-bf0a-8fb3cebdb1b6'),
+	('c559907b-92e6-4383-94d3-e87fb47bcf12', '2026-01-22 05:33:16.620772+00', '2026-01-22 05:33:16.620772+00', 'password', '4785f4a1-4fbb-48c0-bad2-682889d42f13'),
+	('c82bdde5-929b-40e9-8a44-6b045e3f09fa', '2026-01-22 05:38:22.832974+00', '2026-01-22 05:38:22.832974+00', 'password', '8f6957bb-e244-4e91-a22b-dd63ab345be7'),
+	('0bac077a-943c-48e3-9124-e4a33f9dae6c', '2026-01-22 05:42:45.227606+00', '2026-01-22 05:42:45.227606+00', 'password', 'e7d550c0-8be5-4b7e-8014-22b51bb7d0e7'),
+	('da2abd26-9ada-4ca5-8308-ee712e558487', '2026-01-22 05:44:12.925981+00', '2026-01-22 05:44:12.925981+00', 'password', 'ab751ea6-b170-4449-871d-ad51833b3510'),
+	('49211c60-1d88-4ec3-b75d-f886426c5470', '2026-01-22 05:47:52.00118+00', '2026-01-22 05:47:52.00118+00', 'password', 'd94a21a7-f87b-4263-8d86-cb71bb97e0e0'),
+	('e8a53a6b-b843-4029-a886-ab5bbf4f37b1', '2026-01-22 05:48:20.884719+00', '2026-01-22 05:48:20.884719+00', 'password', '4297f384-e4ab-4798-acc8-82f0e935a5c6'),
+	('c36b675e-7b2c-4f02-9ab9-266bf446c2f0', '2026-01-22 05:49:42.775617+00', '2026-01-22 05:49:42.775617+00', 'password', 'b432c764-e945-48f4-965f-5f43874b50f6'),
+	('4ae822c6-7b71-4eb4-82ed-1b75eccf694a', '2026-01-22 05:50:59.739427+00', '2026-01-22 05:50:59.739427+00', 'password', '49df7ad9-f2dd-43cd-92f2-f01652b5a07b'),
+	('65cee9fc-03dd-439e-a868-6badf38337d4', '2026-01-22 05:53:08.288841+00', '2026-01-22 05:53:08.288841+00', 'password', '5b25f173-2bf4-47e3-a92d-c3c83135dfad'),
+	('214ad58e-4762-4b90-a8a9-c4e426310369', '2026-01-22 05:53:50.806814+00', '2026-01-22 05:53:50.806814+00', 'password', '1a4a49e9-2d13-400d-9a6a-07bfa9f9d7a9'),
+	('13ff54ca-ba68-46c8-acb5-b92b47ec9d9d', '2026-01-22 05:59:41.39465+00', '2026-01-22 05:59:41.39465+00', 'password', '2cee2243-0da7-4b42-a9ba-7e9cae31262e'),
+	('6eac276b-f1b7-464a-9426-06c9a558b64e', '2026-01-22 06:02:26.865426+00', '2026-01-22 06:02:26.865426+00', 'password', 'f432dc51-5d0b-48e7-91c3-949e685135fa'),
+	('7abc3e23-bce6-4215-b4f1-1ec5a2b9140e', '2026-01-22 06:05:37.857976+00', '2026-01-22 06:05:37.857976+00', 'password', 'cd94ed70-9a51-43b6-9a90-7af33203b761'),
+	('202234ea-99ab-4d52-af53-2ca7db57f3d7', '2026-01-22 06:29:36.162082+00', '2026-01-22 06:29:36.162082+00', 'password', 'c0392d07-5669-4e4f-97ca-1298c85212f9'),
+	('87360bce-514a-4fba-8cda-a6b3328b6309', '2026-01-22 06:39:43.561198+00', '2026-01-22 06:39:43.561198+00', 'password', '37e9b068-1d2b-4334-81b8-22b24657f6f5'),
+	('680d842c-4d93-4c76-865b-31c4116f0f5c', '2026-01-22 12:20:34.439837+00', '2026-01-22 12:20:34.439837+00', 'password', '4e17d00c-eca3-4912-a1d2-0e47895396df'),
+	('455005c3-dfd4-4554-ae32-2e74513b416e', '2026-01-23 05:30:37.801932+00', '2026-01-23 05:30:37.801932+00', 'password', '85e41496-9258-4bc0-8bd8-4c6a21b90b2b'),
+	('7bf21705-ed2d-4ad9-8f65-3d6e2c7d56d2', '2026-01-23 08:45:09.734526+00', '2026-01-23 08:45:09.734526+00', 'password', '0c3fb94d-2988-4026-a471-e576bf3232b9'),
+	('cde0ef20-706f-4fe9-baa4-dffd9080e579', '2026-01-23 09:12:22.928475+00', '2026-01-23 09:12:22.928475+00', 'password', '32ce4672-86d4-4415-b8ab-6cc153f7de7b'),
+	('86f541d2-0667-4c4c-95f3-f4a6ded4994a', '2026-01-23 09:23:19.024891+00', '2026-01-23 09:23:19.024891+00', 'password', 'fdbee389-439b-4ffa-ac0a-44233656323a'),
+	('758a092a-21d4-4845-a9ca-28bcae0abc8f', '2026-01-23 10:44:21.610422+00', '2026-01-23 10:44:21.610422+00', 'password', '696844b0-077d-4b2c-976c-4c7e2fad6ba4'),
+	('b8b1c8bf-50d1-4b32-88be-081f298a0ed9', '2026-01-23 11:09:19.353408+00', '2026-01-23 11:09:19.353408+00', 'password', 'fe207884-44ff-49d1-aac8-d85ecdf746c3'),
+	('3580dd61-3326-4e3c-80fc-963dae52296d', '2026-01-23 12:29:15.513328+00', '2026-01-23 12:29:15.513328+00', 'password', '86f7c616-8212-45d7-a695-432605c7bf2f'),
+	('1546b299-3ccf-4f8e-ae0a-23f8a3cafbb0', '2026-01-23 12:41:42.612184+00', '2026-01-23 12:41:42.612184+00', 'password', '4c9c2bf6-32a1-479b-8e9e-819b4f84416e'),
+	('5adfe8c2-5d7b-4619-85f4-591843090075', '2026-01-23 17:19:19.961196+00', '2026-01-23 17:19:19.961196+00', 'password', '7b421395-fe8f-44b5-8665-ee8f7a6ebb43'),
+	('7637f5d7-a5e0-45fc-85cc-9118c2814395', '2026-01-23 17:33:16.683814+00', '2026-01-23 17:33:16.683814+00', 'password', '0b4d226f-ea2f-472c-872c-5482366b3b90'),
+	('383be3e6-dd73-4d3b-bc9e-0fba796bff91', '2026-01-23 17:41:37.935231+00', '2026-01-23 17:41:37.935231+00', 'password', '17ce1fc6-1931-426c-a1df-cf9e70634a31'),
+	('96dbd3b2-8309-4507-919a-6473a0efa18a', '2026-01-23 17:44:20.585658+00', '2026-01-23 17:44:20.585658+00', 'password', '3b719e5b-bcc4-4ec8-99d3-e5ec2bd23e40'),
+	('46102734-3fbf-4360-b805-9b68c1fbbd09', '2026-01-23 17:44:29.692607+00', '2026-01-23 17:44:29.692607+00', 'password', 'd8ee49e7-3bc3-4d84-bf63-caf13fe0576d'),
+	('a8c65cc2-d3fb-4880-bc59-0e632884ea02', '2026-01-23 17:46:52.245889+00', '2026-01-23 17:46:52.245889+00', 'password', '537d4227-0522-4ac7-9652-ccb7ae148a2a'),
+	('31d69aa6-d32d-4653-8e8c-d7dadf0531f8', '2026-01-23 17:47:45.938399+00', '2026-01-23 17:47:45.938399+00', 'otp', '34697b48-d083-4dfa-8be4-21506a2e4dff'),
+	('edbc0ef0-10b0-480b-b2a1-91fc1b2e83d1', '2026-01-23 17:54:48.531407+00', '2026-01-23 17:54:48.531407+00', 'otp', '335dcdad-e9aa-42d7-9065-9016fb533143'),
+	('61626af3-b4d9-4c85-af87-659078cad0a9', '2026-01-23 17:56:04.445997+00', '2026-01-23 17:56:04.445997+00', 'otp', '3716a88c-ca16-4666-8698-7c217389562c'),
+	('316cd111-ea98-4c5e-8075-ffd63b7023a4', '2026-01-23 17:59:10.079664+00', '2026-01-23 17:59:10.079664+00', 'otp', '6ac04cac-0eb4-4add-bd25-3e5c8be40703'),
+	('4e23e4a4-9f3f-4219-ab9e-d6c1bd5727dd', '2026-01-23 18:11:01.964285+00', '2026-01-23 18:11:01.964285+00', 'otp', '9db3792a-e784-4c6a-beca-a3fd123b5c20'),
+	('b5ebb113-1e05-4a52-9ef8-a6c3ab0ad8dc', '2026-01-23 18:14:00.294274+00', '2026-01-23 18:14:00.294274+00', 'password', '06032a2c-592d-4f40-8429-d55d4a8d1206'),
+	('a2361f44-d9c4-42f7-952a-1dd25da8e09a', '2026-01-23 18:16:43.924877+00', '2026-01-23 18:16:43.924877+00', 'password', '009adabb-527a-40c4-9754-64b131741929'),
+	('8d137107-11c7-4da0-98e4-4be81e78369a', '2026-01-24 04:37:30.996618+00', '2026-01-24 04:37:30.996618+00', 'password', 'bde6ae5d-b92a-4cf9-a28d-3b3c5afaacf2'),
+	('52cf7744-c779-4909-9214-ad54db23b088', '2026-01-24 04:56:38.934145+00', '2026-01-24 04:56:38.934145+00', 'password', 'bb3a811d-7015-47f0-95e3-ac4f9b08dc59'),
+	('27a94a0f-1ed0-4abe-a8b0-16fa24c72872', '2026-01-24 04:57:48.841281+00', '2026-01-24 04:57:48.841281+00', 'password', '212772d3-5d79-4934-b561-928b4671a675'),
+	('55a647f0-5533-4f69-9f56-c172829abf25', '2026-01-24 04:58:29.078155+00', '2026-01-24 04:58:29.078155+00', 'password', '6ff617f3-da00-465d-8b42-290c48285e1d'),
+	('b32439fe-9399-439e-bd68-9420808bedf0', '2026-01-24 05:00:24.391156+00', '2026-01-24 05:00:24.391156+00', 'password', '00ba6320-40f6-4904-b713-2d857ee548c8'),
+	('b60ede31-bd34-4537-8a45-272cdc71449f', '2026-01-24 05:02:39.502488+00', '2026-01-24 05:02:39.502488+00', 'password', 'bc65cd7e-d759-4e54-992c-09e58ba9b995'),
+	('2baf3d76-249b-4033-8add-41bd7efcd488', '2026-01-24 05:20:19.150803+00', '2026-01-24 05:20:19.150803+00', 'password', 'af999780-3d3a-4424-b217-482c960b8e41'),
+	('3b24e756-b10c-4e5d-913a-922d106340a4', '2026-01-24 05:29:37.796734+00', '2026-01-24 05:29:37.796734+00', 'password', '258863d4-6e3e-42aa-b09b-c7b04df1521d'),
+	('038a78c3-a511-4fca-97e4-553738f32693', '2026-01-24 05:31:12.459531+00', '2026-01-24 05:31:12.459531+00', 'password', '55d64b9e-195c-4f0f-a59b-c6ab4a2d073e'),
+	('011fc172-3e69-4933-a938-73cc08d2a585', '2026-01-24 05:46:03.280683+00', '2026-01-24 05:46:03.280683+00', 'password', '7d8ff49b-3503-443f-b686-ccde012ec642'),
+	('8afd8a0b-3869-48f3-99a6-9c02760164c2', '2026-01-24 05:47:06.623022+00', '2026-01-24 05:47:06.623022+00', 'password', '25f7bdd8-db31-4594-998a-369fc9c2b05c'),
+	('ee558190-37e3-4790-a235-486c7034cf8c', '2026-01-24 05:47:48.708701+00', '2026-01-24 05:47:48.708701+00', 'password', 'd6ce068c-232a-415d-b98d-cf67a0524a20'),
+	('4e0c387f-7c43-4bf4-bb1d-600b2308d95d', '2026-01-24 05:48:40.337864+00', '2026-01-24 05:48:40.337864+00', 'password', 'e764bc3a-1488-433f-846d-fd925f91cf82'),
+	('354e4ca1-a64a-4b4c-962d-f7c88d875f89', '2026-01-24 05:56:03.725184+00', '2026-01-24 05:56:03.725184+00', 'password', '7a06a601-5c9c-48cd-84b1-2f62103f1d19'),
+	('643f984d-dbca-44cb-b257-94cf09688d8a', '2026-01-24 07:43:44.568797+00', '2026-01-24 07:43:44.568797+00', 'password', 'dbeddb02-99ca-496a-b1ae-26922beaba86'),
+	('e49d3f8d-8c27-41d8-9450-d86fb37fa5cc', '2026-01-24 09:48:53.074097+00', '2026-01-24 09:48:53.074097+00', 'password', '30955981-e13d-4acb-aebc-f38a59f80a37'),
+	('937f5320-de2a-4889-853a-cab7f9e96d9e', '2026-01-24 11:28:32.178269+00', '2026-01-24 11:28:32.178269+00', 'password', '4cbb9cfe-d315-4e67-b448-5e0eded04ef9'),
+	('68b6b5e5-b145-4949-a4d6-4e2bdea9bee8', '2026-01-24 11:34:20.322524+00', '2026-01-24 11:34:20.322524+00', 'password', '82bcaa27-2d72-438c-9d80-bc31ca7d0ce5'),
+	('6836879f-a910-45ba-a7d0-e0b6d1cdc874', '2026-01-24 11:34:48.580242+00', '2026-01-24 11:34:48.580242+00', 'otp', 'c2cce4ec-d61f-4493-b433-d1ccffb64269'),
+	('ac8cffed-2624-43f7-9aed-6c01f9b16ff8', '2026-01-24 11:42:06.640494+00', '2026-01-24 11:42:06.640494+00', 'password', 'f45038bd-e424-4e1b-b8cd-091f340231cb'),
+	('62d2a4f9-649c-4d83-b39b-310425f30c79', '2026-01-24 11:46:27.749951+00', '2026-01-24 11:46:27.749951+00', 'password', 'c21231f5-6a9f-4737-99aa-e7b2d7020f7c'),
+	('6e32e5fe-5d57-4ea3-9d96-50b07988f109', '2026-01-24 11:51:56.889982+00', '2026-01-24 11:51:56.889982+00', 'otp', '784a8b09-5244-4ff0-951c-d04599f11472'),
+	('1a2f61d8-f1b7-4a83-b49f-aae322e091bd', '2026-01-24 12:03:45.245343+00', '2026-01-24 12:03:45.245343+00', 'password', 'b94acffc-c208-4d99-8f20-f21d83f22e8c'),
+	('dae7ed16-960f-4bcd-b23f-c43689e5c3e1', '2026-01-24 12:19:38.004522+00', '2026-01-24 12:19:38.004522+00', 'password', '7a7465bf-850a-419f-a4d2-28701c493c38'),
+	('60714f91-fdaa-4c8a-a3a9-e251b55df708', '2026-01-24 12:38:29.302068+00', '2026-01-24 12:38:29.302068+00', 'password', 'c5c09e36-a052-4965-b45d-8f886dbfd064'),
+	('63f16876-2370-4a20-99bb-9ccb8cdd0001', '2026-01-24 17:11:07.117822+00', '2026-01-24 17:11:07.117822+00', 'password', '962fccf4-cf6e-4995-8279-bb3e259355fc'),
+	('759174ac-128b-4462-b1a8-81cd5c9d2320', '2026-01-24 17:42:39.619767+00', '2026-01-24 17:42:39.619767+00', 'password', '8e195826-b7b4-4b3b-b604-cea9060f5abf'),
+	('97ecdf27-17eb-4c64-9c87-c75de6977e62', '2026-01-24 17:45:33.778134+00', '2026-01-24 17:45:33.778134+00', 'password', '2332b0df-f28f-4114-8aaa-52644198edf3'),
+	('c4bc401b-f4fb-438b-a483-45e69c64a62b', '2026-01-24 17:55:49.930127+00', '2026-01-24 17:55:49.930127+00', 'password', '1b30ce9b-cc3a-4a63-905b-ad32fecbbaa0'),
+	('8ae76c68-c3f6-4930-9716-2e7cd9e4c380', '2026-01-25 06:53:31.057967+00', '2026-01-25 06:53:31.057967+00', 'password', '8fcdb724-1ed6-430d-a180-1af796691468'),
+	('20f8ec57-44f9-4ff7-87ac-f5b4c9fd03fa', '2026-01-25 09:29:53.972574+00', '2026-01-25 09:29:53.972574+00', 'password', '57808138-b4b7-4486-a5f2-9a3de39bfae8'),
+	('99e0143d-0152-46fc-93dd-3973587e1aea', '2026-01-25 09:54:45.607311+00', '2026-01-25 09:54:45.607311+00', 'password', '7feac1ab-c86c-44e3-9614-3a58ae385fcc'),
+	('e20df2b8-fd02-492a-ae05-4e19437ceb9f', '2026-01-25 09:56:45.048838+00', '2026-01-25 09:56:45.048838+00', 'password', '3ec29d1e-fb29-48c5-8f61-38de5758234d'),
+	('7e5aeaef-59ef-4f6d-92f9-43b53f70fb4e', '2026-01-25 10:06:47.637625+00', '2026-01-25 10:06:47.637625+00', 'password', 'da590a3d-93c0-4b05-9bc4-fdddfed1e95c'),
+	('f03a70c1-a082-4cd3-88d5-3e1140e0502d', '2026-01-25 11:22:52.054378+00', '2026-01-25 11:22:52.054378+00', 'password', 'fd6e258d-99e8-42cc-8346-bdb49c8b5e7c'),
+	('68d9fea0-3487-4e9d-b48c-3633ae597770', '2026-01-25 12:12:21.309361+00', '2026-01-25 12:12:21.309361+00', 'password', 'f5857a20-d315-4098-9111-26afbdcb2a8c'),
+	('acd65afc-bbd8-4acb-ba56-25616fce24f2', '2026-01-25 13:00:53.695915+00', '2026-01-25 13:00:53.695915+00', 'password', '8ccdd01c-a3ef-46c6-8ad2-c3fd4a2b06f3'),
+	('387746f3-21a8-44ce-b6a0-a84f1ce55e22', '2026-01-25 13:01:29.728604+00', '2026-01-25 13:01:29.728604+00', 'password', 'd928bb91-563a-49c0-ba6a-84355bb66e00'),
+	('d2f51412-2634-4c6b-9b2f-f20e0b8f57f0', '2026-01-25 13:02:52.213499+00', '2026-01-25 13:02:52.213499+00', 'password', 'db3da127-251a-4d7e-a7cd-a8a1782f7003'),
+	('343ce498-49a3-4cd2-b45b-dc6f5e50aa22', '2026-01-25 13:03:22.768682+00', '2026-01-25 13:03:22.768682+00', 'password', '8dd099c3-0eb3-4206-93c2-95ffd06bffe9'),
+	('4c101548-afe2-4092-b3a1-155c643ad0e4', '2026-01-25 13:06:04.673972+00', '2026-01-25 13:06:04.673972+00', 'password', '0a419d4b-bf16-4fc3-8ec8-efb00224a7ca'),
+	('35b23bfd-c2d4-416a-a7cb-1000bc02ddd4', '2026-01-26 03:45:41.805526+00', '2026-01-26 03:45:41.805526+00', 'password', '67cf255e-1470-49af-a0a1-9c60c02586b5'),
+	('f01479fd-b6cb-4b6b-a32c-973d2174bf9e', '2026-01-26 04:15:34.066179+00', '2026-01-26 04:15:34.066179+00', 'password', '99412e6d-e34d-4247-b14d-e18690e323ef'),
+	('10c82662-29d9-4e4f-943e-953c0ef2c366', '2026-01-26 04:18:42.508657+00', '2026-01-26 04:18:42.508657+00', 'password', '74aa936f-4f48-49ab-a499-cd355babe52f'),
+	('f725a465-d4f4-45e2-9819-c3ae6e79b090', '2026-01-26 05:03:22.508131+00', '2026-01-26 05:03:22.508131+00', 'password', '19936ef9-4f30-4bb8-9770-80747e9bf539'),
+	('6b85bd23-2e5c-4422-a64d-c5287ab46713', '2026-01-26 05:09:09.424165+00', '2026-01-26 05:09:09.424165+00', 'password', '915d4f81-11e3-4a67-83d1-758e4d7982d9'),
+	('743b3bb8-9e70-4d64-ae24-7c86ff691a24', '2026-01-26 05:21:04.493721+00', '2026-01-26 05:21:04.493721+00', 'password', '4b0b9adc-2bc9-4c34-adab-68376b866fe1'),
+	('514a4548-9456-4eae-8ca0-dca4e077f1d3', '2026-01-26 05:23:26.044909+00', '2026-01-26 05:23:26.044909+00', 'password', '743a1104-5c28-4beb-847d-936d49a56be2'),
+	('2bce0558-d522-4146-aea9-6d2678020d76', '2026-01-26 05:24:50.105477+00', '2026-01-26 05:24:50.105477+00', 'password', '313c89d5-3404-4237-a409-2355863adb8e'),
+	('cb00a0bb-52a6-4dea-9934-bdc46e75aa68', '2026-01-26 05:31:04.953174+00', '2026-01-26 05:31:04.953174+00', 'password', 'ea364729-47ce-4a2b-9c03-ba90da19caed'),
+	('3aae31fd-c18d-4236-b8c0-4d945f4ca20f', '2026-01-26 05:31:49.940137+00', '2026-01-26 05:31:49.940137+00', 'password', 'c60ea163-0ab0-4bec-afc0-b1c746e614a1'),
+	('843849ba-2baf-4c49-99bb-ba4ea7f9c4f3', '2026-01-26 06:13:01.906461+00', '2026-01-26 06:13:01.906461+00', 'password', 'c8bb0278-1475-46dc-a885-6bef99a2c2ca'),
+	('ed76f111-62a2-46a8-be44-5ccb776b2ecc', '2026-01-26 08:20:01.058337+00', '2026-01-26 08:20:01.058337+00', 'password', '7d727207-76e3-44b8-8106-09414ab6b0aa'),
+	('2d359fb7-a7c4-4cf9-871c-04f6e170c488', '2026-01-26 08:20:09.344267+00', '2026-01-26 08:20:09.344267+00', 'password', 'ab78536b-fbaf-4cb4-847f-65673bf4a448'),
+	('98e6cf21-8fe7-433b-8897-af2201bc5a19', '2026-01-27 17:41:54.026715+00', '2026-01-27 17:41:54.026715+00', 'password', 'b34995d1-1222-4cc5-8f1f-813255fe0d1a'),
+	('3559293e-1d3a-4738-a36b-81a83243ce93', '2026-01-27 17:42:01.54782+00', '2026-01-27 17:42:01.54782+00', 'password', 'f2ccefdd-37e2-49e6-8c0e-622954d3d46d'),
+	('0acca816-8b94-4b27-a879-ba0eb4f62545', '2026-01-30 12:55:34.688214+00', '2026-01-30 12:55:34.688214+00', 'otp', '06621bb7-2f42-43dc-9d12-07b098262466'),
+	('164b5490-4c7b-4bd9-9917-9ce9db051589', '2026-01-31 06:35:00.724242+00', '2026-01-31 06:35:00.724242+00', 'otp', '88e869be-efc9-43c5-ac5a-8ec597721fbd');
+
+
+--
+-- Data for Name: mfa_factors; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: mfa_challenges; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_authorizations; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_client_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: oauth_consents; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: one_time_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."one_time_tokens" ("id", "user_id", "token_type", "token_hash", "relates_to", "created_at", "updated_at") VALUES
+	('9db20644-7ce9-4718-ad50-d3ab235bf225', 'af1c7310-2665-4f7b-800b-a1a5b3946852', 'recovery_token', '61f354f341520422044d2c25cf3f9450708ffc1604bc96bcaf61c517', 'jiangdalin1988@gmail.cpom', '2026-01-22 03:19:16.570171', '2026-01-22 03:19:16.570171'),
+	('a87958f6-917b-46ed-acdb-4e01d828aaeb', 'ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', 'recovery_token', '9794debe859567318080d5bfe79a4915b2c461fb67392a43262eb9bb', 'jiangdalin@gmail.com', '2026-01-22 04:05:47.754104', '2026-01-22 04:05:47.754104');
+
+
+--
+-- Data for Name: refresh_tokens; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "revoked", "created_at", "updated_at", "parent", "session_id") VALUES
+	('00000000-0000-0000-0000-000000000000', 1, 'onfzdduebsiz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:05:48.359183+00', '2026-01-20 09:05:48.359183+00', NULL, '7d73aa93-b88f-4cc9-a17a-98e0f7b61749'),
+	('00000000-0000-0000-0000-000000000000', 2, 'ui2melbp5kod', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:06:15.692167+00', '2026-01-20 09:06:15.692167+00', NULL, '220fd48d-8444-4163-baf2-3427712289a2'),
+	('00000000-0000-0000-0000-000000000000', 3, 'oljrvvr6uvt5', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:09:14.838378+00', '2026-01-20 09:09:14.838378+00', NULL, '2d1752de-cdcb-464e-a302-5151a066408f'),
+	('00000000-0000-0000-0000-000000000000', 34, 'higdosd67pmr', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:11:12.159979+00', '2026-01-20 09:11:12.159979+00', NULL, 'a1166950-f432-4b97-a3ac-fc7712a1daaf'),
+	('00000000-0000-0000-0000-000000000000', 67, 'kpkcvpt4tg4c', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:14:03.614874+00', '2026-01-20 09:14:03.614874+00', NULL, 'c23289e5-0c77-4b7e-8dd6-c47170a5faa7'),
+	('00000000-0000-0000-0000-000000000000', 68, 'nejfgb3mnisa', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:17:05.19758+00', '2026-01-20 09:17:05.19758+00', NULL, '57b57ee4-9f4f-422c-8c71-d51650df5230'),
+	('00000000-0000-0000-0000-000000000000', 100, '7i2v7xk5brj5', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:19:12.298857+00', '2026-01-20 09:19:12.298857+00', NULL, 'ce7fc29e-142a-4c08-af28-f01a544542db'),
+	('00000000-0000-0000-0000-000000000000', 133, 'lj4tdzbxd4rg', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:24:15.683709+00', '2026-01-20 09:24:15.683709+00', NULL, '14078374-259e-4562-b376-c4556abfc59b'),
+	('00000000-0000-0000-0000-000000000000', 134, 'isk22kgihnm7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:26:51.184024+00', '2026-01-20 09:26:51.184024+00', NULL, '0d63b357-8b2e-430a-b527-68a09498d970'),
+	('00000000-0000-0000-0000-000000000000', 167, 'povw7r6ukuc3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:31:42.658214+00', '2026-01-20 09:31:42.658214+00', NULL, '55d24cb7-7c5b-4ba9-b7e3-9a7b715aee74'),
+	('00000000-0000-0000-0000-000000000000', 168, '2i7ctwbsqzde', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:32:17.553363+00', '2026-01-20 09:32:17.553363+00', NULL, '28b491a6-d267-4f67-9a24-faa9d7641f30'),
+	('00000000-0000-0000-0000-000000000000', 169, 'lqezyj5pu2qu', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:34:46.518698+00', '2026-01-20 09:34:46.518698+00', NULL, '0783e298-4c5b-437a-b2f6-2a5747366083'),
+	('00000000-0000-0000-0000-000000000000', 170, 'tzcjttu3kguv', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 09:37:32.092725+00', '2026-01-20 09:37:32.092725+00', NULL, '61683c04-156a-4be9-9be9-d704bdfe55c1'),
+	('00000000-0000-0000-0000-000000000000', 171, 'jmjrctvzzzda', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:02:06.933888+00', '2026-01-20 10:02:06.933888+00', NULL, '9de33ad7-42e8-4070-a6c0-04aacf47af87'),
+	('00000000-0000-0000-0000-000000000000', 172, 'dgli6neqqzut', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:05:05.601288+00', '2026-01-20 10:05:05.601288+00', NULL, '6fdddfc5-8822-4ba2-9fea-8e8109abeca0'),
+	('00000000-0000-0000-0000-000000000000', 173, 'mt5iy35junmy', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:07:13.531913+00', '2026-01-20 10:07:13.531913+00', NULL, 'f3084e44-3ea5-4e61-8d57-389df92138af'),
+	('00000000-0000-0000-0000-000000000000', 174, 'dmpbswc6rfmw', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:12:57.426639+00', '2026-01-20 10:12:57.426639+00', NULL, '9d325e1b-34e2-445a-a591-a4379a467b65'),
+	('00000000-0000-0000-0000-000000000000', 175, 'v7ob5aeyb2sz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:20:25.399254+00', '2026-01-20 10:20:25.399254+00', NULL, '6aef64ee-532f-4e2f-95c9-8acd31001124'),
+	('00000000-0000-0000-0000-000000000000', 176, 'cq4ynq7hccc7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:34:52.222814+00', '2026-01-20 10:34:52.222814+00', NULL, 'e14d66a9-af30-44ac-a8b4-5a09937922f7'),
+	('00000000-0000-0000-0000-000000000000', 177, 'asmk3dxyd2r6', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:35:28.055544+00', '2026-01-20 10:35:28.055544+00', NULL, 'a3ccbcbd-9d32-43df-b9a6-cd2649398a62'),
+	('00000000-0000-0000-0000-000000000000', 178, 'i4z4gi6qbez5', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:35:58.937775+00', '2026-01-20 10:35:58.937775+00', NULL, '23b409c5-677b-4641-8d02-fb544fb7f170'),
+	('00000000-0000-0000-0000-000000000000', 210, 'ybyzo65oimvt', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 10:37:18.425004+00', '2026-01-20 10:37:18.425004+00', NULL, '985d5de2-5ab2-4eb6-bb00-0dd55d259e99'),
+	('00000000-0000-0000-0000-000000000000', 399, 'cjg6cisk6wbz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 07:42:13.319346+00', '2026-01-24 07:42:13.319346+00', 'wsnjce4wxbz3', '2baf3d76-249b-4033-8add-41bd7efcd488'),
+	('00000000-0000-0000-0000-000000000000', 402, 'nxhjevuuhrt6', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 09:15:16.325642+00', '2026-01-24 09:15:16.325642+00', 'ohulnlgpuafv', '643f984d-dbca-44cb-b257-94cf09688d8a'),
+	('00000000-0000-0000-0000-000000000000', 405, '4b2mkty564vz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 11:28:32.176063+00', '2026-01-24 11:28:32.176063+00', NULL, '937f5320-de2a-4889-853a-cab7f9e96d9e'),
+	('00000000-0000-0000-0000-000000000000', 408, '2wwztf5xjr46', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 11:42:06.639288+00', '2026-01-24 11:42:06.639288+00', NULL, 'ac8cffed-2624-43f7-9aed-6c01f9b16ff8'),
+	('00000000-0000-0000-0000-000000000000', 411, 'q7awljjnbtxn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 12:03:45.243562+00', '2026-01-24 12:03:45.243562+00', NULL, '1a2f61d8-f1b7-4a83-b49f-aae322e091bd'),
+	('00000000-0000-0000-0000-000000000000', 212, 'xe4qhgicecyz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-20 11:05:29.69536+00', '2026-01-20 12:32:49.444021+00', NULL, 'b52b1b71-e4d1-4b5b-a70c-a97d22465bc3'),
+	('00000000-0000-0000-0000-000000000000', 215, 'qq4q3udezje7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-20 12:32:49.444629+00', '2026-01-20 12:32:49.444629+00', 'xe4qhgicecyz', 'b52b1b71-e4d1-4b5b-a70c-a97d22465bc3'),
+	('00000000-0000-0000-0000-000000000000', 414, 'wf5qfrev5je6', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', true, '2026-01-24 12:50:23.638949+00', '2026-01-24 17:11:01.681114+00', 'ewxngkbpv3ut', '6e32e5fe-5d57-4ea3-9d96-50b07988f109'),
+	('00000000-0000-0000-0000-000000000000', 415, 'zvqfgwy5ewrh', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', false, '2026-01-24 17:11:01.681554+00', '2026-01-24 17:11:01.681554+00', 'wf5qfrev5je6', '6e32e5fe-5d57-4ea3-9d96-50b07988f109'),
+	('00000000-0000-0000-0000-000000000000', 421, '4lno6swjlxeo', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 17:55:49.928873+00', '2026-01-24 17:55:49.928873+00', NULL, 'c4bc401b-f4fb-438b-a483-45e69c64a62b'),
+	('00000000-0000-0000-0000-000000000000', 422, 'h3hp3wt24wek', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-25 06:53:31.055801+00', '2026-01-25 07:54:17.661846+00', NULL, '8ae76c68-c3f6-4930-9716-2e7cd9e4c380'),
+	('00000000-0000-0000-0000-000000000000', 425, 'izzrdmrfha7p', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-25 07:54:17.66245+00', '2026-01-25 09:29:52.218986+00', 'h3hp3wt24wek', '8ae76c68-c3f6-4930-9716-2e7cd9e4c380'),
+	('00000000-0000-0000-0000-000000000000', 222, 'asy7535bojst', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 08:15:14.459016+00', '2026-01-21 08:15:14.459016+00', NULL, '712806ac-93fd-4567-9a7c-363bcec8b17e'),
+	('00000000-0000-0000-0000-000000000000', 428, 'nl554afowryr', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 09:29:53.971219+00', '2026-01-25 09:29:53.971219+00', NULL, '20f8ec57-44f9-4ff7-87ac-f5b4c9fd03fa'),
+	('00000000-0000-0000-0000-000000000000', 431, 'sdm6ducohkwx', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 09:56:45.047164+00', '2026-01-25 09:56:45.047164+00', NULL, 'e20df2b8-fd02-492a-ae05-4e19437ceb9f'),
+	('00000000-0000-0000-0000-000000000000', 224, 'pqilvkirpvrp', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 08:47:36.766416+00', '2026-01-21 08:47:36.766416+00', NULL, 'ee4c1eac-1f3c-4afb-abb3-6733cda0e05f'),
+	('00000000-0000-0000-0000-000000000000', 225, 'f4egj57npj2r', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 09:39:12.955141+00', '2026-01-21 09:39:12.955141+00', NULL, '20f99697-d6ea-4dc1-b785-00e2b40d5974'),
+	('00000000-0000-0000-0000-000000000000', 434, 'hmrm7c56vbo7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 11:22:44.017735+00', '2026-01-25 11:22:44.017735+00', 'aboxcarhy7af', '7e5aeaef-59ef-4f6d-92f9-43b53f70fb4e'),
+	('00000000-0000-0000-0000-000000000000', 437, 'dayzadrinppc', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 12:12:21.308398+00', '2026-01-25 12:12:21.308398+00', NULL, '68d9fea0-3487-4e9d-b48c-3633ae597770'),
+	('00000000-0000-0000-0000-000000000000', 227, '57pudxnlazwv', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 10:00:02.461474+00', '2026-01-21 10:00:02.461474+00', NULL, '7d232808-7eee-4d1d-84db-9599e2a69bf2'),
+	('00000000-0000-0000-0000-000000000000', 228, 'r7v4skngnytf', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 10:42:48.327008+00', '2026-01-21 10:42:48.327008+00', NULL, '07068b6c-a112-40cf-b30f-03acec5e22ca'),
+	('00000000-0000-0000-0000-000000000000', 440, '4uyopqx5mw6e', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 13:01:29.727281+00', '2026-01-25 13:01:29.727281+00', NULL, '387746f3-21a8-44ce-b6a0-a84f1ce55e22'),
+	('00000000-0000-0000-0000-000000000000', 443, 'uahcy4tmd2uz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 13:06:04.672466+00', '2026-01-25 13:06:04.672466+00', NULL, '4c101548-afe2-4092-b3a1-155c643ad0e4'),
+	('00000000-0000-0000-0000-000000000000', 447, 'ubrxqtifvjvs', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 04:18:42.507241+00', '2026-01-26 04:18:42.507241+00', NULL, '10c82662-29d9-4e4f-943e-953c0ef2c366'),
+	('00000000-0000-0000-0000-000000000000', 232, 'n6sb65akqunu', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 12:33:25.883257+00', '2026-01-21 12:33:25.883257+00', NULL, 'ebc09685-e6b9-437c-958e-b49ee39df7e7'),
+	('00000000-0000-0000-0000-000000000000', 234, 'maxd6hr6yf7r', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-21 12:46:28.003189+00', '2026-01-21 12:46:28.003189+00', NULL, '503ee2a4-094c-4e7d-8a46-5cbb1499b34b'),
+	('00000000-0000-0000-0000-000000000000', 235, '34iyjelan4jj', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-21 13:10:53.309254+00', '2026-01-22 03:18:38.368114+00', NULL, '0f85c23c-69c8-46ed-8617-0878f38e922f'),
+	('00000000-0000-0000-0000-000000000000', 237, 'olnqgstia7p3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 03:18:38.368606+00', '2026-01-22 03:18:38.368606+00', '34iyjelan4jj', '0f85c23c-69c8-46ed-8617-0878f38e922f'),
+	('00000000-0000-0000-0000-000000000000', 238, 'sqcxqrazi5vn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 03:18:52.915924+00', '2026-01-22 03:18:52.915924+00', NULL, '5e24b2d0-8872-431e-8301-0b4f73044e17'),
+	('00000000-0000-0000-0000-000000000000', 239, 'xqrb74lnnuyo', 'af1c7310-2665-4f7b-800b-a1a5b3946852', false, '2026-01-22 03:19:11.42851+00', '2026-01-22 03:19:11.42851+00', NULL, '0cb3bb5a-bd54-47c0-868b-fd60f139b13c'),
+	('00000000-0000-0000-0000-000000000000', 242, 'rneromy343rt', 'ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', false, '2026-01-22 04:05:42.958392+00', '2026-01-22 04:05:42.958392+00', NULL, '08b9e363-4aac-4bb5-a2d6-d3d41f6b4092'),
+	('00000000-0000-0000-0000-000000000000', 400, 'ohulnlgpuafv', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-24 07:43:44.566757+00', '2026-01-24 09:15:16.325013+00', NULL, '643f984d-dbca-44cb-b257-94cf09688d8a'),
+	('00000000-0000-0000-0000-000000000000', 245, 'y267pr7sz7wo', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 04:59:56.626675+00', '2026-01-22 04:59:56.626675+00', NULL, '15976c5f-bc8b-48b2-8c97-fb4a27301b23'),
+	('00000000-0000-0000-0000-000000000000', 406, 'wj56spwulxvq', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', false, '2026-01-24 11:34:20.321542+00', '2026-01-24 11:34:20.321542+00', NULL, '68b6b5e5-b145-4949-a4d6-4e2bdea9bee8'),
+	('00000000-0000-0000-0000-000000000000', 247, 'u6pirtehjozw', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:33:16.619505+00', '2026-01-22 05:33:16.619505+00', NULL, 'c559907b-92e6-4383-94d3-e87fb47bcf12'),
+	('00000000-0000-0000-0000-000000000000', 248, '2jkrtngffvtz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:38:22.831958+00', '2026-01-22 05:38:22.831958+00', NULL, 'c82bdde5-929b-40e9-8a44-6b045e3f09fa'),
+	('00000000-0000-0000-0000-000000000000', 249, '6gtgdqcwd7kh', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:42:45.225475+00', '2026-01-22 05:42:45.225475+00', NULL, '0bac077a-943c-48e3-9124-e4a33f9dae6c'),
+	('00000000-0000-0000-0000-000000000000', 250, 'ikdjmw7yd2gv', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:44:12.924723+00', '2026-01-22 05:44:12.924723+00', NULL, 'da2abd26-9ada-4ca5-8308-ee712e558487'),
+	('00000000-0000-0000-0000-000000000000', 251, 'le7udekgvf76', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:47:52.000184+00', '2026-01-22 05:47:52.000184+00', NULL, '49211c60-1d88-4ec3-b75d-f886426c5470'),
+	('00000000-0000-0000-0000-000000000000', 252, 'e23kneeo5cw3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:48:20.883395+00', '2026-01-22 05:48:20.883395+00', NULL, 'e8a53a6b-b843-4029-a886-ab5bbf4f37b1'),
+	('00000000-0000-0000-0000-000000000000', 253, 'yvuzfeogkcte', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:49:42.774214+00', '2026-01-22 05:49:42.774214+00', NULL, 'c36b675e-7b2c-4f02-9ab9-266bf446c2f0'),
+	('00000000-0000-0000-0000-000000000000', 254, 'l3phgrc7736x', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:50:59.738071+00', '2026-01-22 05:50:59.738071+00', NULL, '4ae822c6-7b71-4eb4-82ed-1b75eccf694a'),
+	('00000000-0000-0000-0000-000000000000', 255, '7asq6agyokgj', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:53:08.287515+00', '2026-01-22 05:53:08.287515+00', NULL, '65cee9fc-03dd-439e-a868-6badf38337d4'),
+	('00000000-0000-0000-0000-000000000000', 256, 'pli6urppyohb', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:53:50.805575+00', '2026-01-22 05:53:50.805575+00', NULL, '214ad58e-4762-4b90-a8a9-c4e426310369'),
+	('00000000-0000-0000-0000-000000000000', 257, '5yvfsxjc5i22', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 05:59:41.393524+00', '2026-01-22 05:59:41.393524+00', NULL, '13ff54ca-ba68-46c8-acb5-b92b47ec9d9d'),
+	('00000000-0000-0000-0000-000000000000', 258, 'y4cjrpi65wwn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 06:02:26.864139+00', '2026-01-22 06:02:26.864139+00', NULL, '6eac276b-f1b7-464a-9426-06c9a558b64e'),
+	('00000000-0000-0000-0000-000000000000', 259, 'c4l6ajhkfquy', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 06:05:37.855554+00', '2026-01-22 06:05:37.855554+00', NULL, '7abc3e23-bce6-4215-b4f1-1ec5a2b9140e'),
+	('00000000-0000-0000-0000-000000000000', 409, 'pkhyxxm7qfpg', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 11:46:27.748594+00', '2026-01-24 11:46:27.748594+00', NULL, '62d2a4f9-649c-4d83-b39b-310425f30c79'),
+	('00000000-0000-0000-0000-000000000000', 261, 'frtv5sahejay', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 06:29:36.160927+00', '2026-01-22 06:29:36.160927+00', NULL, '202234ea-99ab-4d52-af53-2ca7db57f3d7'),
+	('00000000-0000-0000-0000-000000000000', 412, 'v2q2fixfhior', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 12:19:38.003129+00', '2026-01-24 12:19:38.003129+00', NULL, 'dae7ed16-960f-4bcd-b23f-c43689e5c3e1'),
+	('00000000-0000-0000-0000-000000000000', 416, 'hcoq66dcxxnl', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 17:11:02.281194+00', '2026-01-24 17:11:02.281194+00', '2hctjx6fe6pr', '60714f91-fdaa-4c8a-a3a9-e251b55df708'),
+	('00000000-0000-0000-0000-000000000000', 419, 'fxyk6exraoxf', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 17:42:39.618252+00', '2026-01-24 17:42:39.618252+00', NULL, '759174ac-128b-4462-b1a8-81cd5c9d2320'),
+	('00000000-0000-0000-0000-000000000000', 262, 'iulwm5dae5zr', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-22 06:39:43.559826+00', '2026-01-22 07:48:19.778798+00', NULL, '87360bce-514a-4fba-8cda-a6b3328b6309'),
+	('00000000-0000-0000-0000-000000000000', 264, 'cljlnljef7wi', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-22 07:48:19.779453+00', '2026-01-22 07:48:19.779453+00', 'iulwm5dae5zr', '87360bce-514a-4fba-8cda-a6b3328b6309'),
+	('00000000-0000-0000-0000-000000000000', 432, 'aboxcarhy7af', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-25 10:06:47.636255+00', '2026-01-25 11:22:44.017336+00', NULL, '7e5aeaef-59ef-4f6d-92f9-43b53f70fb4e'),
+	('00000000-0000-0000-0000-000000000000', 435, 'v4wmjclhvz7y', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 11:22:52.052996+00', '2026-01-25 11:22:52.052996+00', NULL, 'f03a70c1-a082-4cd3-88d5-3e1140e0502d'),
+	('00000000-0000-0000-0000-000000000000', 268, 'dfsi5ptqie7t', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-22 12:20:34.438618+00', '2026-01-23 04:37:31.333018+00', NULL, '680d842c-4d93-4c76-865b-31c4116f0f5c'),
+	('00000000-0000-0000-0000-000000000000', 441, 'm2spgzp6q7x4', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 13:02:52.212307+00', '2026-01-25 13:02:52.212307+00', NULL, 'd2f51412-2634-4c6b-9b2f-f20e0b8f57f0'),
+	('00000000-0000-0000-0000-000000000000', 445, 'qf5fgr2dhzxa', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 03:45:41.804207+00', '2026-01-26 03:45:41.804207+00', NULL, '35b23bfd-c2d4-416a-a7cb-1000bc02ddd4'),
+	('00000000-0000-0000-0000-000000000000', 271, 'dooqy4vgi6wt', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 04:37:31.333464+00', '2026-01-23 05:35:51.036415+00', 'dfsi5ptqie7t', '680d842c-4d93-4c76-865b-31c4116f0f5c'),
+	('00000000-0000-0000-0000-000000000000', 450, '3bn4v3ykkhg6', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:09:09.422501+00', '2026-01-26 05:09:09.422501+00', NULL, '6b85bd23-2e5c-4422-a64d-c5287ab46713'),
+	('00000000-0000-0000-0000-000000000000', 452, 'msomdvxfndvo', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:23:26.043441+00', '2026-01-26 05:23:26.043441+00', NULL, '514a4548-9456-4eae-8ca0-dca4e077f1d3'),
+	('00000000-0000-0000-0000-000000000000', 454, '62xk63jali4l', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:31:04.951768+00', '2026-01-26 05:31:04.951768+00', NULL, 'cb00a0bb-52a6-4dea-9934-bdc46e75aa68'),
+	('00000000-0000-0000-0000-000000000000', 457, 'bvmmukxj4lbj', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 06:13:01.905107+00', '2026-01-26 06:13:01.905107+00', NULL, '843849ba-2baf-4c49-99bb-ba4ea7f9c4f3'),
+	('00000000-0000-0000-0000-000000000000', 274, 'boujv6yc4f4m', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 05:30:37.800754+00', '2026-01-23 08:44:53.850799+00', NULL, '455005c3-dfd4-4554-ae32-2e74513b416e'),
+	('00000000-0000-0000-0000-000000000000', 275, 'zxqleee2oxae', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 05:35:51.036893+00', '2026-01-23 08:45:08.65123+00', 'dooqy4vgi6wt', '680d842c-4d93-4c76-865b-31c4116f0f5c'),
+	('00000000-0000-0000-0000-000000000000', 315, 'nhcgf3fi3ls2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 08:45:08.651767+00', '2026-01-23 08:45:08.651767+00', 'zxqleee2oxae', '680d842c-4d93-4c76-865b-31c4116f0f5c'),
+	('00000000-0000-0000-0000-000000000000', 316, 'btgbzda3yvbp', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 08:45:09.733427+00', '2026-01-23 08:45:09.733427+00', NULL, '7bf21705-ed2d-4ad9-8f65-3d6e2c7d56d2'),
+	('00000000-0000-0000-0000-000000000000', 317, 'gjjg3l5weyd3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 09:12:22.927207+00', '2026-01-23 09:12:22.927207+00', NULL, 'cde0ef20-706f-4fe9-baa4-dffd9080e579'),
+	('00000000-0000-0000-0000-000000000000', 313, '63ue3y644i7s', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 08:44:53.851225+00', '2026-01-23 09:43:07.989161+00', 'boujv6yc4f4m', '455005c3-dfd4-4554-ae32-2e74513b416e'),
+	('00000000-0000-0000-0000-000000000000', 321, 'svtpjbxmabfp', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 09:43:07.989597+00', '2026-01-23 10:41:07.995643+00', '63ue3y644i7s', '455005c3-dfd4-4554-ae32-2e74513b416e'),
+	('00000000-0000-0000-0000-000000000000', 318, 'cmjnpijvxrny', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 09:23:19.023446+00', '2026-01-23 10:44:16.103943+00', NULL, '86f541d2-0667-4c4c-95f3-f4a6ded4994a'),
+	('00000000-0000-0000-0000-000000000000', 325, 'pfkpdadcbeo2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 10:44:16.104306+00', '2026-01-23 10:44:16.104306+00', 'cmjnpijvxrny', '86f541d2-0667-4c4c-95f3-f4a6ded4994a'),
+	('00000000-0000-0000-0000-000000000000', 324, 'fufjrah737qt', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 10:41:07.99603+00', '2026-01-23 11:39:07.996263+00', 'svtpjbxmabfp', '455005c3-dfd4-4554-ae32-2e74513b416e'),
+	('00000000-0000-0000-0000-000000000000', 326, 'haau7i6ciau7', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 10:44:21.607633+00', '2026-01-23 10:44:21.607633+00', NULL, '758a092a-21d4-4845-a9ca-28bcae0abc8f'),
+	('00000000-0000-0000-0000-000000000000', 396, 'wsnjce4wxbz3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-24 06:19:43.055072+00', '2026-01-24 07:42:13.318841+00', 'vthosqkem76x', '2baf3d76-249b-4033-8add-41bd7efcd488'),
+	('00000000-0000-0000-0000-000000000000', 330, 'zinokinngob6', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 11:39:07.996706+00', '2026-01-23 11:39:07.996706+00', 'fufjrah737qt', '455005c3-dfd4-4554-ae32-2e74513b416e'),
+	('00000000-0000-0000-0000-000000000000', 404, '66cfssrp6i4f', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 09:48:53.072885+00', '2026-01-24 09:48:53.072885+00', NULL, 'e49d3f8d-8c27-41d8-9450-d86fb37fa5cc'),
+	('00000000-0000-0000-0000-000000000000', 327, 'eno3ummme4mr', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-23 11:09:19.352258+00', '2026-01-23 12:29:10.871917+00', NULL, 'b8b1c8bf-50d1-4b32-88be-081f298a0ed9'),
+	('00000000-0000-0000-0000-000000000000', 332, '2lhjt4lirphx', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 12:29:10.872473+00', '2026-01-23 12:29:10.872473+00', 'eno3ummme4mr', 'b8b1c8bf-50d1-4b32-88be-081f298a0ed9'),
+	('00000000-0000-0000-0000-000000000000', 333, 'sl3cvwz4sr2c', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 12:29:15.512141+00', '2026-01-23 12:29:15.512141+00', NULL, '3580dd61-3326-4e3c-80fc-963dae52296d'),
+	('00000000-0000-0000-0000-000000000000', 334, 'a6fspqbt6t3j', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 12:41:42.610669+00', '2026-01-23 12:41:42.610669+00', NULL, '1546b299-3ccf-4f8e-ae0a-23f8a3cafbb0'),
+	('00000000-0000-0000-0000-000000000000', 335, 'hh5vjvvpgokh', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 17:19:19.958471+00', '2026-01-23 17:19:19.958471+00', NULL, '5adfe8c2-5d7b-4619-85f4-591843090075'),
+	('00000000-0000-0000-0000-000000000000', 336, 'jmmlgqrr5oml', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 17:33:16.682372+00', '2026-01-23 17:33:16.682372+00', NULL, '7637f5d7-a5e0-45fc-85cc-9118c2814395'),
+	('00000000-0000-0000-0000-000000000000', 337, '7bcsghw4vtyy', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 17:41:37.933975+00', '2026-01-23 17:41:37.933975+00', NULL, '383be3e6-dd73-4d3b-bc9e-0fba796bff91'),
+	('00000000-0000-0000-0000-000000000000', 370, 'xuy4yvvxgf65', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 17:44:20.584122+00', '2026-01-23 17:44:20.584122+00', NULL, '96dbd3b2-8309-4507-919a-6473a0efa18a'),
+	('00000000-0000-0000-0000-000000000000', 371, 'stt6pxibovcf', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 17:44:29.691471+00', '2026-01-23 17:44:29.691471+00', NULL, '46102734-3fbf-4360-b805-9b68c1fbbd09'),
+	('00000000-0000-0000-0000-000000000000', 372, 'wz4axzgyjn2l', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', false, '2026-01-23 17:46:52.244723+00', '2026-01-23 17:46:52.244723+00', NULL, 'a8c65cc2-d3fb-4880-bc59-0e632884ea02'),
+	('00000000-0000-0000-0000-000000000000', 373, 'fteeor4iggdu', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', false, '2026-01-23 17:47:45.937373+00', '2026-01-23 17:47:45.937373+00', NULL, '31d69aa6-d32d-4653-8e8c-d7dadf0531f8'),
+	('00000000-0000-0000-0000-000000000000', 374, 'zw47r3pfblic', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', false, '2026-01-23 17:54:48.529617+00', '2026-01-23 17:54:48.529617+00', NULL, 'edbc0ef0-10b0-480b-b2a1-91fc1b2e83d1'),
+	('00000000-0000-0000-0000-000000000000', 375, 'pzozsa2okqyj', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', false, '2026-01-23 17:56:04.444336+00', '2026-01-23 17:56:04.444336+00', NULL, '61626af3-b4d9-4c85-af87-659078cad0a9'),
+	('00000000-0000-0000-0000-000000000000', 376, 'nz55blls4wbf', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', false, '2026-01-23 17:59:10.078216+00', '2026-01-23 17:59:10.078216+00', NULL, '316cd111-ea98-4c5e-8075-ffd63b7023a4'),
+	('00000000-0000-0000-0000-000000000000', 377, 'nywp2uzmj57p', '94316d2d-636c-46c2-b5dd-b9a55a8424a5', false, '2026-01-23 18:11:01.962616+00', '2026-01-23 18:11:01.962616+00', NULL, '4e23e4a4-9f3f-4219-ab9e-d6c1bd5727dd'),
+	('00000000-0000-0000-0000-000000000000', 378, 'nvechlrfjmw5', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 18:14:00.292903+00', '2026-01-23 18:14:00.292903+00', NULL, 'b5ebb113-1e05-4a52-9ef8-a6c3ab0ad8dc'),
+	('00000000-0000-0000-0000-000000000000', 379, 'kcg3rkhpjkcj', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-23 18:16:43.923705+00', '2026-01-23 18:16:43.923705+00', NULL, 'a2361f44-d9c4-42f7-952a-1dd25da8e09a'),
+	('00000000-0000-0000-0000-000000000000', 380, 'g7zvtyb3z6hk', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 04:37:30.993997+00', '2026-01-24 04:37:30.993997+00', NULL, '8d137107-11c7-4da0-98e4-4be81e78369a'),
+	('00000000-0000-0000-0000-000000000000', 407, 'sjcqedxbhyps', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', false, '2026-01-24 11:34:48.578445+00', '2026-01-24 11:34:48.578445+00', NULL, '6836879f-a910-45ba-a7d0-e0b6d1cdc874'),
+	('00000000-0000-0000-0000-000000000000', 382, 'psljjz6vymoq', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 04:56:38.932695+00', '2026-01-24 04:56:38.932695+00', NULL, '52cf7744-c779-4909-9214-ad54db23b088'),
+	('00000000-0000-0000-0000-000000000000', 383, 'frwk4nhemgpa', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 04:57:48.84008+00', '2026-01-24 04:57:48.84008+00', NULL, '27a94a0f-1ed0-4abe-a8b0-16fa24c72872'),
+	('00000000-0000-0000-0000-000000000000', 384, 'ott6o2w2syu2', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 04:58:29.076704+00', '2026-01-24 04:58:29.076704+00', NULL, '55a647f0-5533-4f69-9f56-c172829abf25'),
+	('00000000-0000-0000-0000-000000000000', 385, '6n6x4funf3c6', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:00:24.389702+00', '2026-01-24 05:00:24.389702+00', NULL, 'b32439fe-9399-439e-bd68-9420808bedf0'),
+	('00000000-0000-0000-0000-000000000000', 386, 'mrs6ucy27mkk', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:02:39.500895+00', '2026-01-24 05:02:39.500895+00', NULL, 'b60ede31-bd34-4537-8a45-272cdc71449f'),
+	('00000000-0000-0000-0000-000000000000', 388, 'y2qjco3gl2eo', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:29:37.795609+00', '2026-01-24 05:29:37.795609+00', NULL, '3b24e756-b10c-4e5d-913a-922d106340a4'),
+	('00000000-0000-0000-0000-000000000000', 389, 'ii2fjcp66xnz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:31:12.458451+00', '2026-01-24 05:31:12.458451+00', NULL, '038a78c3-a511-4fca-97e4-553738f32693'),
+	('00000000-0000-0000-0000-000000000000', 390, 'rnjqhxidlhb4', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:46:03.279478+00', '2026-01-24 05:46:03.279478+00', NULL, '011fc172-3e69-4933-a938-73cc08d2a585'),
+	('00000000-0000-0000-0000-000000000000', 391, 'ypvxrw4wogrx', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:47:06.622053+00', '2026-01-24 05:47:06.622053+00', NULL, '8afd8a0b-3869-48f3-99a6-9c02760164c2'),
+	('00000000-0000-0000-0000-000000000000', 392, 'duvg4dh7n4hi', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:47:48.707553+00', '2026-01-24 05:47:48.707553+00', NULL, 'ee558190-37e3-4790-a235-486c7034cf8c'),
+	('00000000-0000-0000-0000-000000000000', 393, 'l7vthd44d6wn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:48:40.335857+00', '2026-01-24 05:48:40.335857+00', NULL, '4e0c387f-7c43-4bf4-bb1d-600b2308d95d'),
+	('00000000-0000-0000-0000-000000000000', 394, 'fccoxf6pzcnf', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 05:56:03.723941+00', '2026-01-24 05:56:03.723941+00', NULL, '354e4ca1-a64a-4b4c-962d-f7c88d875f89'),
+	('00000000-0000-0000-0000-000000000000', 387, 'vthosqkem76x', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-24 05:20:19.149443+00', '2026-01-24 06:19:43.054603+00', NULL, '2baf3d76-249b-4033-8add-41bd7efcd488'),
+	('00000000-0000-0000-0000-000000000000', 410, 'ewxngkbpv3ut', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', true, '2026-01-24 11:51:56.88824+00', '2026-01-24 12:50:23.638485+00', NULL, '6e32e5fe-5d57-4ea3-9d96-50b07988f109'),
+	('00000000-0000-0000-0000-000000000000', 413, '2hctjx6fe6pr', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', true, '2026-01-24 12:38:29.300855+00', '2026-01-24 17:11:02.280867+00', NULL, '60714f91-fdaa-4c8a-a3a9-e251b55df708'),
+	('00000000-0000-0000-0000-000000000000', 417, 'h64e2wgwfj2b', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 17:11:07.116638+00', '2026-01-24 17:11:07.116638+00', NULL, '63f16876-2370-4a20-99bb-9ccb8cdd0001'),
+	('00000000-0000-0000-0000-000000000000', 420, '65uhztni467u', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-24 17:45:33.776703+00', '2026-01-24 17:45:33.776703+00', NULL, '97ecdf27-17eb-4c64-9c87-c75de6977e62'),
+	('00000000-0000-0000-0000-000000000000', 427, 'r7p4iwsgxkrw', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 09:29:52.219474+00', '2026-01-25 09:29:52.219474+00', 'izzrdmrfha7p', '8ae76c68-c3f6-4930-9716-2e7cd9e4c380'),
+	('00000000-0000-0000-0000-000000000000', 430, 'm5udxznusvyq', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 09:54:45.606147+00', '2026-01-25 09:54:45.606147+00', NULL, '99e0143d-0152-46fc-93dd-3973587e1aea'),
+	('00000000-0000-0000-0000-000000000000', 439, 'kavnak64djyn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 13:00:53.69453+00', '2026-01-25 13:00:53.69453+00', NULL, 'acd65afc-bbd8-4acb-ba56-25616fce24f2'),
+	('00000000-0000-0000-0000-000000000000', 442, 'zajft5ohc7ju', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-25 13:03:22.767147+00', '2026-01-25 13:03:22.767147+00', NULL, '343ce498-49a3-4cd2-b45b-dc6f5e50aa22'),
+	('00000000-0000-0000-0000-000000000000', 446, 'tvohdgtz42ix', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 04:15:34.064766+00', '2026-01-26 04:15:34.064766+00', NULL, 'f01479fd-b6cb-4b6b-a32c-973d2174bf9e'),
+	('00000000-0000-0000-0000-000000000000', 449, 'dnvihwp754yz', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:03:22.506705+00', '2026-01-26 05:03:22.506705+00', NULL, 'f725a465-d4f4-45e2-9819-c3ae6e79b090'),
+	('00000000-0000-0000-0000-000000000000', 451, 'v5nbhwt22wd3', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:21:04.491913+00', '2026-01-26 05:21:04.491913+00', NULL, '743b3bb8-9e70-4d64-ae24-7c86ff691a24'),
+	('00000000-0000-0000-0000-000000000000', 453, 'fyiyp5cpyinn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:24:50.104117+00', '2026-01-26 05:24:50.104117+00', NULL, '2bce0558-d522-4146-aea9-6d2678020d76'),
+	('00000000-0000-0000-0000-000000000000', 455, 'vejf7rcwhvpd', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 05:31:49.938884+00', '2026-01-26 05:31:49.938884+00', NULL, '3aae31fd-c18d-4236-b8c0-4d945f4ca20f'),
+	('00000000-0000-0000-0000-000000000000', 459, 'dy7zylhrmsbw', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 08:20:01.056814+00', '2026-01-26 08:20:01.056814+00', NULL, 'ed76f111-62a2-46a8-be44-5ccb776b2ecc'),
+	('00000000-0000-0000-0000-000000000000', 460, '45xb5q7wkuoe', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-26 08:20:09.342565+00', '2026-01-26 08:20:09.342565+00', NULL, '2d359fb7-a7c4-4cf9-871c-04f6e170c488'),
+	('00000000-0000-0000-0000-000000000000', 474, '2odkd7qonqsn', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-27 17:41:54.025491+00', '2026-01-27 17:41:54.025491+00', NULL, '98e6cf21-8fe7-433b-8897-af2201bc5a19'),
+	('00000000-0000-0000-0000-000000000000', 475, 'a7h42gsb2s7c', '8ed241f2-00ba-4948-9f37-2ea13358c0a0', false, '2026-01-27 17:42:01.546275+00', '2026-01-27 17:42:01.546275+00', NULL, '3559293e-1d3a-4738-a36b-81a83243ce93'),
+	('00000000-0000-0000-0000-000000000000', 514, 'tljv76bogjh4', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', true, '2026-01-30 12:55:34.686774+00', '2026-01-31 06:01:29.240632+00', NULL, '0acca816-8b94-4b27-a879-ba0eb4f62545'),
+	('00000000-0000-0000-0000-000000000000', 515, 'nptef5xcmifj', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', false, '2026-01-31 06:01:29.241121+00', '2026-01-31 06:01:29.241121+00', 'tljv76bogjh4', '0acca816-8b94-4b27-a879-ba0eb4f62545'),
+	('00000000-0000-0000-0000-000000000000', 518, 'p52n2ocmijp3', '71b19525-6151-49d3-ab87-ee38158e2f67', false, '2026-01-31 06:35:00.722364+00', '2026-01-31 06:35:00.722364+00', NULL, '164b5490-4c7b-4bd9-9917-9ce9db051589');
+
+
+--
+-- Data for Name: sso_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: saml_providers; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: saml_relay_states; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: sso_domains; Type: TABLE DATA; Schema: auth; Owner: supabase_auth_admin
+--
+
+
+
+--
+-- Data for Name: admin_departments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."admin_departments" ("id", "name", "permissions", "created_at") VALUES
+	('d1e2f3a4-b5c6-d7e8-f9a0-b1c2d3e4f5a6', '超级管理组', '["*"]', '2026-01-20 08:55:28.809587+00'),
+	('51d9c770-7d07-4766-8328-5bc427bba89b', '新部门', '["/_mgmt_9Xfa3", "/_mgmt_9Xfa3/products", "/_mgmt_9Xfa3/coupons", "/_mgmt_9Xfa3/tickets"]', '2026-01-23 17:33:27.679446+00');
+
+
+--
+-- Data for Name: admin_users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."admin_users" ("id", "name", "email", "password_hash", "department_id", "status", "created_at", "auth_user_id") VALUES
+	('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', '超级管理员', 'admin@fantula.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'd1e2f3a4-b5c6-d7e8-f9a0-b1c2d3e4f5a6', 'enabled', '2026-01-20 08:55:28.809587+00', '8ed241f2-00ba-4948-9f37-2ea13358c0a0'),
+	('69f54875-a21c-4091-9f91-0ee896cf1969', '啊啊啊', 'liumeiti1108@gmail.com', '2b62ce539f8d7fab33461ee3e77b528df3e79e4357e12aabcd353031f933eb58', '51d9c770-7d07-4766-8328-5bc427bba89b', 'enabled', '2026-01-23 17:46:29.206495+00', '94316d2d-636c-46c2-b5dd-b9a55a8424a5');
+
+
+--
+-- Data for Name: image_categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."image_categories" ("id", "name", "sort_order", "created_at") VALUES
+	('efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '未分类', 1, '2026-01-20 10:44:16.983865+00');
+
+
+--
+-- Data for Name: images; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."images" ("id", "name", "url", "category_id", "created_at") VALUES
+	('375e5f7b-1259-400c-a1e5-00b96a98f7e8', '1766998873555-z2t8fw.webp', 'https://img.fantula.com/uploads/1766998873555-z2t8fw.webp', 'efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '2026-01-20 10:44:16.99664+00'),
+	('8d73ed8a-dcf5-4caa-90fd-cb8474a838d2', '1767001790398-1j9utd.webp', 'https://img.fantula.com/uploads/1767001790398-1j9utd.webp', 'efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '2026-01-20 10:44:17.001898+00'),
+	('45e10bfc-b91e-4064-a9ef-4f63895364b1', '1767001808902-qkt8pc.webp', 'https://img.fantula.com/uploads/1767001808902-qkt8pc.webp', 'efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '2026-01-20 10:44:17.005628+00'),
+	('d1184679-1b47-4299-b914-f1c2db77e7e0', '1767001823495-kb1i7q.png', 'https://img.fantula.com/uploads/1767001823495-kb1i7q.png', 'efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '2026-01-20 10:44:17.008581+00'),
+	('7b013fd6-e973-4f82-ba48-aebccb5086ed', '1767001837804-4d5ics.webp', 'https://img.fantula.com/uploads/1767001837804-4d5ics.webp', 'efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '2026-01-20 10:44:17.012261+00'),
+	('36b21664-53cd-40fb-b5d4-301badd55b4b', '1767851082111-jeeeft.png', 'https://img.fantula.com/uploads/1767851082111-jeeeft.png', 'efcadc0e-4ca3-4b95-ac6c-55bc0ab751ca', '2026-01-20 10:44:17.015271+00');
+
+
+--
+-- Data for Name: banners; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."banners" ("id", "image_id", "title", "link", "sort_order", "status", "created_at") VALUES
+	('654ab1cf-5cdc-4dff-8b6e-d76430d5e3e5', '7b013fd6-e973-4f82-ba48-aebccb5086ed', '', '', 0, 'on', '2026-01-20 11:00:09.28079+00');
+
+
+--
+-- Data for Name: product_skus; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."product_skus" ("id", "spec_combination", "image", "intro", "price", "duration", "enabled", "sort_order", "created_at", "product_type", "tag", "tag_name") VALUES
+	('f08f339a-d648-4fe9-b416-a65c9d37b970', '{"是谁": "虚拟", "虚拟": "001"}', '', '111', 10.00, 10, true, 0, '2026-01-20 10:49:29.609187+00', 'virtual', NULL, NULL),
+	('f4bd0dcc-dde5-493a-838a-6d977c551ede', '{"一次性": "0001"}', '', '111', 2.00, 5, true, 0, '2026-01-20 10:57:24.825173+00', 'one_time_cdk', NULL, NULL),
+	('821d470d-1554-4e7d-9eef-9fa6344ca9b4', '{"合租": "是谁", "车位": "合租的"}', '', '111', 10.00, 3, true, 0, '2026-01-20 10:50:37.013351+00', 'shared_account', NULL, NULL),
+	('e1766ff5-8918-47ca-9994-606c0db9fa44', '{"是谁": "虚拟", "虚拟": "001", "订单": "点点滴滴"}', '', '141', 0.00, 5, true, 0, '2026-01-27 17:43:35.118319+00', 'virtual', NULL, NULL),
+	('9974a762-5661-4493-95e0-d60fbe788020', '{"是谁": "虚拟", "虚拟": "的订单", "订单": "点点滴滴"}', '', '25525', 5.50, 5, true, 1, '2026-01-27 17:43:35.118319+00', 'virtual', NULL, NULL),
+	('1e301e4e-82b2-4f47-9947-ad1d2c2cd2cc', '{"是谁": "类型1", "虚拟": "001", "订单": "点点滴滴"}', '', '42424', 4.40, 5, true, 2, '2026-01-27 17:43:35.118319+00', 'virtual', NULL, NULL),
+	('99167311-9fe8-4433-9972-d26c5dcf5eab', '{"是谁": "类型1", "虚拟": "的订单", "订单": "点点滴滴"}', '', '4141', 3.30, 5, true, 3, '2026-01-27 17:43:35.118319+00', 'virtual', NULL, NULL),
+	('a5a4bbc2-cfcc-4f0d-b976-b07ab2a32078', '{"是谁": "的恶", "虚拟": "001", "订单": "点点滴滴"}', '', '414', 2.00, 5, true, 4, '2026-01-27 17:43:35.118319+00', 'virtual', NULL, NULL),
+	('a60f8e59-ed13-457d-a30e-41f96754326d', '{"是谁": "的恶", "虚拟": "的订单", "订单": "点点滴滴"}', '', '1414', 1.00, 5, true, 5, '2026-01-27 17:43:35.118319+00', 'virtual', NULL, NULL);
+
+
+--
+-- Data for Name: profiles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."profiles" ("id", "uid", "email", "status", "created_at", "nickname", "balance", "avatar", "wechat_openid", "wechat_unionid") VALUES
+	('8ed241f2-00ba-4948-9f37-2ea13358c0a0', '34632458', 'admin@fantula.com', 'active', '2026-01-20 08:55:28.809587+00', 'admin', 0.00, '', NULL, NULL),
+	('35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '90989832', 'jiangdalin1999@gmail.com', 'active', '2026-01-24 11:34:20.304727+00', 'jiangdalin1999', 980.00, '', NULL, NULL),
+	('71b19525-6151-49d3-ab87-ee38158e2f67', '40050162', 'jiangdalin1988@gmail.com', 'active', '2026-01-20 11:00:36.547214+00', '说撒上', 4639.00, '/images/client/pc/avatars/avatar-bunny.png', NULL, NULL),
+	('af1c7310-2665-4f7b-800b-a1a5b3946852', '73239148', 'jiangdalin1988@gmail.cpom', 'active', '2026-01-22 03:19:11.413239+00', 'jiangdalin1988', 0.00, '', NULL, NULL),
+	('ec57b0a4-ad47-4807-becf-2e0ae0c9eacc', '75742021', 'jiangdalin@gmail.com', 'active', '2026-01-22 04:05:42.942802+00', 'jiangdalin', 0.00, '', NULL, NULL),
+	('94316d2d-636c-46c2-b5dd-b9a55a8424a5', '94799510', 'liumeiti1108@gmail.com', 'active', '2026-01-23 17:46:29.194128+00', 'liumeiti1108', 0.00, '', NULL, NULL);
+
+
+--
+-- Data for Name: cart_items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: coupons; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."coupons" ("id", "name", "type", "value", "min_usage", "sku_ids", "total_quantity", "start_date", "end_date", "status", "created_at", "used_quantity", "code") VALUES
+	('96583bc9-4555-45c7-ae05-dcbd2c78ca91', '是谁', 'product', 0.00, 0.00, '{f08f339a-d648-4fe9-b416-a65c9d37b970}', NULL, NULL, NULL, true, '2026-01-20 11:09:55.565169+00', 2, NULL),
+	('3786eb85-3f0f-492e-8011-32c12f604691', '规格', 'flat', 5.00, 1.00, '{}', NULL, NULL, NULL, true, '2026-01-20 11:08:23.626183+00', 5, NULL),
+	('3e091974-67d3-4bb7-bb85-4979c04c895b', '规格', 'balance', 1000.00, 0.00, '{}', NULL, NULL, NULL, true, '2026-01-20 11:07:10.232248+00', 6, NULL);
+
+
+--
+-- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."orders" ("id", "order_no", "order_type", "start_time", "end_time", "created_at", "status", "product_snapshot", "sku_snapshot", "user_id", "quantity", "cdk_snapshot", "expires_at", "slot_occupancy_ids", "total_amount", "original_amount", "coupon_snapshot") VALUES
+	('e43b8d9e-5a3f-450e-9906-1d9e038a1540', '2026012004715', 'virtual', '2026-01-20 11:10:31.660912+00', '2026-01-30 11:10:31.660912+00', '2026-01-20 11:10:31.660912+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-01-30 11:10:31.660912+00', '{}', 5.00, 10.00, '{"id": "964774e2-002d-4c4b-b0d3-3b627dbc3186", "code": null, "name": "规格", "type": "flat", "discount_amount": 5.00}'),
+	('33ae77ba-2809-4835-8e0e-cc04199e9577', '2026012049210', 'shared_account', '2026-01-20 11:12:52.182828+00', '2026-01-23 11:12:52.182828+00', '2026-01-20 11:12:52.182828+00', 'expired', '{"image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp", "product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租"}', '{"price": 10.00, "sku_id": "821d470d-1554-4e7d-9eef-9fa6344ca9b4", "duration": 3, "product_type": "shared_account", "spec_combination": {"合租": "是谁", "车位": "合租的"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["05b9fdc3-5f02-47be-82cc-2dd94c2a0418"]}', '2026-01-23 11:12:52.182828+00', '{46d68d63-bd5d-4a15-becf-f30b4d2cbc2c}', 5.00, 10.00, '{"id": "9e1c3448-e3e0-4b9e-aba4-16a038e4d1aa", "code": null, "name": "规格", "type": "flat", "discount_amount": 5.00}'),
+	('35af021d-c473-4a3d-8d8c-0139e4a7ff15', '2026012078462', 'shared_account', '2026-01-20 12:21:18.11861+00', '2026-01-26 11:12:52.182828+00', '2026-01-20 12:21:18.11861+00', 'active', '{"image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp", "product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租"}', '{"price": 10.00, "sku_id": "821d470d-1554-4e7d-9eef-9fa6344ca9b4", "duration": 3, "product_type": "shared_account", "spec_combination": {"合租": "是谁", "车位": "合租的"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["05b9fdc3-5f02-47be-82cc-2dd94c2a0418"]}', '2026-01-26 11:12:52.182828+00', '{46d68d63-bd5d-4a15-becf-f30b4d2cbc2c}', 10.00, 10.00, NULL),
+	('624d38c9-29cd-409e-9ce5-13aa715dfc3c', '2026012153120', 'virtual', '2026-01-21 12:32:36.562439+00', '2026-01-31 12:32:36.562439+00', '2026-01-21 12:32:36.562439+00', 'expired', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-01-31 12:32:36.562439+00', '{}', 10.00, 10.00, NULL),
+	('36b4f551-a5d7-4220-ba17-4244a6fc3e31', '2026012198375', 'virtual', '2026-01-21 13:09:33.698523+00', '2026-02-10 12:32:36.562439+00', '2026-01-21 13:09:33.698523+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-10 12:32:36.562439+00', '{}', 10.00, 10.00, NULL),
+	('e555cc69-791a-4038-8caa-df645d27d4c3', '2026012214428', 'virtual', '2026-01-22 12:37:23.661208+00', '2026-02-01 12:37:23.661208+00', '2026-01-22 12:37:23.661208+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-01 12:37:23.661208+00', '{}', 10.00, 10.00, NULL),
+	('670755f1-f60c-4ab9-a8a1-2960e07cf26a', '2026012334720', 'virtual', '2026-01-23 09:59:27.959485+00', '2026-02-02 09:59:27.959485+00', '2026-01-23 09:59:27.959485+00', 'expired', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-02 09:59:27.959485+00', '{}', 10.00, 10.00, NULL),
+	('57cf36e5-c788-461e-9967-6cf75076b8db', '2026012341084', 'one_time_cdk', '2026-01-23 10:44:11.054061+00', '2026-01-28 10:44:11.054061+00', '2026-01-23 10:44:11.054061+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp", "product_id": "0097edf0-a9c6-4224-8bad-c688eb224030", "product_name": "依次"}', '{"price": 2.00, "sku_id": "f4bd0dcc-dde5-493a-838a-6d977c551ede", "duration": 5, "product_type": "one_time_cdk", "spec_combination": {"一次性": "0001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["7aedf80f-9e5c-4db9-82f5-42335da081ad"]}', '2026-01-28 10:44:11.054061+00', '{}', 2.00, 2.00, NULL),
+	('c5ec781c-88d4-46a6-bf73-d6957c76bfdd', '2026012330174', 'virtual', '2026-01-23 10:13:19.681289+00', '2026-02-12 09:59:27.959485+00', '2026-01-23 10:13:19.681289+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-12 09:59:27.959485+00', '{}', 10.00, 10.00, NULL),
+	('c5f26582-9ccb-4971-a759-d2beda6141fc', '2026012366941', 'virtual', '2026-01-23 11:11:13.895216+00', '2026-02-02 11:11:13.895216+00', '2026-01-23 11:11:13.895216+00', 'expired', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-02 11:11:13.895216+00', '{}', 10.00, 10.00, NULL),
+	('5ca544cb-04e5-4c19-bcce-bac3a2023ab9', '2026012391294', 'virtual', '2026-01-23 11:12:41.836558+00', '2026-02-12 11:11:13.895216+00', '2026-01-23 11:12:41.836558+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-12 11:11:13.895216+00', '{}', 10.00, 10.00, NULL),
+	('d61e2b07-17b5-442f-bdb3-f27b295e8988', '2026012312129', 'virtual', '2026-01-23 11:15:41.013857+00', '2026-02-02 11:15:41.013857+00', '2026-01-23 11:15:41.013857+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-02 11:15:41.013857+00', '{}', 10.00, 10.00, NULL),
+	('f5dbf261-53b1-49cd-b9dc-e9f08a2ddb2b', '2026012365146', 'virtual', '2026-01-23 11:29:55.820326+00', '2026-02-02 11:29:55.820326+00', '2026-01-23 11:29:55.820326+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-02 11:29:55.820326+00', '{}', 10.00, 10.00, NULL),
+	('8e66fa78-65e5-4df9-9701-924d050293a0', '2026012318699', 'shared_account', '2026-01-23 11:30:45.330599+00', '2026-01-26 11:30:45.330599+00', '2026-01-23 11:30:45.330599+00', 'active', '{"image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp", "product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租"}', '{"price": 10.00, "sku_id": "821d470d-1554-4e7d-9eef-9fa6344ca9b4", "duration": 3, "product_type": "shared_account", "spec_combination": {"合租": "是谁", "车位": "合租的"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["05b9fdc3-5f02-47be-82cc-2dd94c2a0418"]}', '2026-01-26 11:30:45.330599+00', '{d5e306f6-5a13-4880-be4b-b588153cfefc}', 10.00, 10.00, NULL),
+	('1aede0c9-77b3-4a20-ac3c-a7a5b2418aa9', '2026012398631', 'shared_account', '2026-01-23 12:42:45.882946+00', '2026-01-26 12:42:45.882946+00', '2026-01-23 12:42:45.882946+00', 'active', '{"image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp", "product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租"}', '{"price": 10.00, "sku_id": "821d470d-1554-4e7d-9eef-9fa6344ca9b4", "duration": 3, "product_type": "shared_account", "spec_combination": {"合租": "是谁", "车位": "合租的"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["05b9fdc3-5f02-47be-82cc-2dd94c2a0418"]}', '2026-01-26 12:42:45.882946+00', '{4baf7a9a-eb47-481f-9b2f-3d1d0e5f5351}', 10.00, 10.00, NULL),
+	('5f044de0-1948-4b39-bab3-48ace8056c8a', '2026012491120', 'virtual', '2026-01-24 06:22:32.30091+00', '2026-02-03 06:22:32.30091+00', '2026-01-24 06:22:32.30091+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 06:22:32.30091+00', '{}', 10.00, 10.00, NULL),
+	('4735aa31-a8dc-4f7d-b338-e1adece14ea8', '2026012496446', 'virtual', '2026-01-24 06:30:03.217471+00', '2026-02-03 06:30:03.217471+00', '2026-01-24 06:30:03.217471+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 2, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 06:30:03.217471+00', '{}', 20.00, 20.00, NULL),
+	('579577aa-6a7e-4a3e-8fa5-7d482ef5f9b3', '2026012482679', 'shared_account', '2026-01-24 07:43:09.510701+00', '2026-01-27 07:43:09.510701+00', '2026-01-24 07:43:09.510701+00', 'active', '{"image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp", "product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租"}', '{"price": 10.00, "sku_id": "821d470d-1554-4e7d-9eef-9fa6344ca9b4", "duration": 3, "product_type": "shared_account", "spec_combination": {"合租": "是谁", "车位": "合租的"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 2, '{"locked_cdk_ids": ["05b9fdc3-5f02-47be-82cc-2dd94c2a0418", "05b9fdc3-5f02-47be-82cc-2dd94c2a0418"]}', '2026-01-27 07:43:09.510701+00', '{adbdf4d4-6f1e-4b6e-9e17-b6bb0bb7c345,6bfa0b18-246f-4c67-9937-d08a43165042}', 20.00, 20.00, NULL),
+	('3936558e-3a35-4ebf-9619-ba57b86634a5', '2026012419192', 'one_time_cdk', '2026-01-24 07:44:35.276028+00', '2026-01-29 07:44:35.276028+00', '2026-01-24 07:44:35.276028+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp", "product_id": "0097edf0-a9c6-4224-8bad-c688eb224030", "product_name": "依次"}', '{"price": 2.00, "sku_id": "f4bd0dcc-dde5-493a-838a-6d977c551ede", "duration": 5, "product_type": "one_time_cdk", "spec_combination": {"一次性": "0001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 2, '{"locked_cdk_ids": ["d53bf0ac-e092-4ab7-a0bd-c7cc7eba89f5", "83385d4d-f610-4d88-8703-6ae0bba0adfb"]}', '2026-01-29 07:44:35.276028+00', '{}', 4.00, 4.00, NULL),
+	('9fe1a333-8ef0-4339-9dfd-759012333de5', '2026012465897', 'virtual', '2026-01-24 07:14:01.580209+00', '2026-02-03 07:14:01.580209+00', '2026-01-24 07:14:01.580209+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 3, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 07:14:01.580209+00', '{}', 30.00, 30.00, NULL),
+	('f7c71e6c-7b0d-409d-b98f-4184ba90e3ca', '2026012454030', 'virtual', '2026-01-24 08:23:09.901615+00', '2026-02-03 08:23:09.901615+00', '2026-01-24 08:23:09.901615+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 08:23:09.901615+00', '{}', 10.00, 10.00, NULL),
+	('921067a1-b83f-456b-9dfe-69045ed5363b', '2026012440019', 'virtual', '2026-01-24 08:24:35.525662+00', '2026-02-03 08:24:35.525662+00', '2026-01-24 08:24:35.525662+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 08:24:35.525662+00', '{}', 10.00, 10.00, NULL),
+	('d8914edb-de99-48b6-8742-9587cb1a9bfd', '2026012481863', 'virtual', '2026-01-24 08:38:05.189215+00', '2026-02-03 08:38:05.189215+00', '2026-01-24 08:38:05.189215+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 08:38:05.189215+00', '{}', 10.00, 10.00, NULL),
+	('a8e7322e-d94d-4455-862f-f727aa4e0a4e', '2026012448454', 'virtual', '2026-01-24 09:05:46.505283+00', '2026-02-03 09:05:46.505283+00', '2026-01-24 09:05:46.505283+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 09:05:46.505283+00', '{}', 10.00, 10.00, NULL),
+	('806b1962-35af-4e76-8d89-301c372f9493', '2026012440269', 'virtual', '2026-01-24 09:47:17.056721+00', '2026-02-03 09:47:17.056721+00', '2026-01-24 09:47:17.056721+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 09:47:17.056721+00', '{}', 10.00, 10.00, NULL),
+	('e599c28a-6349-443d-aea7-3a8de07356c2', '2026012419746', 'virtual', '2026-01-24 12:43:22.983868+00', '2026-02-03 12:43:22.983868+00', '2026-01-24 12:43:22.983868+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 12:43:22.983868+00', '{}', 10.00, 10.00, NULL),
+	('d9183c2d-e1f2-4c1a-bbb7-912b1332ddbc', '2026012467337', 'virtual', '2026-01-24 12:57:01.915381+00', '2026-02-03 12:57:01.915381+00', '2026-01-24 12:57:01.915381+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 12:57:01.915381+00', '{}', 10.00, 10.00, NULL),
+	('5ec093fa-c510-4c05-a9a4-602eb3be0ce3', '2026012417895', 'virtual', '2026-01-24 17:44:47.651421+00', '2026-02-03 17:44:47.651421+00', '2026-01-24 17:44:47.651421+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 17:44:47.651421+00', '{}', 10.00, 10.00, NULL),
+	('1c0271fa-210b-4eb4-b7a4-90dbaf6c08c9', '2026012402536', 'virtual', '2026-01-24 17:56:10.914919+00', '2026-02-03 17:56:10.914919+00', '2026-01-24 17:56:10.914919+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 17:56:10.914919+00', '{}', 10.00, 10.00, NULL),
+	('9529151d-0879-4585-8c49-cc0aa8382312', '2026012427646', 'virtual', '2026-01-24 17:43:32.35298+00', '2026-02-03 17:43:32.35298+00', '2026-01-24 17:43:32.35298+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-03 17:43:32.35298+00', '{}', 10.00, 10.00, NULL),
+	('c588fd1b-ab9e-4b34-9fa2-2600c1a68d02', '2026012515216', 'virtual', '2026-01-25 07:11:20.919591+00', '2026-02-04 07:11:20.919591+00', '2026-01-25 07:11:20.919591+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-04 07:11:20.919591+00', '{}', 10.00, 10.00, NULL),
+	('2449fd84-3550-472e-b758-a0c7549139f7', '2026012538897', 'virtual', '2026-01-25 07:22:43.873281+00', '2026-02-04 07:22:43.873281+00', '2026-01-25 07:22:43.873281+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-04 07:22:43.873281+00', '{}', 10.00, 10.00, NULL),
+	('9ae3bb14-f45c-4119-8bc8-2289b0112b03', '2026012550186', 'virtual', '2026-01-25 07:26:40.327829+00', '2026-02-04 07:26:40.327829+00', '2026-01-25 07:26:40.327829+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-04 07:26:40.327829+00', '{}', 10.00, 10.00, NULL),
+	('a926df1d-97e2-4d1b-9109-e83e3b129e6d', '2026012580509', 'virtual', '2026-01-25 07:30:04.190416+00', '2026-02-04 07:30:04.190416+00', '2026-01-25 07:30:04.190416+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-04 07:30:04.190416+00', '{}', 10.00, 10.00, NULL),
+	('c45cadbb-1467-499f-88c4-6f0f84a7498a', '2026012601543', 'virtual', '2026-01-26 06:09:52.368365+00', '2026-02-05 06:09:52.368365+00', '2026-01-26 06:09:52.368365+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-05 06:09:52.368365+00', '{}', 10.00, 10.00, NULL),
+	('52e11bd7-00fa-46b7-8d28-e37eeee8f57c', '2026012602443', 'virtual', '2026-01-26 03:43:27.003854+00', '2026-02-05 03:43:27.003854+00', '2026-01-26 03:43:27.003854+00', 'active', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-05 03:43:27.003854+00', '{}', 5.00, 10.00, '{"id": "cab17d45-ed3c-491d-b202-76651257463c", "code": null, "name": "规格", "type": "flat", "discount_amount": 5.00}'),
+	('14730d60-a2e8-4966-9026-583a971aabc6', '2026012724043', 'virtual', '2026-01-27 11:01:43.510894+00', '2026-02-06 11:01:43.510894+00', '2026-01-27 11:01:43.510894+00', 'pending_delivery', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '71b19525-6151-49d3-ab87-ee38158e2f67', 1, '{"locked_cdk_ids": ["1a37654d-fc5b-416c-8c58-e81d8d92ea0a"]}', '2026-02-06 11:01:43.510894+00', '{}', 10.00, 10.00, NULL);
+
+
+--
+-- Data for Name: user_coupons; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."user_coupons" ("id", "user_id", "coupon_id", "status", "redeemed_at", "used_at", "code", "order_id", "coupon_snapshot", "expire_at", "redeemed_code") VALUES
+	('0e873ef6-493c-4136-a8d3-f28249cc0177', '71b19525-6151-49d3-ab87-ee38158e2f67', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'used', '2026-01-20 11:07:52.73019+00', '2026-01-20 11:07:55.679121+00', NULL, NULL, '{"name": "规格", "type": "balance", "value": 1000.00, "sku_ids": [], "min_usage": 0.00}', '2026-02-19 11:07:52.73019+00', '2DM-7FX-TFV-GCM'),
+	('93bca707-6479-4c56-8b6a-057114dfae34', '71b19525-6151-49d3-ab87-ee38158e2f67', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', 'unused', '2026-01-20 11:10:06.979811+00', NULL, NULL, NULL, '{"name": "是谁", "type": "product", "value": 0.00, "sku_ids": ["f08f339a-d648-4fe9-b416-a65c9d37b970"], "min_usage": 0.00}', '2026-02-19 11:10:06.979811+00', 'CQR-PWB-ZW7-HNB'),
+	('7ac1bfd4-8b53-471e-9283-4eb41f3f08ed', '71b19525-6151-49d3-ab87-ee38158e2f67', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', 'unused', '2026-01-20 11:10:14.245154+00', NULL, NULL, NULL, '{"name": "是谁", "type": "product", "value": 0.00, "sku_ids": ["f08f339a-d648-4fe9-b416-a65c9d37b970"], "min_usage": 0.00}', '2026-02-19 11:10:14.245154+00', '8Z3-ARW-R8E-LBM'),
+	('964774e2-002d-4c4b-b0d3-3b627dbc3186', '71b19525-6151-49d3-ab87-ee38158e2f67', '3786eb85-3f0f-492e-8011-32c12f604691', 'used', '2026-01-20 11:08:56.96412+00', '2026-01-20 11:10:31.660912+00', NULL, 'e43b8d9e-5a3f-450e-9906-1d9e038a1540', '{"name": "规格", "type": "flat", "value": 5.00, "sku_ids": [], "min_usage": 1.00}', '2026-02-19 11:08:56.96412+00', 'MHM-3HL-UXS-APR'),
+	('9e1c3448-e3e0-4b9e-aba4-16a038e4d1aa', '71b19525-6151-49d3-ab87-ee38158e2f67', '3786eb85-3f0f-492e-8011-32c12f604691', 'used', '2026-01-20 11:08:46.598786+00', '2026-01-20 11:12:52.182828+00', NULL, '33ae77ba-2809-4835-8e0e-cc04199e9577', '{"name": "规格", "type": "flat", "value": 5.00, "sku_ids": [], "min_usage": 1.00}', '2026-02-19 11:08:46.598786+00', 'PG3-KRQ-WCW-8ST'),
+	('a2a3763e-1fa5-4c8d-be51-c54ecc739d07', '71b19525-6151-49d3-ab87-ee38158e2f67', '3786eb85-3f0f-492e-8011-32c12f604691', 'unused', '2026-01-22 06:39:59.828144+00', NULL, NULL, NULL, '{"name": "规格", "type": "flat", "value": 5.00, "sku_ids": [], "min_usage": 1.00}', '2026-02-21 06:39:59.828144+00', 'ESE-HAW-YXP-PMS'),
+	('48dd69d6-61bc-411e-8f3a-0aad2ea346cc', '71b19525-6151-49d3-ab87-ee38158e2f67', '3786eb85-3f0f-492e-8011-32c12f604691', 'unused', '2026-01-22 06:40:39.385077+00', NULL, NULL, NULL, '{"name": "规格", "type": "flat", "value": 5.00, "sku_ids": [], "min_usage": 1.00}', '2026-02-21 06:40:39.385077+00', 'MLE-86C-HHV-Z78'),
+	('e76cb2e9-dc8e-41db-ba1e-a7f5f03533ba', '71b19525-6151-49d3-ab87-ee38158e2f67', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'used', '2026-01-22 06:40:57.27675+00', '2026-01-22 06:41:44.310439+00', NULL, NULL, '{"name": "规格", "type": "balance", "value": 1000.00, "sku_ids": [], "min_usage": 0.00}', '2026-02-21 06:40:57.27675+00', 'EC8-JPK-G5H-H4M'),
+	('9c9433f9-4b9a-4b3f-8805-5f6b07d1f8ed', '71b19525-6151-49d3-ab87-ee38158e2f67', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'used', '2026-01-22 07:48:37.451925+00', '2026-01-24 08:23:39.142571+00', NULL, NULL, '{"name": "规格", "type": "balance", "value": 1000.00, "sku_ids": [], "min_usage": 0.00}', '2026-02-21 07:48:37.451925+00', '3P9-SUW-FNH-HF7'),
+	('1d9f549e-aef2-4ecb-a718-166c6a3121d9', '71b19525-6151-49d3-ab87-ee38158e2f67', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'used', '2026-01-22 07:04:46.165787+00', '2026-01-24 08:23:45.248245+00', NULL, NULL, '{"name": "规格", "type": "balance", "value": 1000.00, "sku_ids": [], "min_usage": 0.00}', '2026-02-21 07:04:46.165787+00', 'HPL-NA8-Z7X-9R8'),
+	('390003bd-060d-4570-9dd7-7fc8d0aa605e', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'used', '2026-01-24 12:39:37.14919+00', '2026-01-24 12:43:14.465244+00', NULL, NULL, '{"name": "规格", "type": "balance", "value": 1000.00, "sku_ids": [], "min_usage": 0.00}', '2026-02-23 12:39:37.14919+00', 'E4K-5ZJ-KJK-C5P'),
+	('c9336b34-96a9-42e4-a0dc-201e90eda302', '71b19525-6151-49d3-ab87-ee38158e2f67', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'used', '2026-01-24 17:48:54.100634+00', '2026-01-24 17:49:04.494797+00', NULL, NULL, '{"name": "规格", "type": "balance", "value": 1000.00, "sku_ids": [], "min_usage": 0.00}', '2026-02-23 17:48:54.100634+00', '5PL-TH3-4FP-27C'),
+	('cab17d45-ed3c-491d-b202-76651257463c', '71b19525-6151-49d3-ab87-ee38158e2f67', '3786eb85-3f0f-492e-8011-32c12f604691', 'used', '2026-01-24 17:47:59.205381+00', '2026-01-26 03:43:27.003854+00', NULL, '52e11bd7-00fa-46b7-8d28-e37eeee8f57c', '{"name": "规格", "type": "flat", "value": 5.00, "sku_ids": [], "min_usage": 1.00}', '2026-02-23 17:47:59.205381+00', '3L2-W4X-B3R-NRG');
+
+
+--
+-- Data for Name: pre_orders; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."pre_orders" ("id", "user_id", "status", "total_amount", "source", "expires_at", "created_at", "order_no", "quantity", "unit_price", "product_snapshot", "sku_snapshot", "locked_cdk_ids", "locked_slot_ids", "coupon_id", "discount_amount", "original_amount", "related_order_id") VALUES
+	('d90fabbc-1c8e-4956-9437-446bb5bc21a5', '71b19525-6151-49d3-ab87-ee38158e2f67', 'converted', 10.00, 'buy_now', '2026-01-27 11:15:52.093752+00', '2026-01-27 11:00:52.093752+00', '2026012724043', 1, 10.00, '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '{1a37654d-fc5b-416c-8c58-e81d8d92ea0a}', '{}', NULL, 0.00, 10.00, NULL),
+	('878cbb88-cef0-4c73-b756-978977dd2e8b', '71b19525-6151-49d3-ab87-ee38158e2f67', 'deleted', 10.00, 'buy_now', '2026-01-27 11:09:17.628435+00', '2026-01-27 10:54:17.628435+00', '2026012753718', 1, 10.00, '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp", "product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 "}', '{"price": 10.00, "sku_id": "f08f339a-d648-4fe9-b416-a65c9d37b970", "duration": 10, "product_type": "virtual", "spec_combination": {"是谁": "虚拟", "虚拟": "001"}}', '{1a37654d-fc5b-416c-8c58-e81d8d92ea0a}', '{}', NULL, 0.00, 10.00, NULL);
+
+
+--
+-- Data for Name: product_categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."product_categories" ("id", "name", "sort_order", "status", "created_at") VALUES
+	('a6963e8a-a0c4-496b-95ab-a0b330162899', '的订单', 0, 'on', '2026-01-20 10:44:35.814414+00'),
+	('881e7f1c-0d21-40b0-84a8-78e135abb9f4', '是谁', 1, 'on', '2026-01-20 10:44:31.717209+00'),
+	('6a9ca390-59ae-445b-ad13-79cf4f2760b9', '点点滴滴', 2, 'on', '2026-01-26 05:24:59.697188+00');
+
+
+--
+-- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."products" ("id", "product_name", "status", "created_at", "category_id", "image", "sort_order", "display_price", "tags", "initial_sales", "badge_label", "rating", "allow_addon", "detail_modules") VALUES
+	('2a2cc45c-b4fb-4737-a4e0-4c096646beb7', '合租', 'on', '2026-01-20 10:49:59.280334+00', 'a6963e8a-a0c4-496b-95ab-a0b330162899', 'https://img.fantula.com/uploads/1766998873555-z2t8fw.webp', 0, 1000.00, '{}', 1000, NULL, 100, true, '[{"type": "image", "content": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp"}]'),
+	('0097edf0-a9c6-4224-8bad-c688eb224030', '依次', 'on', '2026-01-20 10:56:57.372406+00', 'a6963e8a-a0c4-496b-95ab-a0b330162899', 'https://img.fantula.com/uploads/1767001808902-qkt8pc.webp', 1, 1000.00, '{v哥哥,他天天}', 10, '优惠', 100, true, '[{"type": "image", "content": "https://img.fantula.com/uploads/1767001837804-4d5ics.webp"}]'),
+	('1b39366f-85a1-4dbd-9c98-a81b995317b7', '虚拟 ', 'on', '2026-01-20 10:49:06.975526+00', 'a6963e8a-a0c4-496b-95ab-a0b330162899', 'https://img.fantula.com/uploads/1767001790398-1j9utd.webp', 1, 1000.00, '{方法}', 1000, '推荐', 100, false, '[{"type": "text", "content": "改改改改改改改改改会不管不顾吧"}, {"type": "image", "content": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp"}]');
+
+
+--
+-- Data for Name: cdks; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."cdks" ("id", "product_id", "code", "cdk_type", "account_data", "status", "created_at", "used_at", "max_slots", "stock", "pre_order_id", "product_snapshot") VALUES
+	('1a37654d-fc5b-416c-8c58-e81d8d92ea0a', NULL, '{"fields":["邮箱","是谁","随时随地"]}', 'virtual', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp"}', 'idle', '2026-01-20 10:51:51.886428+00', NULL, 1, 963, NULL, '{"product_id": "1b39366f-85a1-4dbd-9c98-a81b995317b7", "product_name": "虚拟 ", "product_image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp"}'),
+	('7aedf80f-9e5c-4db9-82f5-42335da081ad', NULL, '1111', 'one_time', '{"image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}', 'using', '2026-01-20 10:58:50.545064+00', NULL, 1, 1, NULL, '{"product_id": "0097edf0-a9c6-4224-8bad-c688eb224030", "product_name": "依次", "product_image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}'),
+	('05b9fdc3-5f02-47be-82cc-2dd94c2a0418', NULL, '{"账":"1111复古风格方法","密":"1111反反复复","地方":"风格"}', 'shared', '{"image": "https://img.fantula.com/uploads/1767001790398-1j9utd.webp"}', 'idle', '2026-01-20 10:52:17.466837+00', NULL, 5, 1, NULL, '{"product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租", "product_image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp"}'),
+	('d53bf0ac-e092-4ab7-a0bd-c7cc7eba89f5', NULL, '5555', 'one_time', '{"image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}', 'using', '2026-01-20 10:58:50.545064+00', NULL, 1, 1, NULL, '{"product_id": "0097edf0-a9c6-4224-8bad-c688eb224030", "product_name": "依次", "product_image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}'),
+	('83385d4d-f610-4d88-8703-6ae0bba0adfb', NULL, '66666', 'one_time', '{"image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}', 'using', '2026-01-20 10:58:50.545064+00', NULL, 1, 1, NULL, '{"product_id": "0097edf0-a9c6-4224-8bad-c688eb224030", "product_name": "依次", "product_image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}'),
+	('2c46f243-d9c2-474d-8704-2e47afa22575', NULL, '{"账号":"111","密码":"11111","京津冀":"44444"}', 'shared', '{"image": "https://img.fantula.com/uploads/1767001808902-qkt8pc.webp"}', 'idle', '2026-01-24 11:38:57.212003+00', NULL, 5, 1, NULL, '{"product_id": "2a2cc45c-b4fb-4737-a4e0-4c096646beb7", "product_name": "合租", "product_image": "https://img.fantula.com/uploads/1766998873555-z2t8fw.webp"}');
+
+
+--
+-- Data for Name: cdk_sku_map; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."cdk_sku_map" ("id", "cdk_id", "sku_id", "created_at") VALUES
+	('d383e75d-79f2-4388-8d86-7a0be2d98942', '05b9fdc3-5f02-47be-82cc-2dd94c2a0418', '821d470d-1554-4e7d-9eef-9fa6344ca9b4', '2026-01-20 10:52:17.480622+00'),
+	('e8ed67f6-043a-44c4-b4f1-db4ecffa9ca2', '7aedf80f-9e5c-4db9-82f5-42335da081ad', 'f4bd0dcc-dde5-493a-838a-6d977c551ede', '2026-01-20 10:58:50.550627+00'),
+	('fcc8bb0f-5dcb-48b4-941f-48624f5a77af', 'd53bf0ac-e092-4ab7-a0bd-c7cc7eba89f5', 'f4bd0dcc-dde5-493a-838a-6d977c551ede', '2026-01-20 10:58:50.550627+00'),
+	('65138e1d-bf71-4a56-ad80-99ef8ea4731f', '83385d4d-f610-4d88-8703-6ae0bba0adfb', 'f4bd0dcc-dde5-493a-838a-6d977c551ede', '2026-01-20 10:58:50.550627+00'),
+	('0b9581a1-e411-411e-91c4-2fbed55779f3', '2c46f243-d9c2-474d-8704-2e47afa22575', '821d470d-1554-4e7d-9eef-9fa6344ca9b4', '2026-01-24 11:38:57.225166+00'),
+	('666f848f-b17a-4041-bb6b-f086b9bb3504', '1a37654d-fc5b-416c-8c58-e81d8d92ea0a', 'e1766ff5-8918-47ca-9994-606c0db9fa44', '2026-01-27 17:44:17.65749+00'),
+	('449c268f-288a-427a-ab80-b80213859d8d', '1a37654d-fc5b-416c-8c58-e81d8d92ea0a', '9974a762-5661-4493-95e0-d60fbe788020', '2026-01-27 17:44:17.670901+00'),
+	('4a87bf71-377e-4f55-a3ba-16c4f60e834c', '1a37654d-fc5b-416c-8c58-e81d8d92ea0a', '1e301e4e-82b2-4f47-9947-ad1d2c2cd2cc', '2026-01-27 17:44:17.681806+00'),
+	('4c0eee5a-cbf2-4e2e-aaa2-f2650c4cdac1', '1a37654d-fc5b-416c-8c58-e81d8d92ea0a', '99167311-9fe8-4433-9972-d26c5dcf5eab', '2026-01-27 17:44:17.693043+00'),
+	('0349fe9f-95d0-41b8-a53a-6d03149e2b12', '1a37654d-fc5b-416c-8c58-e81d8d92ea0a', 'a5a4bbc2-cfcc-4f0d-b976-b07ab2a32078', '2026-01-27 17:44:17.704265+00'),
+	('648ead0b-9cf9-471f-844f-31fd0efd785e', '1a37654d-fc5b-416c-8c58-e81d8d92ea0a', 'a60f8e59-ed13-457d-a30e-41f96754326d', '2026-01-27 17:44:17.715153+00');
+
+
+--
+-- Data for Name: channel_recognitions; Type: TABLE DATA; Schema: public; Owner: supabase_admin
+--
+
+INSERT INTO "public"."channel_recognitions" ("id", "channel_key", "product_id", "created_at", "updated_at") VALUES
+	('1868e52a-248e-457b-9309-8263a9150399', '@example', '1b39366f-85a1-4dbd-9c98-a81b995317b7', '2026-01-25 09:57:33.752885+00', '2026-01-25 10:06:40.526+00'),
+	('b1234679-494c-421d-91cb-dd354512a228', '@aiaamare', NULL, '2026-01-25 10:14:45.939051+00', '2026-01-25 10:14:45.939051+00'),
+	('aec0eb22-d49e-48d1-9e13-c042d9ea8e38', '@akagiwen', NULL, '2026-01-25 10:14:45.939051+00', '2026-01-25 10:14:45.939051+00'),
+	('fa2ab1f4-fb8b-44b2-80b9-c521e1f7d347', '@albanknox', NULL, '2026-01-25 10:14:45.939051+00', '2026-01-25 10:14:45.939051+00'),
+	('76e399fd-5f7f-4c77-9be7-234886ae47b5', '@altareregis', NULL, '2026-01-25 10:14:45.939051+00', '2026-01-25 10:14:45.939051+00'),
+	('984bd741-d9a7-4195-b2e7-3b188db67fd9', '@angekatrina', NULL, '2026-01-25 10:14:45.939051+00', '2026-01-25 10:14:45.939051+00'),
+	('84f65c19-b09e-4713-b97c-14cb9c060440', '@ddddf', NULL, '2026-01-27 10:52:24.075783+00', '2026-01-27 10:52:24.075783+00');
+
+
+--
+-- Data for Name: community_articles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: community_categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."community_categories" ("id", "name", "icon", "color", "sort_order", "is_active", "created_at") VALUES
+	('b1d2a1c1-74d9-4308-b196-64a712e5cbd3', '收拾收拾', '帮助📝', '#409EFF', 1, true, '2026-01-25 07:00:53.440452+00');
+
+
+--
+-- Data for Name: coupon_codes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."coupon_codes" ("id", "coupon_id", "code", "status", "user_uid", "used_at", "created_at", "updated_at", "max_usage", "used_count") VALUES
+	('24b00942-fb49-4d57-ada1-1f242737115f', '3e091974-67d3-4bb7-bb85-4979c04c895b', '2DM-7FX-TFV-GCM', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-20 11:07:52.73019+00', '2026-01-20 11:07:18.370006+00', '2026-01-20 11:07:18.370006+00', 1, 1),
+	('6f146fff-36a8-4605-a733-d66a3fa8c2e9', '3786eb85-3f0f-492e-8011-32c12f604691', 'PG3-KRQ-WCW-8ST', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-20 11:08:46.598786+00', '2026-01-20 11:08:32.464956+00', '2026-01-20 11:08:32.464956+00', 1, 1),
+	('9d0b4dfb-858a-4a20-9612-04f8db21cb35', '3786eb85-3f0f-492e-8011-32c12f604691', 'MHM-3HL-UXS-APR', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-20 11:08:56.96412+00', '2026-01-20 11:08:32.464956+00', '2026-01-20 11:08:32.464956+00', 1, 1),
+	('90894745-6798-4a68-b94a-12e125dc0778', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', 'ZV8-EAK-CCD-XF4', 'available', NULL, NULL, '2026-01-20 11:10:00.695287+00', '2026-01-20 11:10:00.695287+00', 1, 0),
+	('4090b461-7e35-48f8-9933-a1e36d0e9c82', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', 'HKF-A6M-FXL-6ZE', 'available', NULL, NULL, '2026-01-20 11:10:00.695287+00', '2026-01-20 11:10:00.695287+00', 1, 0),
+	('1f85bce1-c3b8-47dc-92cb-3965cec776b6', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', '5G4-LZJ-JD8-L3S', 'available', NULL, NULL, '2026-01-20 11:10:00.695287+00', '2026-01-20 11:10:00.695287+00', 1, 0),
+	('7a1aa14c-5394-4601-9764-bd2e41e54223', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', 'CQR-PWB-ZW7-HNB', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-20 11:10:06.979811+00', '2026-01-20 11:10:00.695287+00', '2026-01-20 11:10:00.695287+00', 1, 1),
+	('33fa8cb0-dbe7-42d7-9685-8f6876d46aa0', '96583bc9-4555-45c7-ae05-dcbd2c78ca91', '8Z3-ARW-R8E-LBM', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-20 11:10:14.245154+00', '2026-01-20 11:10:00.695287+00', '2026-01-20 11:10:00.695287+00', 1, 1),
+	('417c1293-2388-4b51-9e26-f64df928ec53', '3786eb85-3f0f-492e-8011-32c12f604691', 'ESE-HAW-YXP-PMS', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-22 06:39:59.828144+00', '2026-01-20 11:08:32.464956+00', '2026-01-20 11:08:32.464956+00', 1, 1),
+	('f296827d-8e8e-4832-944a-32d6e62e5f36', '3786eb85-3f0f-492e-8011-32c12f604691', 'MLE-86C-HHV-Z78', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-22 06:40:39.385077+00', '2026-01-20 11:08:32.464956+00', '2026-01-20 11:08:32.464956+00', 1, 1),
+	('9e4c5d19-ca58-406c-8cf1-957156517e85', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'EC8-JPK-G5H-H4M', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-22 06:40:57.27675+00', '2026-01-20 11:07:18.370006+00', '2026-01-20 11:07:18.370006+00', 1, 1),
+	('24b828c7-0a38-4937-b434-acd550e37aa5', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'HPL-NA8-Z7X-9R8', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-22 07:04:46.165787+00', '2026-01-22 07:04:38.438385+00', '2026-01-22 07:04:38.438385+00', 1, 1),
+	('719a624c-7547-4119-82c0-a6e9b5cf72ae', '3e091974-67d3-4bb7-bb85-4979c04c895b', '3P9-SUW-FNH-HF7', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-22 07:48:37.451925+00', '2026-01-22 07:04:38.438385+00', '2026-01-22 07:04:38.438385+00', 1, 1),
+	('88da3ea4-a532-4828-a2f7-cea8de474a29', '3e091974-67d3-4bb7-bb85-4979c04c895b', 'E4K-5ZJ-KJK-C5P', 'exhausted', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '2026-01-24 12:39:37.14919+00', '2026-01-24 12:39:26.063736+00', '2026-01-24 12:39:26.063736+00', 1, 1),
+	('823a2b2a-049c-4056-80a5-68e6406f75d4', '3786eb85-3f0f-492e-8011-32c12f604691', '3L2-W4X-B3R-NRG', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-24 17:47:59.205381+00', '2026-01-20 11:08:32.464956+00', '2026-01-20 11:08:32.464956+00', 1, 1),
+	('6bd5af07-ce19-4e25-894f-dbc345346911', '3e091974-67d3-4bb7-bb85-4979c04c895b', '5PL-TH3-4FP-27C', 'exhausted', '71b19525-6151-49d3-ab87-ee38158e2f67', '2026-01-24 17:48:54.100634+00', '2026-01-24 17:48:41.952531+00', '2026-01-24 17:48:41.952531+00', 1, 1),
+	('120407a0-410a-454f-82b8-c336bee9d573', '3e091974-67d3-4bb7-bb85-4979c04c895b', '3JL-LN2-EQR-CD3', 'available', NULL, NULL, '2026-01-25 11:23:26.315029+00', '2026-01-25 11:23:26.315029+00', 1, 0);
+
+
+--
+-- Data for Name: faq_categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."faq_categories" ("id", "name", "sort_order", "is_active", "created_at", "updated_at", "is_checkout_visible") VALUES
+	('bcf512c3-050d-4230-85ed-baacf806655e', '点点滴滴', 0, true, '2026-01-24 11:43:24.853471+00', '2026-01-24 11:43:24.853471+00', false),
+	('e21be30b-a058-481f-8739-a523d0cecbc1', '说撒上', 0, true, '2026-01-24 11:43:18.054141+00', '2026-01-24 11:43:18.054141+00', true);
+
+
+--
+-- Data for Name: faqs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."faqs" ("id", "category_id", "question", "answer", "product_id", "sort_order", "is_active", "created_at", "updated_at") VALUES
+	('567479cc-18aa-4d9a-9f3d-e9a59413758e', 'e21be30b-a058-481f-8739-a523d0cecbc1', '山东山东山东山东', '点点滴滴的点点滴滴的', NULL, 0, true, '2026-01-24 11:49:56.277962+00', '2026-01-24 11:49:56.277962+00'),
+	('754f5300-c9bc-4e2a-af18-f7e650d2eb16', 'e21be30b-a058-481f-8739-a523d0cecbc1', '点点滴滴', '收拾收拾点点滴滴的', NULL, 1, true, '2026-01-24 11:49:44.934608+00', '2026-01-24 11:49:44.934608+00'),
+	('916ef12d-1040-44bf-9dce-a1d0ec807fa3', 'e21be30b-a058-481f-8739-a523d0cecbc1', '反反复复分', '的发个哈是r   是大山东撒的撒', NULL, 2, true, '2026-01-24 11:50:25.273542+00', '2026-01-24 11:50:25.273542+00'),
+	('0643f756-15bc-4ea4-90a3-00dfe063efc3', 'e21be30b-a058-481f-8739-a523d0cecbc1', '山东粉丝多福多寿', '山东发山东粉丝D发SDF', NULL, 3, true, '2026-01-24 11:50:42.730955+00', '2026-01-24 11:50:42.730955+00');
+
+
+--
+-- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."messages" ("id", "user_uid", "title", "content", "is_read", "created_at", "user_id", "type", "link", "data") VALUES
+	('65dad7ee-470d-47d4-b165-ad75cdfcddb7', '90989832', '余额变动通知 (Balance Updated)', '您的账户余额减少了 10.00 元。当前余额：980.00', true, '2026-01-24 12:57:01.915381+00', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 'system', '/profile/wallet', NULL),
+	('8f7f8aa3-ea79-4220-9559-62099ac562c4', '90989832', '下单成功 (Order Placed)', '您的订单 2026012467337 已成功提交。我们正在为您准备商品。', true, '2026-01-24 12:57:01.915381+00', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 'order', '/profile/orders', NULL),
+	('3e29019c-a5ac-414a-bcd0-9349b32b8f66', '40050162', '您有新的订单', '您的订单 2026012427646 已成功提交，我们正在为您准备商品。', true, '2026-01-24 17:43:32.35298+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('b46e4dbb-fc7f-40a0-ac8d-adf7d91ed27f', '40050162', '您有新的订单', '您的订单 2026012417895 已成功提交，我们正在为您准备商品。', true, '2026-01-24 17:44:47.651421+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('1d22efad-915a-428d-8375-2b5c92a94cc1', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4714.00 元。', true, '2026-01-24 17:49:04.494797+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('8c517c40-768f-4d29-b247-7151de2187c0', '40050162', '优惠券到账', '恭喜！您获得了一张新的优惠券，快去使用吧。', true, '2026-01-24 17:48:54.100634+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'activity', '/profile/coupons', NULL),
+	('ff12dc79-d043-4431-afc4-81373e040cd7', '40050162', '您有新的订单', '您的订单 2026012402536 已成功提交，我们正在为您准备商品。', true, '2026-01-24 17:56:10.914919+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('34ea10aa-7b7b-4ec4-80ee-98fbb06de9f3', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4704.00 元。', true, '2026-01-24 17:56:10.914919+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('eb479531-9d6a-43d3-bb15-d5b10734fcd8', '40050162', '优惠券到账', '恭喜！您获得了一张新的优惠券，快去使用吧。', true, '2026-01-24 17:47:59.205381+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'activity', '/profile/coupons', NULL),
+	('1093754e-5baf-40dd-8ee6-d7b84c2e5baf', '40050162', '工单回复', '管理员回复了您的工单，请前往查看。', true, '2026-01-24 17:49:47.00018+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/support', NULL),
+	('295457bd-e8f0-473f-8a50-39d8bc987933', '40050162', '订单已发货', '您的订单 2026012427646 已经发货，请注意查收。', true, '2026-01-24 18:04:42.389409+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('a8bdfb78-de8b-4f9a-b7ea-77f19d882cef', '40050162', '订单已完成', '您的订单 2026012427646 已处理完成，请查看卡密或充值结果。 (结果: 成功)', true, '2026-01-24 18:04:42.370643+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('a49f7805-0837-49c9-97af-63e5c0cd9723', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4694.00 元。', true, '2026-01-25 07:11:20.919591+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('242edef2-26b6-4a9e-a448-fb4388fe7d68', '40050162', '订单已完成', '您的订单 2026012402536 已处理完成，请查看卡密或充值结果。 (结果: 失败/驳回, 原因: 收拾收拾谁)', true, '2026-01-24 18:05:34.784864+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('16d18af2-4292-4e9f-b941-9dad8f252869', '40050162', '您有新的订单', '您的订单 2026012515216 已成功提交，我们正在为您准备商品。', true, '2026-01-25 07:11:20.919591+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('91b386b7-6840-4cd0-bf95-67bc5460d4b0', '40050162', '您有新的订单', '您的订单 2026012538897 已成功提交，我们正在为您准备商品。', true, '2026-01-25 07:22:43.873281+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('b9486528-61c4-4c9f-9bb9-e8edbef5697c', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4684.00 元。', true, '2026-01-25 07:22:43.873281+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('4635299d-6c61-40ac-94bc-5d75c7ab548a', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4674.00 元。', true, '2026-01-25 07:26:40.327829+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('1cece1c3-3459-4648-9059-9ebdf9542a8d', '40050162', '您有新的订单', '您的订单 2026012550186 已成功提交，我们正在为您准备商品。', true, '2026-01-25 07:26:40.327829+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('5b1a0985-0cde-4b4b-b53b-7ec697660a29', '40050162', '您有新的订单', '您的订单 2026012580509 已成功提交，我们正在为您准备商品。', true, '2026-01-25 07:30:04.190416+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('428d5d59-450d-4e55-8273-330c9ae9f15f', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4664.00 元。', true, '2026-01-25 07:30:04.190416+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('47a9b36e-0758-4c96-a0b7-f30822c8e678', '40050162', '您有新的订单', '您的订单 2026012602443 已成功提交，我们正在为您准备商品。', true, '2026-01-26 03:43:27.003854+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('1e86e786-d203-49de-b840-802b11917775', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4659.00 元。', true, '2026-01-26 03:43:27.003854+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('072979c1-4b56-420b-b8ea-52607f4b73ba', '40050162', '订单已发货', '您的订单 2026012602443 已经发货，请注意查收。', true, '2026-01-26 03:46:25.229631+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('029f0074-9939-4cc4-9f59-e871717e7cc4', '40050162', '订单已完成', '您的订单 2026012602443 已处理完成，请查看卡密或充值结果。 (结果: 成功)', true, '2026-01-26 03:46:25.203103+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('87ccc2b9-7e0a-474f-a7e0-246813a489d6', '40050162', '您有新的订单', '您的订单 2026012601543 已成功提交，我们正在为您准备商品。', true, '2026-01-26 06:09:52.368365+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('5cd78188-a061-48c9-a32a-7f8864a2921e', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4649.00 元。', true, '2026-01-26 06:09:52.368365+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL),
+	('dc281092-3c2b-449e-ac49-2cac251a997f', '40050162', '订单已发货', '您的订单 2026012602443 已经发货，请注意查收。', true, '2026-01-27 12:49:13.254571+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('29126cf9-40ab-4cdd-a1d7-cddb5fc8e341', '40050162', '您有新的订单', '您的订单 2026012724043 已成功提交，我们正在为您准备商品。', true, '2026-01-27 11:01:43.510894+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'order', '/profile/orders', NULL),
+	('6527f505-f3e0-48fb-918c-6a773b40373f', '40050162', '额度变动通知', '您的账户余额发生变动，当前余额：4639.00 元。', true, '2026-01-27 11:01:43.510894+00', '71b19525-6151-49d3-ab87-ee38158e2f67', 'system', '/profile/wallet', NULL);
+
+
+--
+-- Data for Name: order_fulfillments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."order_fulfillments" ("id", "order_id", "status", "payload", "reject_reason", "submitted_at", "reviewed_at", "created_at") VALUES
+	('a8c65fad-8519-4f03-9432-9b7653387f2b', 'e43b8d9e-5a3f-450e-9906-1d9e038a1540', 'submitted', '{"是谁": "滚滚滚", "邮箱": "规格", "随时随地": "改改改改改 "}', NULL, '2026-01-21 10:25:50.026+00', NULL, '2026-01-20 11:21:10.467817+00'),
+	('5536e0ef-f222-401a-b864-9c16f81ecea3', '624d38c9-29cd-409e-9ce5-13aa715dfc3c', 'approved', '{"是谁": "方法", "邮箱": "探讨", "随时随地": "反反复复"}', NULL, '2026-01-21 12:33:21.284+00', '2026-01-21 12:33:37.879+00', '2026-01-21 12:33:21.303194+00'),
+	('e9465447-59d9-44a2-a8cf-1e01faa8e9df', '36b4f551-a5d7-4220-ba17-4244a6fc3e31', 'approved', '{"是谁": "f d f f f", "邮箱": "的山东的", "随时随地": " 反反复复"}', NULL, '2026-01-21 13:10:49.864+00', '2026-01-21 13:11:20.3+00', '2026-01-21 13:10:49.900073+00'),
+	('7f3d6348-bd95-4ea8-b27c-fc3636a50180', '670755f1-f60c-4ab9-a8a1-2960e07cf26a', 'rejected', '{"是谁": "改改改改", "邮箱": "滚滚滚", "随时随地": "改改改改改改改改"}', '人人人人人', '2026-01-23 10:02:52.232+00', '2026-01-23 10:03:25.056+00', '2026-01-23 10:02:52.256016+00'),
+	('0b3c3e87-9543-4abc-a9ee-3e9cab4bb67d', '670755f1-f60c-4ab9-a8a1-2960e07cf26a', 'approved', '{"是谁": "改改改改", "邮箱": "滚滚滚", "随时随地": "改改改改改"}', NULL, '2026-01-23 10:03:38.898+00', '2026-01-23 10:03:57.196+00', '2026-01-23 10:03:38.922155+00'),
+	('495c690a-0c57-4798-b210-2888e605729a', '670755f1-f60c-4ab9-a8a1-2960e07cf26a', 'submitted', '{"是谁": "", "邮箱": "", "随时随地": ""}', NULL, '2026-01-23 10:13:13.78+00', NULL, '2026-01-23 10:13:13.806263+00'),
+	('abaf29b9-7771-4a95-81ce-8d3d22a9659a', '9529151d-0879-4585-8c49-cc0aa8382312', 'approved', '{"是谁": "收拾收拾谁是谁", "邮箱": "收拾收拾谁时", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": "收拾收拾"}', NULL, '2026-01-24 18:04:28.773+00', '2026-01-24 18:04:42.352+00', '2026-01-24 18:04:28.795805+00'),
+	('fade182b-fc4e-4474-bbdc-cb5e1ad21bd8', '1c0271fa-210b-4eb4-b7a4-90dbaf6c08c9', 'rejected', '{"是谁": "收拾收拾", "邮箱": "说撒上", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": "收拾收拾谁是谁"}', '收拾收拾谁', '2026-01-24 18:05:22.788+00', '2026-01-24 18:05:34.763+00', '2026-01-24 18:05:22.812256+00'),
+	('ddee25a3-a64b-492a-be93-ce5fd83077e1', 'c5ec781c-88d4-46a6-bf73-d6957c76bfdd', 'rejected', '{"是谁": "订单点点滴滴", "邮箱": "点点滴滴订单点点滴滴", "随时随地": "收拾收拾谁谁谁谁"}', '收拾收拾谁', '2026-01-23 11:09:12.424+00', '2026-01-23 11:09:30.66+00', '2026-01-23 11:08:52.162173+00'),
+	('c2340e82-acae-45fd-b4bf-6d520280ae5f', 'c5ec781c-88d4-46a6-bf73-d6957c76bfdd', 'approved', '{"是谁": "订单点点滴滴", "邮箱": "点点滴滴订单点点滴滴", "随时随地": "收拾收呃呃呃呃"}', NULL, '2026-01-23 11:10:19.609+00', '2026-01-23 11:10:27.519+00', '2026-01-23 11:09:47.643614+00'),
+	('9c043a8a-440b-4dcc-ae5f-fe17abc6a962', 'c5f26582-9ccb-4971-a759-d2beda6141fc', 'approved', '{"是谁": "点点滴滴的", "邮箱": "休息休息", "随时随地": "订单点点滴滴的"}', NULL, '2026-01-23 11:12:20.209+00', '2026-01-23 11:12:27.783+00', '2026-01-23 11:12:20.227378+00'),
+	('ee92f5c9-617a-44d2-a1f8-851f3ec6a9e8', '5ca544cb-04e5-4c19-bcce-bac3a2023ab9', 'approved', '{"是谁": "s s s", "邮箱": "s s", "随时随地": "收拾收拾谁"}', NULL, '2026-01-23 11:12:55.1+00', '2026-01-23 11:13:07.519+00', '2026-01-23 11:12:55.105514+00'),
+	('6c4466ae-a953-459b-9625-70edc5e1c917', 'd61e2b07-17b5-442f-bdb3-f27b295e8988', 'submitted', '{"是谁": "反反复复分", "邮箱": "方法反反复复分", "随时随地": "方法"}', NULL, '2026-01-23 11:23:15.808+00', NULL, '2026-01-23 11:23:15.83593+00'),
+	('c6e55559-38ce-4e1d-b2af-2305dbde7f07', '9fe1a333-8ef0-4339-9dfd-759012333de5', 'submitted', '{"是谁": "说撒上", "邮箱": "是谁", "_cdk_code": "{\"fields\":[\"邮箱\",\"是谁\",\"随时随地\"]}", "随时随地": "收拾收拾谁"}', NULL, '2026-01-24 07:19:14.604+00', NULL, '2026-01-24 07:19:14.612954+00'),
+	('2a6fb457-32f7-47f7-87c0-9adc2a4bb65c', '52e11bd7-00fa-46b7-8d28-e37eeee8f57c', 'approved', '{"是谁": "改改改改改改", "邮箱": "发发发", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": "改改改改改改"}', NULL, '2026-01-26 03:43:43.031+00', '2026-01-26 03:46:25.164+00', '2026-01-26 03:43:43.05277+00'),
+	('3a42f612-0d22-4485-83b1-5d2f396f4cfc', '9fe1a333-8ef0-4339-9dfd-759012333de5', 'approved', '{"是谁": "s s s s s s s s", "邮箱": "收拾收拾", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": " 收拾收拾收拾收拾谁方法"}', NULL, '2026-01-24 07:51:03.975+00', '2026-01-24 07:51:18.345+00', '2026-01-24 07:42:33.657897+00'),
+	('5153b578-4a81-4456-9440-6eb8ef473a5b', '5ec093fa-c510-4c05-a9a4-602eb3be0ce3', 'approved', '{"是谁": "d f f f f f", "邮箱": "的订单", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": " 点点滴滴的"}', NULL, '2026-01-24 17:45:19.546+00', '2026-01-24 17:45:41.131+00', '2026-01-24 17:45:19.553803+00'),
+	('d2671970-080f-454c-b8a5-0081d744216d', '9529151d-0879-4585-8c49-cc0aa8382312', 'rejected', '{"是谁": "收拾收拾谁是谁", "邮箱": "收拾收拾谁", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": "收拾收拾"}', '收拾收拾谁', '2026-01-24 17:46:38.172+00', '2026-01-24 17:46:48.167+00', '2026-01-24 17:46:38.186991+00'),
+	('951f3588-c9be-4435-837a-33ee83acb546', '1c0271fa-210b-4eb4-b7a4-90dbaf6c08c9', 'approved', '{"是谁": "收拾收拾宿舍", "邮箱": "收拾收拾", "_cdk_id": "1a37654d-fc5b-416c-8c58-e81d8d92ea0a", "随时随地": "收拾收拾宿舍"}', NULL, '2026-01-24 17:56:36.918+00', '2026-01-24 17:56:46.623+00', '2026-01-24 17:56:36.929443+00');
+
+
+--
+-- Data for Name: product_sku_map; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."product_sku_map" ("id", "product_id", "sku_id", "sort_order", "created_at") VALUES
+	('ac5762ce-6923-424e-b601-02f282564c10', '2a2cc45c-b4fb-4737-a4e0-4c096646beb7', '821d470d-1554-4e7d-9eef-9fa6344ca9b4', 0, '2026-01-20 10:50:37.020716+00'),
+	('0832688c-6eda-4d00-862f-c79c20016a94', '0097edf0-a9c6-4224-8bad-c688eb224030', 'f4bd0dcc-dde5-493a-838a-6d977c551ede', 0, '2026-01-20 10:57:24.831938+00'),
+	('9bc805e8-cae5-4c25-963e-5688988e38aa', '1b39366f-85a1-4dbd-9c98-a81b995317b7', 'e1766ff5-8918-47ca-9994-606c0db9fa44', 0, '2026-01-27 17:43:35.123778+00'),
+	('616a15c0-ee41-4413-b633-6de8bb6e0a87', '1b39366f-85a1-4dbd-9c98-a81b995317b7', '9974a762-5661-4493-95e0-d60fbe788020', 1, '2026-01-27 17:43:35.123778+00'),
+	('41dc8271-2971-4677-b488-5d193f3b0193', '1b39366f-85a1-4dbd-9c98-a81b995317b7', '1e301e4e-82b2-4f47-9947-ad1d2c2cd2cc', 2, '2026-01-27 17:43:35.123778+00'),
+	('4246d322-29bd-40f1-afbe-28b3fab723fc', '1b39366f-85a1-4dbd-9c98-a81b995317b7', '99167311-9fe8-4433-9972-d26c5dcf5eab', 3, '2026-01-27 17:43:35.123778+00'),
+	('cb36021f-3731-4f17-9b99-80f083541989', '1b39366f-85a1-4dbd-9c98-a81b995317b7', 'a5a4bbc2-cfcc-4f0d-b976-b07ab2a32078', 4, '2026-01-27 17:43:35.123778+00'),
+	('69c0894b-b62c-4d09-a09c-1189086d3aa9', '1b39366f-85a1-4dbd-9c98-a81b995317b7', 'a60f8e59-ed13-457d-a30e-41f96754326d', 5, '2026-01-27 17:43:35.123778+00');
+
+
+--
+-- Data for Name: recharge_orders; Type: TABLE DATA; Schema: public; Owner: supabase_admin
+--
+
+INSERT INTO "public"."recharge_orders" ("id", "out_trade_no", "user_id", "amount", "amount_cents", "status", "pay_type", "description", "transaction_id", "payer_openid", "paid_at", "created_at", "updated_at", "bonus") VALUES
+	('2b2e8fd5-04c0-4953-a37e-9b3cfc3a8d97', 'RECHARGE20260130125841TI2REH', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 2.00, 200, 'pending', 'wechat_native', '凡图拉-充值2点', NULL, NULL, NULL, '2026-01-30 12:58:41.201+00', '2026-01-30 12:58:41.208654+00', 0.00),
+	('af76789a-379b-44a4-9810-99e3b29e9fb0', 'RECHARGE20260130125943yKDDgH', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 2.00, 200, 'pending', 'wechat_native', '凡图拉-充值2点', NULL, NULL, NULL, '2026-01-30 12:59:43.153+00', '2026-01-30 12:59:43.154609+00', 0.00),
+	('26c3f06d-f0bf-4829-9e3b-e28a8ac5e229', 'RECHARGE20260130130244A6Wksy', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 2.00, 200, 'paid', 'wechat_native', '凡图拉-充值2点', '4200003004202601307472985762', NULL, '2026-01-30 13:03:05+00', '2026-01-30 13:02:44.201+00', '2026-01-30 13:03:05.959+00', 0.00),
+	('624c6316-08f3-45a6-b8fc-91bfaebeed1e', 'RECHARGE202601301305392nBLEM', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 1.00, 100, 'paid', 'wechat_native', '凡图拉-充值1点', '4200003009202601308784495921', NULL, '2026-01-30 13:05:57+00', '2026-01-30 13:05:39.133+00', '2026-01-30 13:05:57.914+00', 0.00),
+	('c4c6ed26-23b8-4f6e-a534-57e0de797a90', 'RECHARGE202601301309055X4zwI', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 1.00, 100, 'paid', 'wechat_native', '凡图拉-充值1点', '4200003011202601309467491909', NULL, '2026-01-30 13:09:21+00', '2026-01-30 13:09:05.44+00', '2026-01-30 13:09:24.211+00', 0.00),
+	('1c2546d6-3d11-4d60-9aee-f6b2d1365ca7', 'RECHARGE20260131063634rhbl0T', '71b19525-6151-49d3-ab87-ee38158e2f67', 1.00, 100, 'pending', 'wechat_native', '凡图拉-充值1点', NULL, NULL, NULL, '2026-01-31 06:36:34.4+00', '2026-01-31 06:36:34.410631+00', 0.00),
+	('1ed1d4f3-c4ea-4db1-a7d7-fc9c512effd8', 'RECHARGE20260131063644ugSv1P', '71b19525-6151-49d3-ab87-ee38158e2f67', 1.00, 100, 'pending', 'wechat_native', '凡图拉-充值1点', NULL, NULL, NULL, '2026-01-31 06:36:44.489+00', '2026-01-31 06:36:44.497454+00', 0.00),
+	('5e446bc6-6536-48a6-8277-8f7e7d95f556', 'RECHARGE20260131063836xWHyEg', '71b19525-6151-49d3-ab87-ee38158e2f67', 1.00, 100, 'paid', 'wechat_native', '凡图拉-充值1点', '4200002961202601315924998274', NULL, '2026-01-31 06:38:52+00', '2026-01-31 06:38:36.549+00', '2026-01-31 06:38:55.515+00', 0.00);
+
+
+--
+-- Data for Name: recharge_tiers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."recharge_tiers" ("id", "amount", "bonus", "sort_order", "status", "created_at") VALUES
+	('8d5b2038-8d10-4af3-aebc-aac856061e01', 100.00, 10.00, 1, 'on', '2026-01-21 08:15:26.434725+00'),
+	('41a88d4a-1feb-4e82-a91f-d2fa799708ad', 200.00, 20.00, 2, 'on', '2026-01-21 08:15:31.584523+00'),
+	('270306fc-074f-42b9-9283-7dc8f489c1d1', 300.00, 30.00, 3, 'on', '2026-01-21 08:15:36.92784+00'),
+	('cda639f5-859c-4314-845d-83b4012440fe', 400.00, 40.00, 4, 'on', '2026-01-21 08:15:43.710429+00'),
+	('0d22c390-69d8-432b-a673-0d0c69a8e5dc', 500.00, 50.00, 5, 'on', '2026-01-21 08:15:50.279668+00');
+
+
+--
+-- Data for Name: refund_requests; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."refund_requests" ("id", "order_id", "user_id", "reason", "reason_detail", "original_status", "images_snapshot", "status", "refund_amount", "admin_id", "admin_note", "created_at", "reviewed_at") VALUES
+	('f9bc1245-4179-4de0-be5d-8cc56a38f6a5', '14730d60-a2e8-4966-9026-583a971aabc6', '71b19525-6151-49d3-ab87-ee38158e2f67', '商品无法使用', '', 'pending_delivery', NULL, 'cancelled', NULL, NULL, NULL, '2026-01-27 12:48:35.003447+00', '2026-01-27 12:48:48.858204+00'),
+	('c646bf1a-3d2b-4de1-892e-9d150644e8f0', '52e11bd7-00fa-46b7-8d28-e37eeee8f57c', '71b19525-6151-49d3-ab87-ee38158e2f67', '商品无法使用', '', 'active', NULL, 'cancelled', NULL, NULL, NULL, '2026-01-27 12:49:08.304149+00', '2026-01-27 12:49:13.254571+00');
+
+
+--
+-- Data for Name: scheduled_task_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: shared_sku_groups; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: slot_occupancies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."slot_occupancies" ("id", "cdk_id", "slot_index", "order_id", "status", "occupied_at", "released_at", "pre_order_id", "user_id") VALUES
+	('46d68d63-bd5d-4a15-becf-f30b4d2cbc2c', '05b9fdc3-5f02-47be-82cc-2dd94c2a0418', 1, '35af021d-c473-4a3d-8d8c-0139e4a7ff15', 'using', '2026-01-20 10:52:17.48934+00', NULL, NULL, '71b19525-6151-49d3-ab87-ee38158e2f67'),
+	('d5e306f6-5a13-4880-be4b-b588153cfefc', '05b9fdc3-5f02-47be-82cc-2dd94c2a0418', 5, '8e66fa78-65e5-4df9-9701-924d050293a0', 'using', '2026-01-20 10:52:17.48934+00', NULL, NULL, '71b19525-6151-49d3-ab87-ee38158e2f67'),
+	('4baf7a9a-eb47-481f-9b2f-3d1d0e5f5351', '05b9fdc3-5f02-47be-82cc-2dd94c2a0418', 4, '1aede0c9-77b3-4a20-ac3c-a7a5b2418aa9', 'using', '2026-01-20 10:52:17.48934+00', NULL, NULL, '71b19525-6151-49d3-ab87-ee38158e2f67'),
+	('adbdf4d4-6f1e-4b6e-9e17-b6bb0bb7c345', '05b9fdc3-5f02-47be-82cc-2dd94c2a0418', 3, '579577aa-6a7e-4a3e-8fa5-7d482ef5f9b3', 'using', '2026-01-20 10:52:17.48934+00', NULL, NULL, '71b19525-6151-49d3-ab87-ee38158e2f67'),
+	('6bfa0b18-246f-4c67-9937-d08a43165042', '05b9fdc3-5f02-47be-82cc-2dd94c2a0418', 2, '579577aa-6a7e-4a3e-8fa5-7d482ef5f9b3', 'using', '2026-01-20 10:52:17.48934+00', NULL, NULL, '71b19525-6151-49d3-ab87-ee38158e2f67'),
+	('20b0ab95-25a4-41f2-8e9c-5576da02d0cd', '2c46f243-d9c2-474d-8704-2e47afa22575', 3, NULL, 'idle', '2026-01-24 11:38:57.23907+00', NULL, NULL, NULL),
+	('8fb0cdb7-4bfb-4994-ba3e-95c8d3e306be', '2c46f243-d9c2-474d-8704-2e47afa22575', 4, NULL, 'idle', '2026-01-24 11:38:57.23907+00', NULL, NULL, NULL),
+	('dc522cf9-3dc0-4f11-9e00-43079e71fe4a', '2c46f243-d9c2-474d-8704-2e47afa22575', 5, NULL, 'idle', '2026-01-24 11:38:57.23907+00', NULL, NULL, NULL),
+	('582992f9-af16-4b8c-b4ea-2255e896e708', '2c46f243-d9c2-474d-8704-2e47afa22575', 1, NULL, 'idle', '2026-01-24 11:38:57.23907+00', NULL, NULL, NULL),
+	('5d186721-ad37-4e6c-8102-4a2c4bbc542b', '2c46f243-d9c2-474d-8704-2e47afa22575', 2, NULL, 'idle', '2026-01-24 11:38:57.23907+00', NULL, NULL, NULL);
+
+
+--
+-- Data for Name: system_settings; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."system_settings" ("key", "value", "description", "created_at", "updated_at") VALUES
+	('customer_notification_config', '{"order_created":{"enable":true,"title":"您有新的订单","template":"您的订单 {order_no} 已成功提交，我们正在为您准备商品。"},"order_shipped":{"enable":true,"title":"订单已发货","template":"您的订单 {order_no} 已经发货，请注意查收。"},"virtual_order_received":{"enable":true,"title":"订单已完成","template":"您的订单 {order_no} 已处理完成，请查看卡密或充值结果。"},"coupon_redeemed":{"enable":true,"title":"优惠券到账","template":"恭喜！您获得了一张新的优惠券，快去使用吧。"},"quota_changed":{"enable":true,"title":"额度变动通知","template":"您的账户余额发生变动，当前余额：{balance} 元。"},"ticket_replied":{"enable":true,"title":"工单回复","template":"管理员回复了您的工单，请前往查看。"}}', 'Customer notification trigger configuration', '2026-01-24 12:38:49.471611+00', '2026-01-24 12:38:49.471611+00'),
+	('R2_ACCOUNT_ID', '77e9b725d939b8b7b44df208a40f3fae', NULL, '2026-01-20 09:09:06.630079+00', '2026-01-20 10:40:33.01+00'),
+	('R2_ACCESS_KEY_ID', '930fed2d68030603fd1174e006b9b30c', NULL, '2026-01-20 09:09:06.630079+00', '2026-01-20 10:40:33.01+00'),
+	('R2_BUCKET_NAME', 'fantula2601', NULL, '2026-01-20 09:09:06.630079+00', '2026-01-20 10:40:33.01+00'),
+	('R2_PUBLIC_BASE_URL', 'https://img.fantula.com', NULL, '2026-01-20 09:09:06.630079+00', '2026-01-20 10:40:33.01+00'),
+	('R2_SECRET_ACCESS_KEY', 'd6b39b5e001aeb2b535dbdc823c4a8d25cd8e92b6191c0f7942790211a959441', NULL, '2026-01-20 09:09:06.630079+00', '2026-01-20 10:40:33.01+00');
+
+
+--
+-- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."tickets" ("id", "user_id", "order_id", "title", "status", "priority", "created_at", "updated_at", "resolved_at", "ticket_no") VALUES
+	('80c38b9a-59f4-43d0-807e-169c478b380e', '71b19525-6151-49d3-ab87-ee38158e2f67', '36b4f551-a5d7-4220-ba17-4244a6fc3e31', '复古风格', 'resolved', 'medium', '2026-01-22 04:58:47.616581+00', '2026-01-22 05:08:22.632+00', '2026-01-22 05:08:22.632+00', 'T-80C38B9A'),
+	('d5be3bb6-8e33-4052-b405-c30ba2711ba7', '71b19525-6151-49d3-ab87-ee38158e2f67', '36b4f551-a5d7-4220-ba17-4244a6fc3e31', '说撒上', 'resolved', 'medium', '2026-01-22 05:33:04.009939+00', '2026-01-22 06:06:08.576+00', '2026-01-22 06:06:08.576+00', 'T-E3E1CBA5'),
+	('23c91af7-7d5d-4d0a-8f27-4d26cc8ff489', '71b19525-6151-49d3-ab87-ee38158e2f67', '1aede0c9-77b3-4a20-ac3c-a7a5b2418aa9', 'xxx', 'processing', 'medium', '2026-01-24 04:39:28.510344+00', '2026-01-24 05:00:54.792417+00', NULL, 'T-6B94CD98'),
+	('fe840569-b92a-4755-b445-1131d9c44af2', '71b19525-6151-49d3-ab87-ee38158e2f67', '5ec093fa-c510-4c05-a9a4-602eb3be0ce3', '说撒上', 'processing', 'medium', '2026-01-24 17:49:29.321141+00', '2026-01-24 17:49:29.321141+00', NULL, 'T-F7DEFE30');
+
+
+--
+-- Data for Name: ticket_messages; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."ticket_messages" ("id", "ticket_id", "sender_id", "is_admin", "content", "message_type", "attachments", "created_at") VALUES
+	('ffef2635-6fa3-4857-bef7-8cfda5ddefa7', '80c38b9a-59f4-43d0-807e-169c478b380e', '71b19525-6151-49d3-ab87-ee38158e2f67', false, '反反复复', 'text', '{}', '2026-01-22 04:58:47.616581+00'),
+	('858ab63e-92e2-4415-b857-d56040b5024b', 'd5be3bb6-8e33-4052-b405-c30ba2711ba7', '71b19525-6151-49d3-ab87-ee38158e2f67', false, '订单点点滴滴', 'text', '{}', '2026-01-22 05:33:04.009939+00'),
+	('7b9f14f7-84e6-47d1-863d-7c0b1d0f8919', '23c91af7-7d5d-4d0a-8f27-4d26cc8ff489', '71b19525-6151-49d3-ab87-ee38158e2f67', false, 'ssssssdscxczcasfdaafa', 'text', '{}', '2026-01-24 04:39:28.510344+00'),
+	('7c155541-635a-43d8-b2be-9e4fecb065ed', '23c91af7-7d5d-4d0a-8f27-4d26cc8ff489', '71b19525-6151-49d3-ab87-ee38158e2f67', false, '订单点点滴滴', 'text', '{}', '2026-01-24 05:00:54.792417+00'),
+	('a7ece153-9cde-4475-9622-c1b58dee2613', 'fe840569-b92a-4755-b445-1131d9c44af2', '71b19525-6151-49d3-ab87-ee38158e2f67', false, '收拾收拾宿舍', 'text', '{}', '2026-01-24 17:49:29.321141+00'),
+	('b7ff6f4a-68c4-4af9-86a2-b798acb6b46e', 'fe840569-b92a-4755-b445-1131d9c44af2', NULL, true, '收拾收拾谁是谁', 'text', '{}', '2026-01-24 17:49:47.00018+00');
+
+
+--
+-- Data for Name: user_favorites; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."user_favorites" ("id", "user_id", "product_id", "sku_id", "created_at") VALUES
+	('ee1d4a40-d43f-41dd-991b-4368e6e3a7dc', '71b19525-6151-49d3-ab87-ee38158e2f67', '1b39366f-85a1-4dbd-9c98-a81b995317b7', 'f08f339a-d648-4fe9-b416-a65c9d37b970', '2026-01-26 09:53:37.539223+00');
+
+
+--
+-- Data for Name: wallet_transactions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."wallet_transactions" ("id", "user_id", "type", "amount", "balance_after", "description", "created_at") VALUES
+	('75e106e7-c3ef-49dc-b13d-d442f58facd3', '71b19525-6151-49d3-ab87-ee38158e2f67', '优惠券兑换', 1000.00, 1000.00, NULL, '2026-01-20 11:07:55.679121+00'),
+	('0575afe7-c17d-416f-8b99-8a2dcc463b97', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -5.00, 995.00, '虚拟 ：虚拟，001', '2026-01-20 11:10:31.660912+00'),
+	('bc75c9b9-bd26-4e90-9906-fa70136600e5', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -5.00, 990.00, '合租：是谁，合租的', '2026-01-20 11:12:52.182828+00'),
+	('76b35a98-6472-4316-a75e-1a0d407f401a', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 980.00, '合租：是谁，合租的 (续费)', '2026-01-20 12:21:18.11861+00'),
+	('4787f691-63ac-4037-b61b-5f0fe6f0c305', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 970.00, '虚拟 ：虚拟，001', '2026-01-21 12:32:36.562439+00'),
+	('26fb0170-b806-496d-b3e7-00a1210bbfb1', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 960.00, '虚拟 ：虚拟，001 (续费)', '2026-01-21 13:09:33.698523+00'),
+	('3932bb98-3a18-4834-901f-fb2a0458efc3', '71b19525-6151-49d3-ab87-ee38158e2f67', '优惠券兑换', 1000.00, 1960.00, NULL, '2026-01-22 06:41:44.310439+00'),
+	('19399383-1b22-4e0a-887d-1c0eb9161fbc', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1950.00, '虚拟 ：虚拟，001', '2026-01-22 12:37:23.661208+00'),
+	('0802c4bf-c146-49fa-a588-dddd8aa584c6', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1940.00, '虚拟 ：虚拟，001', '2026-01-23 09:59:27.959485+00'),
+	('6f651c26-561f-46ad-aa3c-98b120f9ad6f', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1930.00, '虚拟 ：虚拟，001 (续费)', '2026-01-23 10:13:19.681289+00'),
+	('a8b711d2-e83e-4fff-a8ea-f529669c6952', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -2.00, 1928.00, '依次：0001', '2026-01-23 10:44:11.054061+00'),
+	('28169873-57ff-4dd0-8f8f-ca871d0d49b4', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1918.00, '虚拟 ：虚拟，001', '2026-01-23 11:11:13.895216+00'),
+	('d07c7902-e9c5-4348-bfa3-ba772e0af0e4', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1908.00, '虚拟 ：虚拟，001 (续费)', '2026-01-23 11:12:41.836558+00'),
+	('a9d95fb9-eafd-4108-ad2d-ad898c5c5e8b', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1898.00, '虚拟 ：虚拟，001', '2026-01-23 11:15:41.013857+00'),
+	('22ff82fd-79a0-4183-b45c-77e5d9ce82a6', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1888.00, '虚拟 ：虚拟，001', '2026-01-23 11:29:55.820326+00'),
+	('7dc905cd-418f-4a33-96f0-88a128d08856', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1878.00, '合租：是谁，合租的', '2026-01-23 11:30:45.330599+00'),
+	('ec5d5cdf-c82b-4f3f-8971-c2f831b73341', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1868.00, '合租：是谁，合租的', '2026-01-23 12:42:45.882946+00'),
+	('520dc467-b264-41aa-92c3-913c8bd03cb5', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1858.00, '虚拟 ：虚拟，001', '2026-01-24 06:22:32.30091+00'),
+	('5740f8fe-a67d-4bf9-8b4b-844caef277d1', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -20.00, 1838.00, '虚拟 ：虚拟，001', '2026-01-24 06:30:03.217471+00'),
+	('d1a4a400-f71d-46de-9a12-5d2212f58f84', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -30.00, 1808.00, '虚拟 ：虚拟，001', '2026-01-24 07:14:01.580209+00'),
+	('0ec4e136-69dc-46f5-9f7c-61bdab993034', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -20.00, 1788.00, '合租：是谁，合租的', '2026-01-24 07:43:09.510701+00'),
+	('29af1a97-afa1-41f3-be31-1c9bdc3b443f', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -4.00, 1784.00, '依次：0001', '2026-01-24 07:44:35.276028+00'),
+	('90d8c14c-9e55-46e7-89e7-aae60a7ca885', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 1774.00, '虚拟 ：虚拟，001', '2026-01-24 08:23:09.901615+00'),
+	('49afd727-3367-4554-a877-d2b6c12bee64', '71b19525-6151-49d3-ab87-ee38158e2f67', '优惠券兑换', 1000.00, 2774.00, NULL, '2026-01-24 08:23:39.142571+00'),
+	('8c008579-fcfe-4535-a0a7-5a450a321b86', '71b19525-6151-49d3-ab87-ee38158e2f67', '优惠券兑换', 1000.00, 3774.00, NULL, '2026-01-24 08:23:45.248245+00'),
+	('56bc3986-4698-4f7c-9e45-a46aac5c8154', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 3764.00, '虚拟 ：虚拟，001', '2026-01-24 08:24:35.525662+00'),
+	('033ffb0e-be03-46ce-892c-54dab5407119', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 3754.00, '虚拟 ：虚拟，001', '2026-01-24 08:38:05.189215+00'),
+	('8980388e-6a83-42e6-9920-575372a1bd5d', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 3744.00, '虚拟 ：虚拟，001', '2026-01-24 09:05:46.505283+00'),
+	('5ef2f10c-d778-4ff0-a589-75cabdc44101', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 3734.00, '虚拟 ：虚拟，001', '2026-01-24 09:47:17.056721+00'),
+	('a357a7cb-0edb-4dd5-a119-7408a73d3d39', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '优惠券兑换', 1000.00, 1000.00, NULL, '2026-01-24 12:43:14.465244+00'),
+	('c3250a68-07e2-4b84-8ceb-02db7addf766', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 'payment', -10.00, 990.00, '虚拟 ：虚拟，001', '2026-01-24 12:43:22.983868+00'),
+	('8f559573-5487-4033-93c2-6b0778424970', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', 'payment', -10.00, 980.00, '虚拟 ：虚拟，001', '2026-01-24 12:57:01.915381+00'),
+	('eb1c5ef9-e250-4258-bef6-48255fd74bfc', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 3724.00, '虚拟 ：虚拟，001', '2026-01-24 17:43:32.35298+00'),
+	('8ea7577e-b0a3-4463-b221-d4bb64233134', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 3714.00, '虚拟 ：虚拟，001', '2026-01-24 17:44:47.651421+00'),
+	('050ad18d-2eeb-4801-8e0e-2231bb650d1c', '71b19525-6151-49d3-ab87-ee38158e2f67', '优惠券兑换', 1000.00, 4714.00, NULL, '2026-01-24 17:49:04.494797+00'),
+	('4c9143a6-1441-413f-8de9-d930681964a1', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4704.00, '虚拟 ：虚拟，001', '2026-01-24 17:56:10.914919+00'),
+	('f5b7c41d-3545-408d-bea5-dd6f317cd0be', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4694.00, '虚拟 ：虚拟，001', '2026-01-25 07:11:20.919591+00'),
+	('506334ab-184f-4495-a68f-6a9c86c535e3', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4684.00, '虚拟 ：虚拟，001', '2026-01-25 07:22:43.873281+00'),
+	('09eae9e6-cb6b-48f9-9824-8971998c2db9', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4674.00, '虚拟 ：虚拟，001', '2026-01-25 07:26:40.327829+00'),
+	('d4c03c8e-7b1c-45d2-938b-a77af1a6a900', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4664.00, '虚拟 ：虚拟，001', '2026-01-25 07:30:04.190416+00'),
+	('db3c47ec-accf-4db1-a1a8-3c080e3671ab', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -5.00, 4659.00, '虚拟 ：虚拟，001', '2026-01-26 03:43:27.003854+00'),
+	('2b800c3b-3707-4f64-a59d-97ea0986329f', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4649.00, '虚拟 ：虚拟，001', '2026-01-26 06:09:52.368365+00'),
+	('811149ff-0bf3-4b1f-8049-ee8b13ffc148', '71b19525-6151-49d3-ab87-ee38158e2f67', 'payment', -10.00, 4639.00, '虚拟 ：虚拟，001', '2026-01-27 11:01:43.510894+00'),
+	('d3614f68-5b18-41b6-9514-125d53d7a8c0', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '微信充值', 2.00, 982.00, '微信支付充值 2 点 (订单号: RECHARGE20260130130244A6Wksy)', '2026-01-30 13:03:05.972+00'),
+	('fa2f0317-dec4-44b4-9208-cbd24f14b02b', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '微信充值', 1.00, 981.00, '微信支付充值 1 点 (订单号: RECHARGE202601301305392nBLEM)', '2026-01-30 13:05:57.926+00'),
+	('334e6d42-ee18-499c-bd0d-90d968066c15', '35b40b94-ca65-44e6-a9ce-0cb8fba42b7e', '微信充值', 1.00, 981.00, '微信支付充值 1 点 (订单号: RECHARGE202601301309055X4zwI)', '2026-01-30 13:09:24.225+00'),
+	('38991bee-8462-4fdd-90e9-c4a75bcef544', '71b19525-6151-49d3-ab87-ee38158e2f67', '微信充值', 1.00, 4640.00, '微信支付充值 1 点 (订单号: RECHARGE20260131063836xWHyEg)', '2026-01-31 06:38:55.528+00');
+
+
+--
+-- Data for Name: wechat_login_sessions; Type: TABLE DATA; Schema: public; Owner: supabase_admin
+--
+
+INSERT INTO "public"."wechat_login_sessions" ("id", "scene_str", "ticket", "openid", "status", "created_at", "expires_at") VALUES
+	('c4f83534-4a34-48d8-bb4a-c1d637d0163e', 'login_ml1zumw9_88867382df5f86ee', 'gQFx7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyRUZ4SnBRYkplV0oxb3VOWmhGY3YAAgTyr31pAwQsAQAA', NULL, 'waiting', '2026-01-31 07:32:02.324902+00', '2026-01-31 07:37:02.307+00');
+
+
+--
+-- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+INSERT INTO "storage"."buckets" ("id", "name", "owner", "created_at", "updated_at", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types", "owner_id", "type") VALUES
+	('tickets', 'tickets', NULL, '2026-01-20 08:55:28.798952+00', '2026-01-20 08:55:28.798952+00', true, false, NULL, NULL, NULL, 'STANDARD');
+
+
+--
+-- Data for Name: buckets_analytics; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: buckets_vectors; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: iceberg_namespaces; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: iceberg_tables; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: objects; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: prefixes; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: s3_multipart_uploads; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: s3_multipart_uploads_parts; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: vector_indexes; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+--
+
+
+
+--
+-- Data for Name: hooks; Type: TABLE DATA; Schema: supabase_functions; Owner: supabase_functions_admin
+--
+
+
+
+--
+-- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
+--
+
+SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 518, true);
+
+
+--
+-- Name: hooks_id_seq; Type: SEQUENCE SET; Schema: supabase_functions; Owner: supabase_functions_admin
+--
+
+SELECT pg_catalog.setval('"supabase_functions"."hooks_id_seq"', 1, false);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+-- \unrestrict u51f5mVD9s5cBqeFKh8hXRPdY4I1PnikadYx5tvtBq6MBuLLhmlT7nT90IFRaax
+
+RESET ALL;

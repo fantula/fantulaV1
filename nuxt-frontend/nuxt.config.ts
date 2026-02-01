@@ -3,8 +3,8 @@ export default defineNuxtConfig({
   // 兼容性日期
   compatibilityDate: '2025-07-01',
 
-  // 开发工具
-  devtools: { enabled: true },
+  // 开发工具 - 只在开发环境启用
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
   // 模块
   modules: [
@@ -94,7 +94,10 @@ export default defineNuxtConfig({
       appName: '凡图拉',
       siteUrl: process.env.SITE_URL || 'https://www.fantula.com',
       // 微信公众号 AppID（前端用于构建 OAuth URL）
-      wechatAppid: process.env.WECHAT_PAY_APPID || 'wxc2042fae927b28b8'
+      wechatAppid: process.env.WECHAT_PAY_APPID || 'wxc2042fae927b28b8',
+      // Supabase 公共配置
+      supabaseUrl: process.env.SUPABASE_URL || '',
+      supabaseAnonKey: process.env.SUPABASE_KEY || ''
     }
   },
 
@@ -127,8 +130,9 @@ export default defineNuxtConfig({
     },
     // 预渲染配置
     prerender: {
-      crawlLinks: true,
-      routes: ['/about-us', '/service', '/faq']
+      crawlLinks: false,
+      routes: ['/about-us', '/service', '/faq'],
+      ignore: ['/pc/**', '/mobile/**']
     }
   },
 

@@ -1,4 +1,4 @@
-import { getAuthToken, EDGE_FUNCTIONS_URL } from './supabase'
+import { getAuthToken, getEdgeFunctionsUrl } from './supabase'
 
 /**
  * 上传进度回调类型
@@ -95,14 +95,15 @@ export async function uploadImageToStorage(
                     resolve({ success: false, error: '网络错误' })
                 }
 
-                xhr.open('POST', `${EDGE_FUNCTIONS_URL}/upload-r2`)
+                const url = typeof getEdgeFunctionsUrl === 'function' ? getEdgeFunctionsUrl() : ''
+                xhr.open('POST', `${url}/upload-r2`)
                 xhr.setRequestHeader('Authorization', `Bearer ${token}`)
                 xhr.send(formData)
             })
         }
 
         // 不需要进度时，使用 fetch（更简洁）
-        const response = await fetch(`${EDGE_FUNCTIONS_URL}/upload-r2`, {
+        const response = await fetch(`${getEdgeFunctionsUrl()}/upload-r2`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`

@@ -316,8 +316,8 @@ const syncFromR2 = async () => {
     const token = await getAdminAuthToken()
     if (!token) return ElMessage.error('请登录管理员账号')
 
-    const { EDGE_FUNCTIONS_URL } = await import('@/utils/supabase')
-    const response = await fetch(`${EDGE_FUNCTIONS_URL}/list-r2`, {
+    const { getEdgeFunctionsUrl } = await import('@/utils/supabase')
+    const response = await fetch(`${getEdgeFunctionsUrl()}/list-r2`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ prefix: 'uploads' })
