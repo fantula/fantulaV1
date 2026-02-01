@@ -3,6 +3,7 @@
  * PC端扫码登录 + 移动端 OAuth 登录
  */
 import type { ApiResponse } from '@/types/api'
+import { getSupabaseClient } from '@/utils/supabase'
 
 const BASE_URL = '/api/wechat'
 
@@ -29,6 +30,7 @@ export interface OAuthResult {
     userId?: string
     email?: string
     nickname?: string
+    avatar?: string
     openid?: string
 }
 
@@ -118,13 +120,20 @@ export const wechatLoginApi = {
         email: string
         code: string
         password?: string
+        nickname?: string
+        avatar?: string
     }): Promise<ApiResponse<{ user: any; session: any }>> {
         try {
+            const client = getSupabaseClient()
+            const { data: { session } } = await client.auth.getSession()
+            const token = session?.access_token
+
             const response = await $fetch<{ success: boolean; data: any; message: string }>(
                 '/api/auth/bind-wechat',
                 {
                     method: 'POST',
                     body: params,
+                    headers: token ? { Authorization: `Bearer ${token}` } : {}
                 }
             )
             return {
@@ -144,15 +153,20 @@ export const wechatLoginApi = {
     },
 
     /**
-     * 已登录用户绑定微信（移动端用）
+     * 已登录用户绑定微信（移动端 wechatCode 或 PC端 bindToken）
      */
-    async bindWechatToAccount(wechatCode: string): Promise<ApiResponse<{ openid: string }>> {
+    async bindWechatToAccount(params: { wechatCode?: string; bindToken?: string }): Promise<ApiResponse<{ openid: string }>> {
         try {
+            const client = getSupabaseClient()
+            const { data: { session } } = await client.auth.getSession()
+            const token = session?.access_token
+
             const response = await $fetch<{ success: boolean; data: any; message: string }>(
                 '/api/auth/bind-wechat',
                 {
                     method: 'POST',
-                    body: { wechatCode },
+                    body: params,
+                    headers: token ? { Authorization: `Bearer ${token}` } : {}
                 }
             )
             return {
@@ -178,6 +192,6 @@ export const wechatLoginApi = {
         const config = useRuntimeConfig()
         const appid = config.public.wechatAppid || ''
         const encodedUri = encodeURIComponent(redirectUri)
-        return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${encodedUri}&response_type=code&scope=snsapi_base&state=${state}#wechat_redirect`
+        return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${encodedUri}&response_type=code&scope=snsapi_userinfo&state=${state}#wechat_redirect`
     },
 }

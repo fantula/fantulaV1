@@ -94,6 +94,8 @@ const bindForm = ref({
   code: '',
   password: '',
   agree: false,
+  nickname: undefined as string | undefined,
+  avatar: undefined as string | undefined,
 })
 
 const codeTimer = ref(0)
@@ -107,6 +109,27 @@ onMounted(async () => {
     state.value = 'error'
     errorMsg.value = '未获取到授权信息'
     return
+  }
+
+  // 场景: 已登录用户绑定微信
+  if (userStore.isLoggedIn) {
+     state.value = 'loading'
+     try {
+        const res = await wechatLoginApi.bindWechatToAccount({ wechatCode: code })
+        if (res.success) {
+            state.value = 'success'
+            setTimeout(() => {
+                router.replace('/mobile/profile/account')
+            }, 1500)
+        } else {
+            state.value = 'error'
+            errorMsg.value = res.msg || '绑定失败'
+        }
+     } catch (e: any) {
+        state.value = 'error'
+        errorMsg.value = e.message || '绑定失败'
+     }
+     return
   }
 
   try {
@@ -123,12 +146,34 @@ onMounted(async () => {
       // 已有绑定账号，直接登录
       state.value = 'success'
       // TODO: 完成登录流程（后端需返回 session）
+      // oauthLogin actually returns session if logged_in?
+      // Check wechat-login.ts oauthLogin return type?
+      // It returns OAuthResult { status, ... }
+      // To actually login, we might need to set token?
+      // But let's assume oauthLogin logic on server sets cookie or returns token?
+      // Wait, oauthLogin on server: returns `token`.
+      // Client `oauthLogin` api wrapper: returns `response.data`.
+      // Check server code?
+      // If server returns token, we need to use it.
+      // But here we are focusing on Binding.
+      
+      // For existing logic (not my task but worth noting): 
+      // If status is logged_in, we probably need to fetch user info or token is already set?
+      // Let's leave existing logic logic alone aside from what I see.
+      
+      // But looking at existing code:
+      // setTimeout(() => { router.replace('/mobile') }, 1500)
+      // It doesn't seem to set userStore?
+      // Maybe oauthLogin endpoint sets HttpOnly cookie?
+      
       setTimeout(() => {
         router.replace('/mobile')
       }, 1500)
     } else if (res.data.status === 'need_bind') {
       // 需要绑定邮箱
       bindToken.value = res.data.bindToken || ''
+      bindForm.value.nickname = res.data.nickname
+      bindForm.value.avatar = res.data.avatar
       state.value = 'bind'
     } else {
       state.value = 'error'
@@ -189,6 +234,8 @@ const onBind = async () => {
       email: bindForm.value.email,
       code: bindForm.value.code,
       password: bindForm.value.password || undefined,
+      nickname: bindForm.value.nickname,
+      avatar: bindForm.value.avatar,
     })
 
     if (res.success && res.data) {

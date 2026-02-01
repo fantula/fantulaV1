@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="dev-login-tool">
+  <div v-if="isDev && show" class="dev-login-tool">
     <div class="tool-header">
       <span>开发调试工具</span>
       <button @click="show = false">×</button>
@@ -13,7 +13,7 @@
       </div>
     </div>
   </div>
-  <button v-else class="dev-tool-trigger" @click="show = true">
+  <button v-else-if="isDev" class="dev-tool-trigger" @click="show = true">
     DEV
   </button>
 </template>
@@ -22,6 +22,7 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/client/user'
 
+const isDev = process.env.NODE_ENV !== 'production'
 const show = ref(true)
 const userStore = useUserStore()
 

@@ -598,10 +598,16 @@ async function pollWechatStatus() {
       // 已登录
       stopWechatPolling()
       wechatState.value = 'logged_in'
-      // TODO: 需要后端返回登录凭证完成前端登录
-      ElMessage.success('登录成功')
-      // 刷新页面以获取登录状态
-      setTimeout(() => location.reload(), 1000)
+      
+      const actionLink = res.data.action_link
+      if (actionLink) {
+         // 使用后端返回的 Magic Link 自动登录
+         window.location.href = actionLink
+      } else {
+         // 降级：如果未返回 Magic Link (旧逻辑)，则提示用户
+         ElMessage.success('登录成功')
+         setTimeout(() => location.reload(), 1000)
+      }
     }
   } catch (err) {
     console.error('Poll error:', err)

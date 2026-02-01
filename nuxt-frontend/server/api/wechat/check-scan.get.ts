@@ -68,9 +68,72 @@ export default defineEventHandler(async (event) => {
                 .single()
 
             if (profile) {
-                // 已绑定用户，生成登录凭证
-                // 这里需要通过 Supabase Auth 生成用户 token
-                // 由于安全限制，我们返回一个标识让前端完成登录
+                // 已绑定用户，生成登录链接 (Magic Link)
+                // 使用 Supabase Admin 生成一次性登录链接
+                const { createClient } = await import('@supabase/supabase-js')
+                const config = useRuntimeConfig()
+                const supabaseAdmin = createClient(
+                    config.public.supabaseUrl as string,
+                    config.supabaseServiceKey as string
+                )
+
+                const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+                    type: 'magiclink',
+                    email: profile.email
+                })
+
+                if (linkError || !linkData.properties?.action_link) {
+                    console.error('[CheckScan] Generate link failed:', linkError)
+                    console.error('[CheckScan] Link data:', JSON.stringify(linkData))
+                    return {
+                        success: true,
+                        data: {
+                            status: 'error',
+                            message: '生成登录链接失败，请尝试其他登录方式',
+                            error_detail: linkError?.message || 'action_link missing'
+                        }
+                    }
+                }
+
+                let actionLink = linkData.properties.action_link
+
+                if (actionLink) {
+                    try {
+                        const publicSupabaseUrl = config.public.supabaseUrl as string
+                        // Handle relative URLs (e.g. /auth/v1/verify...)
+                        if (actionLink.startsWith('/')) {
+                            if (publicSupabaseUrl) {
+                                // Strip trailing slash from base and leading slash from path to avoid double //
+                                const baseUrl = publicSupabaseUrl.replace(/\/$/, '')
+                                const path = actionLink.replace(/^\//, '')
+                                actionLink = `${baseUrl}/${path}`
+                                console.log('[CheckScan] Fixed relative link to:', actionLink)
+                            } else {
+                                console.warn('[CheckScan] Relative link found but publicSupabaseUrl is missing')
+                            }
+                        }
+
+                        let urlObj = new URL(actionLink)
+
+                        // 1. Force fix base URL (Origin) if it's localhost or IP
+                        if (publicSupabaseUrl && (urlObj.hostname.includes('localhost') || urlObj.hostname.includes('127.0.0.1'))) {
+                            const supabaseUrlObj = new URL(publicSupabaseUrl)
+                            urlObj.protocol = supabaseUrlObj.protocol
+                            urlObj.host = supabaseUrlObj.host
+                            console.log('[CheckScan] Fixed localhost base URL to:', urlObj.toString())
+                        }
+
+                        // 2. Force fix redirect_to parameter
+                        const siteUrl = config.public.siteUrl || 'https://www.fantula.com'
+                        urlObj.searchParams.set('redirect_to', siteUrl)
+
+                        actionLink = urlObj.toString()
+                        console.log('[CheckScan] Enforced Action Link:', actionLink)
+                    } catch (e) {
+                        console.warn('[CheckScan] Failed to fix link:', e)
+                    }
+                }
+
                 return {
                     success: true,
                     data: {
@@ -79,6 +142,7 @@ export default defineEventHandler(async (event) => {
                         userId: profile.id,
                         email: profile.email,
                         nickname: profile.nickname,
+                        action_link: actionLink
                     },
                 }
             } else {

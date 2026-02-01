@@ -46,19 +46,41 @@ export default defineEventHandler(async (event) => {
             })
         }
 
+
+        const access_token = result.access_token
         const openid = result.openid
         console.log('[OAuthLogin] Got openid:', openid)
+
+        // 使用 access_token 获取用户头像昵称 (snsapi_userinfo)
+        let userInfo: any = {}
+        try {
+            const userInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openid}&lang=zh_CN`
+            const userRes = await fetch(userInfoUrl)
+            userInfo = await userRes.json()
+            console.log('[OAuthLogin] Got config:', { nickname: userInfo.nickname })
+        } catch (e) {
+            console.warn('[OAuthLogin] Failed to fetch user info:', e)
+        }
 
         // 查询是否已有绑定的用户
         const supabase = getSupabaseServiceClient()
         const { data: profile } = await supabase
             .from('profiles')
-            .select('id, email, nickname')
+            .select('id, email, nickname, avatar')
             .eq('wechat_openid', openid)
             .single()
 
         if (profile) {
-            // 已绑定用户，返回用户信息（前端需要后续处理登录）
+            // 已绑定用户，尝试更新头像昵称 (如果为空)
+            const updates: any = {}
+            if (userInfo.nickname && !profile.nickname) updates.nickname = userInfo.nickname
+            if (userInfo.headimgurl && !profile.avatar) updates.avatar = userInfo.headimgurl
+
+            if (Object.keys(updates).length > 0) {
+                await supabase.from('profiles').update(updates).eq('id', profile.id)
+            }
+
+            // 返回用户信息
             return {
                 success: true,
                 data: {
@@ -66,7 +88,8 @@ export default defineEventHandler(async (event) => {
                     message: '登录成功',
                     userId: profile.id,
                     email: profile.email,
-                    nickname: profile.nickname,
+                    nickname: updates.nickname || profile.nickname,
+                    avatar: updates.avatar || profile.avatar,
                     openid,
                 },
             }
@@ -79,6 +102,8 @@ export default defineEventHandler(async (event) => {
                     status: 'need_bind',
                     message: '请绑定邮箱以完成登录',
                     bindToken,
+                    nickname: userInfo.nickname,
+                    avatar: userInfo.headimgurl
                 },
             }
         }

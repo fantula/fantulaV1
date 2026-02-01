@@ -76,6 +76,23 @@ export default defineEventHandler(async (event) => {
             }
         }
 
+        // CLICK: 自定义菜单点击
+        if (eventType === 'CLICK' && eventKey === 'MENU_CONTACT_SUPPORT') {
+            const now = Math.floor(Date.now() / 1000)
+            const content = `公众号无人值守：需要帮助请联系图拉
+Spotify-cn(长按微信号可复制)
+在线时间：10:00-23:00`
+
+            // 返回文本消息 XML
+            return `<xml>
+              <ToUserName><![CDATA[${fromUser}]]></ToUserName>
+              <FromUserName><![CDATA[${eventData.ToUserName}]]></FromUserName>
+              <CreateTime>${now}</CreateTime>
+              <MsgType><![CDATA[text]]></MsgType>
+              <Content><![CDATA[${content}]]></Content>
+            </xml>`
+        }
+
         // 必须返回 success，否则微信会重试
         return 'success'
     } catch (err: any) {

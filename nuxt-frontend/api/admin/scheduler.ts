@@ -78,5 +78,18 @@ export const adminSchedulerApi = {
         } catch (e: any) {
             return { success: false, error: e.message }
         }
+    },
+
+    /**
+     * Get task list
+     */
+    async getTasks(): Promise<{ success: boolean; tasks: any[]; groups: any }> {
+        try {
+            const res = await fetch(`${SCHEDULER_URL}/tasks`)
+            return await res.json()
+        } catch (e) {
+            console.error('Failed to get tasks:', e)
+            return { success: false, tasks: [], groups: {} }
+        }
     }
 }

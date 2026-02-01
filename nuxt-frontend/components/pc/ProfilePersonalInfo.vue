@@ -99,17 +99,32 @@
               <div class="card-arrow"><el-icon><ArrowRight /></el-icon></div>
             </div>
 
-            <!-- Account Binding -->
+            <!-- Account Binding (Google) -->
             <div class="action-card-lg" @click="showModal('google')">
               <div class="card-bg-icon">🔗</div>
               <div class="card-content">
                 <div class="card-icon-frame purple-frame"><el-icon><Connection /></el-icon></div>
                 <div class="card-text">
-                  <span class="card-title">账号绑定</span>
-                  <span class="card-desc">Google / 微信 快捷登录</span>
+                  <span class="card-title">谷歌绑定</span>
+                  <span class="card-desc">绑定 Google 账号快捷登录</span>
                 </div>
               </div>
-              <div class="card-arrow"><el-icon><ArrowRight /></el-icon></div>
+              <div class="card-arrow" v-if="!user.isGoogleBound"><el-icon><ArrowRight /></el-icon></div>
+              <div class="status-text-mini" v-else>已绑定</div>
+            </div>
+
+            <!-- Account Binding (WeChat) -->
+            <div class="action-card-lg" @click="showModal('wechat')">
+              <div class="card-bg-icon">🔗</div>
+              <div class="card-content">
+                <div class="card-icon-frame green-frame"><el-icon><Connection /></el-icon></div>
+                <div class="card-text">
+                  <span class="card-title">微信绑定</span>
+                  <span class="card-desc">绑定微信扫码快捷登录</span>
+                </div>
+              </div>
+              <div class="card-arrow" v-if="!user.openId"><el-icon><ArrowRight /></el-icon></div>
+              <div class="status-text-mini" v-else>已绑定</div>
             </div>
 
             <!-- Delete Account -->
@@ -136,6 +151,7 @@
     <ChangeNicknameModal v-model:visible="modals.nickname" :current-nickname="user.nickname" @close="closeModal('nickname')" @update="updateNickname" />
     <BindEmailModal v-model:visible="modals.email" :current-email="user.email" @close="closeModal('email')" @confirm="updateEmail" />
     <BindGoogleModal v-model:visible="modals.google" :is-bound="!!user.isGoogleBound" :current-google-email="user.googleEmail" @close="closeModal('google')" @bind="handleGoogleBind" />
+    <BindWechatModal v-model:visible="modals.wechat" :is-bound="!!user.openId" :open-id="user.openId" @close="closeModal('wechat')" @success="handleWechatSuccess" />
     <ChangePasswordModal v-model:visible="modals.password" :email="user.email" @close="closeModal('password')" />
     <DeleteAccountModal v-model:visible="modals.delete" :email="user.email" @close="closeModal('delete')" @confirm="handleDeleteAccount" />
   </div>
@@ -157,6 +173,7 @@ import ChangeAvatarModal from '@/components/pc/modal/ChangeAvatarModal.vue'
 import ChangeNicknameModal from '@/components/pc/modal/ChangeNicknameModal.vue'
 import BindEmailModal from '@/components/pc/modal/BindEmailModal.vue'
 import BindGoogleModal from '@/components/pc/modal/BindGoogleModal.vue'
+import BindWechatModal from '@/components/pc/modal/BindWechatModal.vue'
 import ChangePasswordModal from '@/components/pc/modal/ChangePasswordModal.vue'
 import DeleteAccountModal from '@/components/pc/modal/DeleteAccountModal.vue'
 
@@ -175,6 +192,7 @@ const modals = reactive({
   nickname: false,
   email: false,
   google: false,
+  wechat: false,
   password: false,
   delete: false
 })
@@ -228,6 +246,11 @@ const updateEmail = async (newEmail: string) => {
 
 const handleGoogleBind = () => {
   console.log('Google Bind Action Triggered')
+}
+
+const handleWechatSuccess = async () => {
+  await userStore.fetchUserInfo()
+  closeModal('wechat')
 }
 
 const handleDeleteAccount = async () => {
@@ -549,7 +572,9 @@ const handleCopy = (text: string) => {
 
 .blue-frame { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
 .purple-frame { background: rgba(139, 92, 246, 0.15); color: #A78BFA; }
+.green-frame { background: rgba(16, 185, 129, 0.15); color: #34D399; }
 .red-frame { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+
 
 .card-text { display: flex; flex-direction: column; gap: 4px; }
 .card-title { font-size: 16px; font-weight: 600; color: #F1F5F9; }
@@ -562,6 +587,10 @@ const handleCopy = (text: string) => {
 
 .action-card-lg:hover .card-arrow {
   color: #fff; transform: translateX(6px);
+}
+
+.status-text-mini {
+  font-size: 13px; color: #34D399; font-weight: 600;
 }
 
 /* Responsive */

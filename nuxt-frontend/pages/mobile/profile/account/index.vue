@@ -45,6 +45,15 @@
        <div class="divider"></div>
 
        <!-- Security Section -->
+       <div class="setting-item" @click="handleWechatBindAction">
+          <span class="label">微信绑定</span>
+          <div class="value-wrap">
+             <span class="text-val success" v-if="userStore.user?.openId">已绑定</span>
+             <span class="text-val muted" v-else>未绑定</span>
+             <el-icon class="arrow"><ArrowRight /></el-icon>
+          </div>
+       </div>
+
        <div class="setting-item" @click="activeModal = 'email'">
           <span class="label">邮箱</span>
           <div class="value-wrap">
@@ -113,6 +122,7 @@ import { useUserStore } from '@/stores/client/user'
 import { commonApi } from '@/api/client/common'
 import { clientUserApi } from '@/api/client/user'
 import { authApi } from '@/api/client/auth' // Add missing authApi import if not present
+import { wechatLoginApi } from '@/api/client/wechat-login'
 import { ElMessage } from 'element-plus'
 
 // Modal Imports
@@ -136,6 +146,18 @@ const activeModal = ref<string | null>(null)
 const triggerUpload = () => {
     fileInput.value?.click()
 }
+
+const handleWechatBindAction = () => {
+    if (userStore.user?.openId) {
+        ElMessage.info({ message: '您已绑定微信', offset: 100, customClass: 'mobile-message' })
+        return
+    }
+    // Redirect to WeChat Auth
+    const redirectUri = window.location.origin + '/mobile/wechat-callback'
+    const authUrl = wechatLoginApi.getOAuthUrl(redirectUri, 'bind') // state='bind'
+    window.location.href = authUrl
+}
+
 
 const handleFileChange = async (e: Event) => {
     const files = (e.target as HTMLInputElement).files
@@ -225,6 +247,7 @@ const handleLogout = async () => {
 .value-wrap { display: flex; align-items: center; gap: 8px; }
 .text-val { font-size: 14px; color: #94A3B8; }
 .text-val.muted { color: #64748B; }
+.text-val.success { color: #34D399; }
 .arrow { color: #64748B; font-size: 14px; }
 
 .avatar-img {

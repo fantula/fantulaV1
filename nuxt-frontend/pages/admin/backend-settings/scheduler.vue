@@ -36,26 +36,29 @@
         </div>
         <div class="info-divider"></div>
         <div class="info-item">
-          <div class="label">执行频率</div>
-          <div class="value">每 5 分钟</div>
+          <div class="label">任务组数</div>
+          <div class="value">{{ Object.keys(taskGroups).length }} 组</div>
         </div>
       </div>
     </div>
 
     <!-- 任务控制 -->
-    <AdminActionCard title="手动触发任务" class="mt-4">
-       <div class="tasks-grid">
-          <div class="task-item">
+    <AdminActionCard title="定时任务列表" class="mt-4">
+       <div class="tasks-list">
+          <div v-for="task in taskList" :key="task.key" class="task-item">
              <div class="task-meta">
-               <span class="task-name">清理过期预订单</span>
-               <span class="task-desc">检测并释放超时的待支付订单库存</span>
+               <span class="task-name">{{ task.name }}</span>
+               <span class="task-desc">{{ task.description }}</span>
+               <el-tag size="small" :type="task.group === 'frequent' ? 'warning' : 'info'" class="mt-1">
+                 {{ task.group === 'frequent' ? '每5分钟' : '每日 03:00' }}
+               </el-tag>
              </div>
              <el-button 
                 type="primary" 
                 plain
                 :icon="CaretRight"
-                @click="runTask('cleanup_expired_preorders')"
-                :loading="runningTask === 'cleanup_expired_preorders'"
+                @click="runTask(task.key)"
+                :loading="runningTask === task.key"
              >执行</el-button>
           </div>
        </div>
@@ -68,20 +71,25 @@
         </template>
         
         <el-table :data="logs" style="width: 100%" v-loading="logsLoading" stripe>
-           <el-table-column label="执行时间" width="200">
+           <el-table-column label="执行时间" width="180">
              <template #default="{ row }">
                {{ formatTime(row.executed_at) }}
              </template>
            </el-table-column>
-           <el-table-column prop="task_name" label="任务名称" />
-           <el-table-column label="状态" width="100">
+           <el-table-column prop="task_name" label="任务名称">
+             <template #default="{ row }">
+               {{ getTaskDisplayName(row.task_name) }}
+             </template>
+           </el-table-column>
+           <el-table-column label="状态" width="90">
              <template #default="{ row }">
                <el-tag :type="row.status === 'success' ? 'success' : 'danger'" size="small">
                  {{ row.status === 'success' ? '成功' : '失败' }}
                </el-tag>
              </template>
            </el-table-column>
-           <el-table-column prop="affected_count" label="处理数量" width="120" align="right" />
+           <el-table-column prop="affected_count" label="处理数" width="100" align="right" />
+           <el-table-column prop="error" label="错误信息" show-overflow-tooltip />
         </el-table>
     </AdminActionCard>
   </div>
@@ -99,6 +107,14 @@ import { ElMessage } from 'element-plus'
 import { adminSchedulerApi, type SchedulerStatus, type SchedulerLog } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 
+interface TaskMeta {
+  key: string
+  name: string
+  description: string
+  group: string
+  cron: string
+}
+
 // State
 const status = ref<SchedulerStatus>({
   isRunning: false,
@@ -107,14 +123,37 @@ const status = ref<SchedulerStatus>({
 })
 
 const logs = ref<SchedulerLog[]>([])
+const taskList = ref<TaskMeta[]>([])
+const taskGroups = ref<Record<string, any>>({})
 const actionLoading = ref(false)
 const logsLoading = ref(false)
 const runningTask = ref('')
+
+// Task display name mapping
+const taskDisplayNames: Record<string, string> = {
+  cleanup_expired_preorders: '清理过期预订单',
+  cleanup_unverified_users: '清理未验证用户',
+  cleanup_expired_wechat_sessions: '清理过期微信会话'
+}
+
+const getTaskDisplayName = (key: string) => taskDisplayNames[key] || key
 
 // Methods
 const fetchStatus = async () => {
   const data = await adminSchedulerApi.getStatus()
   status.value = data
+}
+
+const fetchTasks = async () => {
+  try {
+    const res = await adminSchedulerApi.getTasks()
+    if (res.success) {
+      taskList.value = res.tasks
+      taskGroups.value = res.groups
+    }
+  } catch (e) {
+    console.error('Failed to get tasks:', e)
+  }
 }
 
 const fetchLogs = async () => {
@@ -176,6 +215,7 @@ let interval: any = null
 
 onMounted(() => {
   fetchStatus()
+  fetchTasks()
   fetchLogs()
   interval = setInterval(fetchStatus, 30000)
 })
@@ -261,13 +301,16 @@ onUnmounted(() => {
 .mt-4 {
     margin-top: 20px;
 }
+.mt-1 {
+    margin-top: 6px;
+}
 
-.tasks-grid {
+.tasks-list {
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    gap: 12px;
 }
 .task-item {
-    flex: 1;
     background: var(--el-fill-color-light);
     padding: 15px;
     border-radius: 6px;

@@ -189,3 +189,40 @@ export function verifyBindToken(token: string): { valid: boolean; openid?: strin
         return { valid: false, error: 'Token parse error' }
     }
 }
+
+/**
+ * 获取微信用户信息 (包含 UnionID)
+ */
+export async function getWechatUserInfo(openid: string): Promise<{
+    subscribe: number
+    openid: string
+    nickname: string
+    sex: number
+    language: string
+    city: string
+    province: string
+    country: string
+    headimgurl: string
+    subscribe_time: number
+    unionid?: string
+    remark: string
+    groupid: number
+    tagid_list: number[]
+    subscribe_scene: string
+    qr_scene: number
+    qr_scene_str: string
+}> {
+    const accessToken = await getWechatAccessToken()
+    const url = `https://api.weixin.qq.com/cgi-bin/user/info?access_token=${accessToken}&openid=${openid}&lang=zh_CN`
+
+    const response = await fetch(url)
+    const result = await response.json()
+    console.log('[WechatLogin] Raw user info from WeChat:', JSON.stringify(result))
+
+    if (result.errcode) {
+        console.error('[WechatLogin] Get user info failed:', result)
+        throw new Error(result.errmsg || '获取用户信息失败')
+    }
+
+    return result as any
+}

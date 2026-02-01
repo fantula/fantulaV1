@@ -224,7 +224,8 @@ export const authApi = {
       nickName: profile?.nickname || user.email?.split('@')[0],
       price: profile?.balance || 0, // 适配前端余额字段
       balance: profile?.balance || 0, // 兼容性字段，确保 checkout.vue 能读取到
-      avatar: profile?.avatar || ''
+      avatar: profile?.avatar || '',
+      openId: profile?.wechat_openid || '' // 映射微信OpenID
     }
 
     return { code: 0, msg: 'success', data: adaptedUser, success: true }
