@@ -32,6 +32,7 @@ export interface OAuthResult {
     nickname?: string
     avatar?: string
     openid?: string
+    actionLink?: string
 }
 
 export const wechatLoginApi = {

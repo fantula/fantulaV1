@@ -32,8 +32,8 @@ module.exports = {
         {
             name: 'fantula',
             port: 3000,
-            exec_mode: 'cluster',
-            instances: 4,
+            exec_mode: 'fork',
+            instances: 1,
             script: '/opt/fantula/nuxt-frontend/.output/server/index.mjs',
             env: {
                 ...envConfig,

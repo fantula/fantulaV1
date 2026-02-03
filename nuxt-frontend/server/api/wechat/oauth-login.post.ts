@@ -63,8 +63,10 @@ export default defineEventHandler(async (event) => {
         }
 
         // 查询是否已有绑定的用户
-        const supabase = getSupabaseServiceClient()
-        const { data: profile } = await supabase
+        // 关键点：使用 Service Role Client (Admin) 以便生成 Link
+        const supabaseAdmin = getSupabaseServiceClient()
+
+        const { data: profile } = await supabaseAdmin
             .from('profiles')
             .select('id, email, nickname, avatar')
             .eq('wechat_openid', openid)
@@ -77,7 +79,30 @@ export default defineEventHandler(async (event) => {
             if (userInfo.headimgurl && !profile.avatar) updates.avatar = userInfo.headimgurl
 
             if (Object.keys(updates).length > 0) {
-                await supabase.from('profiles').update(updates).eq('id', profile.id)
+                await supabaseAdmin.from('profiles').update(updates).eq('id', profile.id)
+            }
+
+            // 生成 Magic Link 以便通过 Token 登录
+            // 注意：这需要 Supabase 项目启用了 Magic Link 并且 redirect URL 配置正确
+            let actionLink = null
+            if (profile.email) {
+                const config = useRuntimeConfig()
+                const redirectTo = config.public.siteUrl ? `${config.public.siteUrl}/mobile` : 'https://www.fantula.com/mobile'
+                console.log('[OAuthLogin] Magic Link RedirectTo:', redirectTo)
+
+                const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+                    type: 'magiclink',
+                    email: profile.email,
+                    options: {
+                        redirectTo
+                    }
+                })
+
+                if (!linkError && linkData?.properties?.action_link) {
+                    actionLink = linkData.properties.action_link
+                } else {
+                    console.error('[OAuthLogin] Failed to generate magic link:', linkError)
+                }
             }
 
             // 返回用户信息
@@ -91,6 +116,7 @@ export default defineEventHandler(async (event) => {
                     nickname: updates.nickname || profile.nickname,
                     avatar: updates.avatar || profile.avatar,
                     openid,
+                    actionLink // 返回 Magic Link
                 },
             }
         } else {

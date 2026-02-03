@@ -1,5 +1,6 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click="close">
+  <Teleport to="body">
+    <div v-if="visible" class="modal-overlay" @click="close">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
         <h3 class="modal-title">购置额度</h3>
@@ -93,7 +94,8 @@
           </button>
       </div>
     </div>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { User, LoginParams } from '@/types/api'
 import { authApi } from '@/api/client/auth'
-import { orderApi } from '@/api/client/order-legacy'
+import { clientOrderApi as orderApi } from '@/api/client/order' // Use modern API
 import { favoriteApi } from '@/api/client/common'
 import { messageApi } from '@/api/client/message'
 
@@ -223,19 +223,19 @@ export const useUserStore = defineStore('user', () => {
         return
       }
 
-      const response = await orderApi.getOrderList({ page: 1, limit: 50 })
-      if (response.success && response.data && response.data.list) {
+      const response = await orderApi.getOrderList({ limit: 50 })
+      if (response.success && response.data) {
         // 转换API订单格式为前端格式
-        const apiOrders = response.data.list.map((order: any) => ({
-          id: order.orderNo,
-          title: order.goodsName || '未知商品',
-          amount: `¥${order.totalAmount?.toFixed(2) || '0.00'}`,
-          time: order.createTime,
+        const apiOrders = response.data.map((order: any) => ({
+          id: order.order_no, // use order_no as id
+          title: order.product_snapshot?.product_name || '未知商品',
+          amount: `¥${order.total_amount?.toFixed(2) || '0.00'}`,
+          time: order.created_at, // ISO string
           status: getOrderStatus(order.status),
           statusText: getOrderStatusText(order.status),
           statusClass: getOrderStatusClass(order.status),
           payType: '未知',
-          productImage: order.goodsImage
+          productImage: order.product_snapshot?.image
         }))
 
         orders.value = [...apiOrders, ...defaultOrders]
@@ -249,38 +249,80 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // ... (keep getOrderStatus helpers) ...
-  const getOrderStatus = (status: number): OrderItem['status'] => {
+  const getOrderStatus = (status: string | number): OrderItem['status'] => {
+    // Handle both number (legacy) and string (new) status
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return 'pending'
+        case 1: return 'shipped'
+        case 2: return 'shipped'
+        case 3: return 'completed'
+        case 4: return 'completed'
+        case 5: return 'cancelled'
+        default: return 'expired'
+      }
+    }
+
+    // String status from new API
+    // 'pending' | 'pending_delivery' | 'active' | 'expired' | 'completed' | 'refunding' | 'refunded'
     switch (status) {
-      case 0: return 'pending'
-      case 1: return 'shipped'
-      case 2: return 'shipped'
-      case 3: return 'completed'
-      case 4: return 'completed'
-      case 5: return 'cancelled'
+      case 'pending': return 'pending'
+      case 'pending_delivery': return 'shipped' // or pending?
+      case 'active': return 'completed' // active subscription is completed order
+      case 'completed': return 'completed'
+      case 'expired': return 'expired'
+      case 'refunding': return 'cancelled'
+      case 'refunded': return 'cancelled'
       default: return 'expired'
     }
   }
 
-  const getOrderStatusText = (status: number): string => {
+  const getOrderStatusText = (status: string | number): string => {
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return '待支付'
+        case 1: return '已发货'
+        case 2: return '已发货'
+        case 3: return '已完成'
+        case 4: return '已完成'
+        case 5: return '已取消'
+        default: return '已过期'
+      }
+    }
+
     switch (status) {
-      case 0: return '待支付'
-      case 1: return '已发货'
-      case 2: return '已发货'
-      case 3: return '已完成'
-      case 4: return '已完成'
-      case 5: return '已取消'
-      default: return '已过期'
+      case 'pending': return '待支付'
+      case 'pending_delivery': return '待发货'
+      case 'active': return '使用中'
+      case 'completed': return '已完成'
+      case 'expired': return '已过期'
+      case 'refunding': return '退款中'
+      case 'refunded': return '已退款'
+      default: return '未知'
     }
   }
 
-  const getOrderStatusClass = (status: number): string => {
+  const getOrderStatusClass = (status: string | number): string => {
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return 'pending'
+        case 1: return 'shipped'
+        case 2: return 'shipped'
+        case 3: return 'completed'
+        case 4: return 'completed'
+        case 5: return 'cancelled'
+        default: return 'expired'
+      }
+    }
+
     switch (status) {
-      case 0: return 'pending'
-      case 1: return 'shipped'
-      case 2: return 'shipped'
-      case 3: return 'completed'
-      case 4: return 'completed'
-      case 5: return 'cancelled'
+      case 'pending': return 'pending'
+      case 'pending_delivery': return 'shipped'
+      case 'active': return 'completed'
+      case 'completed': return 'completed'
+      case 'expired': return 'expired'
+      case 'refunding': return 'cancelled'
+      case 'refunded': return 'cancelled'
       default: return 'expired'
     }
   }

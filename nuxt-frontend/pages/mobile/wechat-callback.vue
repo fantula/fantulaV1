@@ -166,9 +166,19 @@ onMounted(async () => {
       // It doesn't seem to set userStore?
       // Maybe oauthLogin endpoint sets HttpOnly cookie?
       
-      setTimeout(() => {
-        router.replace('/mobile')
-      }, 1500)
+      state.value = 'success'
+      
+      // 如果后端返回了 Magic Link，使用它进行自动登录跳转
+      if (res.data.actionLink) {
+          console.log('Redirecting to Magic Link...')
+          window.location.href = res.data.actionLink
+      } else {
+          // 降级：如果没有 Link (罕见)，尝试直接跳回首页 (依赖 Session/Cookie?)
+          // 但通常不会成功，除非 OAuthLogin API 设置了 Cookie
+           setTimeout(() => {
+            router.replace('/mobile')
+          }, 1500)
+      }
     } else if (res.data.status === 'need_bind') {
       // 需要绑定邮箱
       bindToken.value = res.data.bindToken || ''

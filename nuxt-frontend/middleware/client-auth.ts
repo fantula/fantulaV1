@@ -19,7 +19,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         // PC端通常弹窗，但在路由守卫里很难弹窗。
         // 如果是 Mobile，跳登录页
         if (to.path.startsWith('/mobile/')) {
-            return navigateTo('/mobile/login')
+            return navigateTo('/mobile?login=1')
         }
         // PC端跳首页
         return navigateTo('/?login=1')

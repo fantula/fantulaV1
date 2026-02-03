@@ -271,6 +271,11 @@ onMounted(async () => {
             openDetail(route.query.open as string)
             router.replace({ query: { ...route.query, open: undefined } })
         }
+        
+        if (route.query.login) {
+            showLoginSheet.value = true
+            router.replace({ query: { ...route.query, login: undefined } })
+        }
     } finally {
         setTimeout(() => stopLoading(), 500)
     }

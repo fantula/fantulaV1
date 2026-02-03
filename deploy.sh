@@ -37,6 +37,8 @@ ssh "$SERVER_USER@$SERVER_IP" "bash -s" << EOF
      echo "复制 .env 到 Scheduler..."
      cp ../../nuxt-frontend/.env .
   fi
+  # 清理可能存在的旧服务以防端口冲突
+  pm2 delete fantula 2>/dev/null || true
   pm2 restart fantula-scheduler || pm2 start index.js --name fantula-scheduler
 
   # 2. 部署 Frontend
@@ -45,7 +47,14 @@ ssh "$SERVER_USER@$SERVER_IP" "bash -s" << EOF
   # 只在 package.json 变动时才需要 npm install，这里假设通常不需要，或者您可以手动运行
   # npm install
   npm run build
-  pm2 restart fantula-frontend || pm2 start .output/server/index.mjs --name fantula-frontend
+  
+  if [ -f ecosystem.config.js ]; then
+     echo "Starting with ecosystem.config.js..."
+     pm2 restart ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+  else
+     echo "Starting directly (No ecosystem config found)..."
+     pm2 restart fantula-frontend || pm2 start .output/server/index.mjs --name fantula-frontend
+  fi
 
   echo "✅ 部署完成!"
 EOF

@@ -1,5 +1,6 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click.self="handleClose">
+  <Teleport to="body">
+    <div v-if="visible" class="modal-overlay" @click.self="handleClose">
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">{{ step === 1 && currentEmail ? '验证原邮箱' : '绑定新邮箱' }}</h3>
@@ -82,7 +83,8 @@
          </template>
       </div>
     </div>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -266,7 +268,7 @@ const handleConfirm = async () => {
 <style scoped>
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-  z-index: 100; display: flex; align-items: center; justify-content: center;
+  z-index: 2000; display: flex; align-items: center; justify-content: center;
   padding: 20px;
 }
 

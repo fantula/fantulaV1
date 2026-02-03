@@ -1,5 +1,6 @@
 <template>
-  <div class="login-sheet-wrapper">
+  <Teleport to="body">
+    <div class="login-sheet-wrapper">
     <!-- Overlay -->
     <transition name="fade">
       <div v-if="visible" class="sheet-overlay" @click="close"></div>
@@ -15,7 +16,7 @@
 
          <!-- Header -->
          <div class="sheet-header">
-            <div class="h-title">Welcome Back</div>
+            <div class="h-title">Welcome Back (v2)</div>
             <div class="h-sub">登录您的凡图拉账户</div>
             
             <!-- Tabs -->
@@ -134,7 +135,8 @@
          </div>
       </div>
     </transition>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -276,17 +278,17 @@ const onWechatLogin = () => {
 
 <style scoped>
 .login-sheet-wrapper {
-   position: relative; z-index: 3000;
+   position: relative; z-index: 10000;
 }
 .sheet-overlay {
    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-   z-index: 3000;
+   z-index: 10000;
 }
 .sheet-panel {
    position: fixed; bottom: 0; left: 0; right: 0;
    background: #0F172A;
    border-radius: 24px 24px 0 0;
-   z-index: 3001;
+   z-index: 10001;
    padding-bottom: max(20px, env(safe-area-inset-bottom));
    max-height: 90vh; overflow-y: auto;
    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
