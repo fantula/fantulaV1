@@ -456,13 +456,13 @@ export const authApi = {
     const { data, error } = await client.rpc('check_email_available', { email_input: email })
 
     if (error) {
-      return { code: 500, msg: error.message, success: false }
+      return { code: 500, msg: error.message, data: false, success: false }
     }
     return {
       code: 0,
       msg: data ? '邮箱可用' : '邮箱已被占用',
       data: data as boolean,
-      success: data as boolean
+      success: true // Fix: Always return true for success so UI can handle the 'false' data (occupied) case
     }
   }
-} 
+}

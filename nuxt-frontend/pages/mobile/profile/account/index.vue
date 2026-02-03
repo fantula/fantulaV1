@@ -204,9 +204,14 @@ const handleSuccess = (msg: string) => {
 
 const handleLogout = async () => {
     if (confirm('确定要退出登录吗？')) {
-        await authApi.logout()
-        userStore.logout()
-        router.push('/mobile')
+        try {
+            await authApi.logout()
+        } catch (e) {
+            console.error('Logout API failed:', e)
+        } finally {
+            userStore.logout()
+            router.replace('/mobile')
+        }
     }
 }
 </script>

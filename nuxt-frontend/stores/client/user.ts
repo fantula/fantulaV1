@@ -9,7 +9,8 @@ import { messageApi } from '@/api/client/message'
 
 // 定义收藏商品类型
 interface FavoriteItem {
-  id: number
+  id: number | string // Allow string | number for product ID
+  favId?: string // Real favorite ID from Supabase
   name: string
   image: string
   desc?: string
@@ -136,23 +137,24 @@ export const useUserStore = defineStore('user', () => {
 
   // 收藏相关API实现
   const loadFavorites = async () => {
-    const userId = user.value?.id
-    if (!userId) return
+    if (!token.value) return // No token, no favorites
     try {
-      const res = await favoriteApi.getFavorites(userId)
-      if (res.code === 0 && res.data && Array.isArray(res.data.list)) {
-        favorites.value = res.data.list.map((item: any) => ({
-          id: item.goodsId,
-          name: item.name || '',
-          image: item.image || '',
-          desc: item.desc || '',
-          region: item.region || '',
-          quality: item.quality || '',
-          devices: item.devices || '',
-          download: item.download || '',
-          prices: item.prices || [],
-          hot: item.hot,
-          addTime: item.addTime || ''
+      // Use modern API
+      const res = await favoriteApi.getFavoritesData()
+      if (res.success && res.data && Array.isArray(res.data.favorites)) {
+        favorites.value = res.data.favorites.map((item: any) => ({
+          favId: item.id, // Real Supabase ID (UUID)
+          id: item.productId, // Display ID (Product ID) to match frontend usage
+          name: item.productName,
+          image: item.productImage,
+          desc: '',
+          region: '',
+          quality: '',
+          devices: '',
+          download: '',
+          prices: [],
+          hot: false,
+          addTime: item.createdAt
         }))
       }
     } catch (e) {
@@ -162,11 +164,10 @@ export const useUserStore = defineStore('user', () => {
 
   // ... (keep addToFavorites, removeFromFavorites, checkIsFavorite) ...
   const addToFavorites = async (item: Omit<FavoriteItem, 'addTime'>) => {
-    // ... code ...
-    const userId = user.value?.id
-    if (!userId) return { success: false, message: '未登录' }
+    if (!token.value) return { success: false, message: '未登录' }
     try {
-      const res = await favoriteApi.addToFavorites(userId, item.id)
+      // item.id is productId
+      const res = await favoriteApi.addFavorite(String(item.id))
       if (res.code === 0) {
         await loadFavorites()
         return { success: true, message: '添加收藏成功' }
@@ -177,12 +178,16 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  const removeFromFavorites = async (itemId: number) => {
-    // ... code ...
-    const userId = user.value?.id
-    if (!userId) return { success: false, message: '未登录' }
+  const removeFromFavorites = async (itemId: number | string) => {
+    if (!token.value) return { success: false, message: '未登录' }
     try {
-      const res = await favoriteApi.removeFromFavorites(userId, itemId)
+      // Find the favorite item by productId (which is mapped to id)
+      const fav = favorites.value.find((f: any) => f.id == itemId)
+      if (!fav || !fav.favId) {
+        return { success: false, message: '未找到该收藏记录' }
+      }
+
+      const res = await favoriteApi.removeFavorite(String(fav.favId))
       if (res.code === 0) {
         await loadFavorites()
         return { success: true, message: '取消收藏成功' }
@@ -439,6 +444,10 @@ export const useUserStore = defineStore('user', () => {
       const response = await authApi.getUserInfo()
       if (response.success) {
         user.value = response.data
+        // Save to localStorage
+        if (process.client) {
+          localStorage.setItem('user_info', JSON.stringify(user.value))
+        }
         // 获取用户信息成功后，顺便获取未读消息数
         fetchUnreadMessageCount()
       }
@@ -458,6 +467,9 @@ export const useUserStore = defineStore('user', () => {
       if (response.success) {
         token.value = response.data.token
         user.value = response.data.user
+        if (process.client) {
+          localStorage.setItem('user_info', JSON.stringify(user.value))
+        }
         loadFavorites()
         loadOrders()
         fetchUnreadMessageCount() // 登录成功获取未读消息
@@ -502,6 +514,9 @@ export const useUserStore = defineStore('user', () => {
     } finally {
       token.value = null
       user.value = null
+      if (process.client) {
+        localStorage.removeItem('user_info')
+      }
       favorites.value = []
       orders.value = [...defaultOrders]
       unreadMessageCount.value = 0

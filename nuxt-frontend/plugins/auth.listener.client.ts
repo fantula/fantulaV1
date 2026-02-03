@@ -16,10 +16,9 @@ export default defineNuxtPlugin((nuxtApp) => {
                 tokenCookie.value = session.access_token
 
                 // 刷新用户信息到 Store
-                // 延迟一点以确保 Supabase 内部状态已更新
-                setTimeout(async () => {
+                if (!userStore.isLoggedIn || !userStore.userInfo) {
                     await userStore.fetchUserInfo()
-                }, 100)
+                }
             }
         } else if (event === 'SIGNED_OUT') {
             const tokenCookie = useCookie('token')

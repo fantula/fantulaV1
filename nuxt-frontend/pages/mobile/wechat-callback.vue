@@ -79,6 +79,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
@@ -204,14 +205,46 @@ const sendCode = async () => {
 
   loading.value = true
   try {
+    // 1. Check if email exists (Pre-flight check)
+    const checkRes = await authApi.checkEmailAvailable(bindForm.value.email)
+    if (!checkRes.success) {
+       errorMsg.value = checkRes.msg || '检查邮箱失败'
+       return
+    }
+
+    const emailAvailable = checkRes.data
+    
+    // If email is taken (available = false), warn user about merging
+    if (!emailAvailable) {
+       try {
+         await ElMessageBox.confirm(
+           '该邮箱已被其他账号注册。继续绑定将把此微信号关联到该现有账号，并共享权益。',
+           '账号合并提示',
+           {
+             confirmButtonText: '确认关联',
+             cancelButtonText: '更换邮箱',
+             type: 'warning',
+             customClass: 'mobile-msg-box' // Optional class for mobile styling
+           }
+         )
+       } catch {
+         // User cancelled
+         return
+       }
+    }
+
+    // 2. Send Code
     const res = await authApi.getEmailCode(bindForm.value.email)
     if (res.success) {
       startTimer(60)
+      ElMessage.success('验证码已发送')
+      errorMsg.value = '' // Clear error if any
     } else {
       errorMsg.value = res.msg || '发送失败'
     }
-  } catch (err) {
-    errorMsg.value = '发送失败'
+  } catch (err: any) {
+    console.error(err)
+    errorMsg.value = '发送失败: ' + (err.message || '网络错误')
   } finally {
     loading.value = false
   }
