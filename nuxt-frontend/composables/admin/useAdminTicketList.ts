@@ -66,7 +66,10 @@ export function useAdminTicketList() {
                 { confirmButtonText: '确定清理', cancelButtonText: '取消', type: 'warning' }
             )
 
-            const res = await adminTicketApi.cleanupImages(7)
+            const session = useSupabaseSession()
+            const token = session.value?.access_token
+
+            const res = await adminTicketApi.cleanupImages(7, token)
             if (res.success) {
                 ElMessage.success(`清理完成，共删除了 ${res.count} 个文件`)
             } else {

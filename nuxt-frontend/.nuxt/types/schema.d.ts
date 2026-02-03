@@ -43,6 +43,14 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
    siteUrl: string,
 
    wechatAppid: string,
+
+   supabaseUrl: string,
+
+   supabaseAnonKey: string,
+
+   supabaseServiceKey: string,
+
+   schedulerUrl: string,
   }
 declare module '@nuxt/schema' {
   interface ModuleDependencies {

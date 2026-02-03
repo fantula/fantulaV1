@@ -2,6 +2,7 @@
 
 > **定位**: 解析后台安全体系、登录流程与权限控制模型。
 > **适用**: 架构师、后端开发者、安全审计。
+> **最后更新**: 2026-02-03
 
 ---
 
@@ -11,13 +12,21 @@
 
 | 层级 | 措施 | 职责 | 文件 |
 |------|------|------|------|
-| **L1 登录层** | Supabase Auth + Admin Table | 验证身份合法性 | `stores/admin/auth.ts` |
-| **L2 路由层** | Middleware 拦截 | 拦截未登录/无权限访问 | `middleware/admin-auth.global.ts` |
+| **L1 登录层** | Supabase Auth + Admin Table | 验证身份合法性 | `stores/admin/admin.ts` |
+| **L2 路由层** | Middleware 拦截 | 拦截未登录/无权限访问 | `middleware/mgmt-auth.ts` |
 | **L3 数据层** | Service Role | 信任后端，绕过 RLS | `utils/supabase-admin.ts` |
 
 ---
 
 ## 二、 登录流程详情 (Login Flow)
+
+### 2.1 唯一登录入口
+
+**后台系统只有一个登录页面**: `pages/admin/login.vue`
+
+所有未认证的后台访问都会被中间件重定向到此页面。
+
+### 2.2 登录流程
 
 1.  **提交凭证**: 用户在 `pages/admin/login.vue` 输入邮箱/密码或验证码。
 2.  **Auth 验证**: 调用 Supabase `signInWithPassword` 或 `signInWithOtp`。
@@ -25,9 +34,16 @@
     *   登录成功后，**立即** 查询 `public.admin_users` 表。
     *   如果表中不存在该 `id` (即该 Auth 用户不是管理员)，**立即登出** 并报错。
 4.  **权限加载**:
-    *   根据 `admin_users.department_id` 查询 `departments` 表。
+    *   根据 `admin_users.department_id` 查询 `admin_departments` 表。
     *   获取 `permissions` (JSON 数组) 并存储到 Pinia `useAdminStore`。
 5.  **会话保持**: Supabase 自动处理 Token 刷新，Middleware 负责检查 Token 有效性。
+
+### 2.3 登录方式
+
+| 方式 | 函数 | 说明 |
+|------|------|------|
+| 密码登录 | `adminStore.login(email, password)` | 标准邮箱+密码认证 |
+| OTP登录 | `adminStore.sendOtp(email)` + `adminStore.loginWithOtp(email, code)` | 邮箱验证码认证 |
 
 ---
 
@@ -41,23 +57,37 @@
 *   **Permission (权限)**: 对应前端路由路径 (如 `/admin/orders`)。
 
 ### 3.2 权限判定逻辑
-*   **超级管理员**: `department.is_super_admin = true`，拥有 `*` 权限，跳过检查。
+*   **超级管理员**: `department.name` 包含 "超级" 或 `permissions` 包含 `*`，拥有全部权限。
 *   **普通管理员**: 检查 `useAdminStore.permissions` 数组是否包含当前路由路径。
-    *   例如访问 `/admin/orders`，检查数组中是否有 `'orders'` 或完整路径。
+    *   支持子路由匹配：访问 `/admin/users/accounts` 时，会检查 `/admin/users` 权限。
 
 ### 3.3 路由守卫实现
-`middleware/admin-auth.global.ts` 逻辑伪代码：
+
+`middleware/mgmt-auth.ts` 核心逻辑：
 
 ```typescript
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (!isAdminRoute(to)) return // 仅拦截 admin
+  // 仅在客户端执行，防止 SSR 问题
+  if (process.server) return
 
-  // 1. 检查登录
-  if (!user.value) return navigateTo('/admin/login')
+  // 登录页无需验证
+  if (to.path === '/admin/login') return
 
-  // 2. 检查权限 (非超级管理员)
+  const adminStore = useAdminStore()
+
+  // 如果尚未初始化，执行初始化
+  if (!adminStore.isInitialized) {
+    await adminStore.init()
+  }
+
+  // 未登录跳转到登录页
+  if (!adminStore.isLoggedIn) {
+    return navigateTo('/admin/login')
+  }
+
+  // 细粒度权限检查
   if (!adminStore.hasPermission(to.path)) {
-    return navigateTo('/admin') // 无权，踢回仪表盘
+    return navigateTo('/admin')  // 无权限跳转到仪表盘
   }
 })
 ```
@@ -69,20 +99,53 @@ export default defineNuxtRouteMiddleware(async (to) => {
 ### `admin_users`
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `id` | uuid | PK, FK -> auth.users.id |
+| `id` | uuid | PK |
+| `auth_user_id` | uuid | FK -> auth.users.id |
 | `name` | text | 显示名称 |
-| `department_id` | uuid | FK -> departments.id |
-| `status` | text | active / inactive |
+| `email` | text | 绑定邮箱 |
+| `department_id` | uuid | FK -> admin_departments.id |
+| `status` | text | enabled / disabled |
 
-### `departments`
+### `admin_departments`
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `name` | text | 部门名称 (客服组, 运营组) |
-| `permissions` | jsonb | 允许访问的路由列表 `['order', 'user']` |
-| `is_super_admin` | bool | 是否超管 |
+| `id` | uuid | PK |
+| `name` | text | 部门名称 (客服组, 运营组, 超级管理员) |
+| `permissions` | jsonb | 允许访问的路由列表 `['/admin/orders', '/admin/users']` |
 
 ---
 
 ## 五、 最佳实践
+
+### ✅ 正确做法
 *   **不要在页面再次验证**: 相信 Middleware。页面加载时 `adminStore.adminInfo` 必然存在。
-*   **新增页面**: 必须同步在【用户管理 -> 部门管理】中添加新的权限配置项，否则普通管理员无法访问。
+*   **新增页面**: 必须同步在【用户管理 -> 部门管理】中添加新的权限配置项。
+*   **使用统一的 Store**: 所有认证相关操作必须通过 `useAdminStore()`。
+
+### ❌ 禁止事项
+*   ❌ 禁止在页面组件中直接调用 Supabase Auth API
+*   ❌ 禁止创建第二个登录页面
+*   ❌ 禁止绕过中间件进行权限检查
+
+---
+
+## 六、 Store API 参考
+
+```typescript
+const adminStore = useAdminStore()
+
+// 状态
+adminStore.isLoggedIn      // 是否已登录
+adminStore.isInitialized   // 是否已初始化
+adminStore.adminUser       // 基础用户信息
+adminStore.adminInfo       // 完整管理员信息（含部门）
+adminStore.permissions     // 权限列表
+
+// 方法
+adminStore.init()                          // 初始化（检查登录状态）
+adminStore.login(email, password)          // 密码登录
+adminStore.sendOtp(email)                  // 发送验证码
+adminStore.loginWithOtp(email, code)       // OTP登录
+adminStore.logout()                        // 登出
+adminStore.hasPermission(path)             // 检查权限
+```

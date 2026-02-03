@@ -649,13 +649,17 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
-    "apiBase": "http://127.0.0.1:54321",
+    "apiBase": "https://vjvmzcodbeijnembjiig.supabase.co",
     "appName": "凡图拉",
     "siteUrl": "https://www.fantula.com",
-    "wechatAppid": "wxc2042fae927b28b8"
+    "wechatAppid": "wxc2042fae927b28b8",
+    "supabaseUrl": "https://vjvmzcodbeijnembjiig.supabase.co",
+    "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MzE3NTgsImV4cCI6MjA4NTQwNzc1OH0.WU0WCXiOh2Orinc8BSXOg50mFKKp7Ru0tFNxj7YAgFc",
+    "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTgzMTc1OCwiZXhwIjoyMDg1NDA3NzU4fQ.5jpTpQ6OLjXiqWxGYN51E_Q5YKEbaKzq3ksbQJ9ouJY",
+    "schedulerUrl": "http://localhost:3001"
   },
   "apiSecret": "",
-  "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+  "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MzE3NTgsImV4cCI6MjA4NTQwNzc1OH0.WU0WCXiOh2Orinc8BSXOg50mFKKp7Ru0tFNxj7YAgFc",
   "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTgzMTc1OCwiZXhwIjoyMDg1NDA3NzU4fQ.5jpTpQ6OLjXiqWxGYN51E_Q5YKEbaKzq3ksbQJ9ouJY",
   "wechatPayMchid": "1716074381",
   "wechatPayAppid": "wxc2042fae927b28b8",
@@ -714,9 +718,9 @@ getContext("nitro-app", {
   AsyncLocalStorage: void 0
 });
 
-const config = useRuntimeConfig();
+const config$1 = useRuntimeConfig();
 const _routeRulesMatcher = toRouteMatcher(
-  createRouter({ routes: config.nitro.routeRules })
+  createRouter({ routes: config$1.nitro.routeRules })
 );
 function createRouteRulesHandler(ctx) {
   return eventHandler((event) => {
@@ -2610,6 +2614,7 @@ const _lazy_fyb9pU = () => Promise.resolve().then(function () { return nativePay
 const _lazy_Oqk9lo = () => Promise.resolve().then(function () { return notify_post$1; });
 const _lazy_6k__qZ = () => Promise.resolve().then(function () { return oauthLogin_post$1; });
 const _lazy_pbVeyW = () => Promise.resolve().then(function () { return queryOrder_post$1; });
+const _lazy_x3llcf = () => Promise.resolve().then(function () { return updateMenu_get$1; });
 const _lazy_8EFkQE = () => Promise.resolve().then(function () { return renderer$1; });
 
 const handlers = [
@@ -2625,6 +2630,7 @@ const handlers = [
   { route: '/api/wechat/notify', handler: _lazy_Oqk9lo, lazy: true, middleware: false, method: "post" },
   { route: '/api/wechat/oauth-login', handler: _lazy_6k__qZ, lazy: true, middleware: false, method: "post" },
   { route: '/api/wechat/query-order', handler: _lazy_pbVeyW, lazy: true, middleware: false, method: "post" },
+  { route: '/api/wechat/update-menu', handler: _lazy_x3llcf, lazy: true, middleware: false, method: "get" },
   { route: '/__nuxt_error', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
   { route: '/__nuxt_island/**', handler: _SxA8c9, lazy: false, middleware: false, method: undefined },
   { route: '/**', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined }
@@ -3219,14 +3225,32 @@ function verifyBindToken(token) {
     return { valid: false, error: "Token parse error" };
   }
 }
+async function getWechatUserInfo(openid) {
+  const accessToken = await getWechatAccessToken();
+  const url = `https://api.weixin.qq.com/cgi-bin/user/info?access_token=${accessToken}&openid=${openid}&lang=zh_CN`;
+  const response = await fetch(url);
+  const result = await response.json();
+  console.log("[WechatLogin] Raw user info from WeChat:", JSON.stringify(result));
+  if (result.errcode) {
+    console.error("[WechatLogin] Get user info failed:", result);
+    throw new Error(result.errmsg || "\u83B7\u53D6\u7528\u6237\u4FE1\u606F\u5931\u8D25");
+  }
+  return result;
+}
 
 const bindWechat_post = defineEventHandler(async (event) => {
+  var _a;
   try {
     const body = await readBody(event);
     const supabase = getSupabaseServiceClient();
     const currentUser = await getCurrentUser(event);
-    if (currentUser && body.wechatCode) {
-      return await bindWechatToExistingUser(supabase, currentUser.id, body.wechatCode);
+    if (currentUser) {
+      if (body.wechatCode) {
+        return await bindWechatToExistingUser(supabase, currentUser.id, body.wechatCode);
+      }
+      if (body.bindToken) {
+        return await bindWechatToExistingUserByToken(supabase, currentUser.id, body.bindToken);
+      }
     }
     if (!body.bindToken) {
       throw createError({
@@ -3241,7 +3265,14 @@ const bindWechat_post = defineEventHandler(async (event) => {
         message: tokenResult.error || "\u7ED1\u5B9A\u51ED\u8BC1\u65E0\u6548\u6216\u5DF2\u8FC7\u671F"
       });
     }
-    const openid = tokenResult.openid;
+    let openid = tokenResult.openid;
+    let unionid;
+    try {
+      const userInfo = await getWechatUserInfo(openid);
+      if (userInfo.unionid) unionid = userInfo.unionid;
+    } catch (e) {
+      console.warn("[BindWechat] Failed to fetch user info:", e);
+    }
     if (!body.email) {
       throw createError({
         statusCode: 400,
@@ -3289,15 +3320,42 @@ const bindWechat_post = defineEventHandler(async (event) => {
         password: body.password
       });
     }
-    const { error: updateError } = await supabase.from("profiles").update({
-      wechat_openid: openid
-    }).eq("id", authData.user.id);
-    if (updateError) {
-      console.error("[BindWechat] Update profile failed:", updateError);
-      throw createError({
-        statusCode: 500,
-        message: "\u7ED1\u5B9A\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
+    const { data: userProfile } = await supabase.from("profiles").select("id").eq("id", authData.user.id).single();
+    if (!userProfile) {
+      console.log("[BindWechat] Profile not found, creating manually for user:", authData.user.id);
+      const uid = Math.floor(1e7 + Math.random() * 9e7).toString();
+      const { error: insertError } = await supabase.from("profiles").insert({
+        id: authData.user.id,
+        uid,
+        email: authData.user.email,
+        nickname: body.nickname || ((_a = authData.user.email) == null ? void 0 : _a.split("@")[0]) || "User",
+        avatar: body.avatar || "",
+        status: "active",
+        balance: 0,
+        wechat_openid: openid,
+        wechat_unionid: unionid
       });
+      if (insertError && !insertError.message.includes("duplicate")) {
+        console.error("[BindWechat] Insert profile failed:", insertError);
+        throw createError({
+          statusCode: 500,
+          message: "\u521B\u5EFA\u8D26\u6237\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
+        });
+      }
+    } else {
+      const { error: updateError } = await supabase.from("profiles").update({
+        wechat_openid: openid,
+        wechat_unionid: unionid,
+        nickname: body.nickname || void 0,
+        avatar: body.avatar || void 0
+      }).eq("id", authData.user.id);
+      if (updateError) {
+        console.error("[BindWechat] Update profile failed:", updateError);
+        throw createError({
+          statusCode: 500,
+          message: "\u7ED1\u5B9A\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
+        });
+      }
     }
     console.log("[BindWechat] Successfully bound:", { userId: authData.user.id, openid });
     return {
@@ -3328,15 +3386,47 @@ async function bindWechatToExistingUser(supabase, userId, wechatCode) {
       message: result.errmsg || "\u5FAE\u4FE1\u6388\u6743\u5931\u8D25"
     });
   }
-  const { data: existingProfile } = await supabase.from("profiles").select("id").eq("wechat_openid", result.openid).single();
-  if (existingProfile && existingProfile.id !== userId) {
+  return await performBinding(supabase, userId, result.openid, result.unionid);
+}
+async function bindWechatToExistingUserByToken(supabase, userId, bindToken) {
+  const tokenResult = verifyBindToken(bindToken);
+  if (!tokenResult.valid || !tokenResult.openid) {
+    throw createError({
+      statusCode: 400,
+      message: tokenResult.error || "\u7ED1\u5B9A\u51ED\u8BC1\u65E0\u6548\u6216\u5DF2\u8FC7\u671F"
+    });
+  }
+  let unionid;
+  try {
+    const userInfo = await getWechatUserInfo(tokenResult.openid);
+    if (userInfo.unionid) unionid = userInfo.unionid;
+  } catch (e) {
+    console.warn("[BindWechat] Failed to fetch unionid:", e);
+  }
+  return await performBinding(supabase, userId, tokenResult.openid, unionid);
+}
+async function performBinding(supabase, userId, openid, unionid) {
+  const { data: existingProfile } = await supabase.from("profiles").select("id, wechat_unionid").eq("wechat_openid", openid).single();
+  if (existingProfile) {
+    if (existingProfile.id === userId) {
+      if (unionid && !existingProfile.wechat_unionid) {
+        await supabase.from("profiles").update({ wechat_unionid: unionid }).eq("id", userId);
+        console.log("[BindWechat] Backfilled missing unionid for user:", userId);
+      }
+      return {
+        success: true,
+        message: "\u60A8\u5DF2\u7ED1\u5B9A\u8BE5\u5FAE\u4FE1",
+        data: { openid }
+      };
+    }
     throw createError({
       statusCode: 400,
       message: "\u6B64\u5FAE\u4FE1\u5DF2\u7ED1\u5B9A\u5176\u4ED6\u8D26\u53F7"
     });
   }
   const { error } = await supabase.from("profiles").update({
-    wechat_openid: result.openid
+    wechat_openid: openid,
+    wechat_unionid: unionid
   }).eq("id", userId);
   if (error) {
     throw createError({
@@ -3348,7 +3438,7 @@ async function bindWechatToExistingUser(supabase, userId, wechatCode) {
     success: true,
     message: "\u5FAE\u4FE1\u7ED1\u5B9A\u6210\u529F",
     data: {
-      openid: result.openid
+      openid
     }
   };
 }
@@ -3368,6 +3458,7 @@ const test$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const checkScan_get = defineEventHandler(async (event) => {
+  var _a;
   try {
     const query = getQuery$1(event);
     const sceneStr = query.scene;
@@ -3409,6 +3500,57 @@ const checkScan_get = defineEventHandler(async (event) => {
     if (session.status === "scanned" && session.openid) {
       const { data: profile } = await supabase.from("profiles").select("id, email, nickname").eq("wechat_openid", session.openid).single();
       if (profile) {
+        const { createClient } = await import('file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs');
+        const config = useRuntimeConfig();
+        const supabaseAdmin = createClient(
+          config.public.supabaseUrl,
+          config.supabaseServiceKey
+        );
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+          type: "magiclink",
+          email: profile.email
+        });
+        if (linkError || !((_a = linkData.properties) == null ? void 0 : _a.action_link)) {
+          console.error("[CheckScan] Generate link failed:", linkError);
+          console.error("[CheckScan] Link data:", JSON.stringify(linkData));
+          return {
+            success: true,
+            data: {
+              status: "error",
+              message: "\u751F\u6210\u767B\u5F55\u94FE\u63A5\u5931\u8D25\uFF0C\u8BF7\u5C1D\u8BD5\u5176\u4ED6\u767B\u5F55\u65B9\u5F0F",
+              error_detail: (linkError == null ? void 0 : linkError.message) || "action_link missing"
+            }
+          };
+        }
+        let actionLink = linkData.properties.action_link;
+        if (actionLink) {
+          try {
+            const publicSupabaseUrl = config.public.supabaseUrl;
+            if (actionLink.startsWith("/")) {
+              if (publicSupabaseUrl) {
+                const baseUrl = publicSupabaseUrl.replace(/\/$/, "");
+                const path = actionLink.replace(/^\//, "");
+                actionLink = `${baseUrl}/${path}`;
+                console.log("[CheckScan] Fixed relative link to:", actionLink);
+              } else {
+                console.warn("[CheckScan] Relative link found but publicSupabaseUrl is missing");
+              }
+            }
+            let urlObj = new URL(actionLink);
+            if (publicSupabaseUrl && (urlObj.hostname.includes("localhost") || urlObj.hostname.includes("127.0.0.1"))) {
+              const supabaseUrlObj = new URL(publicSupabaseUrl);
+              urlObj.protocol = supabaseUrlObj.protocol;
+              urlObj.host = supabaseUrlObj.host;
+              console.log("[CheckScan] Fixed localhost base URL to:", urlObj.toString());
+            }
+            const siteUrl = config.public.siteUrl || "https://www.fantula.com";
+            urlObj.searchParams.set("redirect_to", siteUrl);
+            actionLink = urlObj.toString();
+            console.log("[CheckScan] Enforced Action Link:", actionLink);
+          } catch (e) {
+            console.warn("[CheckScan] Failed to fix link:", e);
+          }
+        }
         return {
           success: true,
           data: {
@@ -3416,7 +3558,8 @@ const checkScan_get = defineEventHandler(async (event) => {
             message: "\u767B\u5F55\u6210\u529F",
             userId: profile.id,
             email: profile.email,
-            nickname: profile.nickname
+            nickname: profile.nickname,
+            action_link: actionLink
           }
         };
       } else {
@@ -3501,6 +3644,19 @@ const eventCallback = defineEventHandler(async (event) => {
       } else {
         console.log("[WechatCallback] Session updated to scanned");
       }
+    }
+    if (eventType === "CLICK" && eventKey === "MENU_CONTACT_SUPPORT") {
+      const now = Math.floor(Date.now() / 1e3);
+      const content = `\u516C\u4F17\u53F7\u65E0\u4EBA\u503C\u5B88\uFF1A\u9700\u8981\u5E2E\u52A9\u8BF7\u8054\u7CFB\u56FE\u62C9
+Spotify-cn(\u957F\u6309\u5FAE\u4FE1\u53F7\u53EF\u590D\u5236)
+\u5728\u7EBF\u65F6\u95F4\uFF1A10:00-23:00`;
+      return `<xml>
+              <ToUserName><![CDATA[${fromUser}]]></ToUserName>
+              <FromUserName><![CDATA[${eventData.ToUserName}]]></FromUserName>
+              <CreateTime>${now}</CreateTime>
+              <MsgType><![CDATA[text]]></MsgType>
+              <Content><![CDATA[${content}]]></Content>
+            </xml>`;
     }
     return "success";
   } catch (err) {
@@ -3895,6 +4051,7 @@ const notify_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.definePrope
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const oauthLogin_post = defineEventHandler(async (event) => {
+  var _a;
   try {
     const body = await readBody(event);
     const { code } = body;
@@ -3921,11 +4078,45 @@ const oauthLogin_post = defineEventHandler(async (event) => {
         message: result.errmsg || "\u5FAE\u4FE1\u6388\u6743\u5931\u8D25"
       });
     }
+    const access_token = result.access_token;
     const openid = result.openid;
     console.log("[OAuthLogin] Got openid:", openid);
-    const supabase = getSupabaseServiceClient();
-    const { data: profile } = await supabase.from("profiles").select("id, email, nickname").eq("wechat_openid", openid).single();
+    let userInfo = {};
+    try {
+      const userInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openid}&lang=zh_CN`;
+      const userRes = await fetch(userInfoUrl);
+      userInfo = await userRes.json();
+      console.log("[OAuthLogin] Got config:", { nickname: userInfo.nickname });
+    } catch (e) {
+      console.warn("[OAuthLogin] Failed to fetch user info:", e);
+    }
+    const supabaseAdmin = getSupabaseServiceClient();
+    const { data: profile } = await supabaseAdmin.from("profiles").select("id, email, nickname, avatar").eq("wechat_openid", openid).single();
     if (profile) {
+      const updates = {};
+      if (userInfo.nickname && !profile.nickname) updates.nickname = userInfo.nickname;
+      if (userInfo.headimgurl && !profile.avatar) updates.avatar = userInfo.headimgurl;
+      if (Object.keys(updates).length > 0) {
+        await supabaseAdmin.from("profiles").update(updates).eq("id", profile.id);
+      }
+      let actionLink = null;
+      if (profile.email) {
+        const config2 = useRuntimeConfig();
+        const redirectTo = config2.public.siteUrl ? `${config2.public.siteUrl}/mobile` : "https://www.fantula.com/mobile";
+        console.log("[OAuthLogin] Magic Link RedirectTo:", redirectTo);
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+          type: "magiclink",
+          email: profile.email,
+          options: {
+            redirectTo
+          }
+        });
+        if (!linkError && ((_a = linkData == null ? void 0 : linkData.properties) == null ? void 0 : _a.action_link)) {
+          actionLink = linkData.properties.action_link;
+        } else {
+          console.error("[OAuthLogin] Failed to generate magic link:", linkError);
+        }
+      }
       return {
         success: true,
         data: {
@@ -3933,8 +4124,11 @@ const oauthLogin_post = defineEventHandler(async (event) => {
           message: "\u767B\u5F55\u6210\u529F",
           userId: profile.id,
           email: profile.email,
-          nickname: profile.nickname,
-          openid
+          nickname: updates.nickname || profile.nickname,
+          avatar: updates.avatar || profile.avatar,
+          openid,
+          actionLink
+          // 返回 Magic Link
         }
       };
     } else {
@@ -3944,7 +4138,9 @@ const oauthLogin_post = defineEventHandler(async (event) => {
         data: {
           status: "need_bind",
           message: "\u8BF7\u7ED1\u5B9A\u90AE\u7BB1\u4EE5\u5B8C\u6210\u767B\u5F55",
-          bindToken
+          bindToken,
+          nickname: userInfo.nickname,
+          avatar: userInfo.headimgurl
         }
       };
     }
@@ -4060,6 +4256,76 @@ const queryOrder_post = defineEventHandler(async (event) => {
 const queryOrder_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: queryOrder_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const config = useRuntimeConfig();
+const appid = config.wechatAppid || config.public.wechatAppid;
+const secret = config.wechatAppSecret;
+const updateMenu_get = defineEventHandler(async (event) => {
+  try {
+    const tokenUrl = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${secret}`;
+    const tokenRes = await fetch(tokenUrl);
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      return { success: false, message: "Failed to get access token", error: tokenData };
+    }
+    const menuData = {
+      button: [
+        {
+          name: "\u5F00\u59CB\u4F7F\u7528",
+          sub_button: [
+            {
+              type: "view",
+              name: "\u8FDB\u5165\u56FE\u62C9",
+              url: "https://www.fantula.com/mobile"
+            },
+            {
+              type: "view",
+              name: "\u6211\u7684\u56FE\u62C9",
+              url: "https://www.fantula.com/mobile/profile/account"
+            }
+          ]
+        },
+        {
+          name: "\u670D\u52A1\u4E2D\u5FC3",
+          sub_button: [
+            {
+              type: "click",
+              name: "\u8054\u7CFB\u5BA2\u670D",
+              key: "MENU_CONTACT_SUPPORT"
+            },
+            {
+              type: "view",
+              name: "\u5E2E\u52A9\u6587\u6863",
+              url: "https://www.fantula.com/mobile/help"
+            }
+          ]
+        }
+      ]
+    };
+    const createMenuUrl = `https://api.weixin.qq.com/cgi-bin/menu/create?access_token=${tokenData.access_token}`;
+    const createRes = await fetch(createMenuUrl, {
+      method: "POST",
+      body: JSON.stringify(menuData),
+      headers: { "Content-Type": "application/json" }
+    });
+    const createResult = await createRes.json();
+    return {
+      success: createResult.errcode === 0,
+      result: createResult,
+      menu: menuData
+    };
+  } catch (e) {
+    return {
+      success: false,
+      message: e.message
+    };
+  }
+});
+
+const updateMenu_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: updateMenu_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function renderPayloadResponse(ssrContext) {

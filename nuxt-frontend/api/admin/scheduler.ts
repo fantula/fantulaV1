@@ -1,3 +1,4 @@
+import { useRuntimeConfig } from '#app'
 
 export interface SchedulerStatus {
     isRunning: boolean
@@ -14,8 +15,24 @@ export interface SchedulerLog {
     error?: string
 }
 
-// TODO: Move base URL to environment config
-const SCHEDULER_URL = 'http://localhost:3001'
+export interface TaskMeta {
+    key: string
+    name: string
+    description: string
+    group: string
+    cron: string
+}
+
+export interface ApiResponse<T = any> {
+    success: boolean
+    data?: T
+    error?: string
+}
+
+const getBaseUrl = () => {
+    const config = useRuntimeConfig()
+    return config.public.schedulerUrl
+}
 
 export const adminSchedulerApi = {
     /**
@@ -23,7 +40,7 @@ export const adminSchedulerApi = {
      */
     async getStatus(): Promise<SchedulerStatus> {
         try {
-            const res = await fetch(`${SCHEDULER_URL}/status`)
+            const res = await fetch(`${getBaseUrl()}/status`)
             return await res.json()
         } catch (e) {
             console.error('Failed to get scheduler status:', e)
@@ -34,47 +51,59 @@ export const adminSchedulerApi = {
     /**
      * Get execution logs
      */
-    async getLogs(limit: number = 20): Promise<{ success: boolean; logs: SchedulerLog[] }> {
+    async getLogs(limit: number = 20): Promise<ApiResponse<{ logs: SchedulerLog[] }>> {
         try {
-            const res = await fetch(`${SCHEDULER_URL}/logs?limit=${limit}`)
-            return await res.json()
-        } catch (e) {
+            const res = await fetch(`${getBaseUrl()}/logs?limit=${limit}`)
+            const data = await res.json()
+            return {
+                success: data.success,
+                data: { logs: data.logs },
+                error: data.error
+            }
+        } catch (e: any) {
             console.error('Failed to get scheduler logs:', e)
-            return { success: false, logs: [] }
+            return { success: false, error: e.message }
         }
     },
 
     /**
      * Start scheduler
      */
-    async start(): Promise<{ success: boolean; message?: string }> {
+    async start(): Promise<ApiResponse> {
         try {
-            const res = await fetch(`${SCHEDULER_URL}/start`, { method: 'POST' })
-            return await res.json()
+            const res = await fetch(`${getBaseUrl()}/start`, { method: 'POST' })
+            const data = await res.json()
+            return { success: data.success, error: data.message }
         } catch (e: any) {
-            return { success: false, message: e.message }
+            return { success: false, error: e.message }
         }
     },
 
     /**
      * Stop scheduler
      */
-    async stop(): Promise<{ success: boolean; message?: string }> {
+    async stop(): Promise<ApiResponse> {
         try {
-            const res = await fetch(`${SCHEDULER_URL}/stop`, { method: 'POST' })
-            return await res.json()
+            const res = await fetch(`${getBaseUrl()}/stop`, { method: 'POST' })
+            const data = await res.json()
+            return { success: data.success, error: data.message }
         } catch (e: any) {
-            return { success: false, message: e.message }
+            return { success: false, error: e.message }
         }
     },
 
     /**
      * Run specific task immediately
      */
-    async runTask(taskName: string): Promise<{ success: boolean; expired_count?: number; error?: string }> {
+    async runTask(taskName: string): Promise<ApiResponse<{ expired_count?: number }>> {
         try {
-            const res = await fetch(`${SCHEDULER_URL}/run/${taskName}`, { method: 'POST' })
-            return await res.json()
+            const res = await fetch(`${getBaseUrl()}/run/${taskName}`, { method: 'POST' })
+            const data = await res.json()
+            return {
+                success: data.success,
+                data: { expired_count: data.expired_count },
+                error: data.error
+            }
         } catch (e: any) {
             return { success: false, error: e.message }
         }
@@ -83,13 +112,18 @@ export const adminSchedulerApi = {
     /**
      * Get task list
      */
-    async getTasks(): Promise<{ success: boolean; tasks: any[]; groups: any }> {
+    async getTasks(): Promise<ApiResponse<{ tasks: TaskMeta[]; groups: any }>> {
         try {
-            const res = await fetch(`${SCHEDULER_URL}/tasks`)
-            return await res.json()
-        } catch (e) {
+            const res = await fetch(`${getBaseUrl()}/tasks`)
+            const data = await res.json()
+            return {
+                success: data.success,
+                data: { tasks: data.tasks, groups: data.groups },
+                error: data.error
+            }
+        } catch (e: any) {
             console.error('Failed to get tasks:', e)
-            return { success: false, tasks: [], groups: {} }
+            return { success: false, error: e.message }
         }
     }
 }

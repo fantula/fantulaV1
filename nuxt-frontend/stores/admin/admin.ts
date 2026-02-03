@@ -4,7 +4,8 @@
  */
 
 import { defineStore } from 'pinia'
-import { getAdminSupabaseClient, adminSignOut } from '@/utils/supabase-admin'
+import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 interface AdminUser {
     id: string
@@ -41,12 +42,14 @@ export const useAdminStore = defineStore('admin', () => {
         if (isInitialized.value) return  // 避免重复初始化
         loading.value = true
         try {
-            const client = getAdminSupabaseClient()
-            const { data: { session } } = await client.auth.getSession()
+            const authClient = getSupabaseClient() // 使用标准客户端获取 Session
+            const adminClient = getAdminSupabaseClient() // 使用 Admin 客户端获取数据
+
+            const { data: { session } } = await authClient.auth.getSession()
 
             if (session) {
                 // 验证是否在 admin_users 表中，并获取部门权限
-                const { data: adminData } = await client
+                const { data: adminData } = await adminClient
                     .from('admin_users')
                     .select(`
                         *,
@@ -85,9 +88,10 @@ export const useAdminStore = defineStore('admin', () => {
      */
     const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const client = getAdminSupabaseClient()
+            const authClient = getSupabaseClient()
+            const adminClient = getAdminSupabaseClient()
 
-            const { data, error } = await client.auth.signInWithPassword({
+            const { data, error } = await authClient.auth.signInWithPassword({
                 email,
                 password
             })
@@ -101,7 +105,7 @@ export const useAdminStore = defineStore('admin', () => {
             }
 
             // 验证是否在 admin_users 表中，并获取部门权限
-            const { data: adminData, error: adminError } = await client
+            const { data: adminData, error: adminError } = await adminClient
                 .from('admin_users')
                 .select(`
                     *,
@@ -112,7 +116,7 @@ export const useAdminStore = defineStore('admin', () => {
 
             if (adminError || !adminData) {
                 // 不是管理员，登出
-                await client.auth.signOut()
+                await authClient.auth.signOut()
                 return { success: false, error: '该账号不是管理员' }
             }
 
@@ -134,7 +138,8 @@ export const useAdminStore = defineStore('admin', () => {
      */
     const logout = async () => {
         try {
-            await adminSignOut()
+            const authClient = getSupabaseClient()
+            await authClient.auth.signOut()
         } catch (error) {
             console.error('Admin logout error:', error)
         } finally {
@@ -148,10 +153,11 @@ export const useAdminStore = defineStore('admin', () => {
      */
     const sendOtp = async (email: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const client = getAdminSupabaseClient()
+            const authClient = getSupabaseClient()
+            const adminClient = getAdminSupabaseClient()
 
             // 先检查该邮箱是否是管理员
-            const { data: adminData } = await client
+            const { data: adminData } = await adminClient
                 .from('admin_users')
                 .select('id, status')
                 .eq('email', email)
@@ -166,7 +172,7 @@ export const useAdminStore = defineStore('admin', () => {
             }
 
             // 发送 OTP
-            const { error } = await client.auth.signInWithOtp({
+            const { error } = await authClient.auth.signInWithOtp({
                 email,
                 options: {
                     shouldCreateUser: false  // 不自动创建用户
@@ -188,10 +194,11 @@ export const useAdminStore = defineStore('admin', () => {
      */
     const loginWithOtp = async (email: string, code: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const client = getAdminSupabaseClient()
+            const authClient = getSupabaseClient()
+            const adminClient = getAdminSupabaseClient()
 
             // 验证 OTP
-            const { data, error } = await client.auth.verifyOtp({
+            const { data, error } = await authClient.auth.verifyOtp({
                 email,
                 token: code,
                 type: 'email'
@@ -210,7 +217,7 @@ export const useAdminStore = defineStore('admin', () => {
             }
 
             // 验证是否在 admin_users 表中，并获取部门权限
-            const { data: adminData, error: adminError } = await client
+            const { data: adminData, error: adminError } = await adminClient
                 .from('admin_users')
                 .select(`
                     *,
@@ -221,12 +228,12 @@ export const useAdminStore = defineStore('admin', () => {
 
             if (adminError || !adminData) {
                 // 不是管理员，登出
-                await client.auth.signOut()
+                await authClient.auth.signOut()
                 return { success: false, error: '该账号不是管理员' }
             }
 
             if (adminData.status !== 'enabled') {
-                await client.auth.signOut()
+                await authClient.auth.signOut()
                 return { success: false, error: '该账号已被禁用' }
             }
 

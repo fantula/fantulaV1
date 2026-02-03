@@ -97,7 +97,11 @@ export default defineNuxtConfig({
       wechatAppid: process.env.WECHAT_PAY_APPID || 'wxc2042fae927b28b8',
       // Supabase 公共配置
       supabaseUrl: process.env.SUPABASE_URL || '',
-      supabaseAnonKey: process.env.SUPABASE_KEY || ''
+      supabaseAnonKey: process.env.SUPABASE_KEY || '',
+      // ⚠️ Admin 专用 (暴露 Service Role Key 给前端 Admin 面板，仅内部使用)
+      supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU',
+      // 定时任务服务地址
+      schedulerUrl: process.env.SCHEDULER_URL || 'http://localhost:3001'
     }
   },
 

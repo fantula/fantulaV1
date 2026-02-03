@@ -101,33 +101,9 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted } from 'vue'
 import { Loading, VideoPause, CaretRight, Refresh } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import { adminSchedulerApi, type SchedulerStatus, type SchedulerLog } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-
-interface TaskMeta {
-  key: string
-  name: string
-  description: string
-  group: string
-  cron: string
-}
-
-// State
-const status = ref<SchedulerStatus>({
-  isRunning: false,
-  lastRun: null,
-  lastResult: null
-})
-
-const logs = ref<SchedulerLog[]>([])
-const taskList = ref<TaskMeta[]>([])
-const taskGroups = ref<Record<string, any>>({})
-const actionLoading = ref(false)
-const logsLoading = ref(false)
-const runningTask = ref('')
 
 // Task display name mapping
 const taskDisplayNames: Record<string, string> = {
@@ -138,90 +114,25 @@ const taskDisplayNames: Record<string, string> = {
 
 const getTaskDisplayName = (key: string) => taskDisplayNames[key] || key
 
-// Methods
-const fetchStatus = async () => {
-  const data = await adminSchedulerApi.getStatus()
-  status.value = data
-}
+// Use Composable
+const {
+  status,
+  logs,
+  taskList,
+  taskGroups,
+  actionLoading,
+  logsLoading,
+  runningTask,
+  fetchLogs,
+  toggleScheduler,
+  runTask,
+  startAutoRefresh,
+  formatTime
+} = useAdminScheduler()
 
-const fetchTasks = async () => {
-  try {
-    const res = await adminSchedulerApi.getTasks()
-    if (res.success) {
-      taskList.value = res.tasks
-      taskGroups.value = res.groups
-    }
-  } catch (e) {
-    console.error('Failed to get tasks:', e)
-  }
-}
-
-const fetchLogs = async () => {
-  logsLoading.value = true
-  try {
-    const res = await adminSchedulerApi.getLogs()
-    if (res.success) {
-      logs.value = res.logs
-    }
-  } finally {
-    logsLoading.value = false
-  }
-}
-
-const toggleScheduler = async (start: boolean) => {
-  actionLoading.value = true
-  try {
-    const res = start ? await adminSchedulerApi.start() : await adminSchedulerApi.stop()
-    if (res.success) {
-      ElMessage.success(start ? '服务已启动' : '服务已停止')
-      await fetchStatus()
-    } else {
-      ElMessage.warning(res.message || '操作失败')
-    }
-  } catch (e: any) {
-    ElMessage.error('操作异常: ' + e.message)
-  } finally {
-    actionLoading.value = false
-  }
-}
-
-const runTask = async (taskName: string) => {
-  runningTask.value = taskName
-  try {
-    const res = await adminSchedulerApi.runTask(taskName)
-    if (res.success) {
-      ElMessage.success(`执行完成，处理 ${res.expired_count || 0} 条数据`)
-      await fetchLogs()
-    } else {
-      ElMessage.error(res.error || '执行失败')
-    }
-  } catch (e: any) {
-    ElMessage.error('执行异常: ' + e.message)
-  } finally {
-    runningTask.value = ''
-  }
-}
-
-const formatTime = (time: string | null) => {
-  if (!time) return '-'
-  return new Date(time).toLocaleString('zh-CN', {
-    month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit'
-  })
-}
-
-// Auto Refresh
-let interval: any = null
-
+// Lifecycle
 onMounted(() => {
-  fetchStatus()
-  fetchTasks()
-  fetchLogs()
-  interval = setInterval(fetchStatus, 30000)
-})
-
-onUnmounted(() => {
-  if (interval) clearInterval(interval)
+  startAutoRefresh()
 })
 </script>
 

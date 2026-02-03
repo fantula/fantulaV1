@@ -323,6 +323,8 @@ declare global {
   const clearNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').clearNuxtData
   const clearNuxtState: typeof import('../../node_modules/nuxt/dist/app/composables/state').clearNuxtState
   const computed: typeof import('vue').computed
+  const confirmAction: typeof import('../../composables/admin/useAdminDialog').confirmAction
+  const confirmDelete: typeof import('../../composables/admin/useAdminDialog').confirmDelete
   const createError: typeof import('../../node_modules/nuxt/dist/app/composables/error').createError
   const customRef: typeof import('vue').customRef
   const defineAppConfig: typeof import('../../node_modules/nuxt/dist/app/nuxt').defineAppConfig
@@ -349,6 +351,7 @@ declare global {
   const getButtonTheme: typeof import('../../utils/buttonThemeRegistry').getButtonTheme
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
+  const getEdgeFunctionsUrl: typeof import('../../utils/supabase').getEdgeFunctionsUrl
   const getRouteRules: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getRouteRules
   const getSupabaseClient: typeof import('../../utils/supabase').getSupabaseClient
   const getTheme: typeof import('../../utils/modalThemeRegistry').getTheme
@@ -433,11 +436,15 @@ declare global {
   const uploadImageToStorage: typeof import('../../utils/uploadImage').uploadImageToStorage
   const useAdminCdkList: typeof import('../../composables/admin/useAdminCdkList').useAdminCdkList
   const useAdminCouponList: typeof import('../../composables/admin/useAdminCouponList').useAdminCouponList
+  const useAdminCouponStats: typeof import('../../composables/admin/useAdminCouponStats').useAdminCouponStats
+  const useAdminDialog: typeof import('../../composables/admin/useAdminDialog').default
   const useAdminGlobalSkuList: typeof import('../../composables/admin/useAdminGlobalSkuList').useAdminGlobalSkuList
+  const useAdminList: typeof import('../../composables/admin/useAdminList').default
   const useAdminOrderList: typeof import('../../composables/admin/useAdminOrderList').useAdminOrderList
   const useAdminPreOrderList: typeof import('../../composables/admin/useAdminPreOrderList').useAdminPreOrderList
   const useAdminProductForm: typeof import('../../composables/admin/useAdminProductForm').useAdminProductForm
   const useAdminProductList: typeof import('../../composables/admin/useAdminProductList').useAdminProductList
+  const useAdminScheduler: typeof import('../../composables/admin/useAdminScheduler').useAdminScheduler
   const useAdminSkuEditor: typeof import('../../composables/admin/useAdminSkuEditor').useAdminSkuEditor
   const useAdminStore: typeof import('../../stores/admin/admin').useAdminStore
   const useAdminTicketList: typeof import('../../composables/admin/useAdminTicketList').useAdminTicketList
@@ -527,6 +534,7 @@ declare global {
   const useSimpleCache: typeof import('../../composables/shared/useSimpleCache').useSimpleCache
   const useSlots: typeof import('vue').useSlots
   const useState: typeof import('../../node_modules/nuxt/dist/app/composables/state').useState
+  const useSupabaseSession: typeof import('../../composables/useSupabaseSession').default
   const useSupabaseUserStore: typeof import('../../stores/shared/supabase-user').useSupabaseUserStore
   const useTemplateRef: typeof import('vue').useTemplateRef
   const useTransitionState: typeof import('vue').useTransitionState
@@ -898,6 +906,8 @@ declare module 'vue' {
     readonly clearNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['clearNuxtData']>
     readonly clearNuxtState: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/state')['clearNuxtState']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
+    readonly confirmAction: UnwrapRef<typeof import('../../composables/admin/useAdminDialog')['confirmAction']>
+    readonly confirmDelete: UnwrapRef<typeof import('../../composables/admin/useAdminDialog')['confirmDelete']>
     readonly createError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['createError']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
     readonly defineAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['defineAppConfig']>
@@ -924,6 +934,7 @@ declare module 'vue' {
     readonly getButtonTheme: UnwrapRef<typeof import('../../utils/buttonThemeRegistry')['getButtonTheme']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
+    readonly getEdgeFunctionsUrl: UnwrapRef<typeof import('../../utils/supabase')['getEdgeFunctionsUrl']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
     readonly getSupabaseClient: UnwrapRef<typeof import('../../utils/supabase')['getSupabaseClient']>
     readonly getTheme: UnwrapRef<typeof import('../../utils/modalThemeRegistry')['getTheme']>
@@ -1008,11 +1019,15 @@ declare module 'vue' {
     readonly uploadImageToStorage: UnwrapRef<typeof import('../../utils/uploadImage')['uploadImageToStorage']>
     readonly useAdminCdkList: UnwrapRef<typeof import('../../composables/admin/useAdminCdkList')['useAdminCdkList']>
     readonly useAdminCouponList: UnwrapRef<typeof import('../../composables/admin/useAdminCouponList')['useAdminCouponList']>
+    readonly useAdminCouponStats: UnwrapRef<typeof import('../../composables/admin/useAdminCouponStats')['useAdminCouponStats']>
+    readonly useAdminDialog: UnwrapRef<typeof import('../../composables/admin/useAdminDialog')['default']>
     readonly useAdminGlobalSkuList: UnwrapRef<typeof import('../../composables/admin/useAdminGlobalSkuList')['useAdminGlobalSkuList']>
+    readonly useAdminList: UnwrapRef<typeof import('../../composables/admin/useAdminList')['default']>
     readonly useAdminOrderList: UnwrapRef<typeof import('../../composables/admin/useAdminOrderList')['useAdminOrderList']>
     readonly useAdminPreOrderList: UnwrapRef<typeof import('../../composables/admin/useAdminPreOrderList')['useAdminPreOrderList']>
     readonly useAdminProductForm: UnwrapRef<typeof import('../../composables/admin/useAdminProductForm')['useAdminProductForm']>
     readonly useAdminProductList: UnwrapRef<typeof import('../../composables/admin/useAdminProductList')['useAdminProductList']>
+    readonly useAdminScheduler: UnwrapRef<typeof import('../../composables/admin/useAdminScheduler')['useAdminScheduler']>
     readonly useAdminSkuEditor: UnwrapRef<typeof import('../../composables/admin/useAdminSkuEditor')['useAdminSkuEditor']>
     readonly useAdminStore: UnwrapRef<typeof import('../../stores/admin/admin')['useAdminStore']>
     readonly useAdminTicketList: UnwrapRef<typeof import('../../composables/admin/useAdminTicketList')['useAdminTicketList']>
@@ -1102,6 +1117,7 @@ declare module 'vue' {
     readonly useSimpleCache: UnwrapRef<typeof import('../../composables/shared/useSimpleCache')['useSimpleCache']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useState: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/state')['useState']>
+    readonly useSupabaseSession: UnwrapRef<typeof import('../../composables/useSupabaseSession')['default']>
     readonly useSupabaseUserStore: UnwrapRef<typeof import('../../stores/shared/supabase-user')['useSupabaseUserStore']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
     readonly useTransitionState: UnwrapRef<typeof import('vue')['useTransitionState']>

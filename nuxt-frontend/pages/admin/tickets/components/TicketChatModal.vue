@@ -143,6 +143,16 @@
                   </div>
 
                   <div v-if="ticket?.status === 'processing'" class="action-area">
+                     <!-- Pending Attachments Preview -->
+                     <div v-if="pendingAttachments.length > 0" class="preview-area">
+                        <div v-for="(url, index) in pendingAttachments" :key="index" class="preview-item">
+                           <el-image :src="url" class="preview-img" fit="cover" />
+                           <div class="remove-btn" @click="removeAttachment(index)">
+                              <el-icon><Close /></el-icon>
+                           </div>
+                        </div>
+                     </div>
+
                      <el-input 
                         v-model="replyText" 
                         type="textarea" 
@@ -152,11 +162,28 @@
                         @keydown.meta.enter="handleReply"
                         @keydown.ctrl.enter="handleReply"
                      />
+                     
                      <div class="footer-buttons">
+                         <!-- Hidden File Input -->
+                         <input 
+                            type="file" 
+                            ref="fileInput" 
+                            style="display: none" 
+                            accept="image/jpeg,image/png,image/gif"
+                            @change="handleFileSelect"
+                         />
+                         
+                         <!-- Upload Button -->
+                         <el-button type="info" plain @click="triggerUpload" :loading="isUploading" circle>
+                            <el-icon><Picture /></el-icon>
+                         </el-button>
+
+                         <div class="flex-grow"></div>
+
                          <el-button type="success" plain @click="handleResolve" :loading="resolving">
                             <el-icon class="mr-1"><Check /></el-icon> 标记已解决
                          </el-button>
-                         <el-button type="primary" @click="handleReply" :loading="sending" :disabled="!replyText.trim()">
+                         <el-button type="primary" @click="handleReply" :loading="sending" :disabled="!replyText.trim() && pendingAttachments.length === 0">
                             发送回复
                          </el-button>
                      </div>
@@ -183,7 +210,8 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { adminTicketApi, type TicketMessage } from '@/api/admin/ticket'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, CircleCheckFilled, RefreshRight } from '@element-plus/icons-vue'
+import { Check, CircleCheckFilled, RefreshRight, Picture, Close } from '@element-plus/icons-vue'
+import { uploadImageToStorage } from '@/utils/uploadImage'
 
 const props = defineProps<{
   modelValue: boolean
@@ -200,14 +228,19 @@ const visible = computed({
 })
 
 const loading = ref(false)
-const loaded = ref(false) // New: distinct loaded state
-const error = ref<string | null>(null) // New: error state
+const loaded = ref(false)
+const error = ref<string | null>(null)
 const sending = ref(false)
 const resolving = ref(false)
 const messages = ref<TicketMessage[]>([])
 const ticket = ref<any>(null)
 const replyText = ref('')
 const chatBox = ref<HTMLElement | null>(null)
+
+// Upload State
+const fileInput = ref<HTMLInputElement | null>(null)
+const isUploading = ref(false)
+const pendingAttachments = ref<string[]>([])
 
 // --- Helper Functions ---
 const handleClose = () => {
@@ -287,7 +320,6 @@ const loadData = async () => {
    try {
       console.log('[TicketChatModal] Loading data for:', props.ticketId)
       
-      // Parallel fetch for better performance
       const [resDetail, resMsgs] = await Promise.all([
          adminTicketApi.getDetail(props.ticketId),
          adminTicketApi.getMessages(props.ticketId)
@@ -295,7 +327,7 @@ const loadData = async () => {
 
       if (resDetail.success) {
           ticket.value = resDetail.data
-          loaded.value = true // Successful load
+          loaded.value = true 
       } else {
           throw new Error(resDetail.error || '工单详情加载失败')
       }
@@ -305,7 +337,6 @@ const loadData = async () => {
          scrollToBottom()
       } else {
          console.warn('[TicketChatModal] Messages load warning:', resMsgs.error)
-         // We don't block the UI if just messages fail, but maybe show a toast
       }
    } catch(e: any) {
       console.error('[TicketChatModal] Load Failed:', e)
@@ -316,15 +347,69 @@ const loadData = async () => {
    }
 }
 
+// --- Upload Logic ---
+const triggerUpload = () => {
+    fileInput.value?.click()
+}
+
+const handleFileSelect = async (event: Event) => {
+    const input = event.target as HTMLInputElement
+    if (!input.files || input.files.length === 0) return
+    
+    const file = input.files[0]
+    
+    // Validate
+    if (file.size > 5 * 1024 * 1024) {
+        ElMessage.warning('图片大小不能超过 5MB')
+        input.value = ''
+        return
+    }
+    
+    if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+        ElMessage.warning('只支持 JPG, PNG, GIF 格式')
+        input.value = ''
+        return
+    }
+
+    isUploading.value = true
+    try {
+        const session = useSupabaseSession()
+        const token = session.value?.access_token
+        
+        if (!token) {
+           ElMessage.error('请登录')
+           isUploading.value = false
+           return
+        }
+
+        const res = await uploadImageToStorage(file, 'tickets', undefined, token)
+        if (res.success && res.url) {
+            pendingAttachments.value.push(res.url)
+        } else {
+            ElMessage.error(res.error || '上传失败')
+        }
+    } catch (e) {
+        ElMessage.error('上传出错')
+    } finally {
+        isUploading.value = false
+        input.value = '' // Reset input
+    }
+}
+
+const removeAttachment = (index: number) => {
+    pendingAttachments.value.splice(index, 1)
+}
+
 const handleReply = async () => {
-   if (!replyText.value.trim()) return
+   if (!replyText.value.trim() && pendingAttachments.value.length === 0) return
    sending.value = true
    try {
-      const res = await adminTicketApi.reply(props.ticketId, replyText.value)
+      // Pass attachments
+      const res = await adminTicketApi.reply(props.ticketId, replyText.value, pendingAttachments.value)
       if (res.success) {
          replyText.value = ''
+         pendingAttachments.value = [] // Clear attachments
          ElMessage.success('发送成功')
-         // Refresh messages
          const resMsgs = await adminTicketApi.getMessages(props.ticketId)
          if (resMsgs.success) {
             messages.value = resMsgs.data
@@ -351,7 +436,7 @@ const handleResolve = async () => {
       const res = await adminTicketApi.resolve(props.ticketId)
       if (res.success) {
          ElMessage.success('工单已结单')
-         await loadData() // Refresh status
+         await loadData() 
       } else {
          ElMessage.error('操作失败')
       }
@@ -360,13 +445,12 @@ const handleResolve = async () => {
    }
 }
 
-// Watch for modal open
 watch(() => props.modelValue, (val) => {
     if (val && props.ticketId) {
-        // Reset state
         messages.value = []
         ticket.value = null
         replyText.value = ''
+        pendingAttachments.value = []
         error.value = null
         loaded.value = false
         
@@ -534,4 +618,42 @@ watch(() => props.modelValue, (val) => {
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+/* Attachment Preview */
+.preview-area {
+    display: flex;
+    gap: 10px;
+    padding: 0 0 10px 0;
+    flex-wrap: wrap;
+}
+.preview-item {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+.preview-img {
+    width: 100%;
+    height: 100%;
+}
+.remove-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+}
+.remove-btn:hover {
+    background: rgba(0,0,0,0.8);
+}
 </style>

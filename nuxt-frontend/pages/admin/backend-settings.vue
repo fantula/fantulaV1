@@ -16,6 +16,7 @@ definePageMeta({
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
 
 const tabs = [
+  { name: 'index', label: '系统状态', route: '/admin/backend-settings' },
   { name: 'storage', label: '对象存储管理', route: '/admin/backend-settings/storage' },
   { name: 'scheduler', label: '定时任务管理', route: '/admin/backend-settings/scheduler' }
 ]

@@ -135,14 +135,17 @@ export const adminImageApi = {
     /**
      * 删除图片（单个）
      */
-    async deleteImage(id: string): Promise<{ success: boolean; error?: string }> {
-        return this.deleteImages([id])
+    /**
+     * 删除图片（单个）
+     */
+    async deleteImage(id: string, token?: string): Promise<{ success: boolean; error?: string }> {
+        return this.deleteImages([id], token)
     },
 
     /**
      * 批量删除图片
      */
-    async deleteImages(ids: string[]): Promise<{ success: boolean; error?: string }> {
+    async deleteImages(ids: string[], token?: string): Promise<{ success: boolean; error?: string }> {
         if (!ids.length) return { success: true }
 
         const client = getAdminSupabaseClient()
@@ -174,10 +177,6 @@ export const adminImageApi = {
         // 3. 调用 delete-r2 Edge Function 删除 R2 文件
         if (filePaths.length > 0) {
             try {
-                // 获取 Admin Token
-                const { getAdminAuthToken } = await import('@/utils/supabase-admin')
-                const token = await getAdminAuthToken()
-
                 if (token) {
                     const { getEdgeFunctionsUrl } = await import('@/utils/supabase')
                     const response = await fetch(`${getEdgeFunctionsUrl()}/delete-r2`, {

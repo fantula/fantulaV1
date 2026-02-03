@@ -1,1 +1,0 @@
-TRUNCATE TABLE public.audit_log_entries;

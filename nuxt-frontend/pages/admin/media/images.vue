@@ -182,6 +182,7 @@ import CategoryManagerModal from '@/components/admin/media/CategoryManagerModal.
 import ImageUploadModal from '@/components/admin/media/ImageUploadModal.vue'
 
 // --- State ---
+const session = useSupabaseSession()
 const loading = ref(false)
 const catLoading = ref(false)
 const categories = ref<AdminImageCategory[]>([])
@@ -282,9 +283,10 @@ const confirmEdit = async () => {
 }
 
 const handleDelete = (img: AdminImage) => {
+   const token = session.value?.access_token
    ElMessageBox.confirm('确认删除此图片？', '警告', { type: 'warning' })
     .then(async () => {
-      const res = await adminImageApi.deleteImage(img.id)
+      const res = await adminImageApi.deleteImage(img.id, token)
       if (res.success) {
         ElMessage.success('删除成功')
         fetchImages()
@@ -295,9 +297,10 @@ const handleDelete = (img: AdminImage) => {
 }
 
 const handleBatchDelete = () => {
+  const token = session.value?.access_token
   ElMessageBox.confirm(`确认删除选中的 ${selectedIds.value.length} 张图片？`, '批量删除', { type: 'warning' })
     .then(async () => {
-        const res = await adminImageApi.deleteImages(selectedIds.value)
+        const res = await adminImageApi.deleteImages(selectedIds.value, token)
         if (res.success) {
              ElMessage.success('批量删除成功')
              fetchImages()
@@ -312,8 +315,7 @@ const syncing = ref(false)
 const syncFromR2 = async () => {
   syncing.value = true
   try {
-    const { getAdminAuthToken } = await import('@/utils/supabase-admin')
-    const token = await getAdminAuthToken()
+    const token = session.value?.access_token
     if (!token) return ElMessage.error('请登录管理员账号')
 
     const { getEdgeFunctionsUrl } = await import('@/utils/supabase')

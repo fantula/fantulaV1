@@ -182,6 +182,7 @@ const uploadDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 
 // Data
+const session = useSupabaseSession()
 const categories = ref<AdminImageCategory[]>([])
 
 const fetchCategories = async () => {
@@ -211,7 +212,8 @@ const handleBatchDelete = () => {
   }).then(async () => {
     loading.value = true
     try {
-        const res = await adminApi.image.deleteImages(selectedIds.value)
+        const token = session.value?.access_token
+        const res = await adminApi.image.deleteImages(selectedIds.value, token)
         if (res.success) {
             ElMessage.success('批量删除成功')
             selectedIds.value = []
@@ -250,11 +252,10 @@ const syncFromR2 = async () => {
   syncing.value = true
   try {
     // 1. 获取 R2 对象列表
-    const { getAdminAuthToken } = await import('@/utils/supabase-admin')
-    const token = await getAdminAuthToken()
+    const token = session.value?.access_token
     
     if (!token) {
-      ElMessage.error('请先登录后台管理员账号')
+      ElMessage.error('无法获取登录凭证，请刷新页面或重新登录')
       return
     }
 
@@ -265,7 +266,7 @@ const syncFromR2 = async () => {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prefix: 'uploads' })
+      body: JSON.stringify({ prefix: 'uploads/' }) // Explicitly sync only uploads folder
     })
 
     const result = await response.json()
@@ -278,15 +279,17 @@ const syncFromR2 = async () => {
     const r2Objects = result.objects || []
     
     if (r2Objects.length === 0) {
-      ElMessage.info('R2 存储桶中没有图片')
+      ElMessage.info('R2 uploads 文件夹中没有图片')
       return
     }
 
     // 2. 获取数据库中已有的图片 URL
     const existingUrls = new Set(images.value.map(img => img.url))
 
-    // 3. 筛选出缺失的图片
-    const missingObjects = r2Objects.filter((obj: any) => !existingUrls.has(obj.url))
+    // 3. 筛选出缺失的图片 (Strictly from uploads/)
+    const missingObjects = r2Objects.filter((obj: any) => 
+        obj.key.startsWith('uploads/') && !existingUrls.has(obj.url)
+    )
 
     if (missingObjects.length === 0) {
       ElMessage.success('已同步，无新图片')
@@ -409,8 +412,16 @@ const submitUpload = async () => {
   try {
     // 1. 先上传文件到 Supabase Storage
     const file = fileList.value[0].raw
+    const token = session.value?.access_token
+    
+    if (!token) {
+        ElMessage.error('请登录')
+        uploading.value = false
+        return
+    }
+
     const { uploadImageToStorage } = await import('@/utils/uploadImage')
-    const uploadRes = await uploadImageToStorage(file)
+    const uploadRes = await uploadImageToStorage(file, 'uploads', undefined, token)
     
     if (!uploadRes.success) {
       ElMessage.error('文件上传失败: ' + uploadRes.error)
@@ -480,7 +491,8 @@ const handleDelete = (img: AdminImage) => {
   ElMessageBox.confirm('确认删除该图片吗？此操作无法恢复。', '删除图片', {
     type: 'warning'
   }).then(async () => {
-    const res = await adminApi.image.deleteImage(img.id)
+    const token = session.value?.access_token
+    const res = await adminApi.image.deleteImage(img.id, token)
     if (res.success) {
       ElMessage.success('已删除')
       await fetchData()

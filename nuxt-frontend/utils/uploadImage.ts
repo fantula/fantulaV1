@@ -15,13 +15,16 @@ export type UploadProgressCallback = (progress: number) => void
 export async function uploadImageToStorage(
     file: File,
     folder: string = 'uploads',
-    onProgress?: UploadProgressCallback
+    onProgress?: UploadProgressCallback,
+    token?: string
 ): Promise<{
     success: boolean
     url?: string
     error?: string
 }> {
     try {
+        // ... (file validation stays same)
+
         // 验证文件类型
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
         if (!allowedTypes.includes(file.type)) {
@@ -40,27 +43,16 @@ export async function uploadImageToStorage(
             }
         }
 
-        // 获取认证 Token (优先尝试后台管理员 Token)
-        let token = null
-        try {
-            const { getAdminAuthToken } = await import('./supabase-admin')
-            token = await getAdminAuthToken()
-        } catch (e) {
-            console.warn('Failed to load admin token logic', e)
-        }
+        // 获取认证 Token
+        // 优先使用传入的 token，否则尝试从通用工具获取 (可能为 null)
+        const finalToken = token || await getAuthToken()
 
-        // 如果后台没登录，再尝试前台（仅作备用，以防万一）
-        if (!token) {
-            token = await getAuthToken()
-        }
-
-        if (!token) {
+        if (!finalToken) {
             return {
                 success: false,
-                error: '请先登录后台管理员账号'
+                error: '请先登录'
             }
         }
-
         // 构建 FormData
         const formData = new FormData()
         formData.append('file', file)
@@ -97,7 +89,7 @@ export async function uploadImageToStorage(
 
                 const url = typeof getEdgeFunctionsUrl === 'function' ? getEdgeFunctionsUrl() : ''
                 xhr.open('POST', `${url}/upload-r2`)
-                xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+                xhr.setRequestHeader('Authorization', `Bearer ${finalToken}`)
                 xhr.send(formData)
             })
         }
@@ -106,7 +98,7 @@ export async function uploadImageToStorage(
         const response = await fetch(`${getEdgeFunctionsUrl()}/upload-r2`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${finalToken}`
             },
             body: formData
         })

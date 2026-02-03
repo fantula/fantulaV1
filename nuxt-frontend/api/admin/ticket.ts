@@ -111,8 +111,8 @@ export const adminTicketApi = {
     return { success: true }
   },
 
-  // 5. Cleanup Images (One-Click)
-  async cleanupImages(daysOld: number = 7): Promise<{ success: boolean; count: number; error?: string }> {
+  // 5. Cleanup Images (One-Click) - 使用 R2 Edge Function
+  async cleanupImages(daysOld: number = 7, token?: string): Promise<{ success: boolean; count: number; error?: string }> {
     const client = getAdminSupabaseClient()
     const dateLimit = new Date();
     dateLimit.setDate(dateLimit.getDate() - daysOld);
@@ -137,38 +137,63 @@ export const adminTicketApi = {
 
     if (!messages || messages.length === 0) return { success: true, count: 0 }
 
-    let deletedFilesCount = 0
     const filesToDelete: string[] = []
 
-    // 3. Extract paths from URLs
-    // URL format: https://.../storage/v1/object/public/tickets/filename.png
-    // We need just "filename.png" or "folder/filename.png"
+    // 3. Extract paths from R2 URLs
+    // R2 URL format: https://img.fantula.com/tickets/filename.png
+    // We need "tickets/filename.png"
     messages.forEach(msg => {
       if (Array.isArray(msg.attachments)) {
         msg.attachments.forEach((url: string) => {
           try {
             const urlObj = new URL(url)
-            // Pathname: /storage/v1/object/public/tickets/abc.png
-            // We need 'abc.png'. 
-            const pathParts = urlObj.pathname.split('/tickets/')
-            if (pathParts.length > 1) {
-              // Decoded path is safer
-              filesToDelete.push(decodeURIComponent(pathParts[1]))
+            // Pathname: /tickets/abc.png → "tickets/abc.png"
+            const path = urlObj.pathname.startsWith('/')
+              ? urlObj.pathname.substring(1)
+              : urlObj.pathname
+            if (path) {
+              filesToDelete.push(decodeURIComponent(path))
             }
           } catch (e) {
             // Fallback if relative path stored
-            filesToDelete.push(url)
+            if (url && !url.startsWith('http')) {
+              filesToDelete.push(url)
+            }
           }
         })
       }
     })
 
-    if (filesToDelete.length > 0) {
-      const { data, error } = await client.storage.from('tickets').remove(filesToDelete)
-      if (error) return { success: false, count: 0, error: error.message }
-      deletedFilesCount = data?.length || 0
-    }
+    if (filesToDelete.length === 0) return { success: true, count: 0 }
 
-    return { success: true, count: deletedFilesCount }
+    // 4. 调用 delete-r2 Edge Function 删除文件
+    // 4. 调用 delete-r2 Edge Function 删除文件
+    try {
+      const { EDGE_FUNCTIONS_URL } = await import('@/utils/supabase')
+
+      if (!token) {
+        return { success: false, count: 0, error: '请先登录后台管理员账号' }
+      }
+
+      const response = await fetch(`${EDGE_FUNCTIONS_URL}/delete-r2`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ paths: filesToDelete })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || result.error) {
+        return { success: false, count: 0, error: result.error || '删除失败' }
+      }
+
+      return { success: true, count: result.deleted || 0 }
+    } catch (e: any) {
+      console.error('Cleanup error:', e)
+      return { success: false, count: 0, error: e.message || '清理失败' }
+    }
   }
 }

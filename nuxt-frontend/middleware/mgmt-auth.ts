@@ -3,6 +3,9 @@
  * 需在页面中明确引用: definePageMeta({ middleware: ['mgmt-auth'] })
  */
 export default defineNuxtRouteMiddleware(async (to) => {
+    // 仅在客户端执行认证检查，防止 SSR 服务端因 LocalStorage 缺失导致无限重定向
+    if (process.server) return
+
     // 登录页无需验证
     if (to.path === '/admin/login') return
 

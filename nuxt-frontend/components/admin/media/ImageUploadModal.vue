@@ -89,9 +89,18 @@ const submitUpload = async () => {
   
   uploading.value = true
   try {
+    const session = useSupabaseSession()
+    const token = session.value?.access_token
+
+    if (!token) {
+        ElMessage.error('请登录管理员账号')
+        uploading.value = false
+        return
+    }
+
     const file = fileList.value[0].raw
     const { uploadImageToStorage } = await import('@/utils/uploadImage')
-    const uploadRes = await uploadImageToStorage(file)
+    const uploadRes = await uploadImageToStorage(file, 'uploads', undefined, token)
     
     if (!uploadRes.success) {
       ElMessage.error('文件上传失败: ' + uploadRes.error)

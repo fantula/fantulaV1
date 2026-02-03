@@ -139,7 +139,8 @@ export function useBizConfig() {
     const COUPON_STATUS = {
         'unused': { label: '未使用', type: 'success' },
         'used': { label: '已使用', type: 'info' },
-        'expired': { label: '已过期', type: 'danger' }
+        'expired': { label: '已过期', type: 'danger' },
+        'exhausted': { label: '已耗尽', type: 'info' }
     } as const
 
     const getCouponStatusLabel = (status: string) => {

@@ -81,21 +81,21 @@
       
       <el-table-column prop="status" label="状态" width="100" align="center">
          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)" size="small">
-              {{ getStatusLabel(row.status) }}
+            <el-tag :type="getCouponStatusType(row.status)" size="small">
+              {{ getCouponStatusLabel(row.status) }}
             </el-tag>
          </template>
       </el-table-column>
 
       <el-table-column label="领取时间" width="170" align="center">
         <template #default="{ row }">
-          {{ formatTime(row.created_at) }}
+          {{ formatDate(row.created_at) }}
         </template>
       </el-table-column>
 
       <el-table-column label="使用时间" width="170" align="center">
         <template #default="{ row }">
-          {{ formatTime(row.used_at) }}
+          {{ formatDate(row.used_at) }}
         </template>
       </el-table-column>
 
@@ -133,162 +133,31 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { onMounted } from 'vue'
 import { Search, User, Refresh } from '@element-plus/icons-vue'
-import dayjs from 'dayjs'
-import { adminApi } from '@/api/admin'
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import BulkActionBar from '@/components/admin/base/BulkActionBar.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 
-const loading = ref(false)
-const dataList = ref<any[]>([])
-const selectedIds = ref<string[]>([])
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 20,
-  total: 0
-})
-
-const filters = reactive({
-  code: '',
-  userUid: ''
-})
-
-const getStatusType = (status: string) => {
-  switch (status) {
-    case 'used': return 'success'
-    case 'expired': return 'info'
-    default: return 'warning'
-  }
-}
-
-const getStatusLabel = (status: string) => {
-  const map: Record<string, string> = {
-    'used': '已使用',
-    'expired': '已过期'
-  }
-  return map[status] || status
-}
-
-const formatTime = (time: string) => {
-  if (!time) return '-'
-  return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
-}
-
-
-
-const loadData = async () => {
-  loading.value = true
-  try {
-    const res = await adminApi.coupon.getCouponStats({
-      page: pagination.page,
-      pageSize: pagination.pageSize,
-      code: filters.code,
-      userUid: filters.userUid
-    })
-    
-    if (res.success) {
-      let list = res.data
-      
-      // 前端二次查询获取 8位 UID (不修改后端API，防止破坏)
-      const userIds = list.map(i => i.user_uid).filter(id => id && id.length > 20) // 简单的UUID长度检查
-      if (userIds.length > 0) {
-          const client = getAdminSupabaseClient()
-          const { data: users } = await client.from('users').select('id, uid, nickname').in('id', userIds)
-          if (users) {
-              const userMap = users.reduce((acc, u) => {
-                  acc[u.id] = u
-                  return acc
-              }, {} as Record<string, any>)
-              
-              // 映射回列表
-              list = list.map(item => {
-                  const u = userMap[item.user_uid]
-                  return {
-                      ...item,
-                      display_uid: u ? u.uid : item.user_uid, // 有8位显示8位，没有显示UUID
-                      user_nickname: u ? u.nickname : item.user_nickname
-                  }
-              })
-          }
-      } else {
-           // 如果本来就是短ID或者没查到，就用原来的
-           list = list.map(item => ({ ...item, display_uid: item.user_uid }))
-      }
-
-      dataList.value = list
-      pagination.total = res.total
-    } else {
-      ElMessage.error(res.error || '加载失败')
-    }
-  } catch (e: any) {
-    ElMessage.error('网络错误: ' + e.message)
-  } finally {
-    loading.value = false
-  }
-}
-
-// ... other functions ...
-
-const handleSearch = () => {
-  pagination.page = 1
-  loadData()
-}
-
-const handleSizeChange = (val: number) => {
-    pagination.pageSize = val
-    loadData()
-}
-
-const handleCurrentChange = (val: number) => {
-    pagination.page = val
-    loadData()
-}
-
-const handleSelectionChange = (rows: any[]) => {
-  selectedIds.value = rows.map(r => r.id)
-}
-
-const handleDelete = (row: any) => {
-  ElMessageBox.confirm('确定删除该条记录吗？删除后用户侧将不再显示此优惠券。', '警告', {
-    confirmButtonText: '确定删除',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    await deleteItems([row.id])
-  })
-}
-
-const handleBatchDelete = () => {
-  if (selectedIds.value.length === 0) return
-  ElMessageBox.confirm(`确定删除选中的 ${selectedIds.value.length} 条记录吗？`, '批量删除', {
-    confirmButtonText: '确定删除',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    await deleteItems(selectedIds.value)
-  })
-}
-
-const deleteItems = async (ids: string[]) => {
-  try {
-    const res = await adminApi.coupon.deleteCouponUsages(ids)
-    if (res.success) {
-      ElMessage.success(`成功删除 ${res.count || ids.length} 条记录`)
-      loadData()
-      selectedIds.value = []
-    } else {
-      ElMessage.error(res.error || '删除失败')
-    }
-  } catch (e: any) {
-    ElMessage.error('删除异常: ' + e.message)
-  }
-}
+// Use composable
+const {
+  loading,
+  dataList,
+  selectedIds,
+  pagination,
+  filters,
+  loadData,
+  handleSearch,
+  handleSizeChange,
+  handleCurrentChange,
+  handleSelectionChange,
+  handleDelete,
+  handleBatchDelete,
+  formatDate,
+  getCouponStatusType,
+  getCouponStatusLabel
+} = useAdminCouponStats()
 
 onMounted(() => {
   loadData()

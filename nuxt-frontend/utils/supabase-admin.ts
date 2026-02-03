@@ -1,29 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-// ======== DEBUG: 确认模块已更新 ========
-console.log('>>> supabase-admin.ts LOADED - Using SERVICE_ROLE key <<<')
-
 /**
  * 后台管理专用 Supabase 客户端
  * 使用 service_role key 绕过所有 RLS 策略
  * 注意：service_role key 具有完全数据库访问权限，仅限后台使用
  */
-
-// Supabase 项目配置 - 本地开发环境
-const SUPABASE_URL = 'http://127.0.0.1:54321'
-
-// 使用 service_role key (绕过 RLS)
-// 新版 Supabase CLI 使用 sb_secret_ 格式
-const SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz'
-
-// 后台专用 Storage Key（与客户端隔离）
-const ADMIN_STORAGE_KEY = 'sb-admin-auth-token'
-
-// 强制清除可能残留的旧 session
-// if (typeof window !== 'undefined') {
-//     localStorage.removeItem(ADMIN_STORAGE_KEY)
-//     console.log('[Admin Client] Cleared any stale admin session from localStorage')
-// }
 
 let adminSupabaseClient: SupabaseClient | null = null
 
@@ -41,12 +22,21 @@ export function resetAdminSupabaseClient(): void {
  */
 export function getAdminSupabaseClient(): SupabaseClient {
     if (!adminSupabaseClient) {
-        console.log('[Admin Client] Creating new Supabase client with service_role key')
+        const config = useRuntimeConfig()
+
+        // 从 RuntimeConfig 获取配置，确保环境一致性
+        // 优先尝试获取 public 中的配置 (针对客户端 Admin), 降级获取 server 配置 (针对 SSR/Server API)
+        const SUPABASE_SERVICE_ROLE_KEY = config.public.supabaseServiceKey || config.supabaseServiceKey
+        const SUPABASE_URL = config.public.supabaseUrl
+
+        if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
+            console.error('[Admin Client] Missing SUPABASE_SERVICE_KEY or SUPABASE_URL')
+        }
+
         adminSupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
             auth: {
-                persistSession: true,
-                storageKey: ADMIN_STORAGE_KEY,
-                autoRefreshToken: true,
+                persistSession: false, // 禁止 Admin Client 持久化 Session
+                autoRefreshToken: false,
                 detectSessionInUrl: false,
             },
             global: {

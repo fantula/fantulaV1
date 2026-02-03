@@ -36,6 +36,9 @@ declare module "nitropack/types" {
     '/api/wechat/query-order': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/query-order.post').default>>>>
     }
+    '/api/wechat/update-menu': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/wechat/update-menu.get').default>>>>
+    }
     '/__nuxt_error': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>
     }

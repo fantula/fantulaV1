@@ -163,7 +163,7 @@ export function useAdminSkuEditor() {
 
             if (res.success) {
                 ElMessage.success('配置已保存')
-                router.push('/_mgmt_9Xfa3/products')
+                router.push('/admin/products')
             } else {
                 ElMessage.error(res.error)
             }
@@ -172,7 +172,7 @@ export function useAdminSkuEditor() {
         }
     }
 
-    const goToSharedManager = () => window.open('/_mgmt_9Xfa3/products/shared-sku')
+    const goToSharedManager = () => window.open('/admin/products/shared-sku')
 
     onMounted(async () => {
         await Promise.all([loadProductData(), loadSharedGroups()])

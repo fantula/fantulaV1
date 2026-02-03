@@ -22,6 +22,22 @@ export interface AdminCoupon {
     created_at: string
 }
 
+export interface AdminCouponStat {
+    id: string
+    code: string
+    status: string
+    used_at: string
+    created_at: string
+    order_id: string | null
+    order_no?: string
+    user_uid: string
+    display_uid?: string
+    user_nickname?: string
+    coupon_name?: string
+    coupon_type?: string
+    value?: number
+}
+
 // ========================================
 // API 实现
 // ========================================
@@ -202,14 +218,14 @@ export const adminCouponApi = {
         pageSize: number
         code?: string
         userUid?: string
-    }): Promise<{ success: boolean; data: any[]; total: number; error?: string }> {
+    }): Promise<{ success: boolean; data: AdminCouponStat[]; total: number; error?: string }> {
         const client = getAdminSupabaseClient()
         const page = params.page
         const pageSize = params.pageSize
         const offset = (page - 1) * pageSize
 
-        // 查询 coupon_codes 表，过滤掉 'available' 状态
-        // 关联 coupons 表获取名字和类型
+        // 1. Query coupon_codes (Primary Source)
+        // This table tracks the generated codes and their current status (available, used, etc.)
         let query = client
             .from('coupon_codes')
             .select(`
@@ -217,41 +233,87 @@ export const adminCouponApi = {
                 code,
                 status,
                 used_at,
+                created_at,
                 user_uid,
-                order_id,
                 coupon:coupons(name, type, value)
             `, { count: 'exact' })
-            .neq('status', 'available') // 过滤掉未使用的
+            .neq('status', 'available') // Only show processed coupons (Used/Expired/Etc)
 
         if (params.code) query = query.ilike('code', `%${params.code}%`)
+        if (params.userUid) query = query.eq('user_uid', params.userUid)
 
-        // 如果需要按 user_uid 搜索，因为 user_uid 在 coupon_codes 表里有 (根据之前的 dump)
-        if (params.userUid) {
-            query = query.eq('user_uid', params.userUid) // 假设搜索存的是 uid 字符串或者根据 id
-            // 根据 dump, user_uid 类型是 uuid, 可能是 user_id。
-            // 之前的 dump 显示 user_uid uuid, 我们先假设它是可以直接搜索的字段。
-            // 如果是模糊搜索，uuid 字段不能用 ilike，只能 eq。暂时假设是 eq。
-        }
+        query = query.order('used_at', { ascending: false, nullsFirst: false })
+            .range(offset, offset + pageSize - 1)
 
-        query = query.order('used_at', { ascending: false }).range(offset, offset + pageSize - 1)
-
-        const { data, error, count } = await query
+        const { data: codes, error, count } = await query
 
         if (error) return { success: false, data: [], total: 0, error: error.message }
+        if (!codes || codes.length === 0) return { success: true, data: [], total: 0 }
 
-        // 格式化返回数据以匹配前端期望
-        const formattedData = (data || []).map((item: any) => ({
-            id: item.id,
-            user_uid: item.user_uid,
-            used_at: item.used_at,
-            created_at: item.created_at,
-            order_id: item.order_id,
-            code: item.code,
-            status: item.status,
-            coupon_name: item.coupon?.name,
-            coupon_type: item.coupon?.type,
-            value: item.coupon?.value
-        }))
+        // 2. Fetch Order Info from user_coupons
+        // We need to link the code usage to an order. We match on 'code' and 'user_id'.
+        const codeValues = codes.map((c: any) => c.code)
+
+        let usageMap: Record<string, any> = {}
+
+        if (codeValues.length > 0) {
+            const { data: usages } = await client
+                .from('user_coupons')
+                .select('code, user_id, order_id, redeemed_at')
+                .in('code', codeValues)
+
+            if (usages) {
+                // Create a map key: code + user_id
+                usageMap = usages.reduce((acc, u) => {
+                    const key = `${u.code}_${u.user_id}`
+                    acc[key] = u
+                    return acc
+                }, {} as Record<string, any>)
+            }
+        }
+
+        // 3. Format Data
+        let formattedData: AdminCouponStat[] = codes.map((item: any) => {
+            // Try to find matching usage
+            const usageKey = `${item.code}_${item.user_uid}`
+            const usage = usageMap[usageKey]
+
+            return {
+                id: item.id, // coupon_codes.id
+                user_uid: item.user_uid,
+                display_uid: item.user_uid,
+                used_at: item.used_at,
+                created_at: usage ? usage.redeemed_at : item.created_at, // Use redemption time if available
+                order_id: usage ? usage.order_id : null,
+                order_no: usage ? usage.order_id : undefined,
+                code: item.code,
+                status: item.status,
+                coupon_name: item.coupon?.name,
+                coupon_type: item.coupon?.type,
+                value: item.coupon?.value
+            }
+        })
+
+        // 4. Fetch User Details (uid, nickname)
+        const userIds = formattedData.map(i => i.user_uid).filter(id => id && id.length > 20)
+        if (userIds.length > 0) {
+            const { data: users } = await client.from('users').select('id, uid, nickname').in('id', userIds)
+            if (users) {
+                const userMap = users.reduce((acc, u) => {
+                    acc[u.id] = u
+                    return acc
+                }, {} as Record<string, any>)
+
+                formattedData = formattedData.map(item => {
+                    const u = userMap[item.user_uid]
+                    return {
+                        ...item,
+                        display_uid: u ? u.uid : item.user_uid,
+                        user_nickname: u ? u.nickname : undefined
+                    }
+                })
+            }
+        }
 
         return { success: true, data: formattedData, total: count || 0 }
     },
@@ -261,7 +323,7 @@ export const adminCouponApi = {
      */
     async deleteCouponUsages(ids: string[]): Promise<{ success: boolean; count?: number; error?: string }> {
         const client = getAdminSupabaseClient()
-        // 直接删除 coupon_codes 表记录
+        // 删除 coupon_codes 表记录 (Primary source)
         const { error, count } = await client.from('coupon_codes').delete().in('id', ids)
 
         if (error) return { success: false, error: error.message }
