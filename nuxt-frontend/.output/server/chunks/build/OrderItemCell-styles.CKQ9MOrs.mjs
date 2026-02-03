@@ -1,0 +1,8 @@
+const OrderItemCell_vue_vue_type_style_index_0_scoped_49df2195_lang = ".order-item-cell[data-v-49df2195]{align-items:center;display:flex;gap:12px}.thumb[data-v-49df2195]{border:1px solid #eee;border-radius:6px;flex-shrink:0;height:44px;width:44px}.no-img[data-v-49df2195]{align-items:center;background:#f5f7fa;color:#ccc;display:flex;font-size:10px;height:100%;justify-content:center;width:100%}.info[data-v-49df2195]{display:flex;flex-direction:column}.info[data-v-49df2195],.name[data-v-49df2195]{overflow:hidden}.name[data-v-49df2195]{font-weight:500;margin-bottom:2px;max-width:200px;text-overflow:ellipsis;white-space:nowrap}.id[data-v-49df2195]{color:#999;font-size:11px}:root.dark .thumb[data-v-49df2195]{border-color:#ffffff1a}:root.dark .no-img[data-v-49df2195]{background:#1e293b;color:#64748b}:root.dark .id[data-v-49df2195]{color:#94a3b8}";
+
+const OrderItemCellStyles_CKQ9MOrs = [
+  OrderItemCell_vue_vue_type_style_index_0_scoped_49df2195_lang
+];
+
+export { OrderItemCellStyles_CKQ9MOrs as default };
+//# sourceMappingURL=OrderItemCell-styles.CKQ9MOrs.mjs.map

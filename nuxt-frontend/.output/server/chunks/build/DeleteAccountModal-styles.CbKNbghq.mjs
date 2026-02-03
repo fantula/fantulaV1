@@ -1,0 +1,8 @@
+const DeleteAccountModal_vue_vue_type_style_index_0_scoped_52693750_lang = ".warning-box[data-v-52693750]{align-items:flex-start;background:#ef44441a;border:1px solid rgba(239,68,68,.2);border-radius:12px;color:#ef4444;display:flex;gap:12px;padding:16px}.warning-icon[data-v-52693750]{font-size:20px}.warning-content[data-v-52693750]{color:#fca5a5;font-size:14px;line-height:1.5}.captcha-row[data-v-52693750]{display:flex;gap:12px}.send-code-btn[data-v-52693750]{background:#ffffff0d;border:1px solid hsla(0,0%,100%,.1);border-radius:12px;color:#94a3b8;cursor:pointer;font-size:13px;height:46px;padding:0 16px;transition:all .2s;white-space:nowrap}.send-code-btn[data-v-52693750]:hover{background:#ffffff1a;color:#fff}.send-code-btn[data-v-52693750]:disabled{cursor:not-allowed;opacity:.5}.confirmation-area[data-v-52693750]{display:flex;justify-content:center;margin-top:8px}.checkbox-label[data-v-52693750]{align-items:center;color:#cbd5e1;cursor:pointer;display:flex;font-size:14px;gap:10px;-webkit-user-select:none;-moz-user-select:none;user-select:none}.checkbox-label input[data-v-52693750]{accent-color:#ef4444;height:18px;width:18px}.delete-btn[data-v-52693750]{background:#ef4444;border:none;border-radius:12px;box-shadow:0 4px 12px #ef44444d;color:#fff;cursor:pointer;font-weight:600;padding:10px 24px;transition:all .2s}.delete-btn[data-v-52693750]:disabled{background:#4b5563;box-shadow:none;cursor:not-allowed;opacity:.5}.delete-btn[data-v-52693750]:not(:disabled):hover{background:#dc2626;transform:translateY(-1px)}";
+
+const DeleteAccountModalStyles_CbKNbghq = [
+  DeleteAccountModal_vue_vue_type_style_index_0_scoped_52693750_lang
+];
+
+export { DeleteAccountModalStyles_CbKNbghq as default };
+//# sourceMappingURL=DeleteAccountModal-styles.CbKNbghq.mjs.map

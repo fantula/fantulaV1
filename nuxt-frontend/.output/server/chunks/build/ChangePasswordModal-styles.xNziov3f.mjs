@@ -1,0 +1,8 @@
+const ChangePasswordModal_vue_vue_type_style_index_0_scoped_54058262_lang = ".alert-box[data-v-54058262]{background:#ef44441a;border-radius:8px;color:#ef4444;font-size:14px;padding:12px}.alert-box[data-v-54058262],.form-group[data-v-54058262]{margin-bottom:20px}.form-label[data-v-54058262]{color:#94a3b8;display:block;font-size:14px;margin-bottom:8px}.form-input[data-v-54058262]{background:#ffffff0d;border:1px solid hsla(0,0%,100%,.1);border-radius:8px;color:#fff;font-size:14px;height:44px;outline:none;padding:0 12px;transition:all .3s;width:100%}.form-input[data-v-54058262]:focus{background:#3b82f60d;border-color:#3b82f6}.input-with-action[data-v-54058262]{display:flex;gap:12px}.send-code-btn[data-v-54058262]{background:#ffffff0d;border:1px solid hsla(0,0%,100%,.1);border-radius:8px;color:#fff;cursor:pointer;font-size:14px;height:44px;padding:0 20px;transition:all .3s;white-space:nowrap}.send-code-btn[data-v-54058262]:hover:not(:disabled){border-color:#3b82f6;color:#3b82f6}.send-code-btn[data-v-54058262]:disabled{cursor:not-allowed;opacity:.5}";
+
+const ChangePasswordModalStyles_xNziov3f = [
+  ChangePasswordModal_vue_vue_type_style_index_0_scoped_54058262_lang
+];
+
+export { ChangePasswordModalStyles_xNziov3f as default };
+//# sourceMappingURL=ChangePasswordModal-styles.xNziov3f.mjs.map

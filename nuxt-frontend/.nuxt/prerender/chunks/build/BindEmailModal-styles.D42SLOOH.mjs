@@ -1,0 +1,8 @@
+const BindEmailModal_vue_vue_type_style_index_0_scoped_a57fc57b_lang = ".alert-box[data-v-a57fc57b]{background:#3b82f61a;border-radius:8px;color:#60a5fa;font-size:14px;padding:12px}.alert-box[data-v-a57fc57b],.form-group[data-v-a57fc57b]{margin-bottom:20px}.form-label[data-v-a57fc57b]{color:#94a3b8;display:block;font-size:14px;margin-bottom:8px}.form-input[data-v-a57fc57b]{background:#ffffff0d;border:1px solid hsla(0,0%,100%,.1);border-radius:8px;color:#fff;font-size:14px;height:44px;outline:none;padding:0 12px;transition:all .3s;width:100%}.form-input[data-v-a57fc57b]:disabled{cursor:not-allowed;opacity:.6}.form-input[data-v-a57fc57b]:focus{background:#3b82f60d;border-color:#3b82f6}.input-with-action[data-v-a57fc57b]{display:flex;gap:12px}.send-code-btn[data-v-a57fc57b]{background:#ffffff0d;border:1px solid hsla(0,0%,100%,.1);border-radius:8px;color:#fff;cursor:pointer;font-size:14px;height:44px;padding:0 20px;transition:all .3s;white-space:nowrap}.send-code-btn[data-v-a57fc57b]:hover:not(:disabled){border-color:#3b82f6;color:#3b82f6}.send-code-btn[data-v-a57fc57b]:disabled{cursor:not-allowed;opacity:.5}.step-actions[data-v-a57fc57b]{margin-top:10px}.primary-btn[data-v-a57fc57b]{background:#3b82f6;border:none;border-radius:8px;color:#fff;cursor:pointer;font-weight:600;height:44px;transition:all .3s}.primary-btn.full-width[data-v-a57fc57b]{width:100%}.primary-btn[data-v-a57fc57b]:hover:not(:disabled){background:#2563eb}.primary-btn[data-v-a57fc57b]:disabled{cursor:not-allowed;opacity:.5}";
+
+const BindEmailModalStyles_D42SLOOH = [
+  BindEmailModal_vue_vue_type_style_index_0_scoped_a57fc57b_lang
+];
+
+export { BindEmailModalStyles_D42SLOOH as default };
+//# sourceMappingURL=BindEmailModal-styles.D42SLOOH.mjs.map

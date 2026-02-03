@@ -1,0 +1,5 @@
+const index_vue_vue_type_style_index_0_scoped_5d641623_lang = ".card-header[data-v-5d641623]{align-items:center;display:flex;justify-content:space-between}.status-list[data-v-5d641623]{display:flex;flex-direction:column}.status-item[data-v-5d641623]{justify-content:space-between;padding:8px 0}.status-item[data-v-5d641623],.status-label[data-v-5d641623]{align-items:center;display:flex}.status-label[data-v-5d641623]{color:var(--el-text-color-regular);font-size:14px;gap:8px}";
+export {
+  index_vue_vue_type_style_index_0_scoped_5d641623_lang as default
+};
+//# sourceMappingURL=index-styles-1.mjs-DHSFR8SG.js.map

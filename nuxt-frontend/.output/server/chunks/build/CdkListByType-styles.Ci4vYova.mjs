@@ -1,0 +1,8 @@
+const CdkListByType_vue_vue_type_style_index_0_scoped_3e5a6af5_lang = ".cdk-list-view[data-v-3e5a6af5]{display:flex;flex-direction:column;height:100%}.filter-group[data-v-3e5a6af5]{gap:10px}.filter-group[data-v-3e5a6af5],.product-cell[data-v-3e5a6af5]{align-items:center;display:flex}.product-name[data-v-3e5a6af5]{font-size:14px;font-weight:500}.code-display[data-v-3e5a6af5]{align-items:center;display:flex;gap:8px}.code-text[data-v-3e5a6af5]{color:#333;font-size:13px;word-break:break-all}.sku-mappings-cell[data-v-3e5a6af5]{align-items:center;display:flex;flex-wrap:wrap;gap:4px}.more-tag[data-v-3e5a6af5]{color:#909399;font-size:12px}.stock-info[data-v-3e5a6af5]{align-items:center;display:flex;font-size:14px;justify-content:center}.stock-divider[data-v-3e5a6af5]{color:#dcdfe6;margin:0 4px}.remaining[data-v-3e5a6af5]{color:#67c23a;font-weight:500}";
+
+const CdkListByTypeStyles_Ci4vYova = [
+  CdkListByType_vue_vue_type_style_index_0_scoped_3e5a6af5_lang
+];
+
+export { CdkListByTypeStyles_Ci4vYova as default };
+//# sourceMappingURL=CdkListByType-styles.Ci4vYova.mjs.map
