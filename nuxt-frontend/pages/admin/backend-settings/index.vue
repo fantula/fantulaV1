@@ -15,6 +15,8 @@
       </el-descriptions>
     </el-card>
 
+
+
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
@@ -59,6 +61,7 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { DataLine, Files, Service } from '@element-plus/icons-vue'
@@ -75,6 +78,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 const supabaseUrl = config.public.supabaseUrl
 const edgeUrl = getEdgeFunctionsUrl()
 const session = useSupabaseSession()
+
 
 // Status Types
 interface Status { type: 'success' | 'warning' | 'danger' | 'info'; text: string }
@@ -166,4 +170,5 @@ onMounted(() => {
     font-size: 14px;
     color: var(--el-text-color-regular);
 }
+
 </style>

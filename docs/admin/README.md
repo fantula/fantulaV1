@@ -1,18 +1,41 @@
-# 后台管理系统文档索引 (Admin Documentation Index)
+# 后台管理系统文档索引
 
-> **凡图拉后台管理系统 (Fantula Admin Panel)**
-> **版本**: v2.0 | **最后更新**: 2026-02-03
+> **Fantula Admin Panel**
+> **版本**: v2.1 | **最后更新**: 2026-02-04
 
 ---
 
-## 📚 文档目录
+## 🎯 快速入口
 
-| 文档 | 描述 | 适用人员 |
-|------|------|---------|
-| [ADMIN_AUTH_PERMISSION.md](./ADMIN_AUTH_PERMISSION.md) | 登录与权限策略 | 架构师、安全审计 |
-| [ADMIN_ENGINEERING_STANDARD.md](./ADMIN_ENGINEERING_STANDARD.md) | 工程开发规范 | 所有开发者 |
-| [ADMIN_SYSTEM_CONFIG.md](./ADMIN_SYSTEM_CONFIG.md) | 系统配置参考 | 前端开发、运维 |
-| [ADMIN_SCHEDULER.md](./ADMIN_SCHEDULER.md) | 定时任务系统 | 后端开发、运维 |
+**AI 工程师请先阅读**: [`../AI_WORKFLOW.md`](../AI_WORKFLOW.md) - 工作流程主框架
+
+---
+
+## 📚 文档列表
+
+### 核心规范 (必读)
+
+| 文档 | 说明 | 场景 |
+|------|------|------|
+| [ADMIN_ENGINEERING_STANDARD.md](./ADMIN_ENGINEERING_STANDARD.md) | 工程开发规范 | 开发新功能 |
+| [ADMIN_TEST_OPTIMIZATION_GUIDE.md](./ADMIN_TEST_OPTIMIZATION_GUIDE.md) | 测试与优化规范 | AI测试优化 |
+| [ADMIN_COMPONENT_ROADMAP.md](./ADMIN_COMPONENT_ROADMAP.md) | 组件标准化路线图 | 组件化改造 |
+
+### 系统配置
+
+| 文档 | 说明 |
+|------|------|
+| [ADMIN_AUTH_PERMISSION.md](./ADMIN_AUTH_PERMISSION.md) | 登录与权限策略 |
+| [ADMIN_SYSTEM_CONFIG.md](./ADMIN_SYSTEM_CONFIG.md) | 系统配置参考 |
+| [ADMIN_SCHEDULER.md](./ADMIN_SCHEDULER.md) | 定时任务系统 |
+
+### 开发参考
+
+| 文档 | 说明 |
+|------|------|
+| [ADMIN_DEVELOPMENT_GUIDE.md](./ADMIN_DEVELOPMENT_GUIDE.md) | 开发指南详解 |
+| [ADMIN_CORE_WORKFLOW.md](./ADMIN_CORE_WORKFLOW.md) | 核心工作流程 |
+| [ADMIN_OPERATION_MANUAL.md](./ADMIN_OPERATION_MANUAL.md) | 操作手册 |
 
 ---
 
@@ -26,160 +49,62 @@
 │  layouts/mgmt.vue    │  唯一后台布局                            │
 │  middleware/mgmt-auth│  统一认证守卫                            │
 ├─────────────────────────────────────────────────────────────────┤
-│  components/admin/   │  全局基础组件 (17个)                      │
-│  composables/admin/  │  通用逻辑封装 (useAdminDialog, etc.)     │
-│  stores/admin/       │  状态管理 (useAdminStore)                │
+│  components/admin/   │  全局基础组件                             │
+│  composables/admin/  │  通用逻辑封装                             │
+│  stores/admin/       │  状态管理                                │
 │  api/admin/          │  后台 API 接口层                         │
-├─────────────────────────────────────────────────────────────────┤
-│  utils/supabase-admin│  Service Role Client (绕过 RLS)          │
 └─────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Backend (Supabase)                       │
-├─────────────────────────────────────────────────────────────────┤
-│  auth.users          │  认证用户                                │
-│  admin_users         │  管理员账号                              │
-│  admin_departments   │  部门与权限                              │
+│                    参见: docs/backend/                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ⚡ 快速开始
+## 🧩 全局组件速查
 
-### 1. 创建新的列表页面
+### 必须使用的组件
 
-```bash
-# 1. 创建页面文件
-touch pages/admin/xxx/index.vue
+| 组件 | 用途 | 场景 |
+|------|------|------|
+| `AdminDataTable` | 数据表格+分页 | 所有列表页 |
+| `AdminDataDialog` | 标准弹窗 | 新增/编辑 |
+| `AdminActionCard` | 操作栏 | 列表页顶部 |
+| `PageTipHeader` | 页面标题 | 所有页面 |
 
-# 2. 使用模板
-```
+### 必须使用的 Composable
 
-```vue
-<template>
-  <div class="page-container">
-    <PageTipHeader title="XX管理" />
-    <AdminActionCard>
-      <template #actions>
-        <el-button @click="loadList">刷新</el-button>
-        <el-button type="primary" @click="dialog.openAdd()">新增</el-button>
-      </template>
-    </AdminActionCard>
-    <AdminDataTable :data="list" :loading="loading" :total="total" ...>
-      <!-- 列定义 -->
-    </AdminDataTable>
-    <AdminDataDialog v-model="dialog.visible.value" ...>
-      <!-- 表单 -->
-    </AdminDataDialog>
-  </div>
-</template>
-
-<script setup lang="ts">
-definePageMeta({ layout: 'mgmt', middleware: ['mgmt-auth'] })
-
-import { useAdminList } from '@/composables/admin/useAdminList'
-import { useAdminDialog } from '@/composables/admin/useAdminDialog'
-
-const { list, loading, total, loadList } = useAdminList({ ... })
-const dialog = useAdminDialog({ ... })
-</script>
-```
-
-### 2. 添加到菜单
-
-编辑 `config/admin-menu.ts`:
-```typescript
-export const ADMIN_MENU_ITEMS = [
-  // ... 现有菜单
-  { index: '/admin/xxx', path: '/admin/xxx', icon: 'Goods', title: 'XX管理' },
-]
-```
-
-### 3. 配置权限
-
-在【用户管理 -> 部门管理】中为相应部门添加 `/admin/xxx` 权限。
-
----
-
-## 🔒 安全要点
-
-| 要求 | 实现方式 |
-|------|---------|
-| 单一登录入口 | `/admin/login.vue` 是唯一登录页面 |
-| 统一认证 | `middleware/mgmt-auth.ts` 全局拦截 |
-| 细粒度权限 | `useAdminStore.hasPermission()` |
-| 数据安全 | Service Role Key 仅在服务端/后台使用 |
-
----
-
-## 🧩 组件速查
-
-### 表格相关
-```vue
-<AdminDataTable :data :loading :total v-model:current-page v-model:page-size />
-<BulkActionBar :count @delete />
-```
-
-### 弹窗相关
-```vue
-<AdminDataDialog v-model :title :loading @confirm />
-```
-
-### 表单相关
-```vue
-<StickyFormHeader :loading @save @back />
-<AdminImageSelector v-model />
-<AdminSkuSelector v-model />
-```
-
-### 布局相关
-```vue
-<PageTipHeader :title :description />
-<AdminActionCard>
-  <template #default />
-  <template #actions />
-</AdminActionCard>
-<CategoryPills v-model :items />
-```
-
----
-
-## 🛠 常用 Composable
-
-```typescript
-// 弹窗管理
-import { useAdminDialog, confirmDelete, confirmAction } from '@/composables/admin/useAdminDialog'
-
-// 列表管理
-import { useAdminList } from '@/composables/admin/useAdminList'
-
-// 格式化
-import { useBizFormat } from '@/composables/common/useBizFormat'
-
-// 业务配置
-import { useBizConfig } from '@/composables/common/useBizConfig'
-```
+| Composable | 用途 |
+|------------|------|
+| `useAdminDialog` | 弹窗状态管理 |
+| `useAdminList` | 列表/分页管理 |
+| `useBizFormat` | 格式化工具 |
+| `useBizConfig` | 状态配置 |
 
 ---
 
 ## ❌ 禁止事项
 
-1. **禁止创建第二个登录页面**
-2. **禁止在 admin 中使用 anon key 客户端**
-3. **禁止绕过 middleware 进行权限检查**
-4. **禁止硬编码业务状态文案**
-5. **禁止提交 console.log 调试代码**
-6. **禁止重复造轮子（有全局组件必须使用）**
+1. 创建第二个登录页面
+2. 在 admin 中使用 anon key 客户端
+3. 绕过 middleware 进行权限检查
+4. 硬编码业务状态文案
+5. 提交 console.log 调试代码
+6. 不使用全局组件而重复造轮子
 
 ---
 
-## 📝 变更日志
+## 📝 更新日志
+
+### v2.1 (2026-02-04)
+- ✅ 添加 AI 工作流程主框架
+- ✅ 添加测试优化规范
+- ✅ 添加组件标准化路线图
+- ✅ 整合分散文档
 
 ### v2.0 (2026-02-03)
-- ✅ 添加 `useAdminDialog` Composable
-- ✅ 添加 `useAdminList` Composable
-- ✅ 清理调试代码
-- ✅ 更新所有文档
-- ✅ 统一全局组件使用规范
+- 添加 `useAdminDialog`/`useAdminList`
+- 统一全局组件使用规范

@@ -122,7 +122,7 @@
     <LoginRegisterModal :visible="showLoginModal" @close="closeLoginModal" />
     
     <!-- 联系我们弹窗 -->
-    <ContactModal :visible="showContactModal" @close="closeContactModal" />
+    <ServiceModal v-if="showContactModal" @close="closeContactModal" />
   </footer>
 </template>
 
@@ -130,7 +130,8 @@
 import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/client/user'
 import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
-import ContactModal from '@/components/pc/modal/ContactModal.vue'
+
+import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
 import { ChatDotRound, Platform, Bell, VideoPlay } from '@element-plus/icons-vue'
 
 const showJoinUs = ref(false)

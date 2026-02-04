@@ -1,415 +1,360 @@
 <template>
-  <Transition name="modal-zoom">
-    <div class="service-modal-mask" @click.self="$emit('close')">
-      <div class="service-modal">
-        <div class="modal-gradient-top">
-          <div class="modal-header">
-            <span class="modal-title">联系客服</span>
-            <button class="modal-close" @click="$emit('close')">×</button>
-          </div>
-          <div class="modal-desc">我们提供多种便捷的客服渠道，7×24小时为您提供专业服务。扫码添加客服，获取即时帮助。</div>
+  <Transition name="modal-fade">
+    <div class="modal-backdrop" @click.self="$emit('close')">
+      <div class="modal-container">
+        
+        <!-- Decoration -->
+        <div class="glow-effect"></div>
+
+        <!-- Header -->
+        <div class="modal-header">
+           <div class="header-content">
+             <img src="/images/shared/logo_v3.png" alt="Logo" class="brand-logo" />
+             <h2 class="title">联系图拉</h2>
+             <p class="subtitle">7x24小时为您提供专业服务</p>
+           </div>
+           <button class="close-btn" @click="$emit('close')">
+             <el-icon><Close /></el-icon>
+           </button>
         </div>
-        <div class="modal-main-white">
-          <div class="modal-row">
-            <div class="modal-card">
-              <div class="card-top-row">
-                <div class="card-avatar wechat">
-                  <img 
-                    :src="weixinIcon1" 
-                    alt="微信客服图标" 
-                    @error="handleImageError"
-                    @load="handleImageLoad"
-                  />
-                </div>
-              <div class="card-title">微信客服</div>
+
+        <!-- Content -->
+        <div class="modal-body">
+           <!-- QR Code Grid -->
+           <div class="qr-grid">
+              
+              <!-- WeChat -->
+              <div class="qr-card wechat">
+                 <div class="qr-box">
+                    <img :src="config.wechat_qr" class="qr-img" />
+                    <div class="scan-tip">
+                        <el-icon><Aim /></el-icon> 扫码添加
+                    </div>
+                 </div>
+                 <div class="info-box">
+                    <div class="icon-label">
+                        <el-icon color="#07C160"><ChatDotRound /></el-icon>
+                        <span class="label">微信客服</span>
+                    </div>
+                    <div class="value copyable" @click="copyText(config.wechat_id)">
+                        {{ config.wechat_id }} <el-icon class="copy-icon"><CopyDocument /></el-icon>
+                    </div>
+                 </div>
               </div>
-              <div class="card-icon-box">
-                <img 
-                  :src="weixinIcon2" 
-                  class="card-icon-img" 
-                  alt="微信二维码" 
-                  @error="handleImageError"
-                  @load="handleImageLoad"
-                />
+
+              <!-- Telegram -->
+              <div class="qr-card telegram">
+                 <div class="qr-box">
+                    <img :src="config.telegram_qr" class="qr-img" />
+                    <div class="scan-tip">
+                        <el-icon><Aim /></el-icon> 扫码添加
+                    </div>
+                 </div>
+                 <div class="info-box">
+                    <div class="icon-label">
+                        <el-icon color="#2AABEE"><Position /></el-icon>
+                        <span class="label">Telegram</span>
+                    </div>
+                    <div class="value copyable" @click="copyText(config.telegram_id)">
+                        {{ config.telegram_id }} <el-icon class="copy-icon"><CopyDocument /></el-icon>
+                    </div>
+                 </div>
               </div>
-              <div class="card-desc">使用微信扫描二维码添加客服<br />或搜索微信号：<span class="account-code">kefu_wechat123</span></div>
-            </div>
-            <div class="modal-card">
-              <div class="card-top-row">
-                <div class="card-avatar dingtalk">
-                  <img 
-                    :src="dingdingIcon1" 
-                    alt="钉钉客服图标" 
-                    @error="handleImageError"
-                    @load="handleImageLoad"
-                  />
-                </div>
-                <div class="card-title">钉钉客服</div>
-              </div>
-              <div class="card-icon-box">
-                <img 
-                  :src="dingdingIcon2" 
-                  class="card-icon-img" 
-                  alt="钉钉二维码" 
-                  @error="handleImageError"
-                  @load="handleImageLoad"
-                />
-              </div>
-              <div class="card-desc">使用钉钉扫描二维码添加客服<br />或搜索ID：<span class="account-code">kefu_dingtalk456</span></div>
-            </div>
-          </div>
-          <div class="modal-row phone-row">
-            <div class="modal-card phone">
-              <div class="phone-header">
-                <div class="modal-card-icon phone">
-                  <img 
-                    :src="phoneIcon" 
-                    alt="电话客服图标" 
-                    @error="handleImageError"
-                    @load="handleImageLoad"
-                  />
-                </div>
-                <div class="modal-card-title phone">电话客服</div>
-              </div>
-              <div class="modal-phone-number">400-888-9999</div>
-              <div class="modal-phone-desc">服务时间：全天24小时<br />拨打客服热线获取即时支持<br />或发送邮件至 <span class="email-support">support@company.com</span></div>
-            </div>
-          </div>
-          <button class="modal-action">
-            <img 
-              :src="contactIcon" 
-              alt="联系客服图标" 
-              class="action-icon"
-              @error="handleImageError"
-              @load="handleImageLoad"
-            />
-            联系在线客服
-          </button>
+
+           </div>
         </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <div class="service-tag">
+                <el-icon><Timer /></el-icon>
+                <span>在线时间: {{ config.service_time }}</span>
+            </div>
+        </div>
+
       </div>
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-// 如果静态路径有问题，可以使用这种方式
-const weixinIcon1 = '/images/client/pc/kefuweixin1.png'
-const weixinIcon2 = '/images/client/pc/kefuweixin2.png'
-const dingdingIcon1 = '/images/client/pc/kefudingding1.png'
-const dingdingIcon2 = '/images/client/pc/kefudingding2.png'
-const phoneIcon = '/images/client/pc/kefudianhua.png'
-const contactIcon = '/images/client/pc/kefulianxi.png'
+import { onMounted, computed } from 'vue'
+import { Close, ChatDotRound, Position, Timer, CopyDocument, Aim } from '@element-plus/icons-vue'
+import { useSystemConfig } from '@/composables/client/useSystemConfig' // Assuming this exists or create it
+import { ElMessage } from 'element-plus'
 
-// 图片加载错误处理
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement
-  console.warn('图片加载失败:', img.src)
-  // 可以设置默认图片或隐藏
-  img.style.display = 'none'
+defineEmits(['close'])
+
+const { contactConfig, fetchContactConfig } = useSystemConfig()
+
+const config = computed(() => {
+    return contactConfig.value || {
+        wechat_id: 'Spotify-cn',
+        wechat_qr: '/images/contact/wechat_qr.jpg',
+        telegram_id: '@FANTULA_SUPPORT',
+        telegram_qr: '/images/contact/telegram_qr.jpg',
+        service_time: '10:00 - 23:00'
+    }
+})
+
+const copyText = (text: string) => {
+    if(!text) return
+    navigator.clipboard.writeText(text).then(() => {
+        ElMessage.success('复制成功')
+    }).catch(() => {
+        ElMessage.error('复制失败')
+    })
 }
 
-// 图片加载成功处理
-const handleImageLoad = (event: Event) => {
-  const img = event.target as HTMLImageElement
-  console.log('图片加载成功:', img.src)
-}
+onMounted(() => {
+    fetchContactConfig()
+})
 </script>
 
 <style scoped>
-.service-modal-mask {
-  position: fixed;
-  z-index: 2000;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.service-modal {
-  height: auto;
-  width: 576px;
-  max-width: 98vw;
-  border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  /* Dark Glass Theme */
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  /* Removed animation: modalIn ... handled by Vue Transition now */
+
+.modal-container {
+    position: relative;
+    width: 680px;
+    background: rgba(20, 20, 25, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
 }
-/* Removed @keyframes modalIn */
-.modal-gradient-top {
-  /* Subtle gradient blend */
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(14, 165, 233, 0.1) 100%);
-  border-radius: 24px 24px 0 0;
-  padding: 26px 32px 19px 32px;
-  text-align: center;
-  position: relative;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+.glow-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
 }
+
+/* Header */
 .modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 32px;
 }
-.modal-title {
-  color: #fff;
-  font-size: 21px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  flex: 1;
-  text-align: center;
+.header-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
-.modal-close {
-  position: absolute;
-  right: 0;
-  top: 0;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  line-height: 1;
-  padding: 3px 6px;
-  border-radius: 5px;
-  transition: background 0.2s;
+.brand-logo {
+    height: 40px;
+    width: auto;
+    margin-bottom: 8px;
 }
-.modal-close:hover {
-  background: rgba(255,255,255,0.1);
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
 }
-.modal-desc {
-  color: #94A3B8; /* Slate-400 */
-  font-size: 13px;
-  margin: 0;
-  text-align: center;
-  line-height: 1.5;
+.subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    margin: 0;
 }
-.modal-main-white {
-  background: transparent; /* Remove white bg */
-  border-radius: 0 0 24px 24px;
-  padding: 29px 26px 26px 26px;
-  margin-top: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.close-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #94a3b8;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
 }
-.modal-row {
-  display: flex;
-  gap: 19px;
-  justify-content: center;
-  margin-bottom: 22px;
-  width: 100%;
+.close-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    transform: rotate(90deg);
 }
-.phone-row {
-  justify-content: center;
-  margin-bottom: 26px;
+
+/* Content */
+.modal-body {
+    width: 100%;
+    z-index: 1;
 }
-.modal-card {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  box-shadow: none;
-  padding: 22px 16px 19px 16px;
-  width: 208px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border */
-  transition: all 0.3s ease;
+
+.qr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
 }
-.modal-card:hover {
-  border-color: var(--primary-blue);
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-2px);
+
+.qr-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s, background 0.2s;
 }
-.card-top-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+.qr-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
 }
-.card-avatar {
-  width: 29px;
-  height: 29px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.qr-box {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    background: #fff; /* Restored white background */
+    border-radius: 12px;
+    padding: 0; /* REMOVED white edge/padding as requested */
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.card-avatar img {
-  width: 19px;
-  height: 19px;
-  object-fit: contain;
-  border-radius: 50%;
+.qr-box:hover {
+    transform: none; /* Removed scale effect for cleaner feel */
 }
-.card-avatar.wechat {
-  background: #E6F7EE;
+.qr-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensure code is visible */
+    border-radius: 12px;
 }
-.card-avatar.dingtalk {
-  background: #E6F0FA;
+.scan-tip {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px;
+    text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
-.card-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #F1F5F9; /* Slate-100 */
-  margin-bottom: 0;
+.qr-box:hover .scan-tip { opacity: 1; }
+
+.info-box {
+    width: 100%;
+    text-align: center;
 }
-.card-icon-box {
-  width: 70px;
-  height: 70px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+.icon-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 500;
 }
-.modal-card:hover .card-icon-box {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+.value {
+    color: #94a3b8;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: color 0.2s;
 }
-.card-icon-img {
-  width: 38px;
-  height: 38px;
+.value:hover { color: #fff; }
+.copy-icon { opacity: 0.5; }
+
+/* Wechat Specifics */
+.wechat .qr-card:hover { border-color: rgba(7, 193, 96, 0.3); }
+
+/* Telegram Specifics */
+.telegram .qr-card:hover { border-color: rgba(42, 171, 238, 0.3); }
+
+/* Footer */
+.modal-footer {
+    margin-top: 32px;
+    z-index: 1;
 }
-.card-desc {
-  font-family: Noto Sans SC, Noto Sans SC;
-  font-weight: 400;
-  font-size: 11px;
-  color: #94A3B8; /* Slate-400 */
-  line-height: 19px;
-  text-align: center;
-  font-style: normal;
-  text-transform: none;
-  margin-top: 0;
-  padding: 6px 10px;
-  letter-spacing: 0.2px;
+.service-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    color: #94a3b8;
+    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
-.account-code {
-  font-family: Noto Sans SC, Noto Sans SC;
-  font-weight: 700;
-  font-size: 11px;
-  color: #F8FAFC; /* Slate-50 */
-  line-height: 19px;
-  text-align: center;
-  font-style: normal;
-  text-transform: none;
-  letter-spacing: 0.6px;
-  padding: 0 2px;
+
+/* Animations */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
 }
-.modal-card.phone {
-  width: 272px;
-  box-shadow: none;
-  margin-top: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  flex-direction: column;
-  align-items: center;
-  padding: 26px 19px 22px 19px;
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
 }
-.modal-card.phone:hover {
-  border-color: var(--primary-blue);
-  background: rgba(255, 255, 255, 0.06);
+
+.modal-fade-enter-active .modal-container {
+    animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.phone-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+.modal-fade-leave-active .modal-container {
+    animation: modal-pop 0.2s reverse ease-in;
 }
-.modal-card-icon.phone {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #FFEBEB;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0;
+
+@keyframes modal-pop {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
-.modal-card-icon.phone img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
+
+@media (max-width: 640px) {
+    .modal-container { width: 95vw; padding: 24px; }
+    .qr-grid { grid-template-columns: 1fr; }
+    .qr-card { flex-direction: row; padding: 16px; gap: 16px; }
+    .qr-box { width: 80px; height: 80px; margin-bottom: 0; }
+    .info-box { text-align: left; }
+    .icon-label, .value { justify-content: flex-start; }
 }
-.modal-card-title.phone {
-  color: #F1F5F9; /* White-ish */
-  text-align: center;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 0;
+
+/* Telegram Specific Override: Remove white box for the dark poster */
+.telegram .qr-box {
+    background: transparent;
+    box-shadow: none;
 }
-.modal-phone-number {
-  color: var(--active-orange); /* Use Theme Active Color */
-  font-size: 19px;
-  font-weight: 700;
-  margin: 10px 0 13px 0;
-  letter-spacing: 1.2px;
+.telegram .qr-img {
+    border-radius: 8px;
+    /* Optional: Add a subtle drop shadow to the image itself instead of the box */
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 }
-.modal-phone-desc {
-  font-family: Noto Sans SC, Noto Sans SC;
-  font-weight: 400;
-  font-size: 11px;
-  color: #94A3B8;
-  line-height: 19px;
-  text-align: center;
-  font-style: normal;
-  text-transform: none;
-  padding: 6px 13px;
-  letter-spacing: 0.2px;
-}
-.email-support {
-  font-family: Noto Sans SC, Noto Sans SC;
-  font-weight: 700;
-  font-size: 11px;
-  color: #F8FAFC;
-  line-height: 19px;
-  text-align: center;
-  font-style: normal;
-  text-transform: none;
-  letter-spacing: 0.4px;
-  padding: 0 2px;
-}
-.modal-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  background: linear-gradient(90deg, #2583f6 0%, #3bb3fa 100%);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  border: none;
-  border-radius: 10px;
-  padding: 0 26px;
-  height: 38px;
-  box-shadow: 0 3px 10px rgba(37,131,246,0.15);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 128px;
-  gap: 6px;
-}
-.modal-action:hover {
-  background: linear-gradient(90deg, #3bb3fa 0%, #2583f6 100%);
-  box-shadow: 0 5px 13px rgba(37,131,246,0.2);
-  transform: translateY(-1px);
-}
-.action-icon {
-  width: 16px;
-  height: 16px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-}
-@media (max-width: 750px) {
-  .service-modal { width: 95vw; }
-  .modal-main-white { padding: 19px 13px 16px 13px; }
-  .modal-row { flex-direction: column; gap: 13px; align-items: center; }
-  .modal-card, .modal-card.phone { width: 100%; max-width: 240px; }
-  .phone-row { margin-bottom: 19px; }
-}
-</style> 
+</style>

@@ -1,5 +1,5 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import { tmpdir } from 'node:os';
-import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getHeader, getMethod, readRawBody, getResponseStatusText } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
+import { defineEventHandler, handleCacheHeaders, splitCookiesString, createEvent, fetchWithEvent, isEvent, eventHandler, setHeaders, sendRedirect, proxyRequest, getRequestHeader, setResponseHeaders, setResponseStatus, send, getRequestHeaders, setResponseHeader, appendResponseHeader, getRequestURL, getResponseHeader, removeResponseHeader, createError, getQuery as getQuery$1, readBody, createApp, createRouter as createRouter$1, toNodeListener, lazyEventHandler, getResponseStatus, getRouterParam, getHeader, setHeader, getMethod, readRawBody, getResponseStatusText } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
 import { Server } from 'node:http';
 import { resolve, dirname, join } from 'node:path';
 import crypto$1 from 'node:crypto';
@@ -2604,6 +2604,7 @@ async function getIslandContext(event) {
 }
 
 const _lazy_dcHuVB = () => Promise.resolve().then(function () { return bindWechat_post$1; });
+const _lazy_hMjmce = () => Promise.resolve().then(function () { return contact_get$1; });
 const _lazy_rPysyX = () => Promise.resolve().then(function () { return test$1; });
 const _lazy_oZR3Aq = () => Promise.resolve().then(function () { return checkScan_get$1; });
 const _lazy_ZV1bkv = () => Promise.resolve().then(function () { return eventCallback$1; });
@@ -2620,6 +2621,7 @@ const _lazy_8EFkQE = () => Promise.resolve().then(function () { return renderer$
 const handlers = [
   { route: '', handler: _2qpWSd, lazy: false, middleware: true, method: undefined },
   { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },
+  { route: '/api/client/config/contact', handler: _lazy_hMjmce, lazy: true, middleware: false, method: "get" },
   { route: '/api/test', handler: _lazy_rPysyX, lazy: true, middleware: false, method: undefined },
   { route: '/api/wechat/check-scan', handler: _lazy_oZR3Aq, lazy: true, middleware: false, method: "get" },
   { route: '/api/wechat/event-callback', handler: _lazy_ZV1bkv, lazy: true, middleware: false, method: undefined },
@@ -3446,6 +3448,58 @@ async function performBinding(supabase, userId, openid, unionid) {
 const bindWechat_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: bindWechat_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+let adminSupabaseClient = null;
+function getAdminSupabaseClient() {
+  if (!adminSupabaseClient) {
+    const config = useRuntimeConfig();
+    const SUPABASE_SERVICE_ROLE_KEY = config.public.supabaseServiceKey || config.supabaseServiceKey;
+    const SUPABASE_URL = config.public.supabaseUrl;
+    if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
+      console.error("[Admin Client] Missing SUPABASE_SERVICE_KEY or SUPABASE_URL");
+    }
+    adminSupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: {
+        persistSession: false,
+        // 禁止 Admin Client 持久化 Session
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      },
+      global: {
+        headers: {
+          // 强制使用 Service Role Key 作为 Authorization Header
+          // 这能防止 Supabase JS 自动使用 LocalStorage 中的用户 Token 覆盖它
+          "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    });
+  }
+  return adminSupabaseClient;
+}
+
+const contact_get = defineEventHandler(async (event) => {
+  const client = getAdminSupabaseClient();
+  setHeader(event, "Cache-Control", "public, s-maxage=300, stale-while-revalidate=60");
+  const { data, error } = await client.from("system_configs").select("value").eq("key", "contact_info").single();
+  if (error) {
+    return {
+      success: true,
+      data: {
+        wechat_id: "Spotify-cn",
+        wechat_qr: "/images/contact/wechat_qr.jpg",
+        telegram_id: "@FANTULA_SUPPORT",
+        telegram_qr: "/images/contact/telegram_qr.jpg",
+        service_time: "10:00 - 23:00"
+      }
+    };
+  }
+  return { success: true, data: data.value };
+});
+
+const contact_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: contact_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const test = defineEventHandler(async (event) => {

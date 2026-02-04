@@ -231,7 +231,7 @@
       @success="onCancelRefundSuccess"
     />
 
-    <ContactModal
+    <ServiceModal
       v-if="showContactModal"
       @close="showContactModal = false"
     />
@@ -259,7 +259,7 @@ import RenewalModal from '@/components/pc/order/RenewalModal.vue'
 import RefundModal from '@/components/pc/order/RefundModal.vue'
 import CancelRefundModal from '@/components/pc/order/CancelRefundModal.vue'
 import TicketApplyModal from '@/components/pc/modal/business/TicketApplyModal.vue'
-import ContactModal from '@/components/pc/modal/ContactModal.vue'
+import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
 import ProductInfoCard from '@/components/pc/order/ProductInfoCard.vue'
 import type { FulfillmentField } from '@/types/order'
 

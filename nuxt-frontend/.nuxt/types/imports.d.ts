@@ -435,6 +435,7 @@ declare global {
   const updateAppConfig: typeof import('../../node_modules/nuxt/dist/app/config').updateAppConfig
   const uploadImageToStorage: typeof import('../../utils/uploadImage').uploadImageToStorage
   const useAdminCdkList: typeof import('../../composables/admin/useAdminCdkList').useAdminCdkList
+  const useAdminContactConfig: typeof import('../../composables/admin/useAdminContactConfig').useAdminContactConfig
   const useAdminCouponList: typeof import('../../composables/admin/useAdminCouponList').useAdminCouponList
   const useAdminCouponStats: typeof import('../../composables/admin/useAdminCouponStats').useAdminCouponStats
   const useAdminDialog: typeof import('../../composables/admin/useAdminDialog').default
@@ -536,6 +537,7 @@ declare global {
   const useState: typeof import('../../node_modules/nuxt/dist/app/composables/state').useState
   const useSupabaseSession: typeof import('../../composables/useSupabaseSession').default
   const useSupabaseUserStore: typeof import('../../stores/shared/supabase-user').useSupabaseUserStore
+  const useSystemConfig: typeof import('../../composables/client/useSystemConfig').useSystemConfig
   const useTemplateRef: typeof import('vue').useTemplateRef
   const useTransitionState: typeof import('vue').useTransitionState
   const useUserStore: typeof import('../../stores/client/user').useUserStore
@@ -573,6 +575,9 @@ declare global {
   // @ts-ignore
   export type { GoodsData } from '../../composables/client/useGoodsDetail'
   import('../../composables/client/useGoodsDetail')
+  // @ts-ignore
+  export type { ContactConfig } from '../../composables/client/useSystemConfig'
+  import('../../composables/client/useSystemConfig')
   // @ts-ignore
   export type { ProductTypeKey } from '../../composables/common/useBizConfig'
   import('../../composables/common/useBizConfig')
@@ -1018,6 +1023,7 @@ declare module 'vue' {
     readonly updateAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['updateAppConfig']>
     readonly uploadImageToStorage: UnwrapRef<typeof import('../../utils/uploadImage')['uploadImageToStorage']>
     readonly useAdminCdkList: UnwrapRef<typeof import('../../composables/admin/useAdminCdkList')['useAdminCdkList']>
+    readonly useAdminContactConfig: UnwrapRef<typeof import('../../composables/admin/useAdminContactConfig')['useAdminContactConfig']>
     readonly useAdminCouponList: UnwrapRef<typeof import('../../composables/admin/useAdminCouponList')['useAdminCouponList']>
     readonly useAdminCouponStats: UnwrapRef<typeof import('../../composables/admin/useAdminCouponStats')['useAdminCouponStats']>
     readonly useAdminDialog: UnwrapRef<typeof import('../../composables/admin/useAdminDialog')['default']>
@@ -1119,6 +1125,7 @@ declare module 'vue' {
     readonly useState: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/state')['useState']>
     readonly useSupabaseSession: UnwrapRef<typeof import('../../composables/useSupabaseSession')['default']>
     readonly useSupabaseUserStore: UnwrapRef<typeof import('../../stores/shared/supabase-user')['useSupabaseUserStore']>
+    readonly useSystemConfig: UnwrapRef<typeof import('../../composables/client/useSystemConfig')['useSystemConfig']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
     readonly useTransitionState: UnwrapRef<typeof import('vue')['useTransitionState']>
     readonly useUserStore: UnwrapRef<typeof import('../../stores/client/user')['useUserStore']>

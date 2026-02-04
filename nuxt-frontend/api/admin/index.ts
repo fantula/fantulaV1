@@ -23,6 +23,7 @@ export { adminOrderApi, type AdminOrder, type AdminOrderDelivery } from './order
 export { adminFaqApi } from './help-center'
 export { adminSettingsApi, adminBannerApi, adminImageApi, adminImageCategoryApi } from './media'
 export { adminSchedulerApi, type SchedulerStatus, type SchedulerLog } from './scheduler'
+export { adminSystemApi, type AdminContactConfig } from './system'
 
 
 // ========================================

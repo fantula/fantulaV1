@@ -162,6 +162,9 @@
         @success="userStore.fetchUserInfo()"
     />
 
+    <!-- Contact Modal -->
+    <MobileContactModal v-model="showContactModal" />
+
   </div>
 </template>
 
@@ -176,6 +179,7 @@ import { useUserStore } from '@/stores/client/user'
 import MobileWalletSheet from '@/components/mobile/profile/MobileWalletSheet.vue'
 import MobileSettingsSheet from '@/components/mobile/profile/MobileSettingsSheet.vue'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
+import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -187,6 +191,7 @@ const userStore = useUserStore()
 const showWalletSheet = ref(false)
 const showSettings = ref(false)
 const showRecharge = ref(false)
+const showContactModal = ref(false)
 const loadingWallet = ref(false)
 
 const userInfo = computed(() => {
@@ -221,7 +226,7 @@ const openWalletSheet = async () => {
 }
 
 const handleContactService = () => {
-    // alert('请联系客服 / Contact Support')
+    showContactModal.value = true
 }
 
 // Logout logic moved to SettingsSheet

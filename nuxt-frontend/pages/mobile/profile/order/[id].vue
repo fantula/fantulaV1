@@ -160,7 +160,7 @@
        @success="handleCancelRefundSuccess"
     />
     
-    <ContactModal v-if="showContactModal" @close="showContactModal = false" />
+    <MobileContactModal v-model="showContactModal" />
 
   </div>
 </template>
@@ -188,8 +188,7 @@ import MobileRefundSheet from '@/components/mobile/order/MobileRefundSheet.vue'
 import MobileTicketSheet from '@/components/mobile/order/MobileTicketSheet.vue'
 import MobileCancelRefundSheet from '@/components/mobile/order/MobileCancelRefundSheet.vue'
 import MobileRefundingCard from '@/components/mobile/order/MobileRefundingCard.vue'
-// Reuse PC Contact Modal as it's simple enough or fallback
-import ContactModal from '@/components/pc/modal/ContactModal.vue'
+import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
 
 definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
 

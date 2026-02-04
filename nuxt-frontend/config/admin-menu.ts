@@ -27,7 +27,7 @@ export const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
     { index: '/admin/media', path: '/admin/media', icon: 'Picture', title: '媒体中心' },
     { index: '/admin/help-center', path: '/admin/help-center', icon: 'QuestionFilled', title: '帮助中心' },
     { index: '/admin/messages', path: '/admin/messages', icon: 'Message', title: '消息发送管理' },
-    { index: '/admin/backend-settings', path: '/admin/backend-settings', icon: 'Setting', title: '后台设定' },
+    { index: '/admin/backend-settings', path: '/admin/backend-settings', icon: 'Setting', title: '系统设置' },
 ]
 
 /**
