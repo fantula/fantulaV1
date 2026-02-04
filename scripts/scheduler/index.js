@@ -1,5 +1,5 @@
 /**
- * 定时任务服务
+ * 定时任务服务 (Fantula Scheduler)
  * 支持多任务组，按频率分类执行
  * 
  * API:
@@ -45,7 +45,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 const tasks = {
   /**
-   * 清理过期预订单
+   * 清理过期预订单（pending -> deleted）
+   * 将过期的待支付预订单标记为已删除，并释放锁定的资源
    */
   cleanup_expired_preorders: async () => {
     console.log('[任务] 开始清理过期预订单...')
@@ -59,8 +60,47 @@ const tasks = {
     }
 
     const expiredCount = data?.expired_count || 0
-    await logTaskExecution('cleanup_expired_preorders', 'success', expiredCount)
     console.log('[任务] 清理完成:', data)
+    return data
+  },
+
+  /**
+   * 将过期的主订单改为 expired
+   * 检查 orders 表中 expires_at 已过期但 status 仍为 active 的订单
+   */
+  expire_active_orders: async () => {
+    console.log('[任务] 开始处理过期主订单...')
+
+    const { data, error } = await supabase.rpc('expire_active_orders')
+
+    if (error) {
+      console.error('[任务] 处理失败:', error.message)
+      await logTaskExecution('expire_active_orders', 'error', 0, error.message)
+      return { success: false, error: error.message }
+    }
+
+    const expiredCount = data?.expired_count || 0
+    console.log('[任务] 处理完成，过期订单数:', expiredCount)
+    return data
+  },
+
+  /**
+   * 清理过期订单的回执信息
+   * 删除已过期超过7天的订单关联的回执记录
+   */
+  cleanup_expired_order_fulfillments: async () => {
+    console.log('[任务] 开始清理过期订单回执...')
+
+    const { data, error } = await supabase.rpc('cleanup_expired_order_fulfillments')
+
+    if (error) {
+      console.error('[任务] 清理失败:', error.message)
+      await logTaskExecution('cleanup_expired_order_fulfillments', 'error', 0, error.message)
+      return { success: false, error: error.message }
+    }
+
+    const expiredCount = data?.expired_count || 0
+    console.log('[任务] 清理完成，删除回执数:', expiredCount)
     return data
   },
 
@@ -79,8 +119,7 @@ const tasks = {
     }
 
     const expiredCount = data?.expired_count || 0
-    await logTaskExecution('cleanup_unverified_users', 'success', expiredCount)
-    console.log('[任务] 清理完成:', data)
+    console.log('[任务] 统计完成:', data)
     return data
   },
 
@@ -106,20 +145,46 @@ const tasks = {
     await logTaskExecution('cleanup_expired_wechat_sessions', 'success', expiredCount)
     console.log('[任务] 清理完成, 删除', expiredCount, '条')
     return { success: true, expired_count: expiredCount, task_name: 'cleanup_expired_wechat_sessions' }
+  },
+
+  /**
+   * 清理老旧的过期预订单（expired -> deleted）
+   * 超过30天的 expired 预订单，标记为 deleted
+   */
+  cleanup_old_expired_preorders: async () => {
+    console.log('[任务] 开始清理老旧过期预订单...')
+
+    const { data, error } = await supabase.rpc('cleanup_old_expired_preorders')
+
+    if (error) {
+      console.error('[任务] 清理失败:', error.message)
+      await logTaskExecution('cleanup_old_expired_preorders', 'error', 0, error.message)
+      return { success: false, error: error.message }
+    }
+
+    const expiredCount = data?.expired_count || 0
+    console.log('[任务] 清理完成，处理', expiredCount, '条')
+    return data
   }
 }
 
-// 任务元信息
+// 任务元信息 (用于前端展示)
 const taskMeta = {
   cleanup_expired_preorders: {
     name: '清理过期预订单',
-    description: '检测并释放超时的待支付订单库存',
+    description: '将过期的待支付预订单改为已删除，释放锁定资源',
+    group: 'frequent',
+    cron: '*/5 * * * *'
+  },
+  expire_active_orders: {
+    name: '过期订单处理',
+    description: '将已过期的有效订单状态改为 expired',
     group: 'frequent',
     cron: '*/5 * * * *'
   },
   cleanup_unverified_users: {
     name: '清理未验证用户',
-    description: '删除超过24小时未验证邮箱的用户',
+    description: '统计超过24小时未验证邮箱的用户',
     group: 'daily',
     cron: '0 3 * * *'
   },
@@ -128,6 +193,18 @@ const taskMeta = {
     description: '删除已过期的微信扫码登录会话',
     group: 'daily',
     cron: '0 3 * * *'
+  },
+  cleanup_expired_order_fulfillments: {
+    name: '清理过期订单回执',
+    description: '删除过期超过7天的订单回执信息',
+    group: 'daily',
+    cron: '0 4 * * *'
+  },
+  cleanup_old_expired_preorders: {
+    name: '清理老旧预订单',
+    description: '将超过30天的过期预订单标记为已删除',
+    group: 'weekly',
+    cron: '0 5 * * 0'
   }
 }
 
@@ -136,12 +213,17 @@ const taskGroups = {
   frequent: {
     cron: '*/5 * * * *',
     description: '高频任务 (每5分钟)',
-    tasks: ['cleanup_expired_preorders']
+    tasks: ['cleanup_expired_preorders', 'expire_active_orders']
   },
   daily: {
     cron: '0 3 * * *',
     description: '每日任务 (凌晨3点)',
-    tasks: ['cleanup_unverified_users', 'cleanup_expired_wechat_sessions']
+    tasks: ['cleanup_unverified_users', 'cleanup_expired_wechat_sessions', 'cleanup_expired_order_fulfillments']
+  },
+  weekly: {
+    cron: '0 5 * * 0',
+    description: '每周任务 (周日凌晨5点)',
+    tasks: ['cleanup_old_expired_preorders']
   }
 }
 
@@ -270,7 +352,7 @@ app.post('/run/:taskName', async (req, res) => {
 
 // 获取执行日志
 app.get('/logs', async (req, res) => {
-  const limit = parseInt(req.query.limit) || 20
+  const limit = parseInt(req.query.limit) || 50
 
   const { data, error } = await supabase
     .from('scheduled_task_logs')
@@ -291,24 +373,25 @@ app.get('/logs', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`
-╔═══════════════════════════════════════════════════╗
-║           定时任务服务 - Fantula Scheduler         ║
-╠═══════════════════════════════════════════════════╣
-║  端口: ${PORT}                                       ║
-║  状态: 已启动                                        ║
-║                                                     ║
-║  任务组:                                            ║
-║    frequent: 每 5 分钟                              ║
-║    daily:    每日 03:00                             ║
-║                                                     ║
-║  API:                                               ║
-║    GET  /status      - 获取状态                      ║
-║    GET  /tasks       - 获取任务列表                  ║
-║    POST /start       - 启动定时器                    ║
-║    POST /stop        - 停止定时器                    ║
-║    POST /run/:task   - 手动执行任务                  ║
-║    GET  /logs        - 获取执行日志                  ║
-╚═══════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════╗
+║             定时任务服务 - Fantula Scheduler v2.0              ║
+╠═══════════════════════════════════════════════════════════════╣
+║  端口: ${PORT}                                                   ║
+║  状态: 已启动                                                    ║
+║                                                                 ║
+║  任务组:                                                        ║
+║    frequent: 每 5 分钟 (预订单/订单过期处理)                     ║
+║    daily:    每日 03:00 (用户/会话/回执清理)                     ║
+║    weekly:   每周 05:00 (老旧数据清理)                           ║
+║                                                                 ║
+║  API:                                                           ║
+║    GET  /status      - 获取状态                                  ║
+║    GET  /tasks       - 获取任务列表                              ║
+║    POST /start       - 启动定时器                                ║
+║    POST /stop        - 停止定时器                                ║
+║    POST /run/:task   - 手动执行任务                              ║
+║    GET  /logs        - 获取执行日志                              ║
+╚═══════════════════════════════════════════════════════════════╝
   `)
 
   // 自动启动定时器

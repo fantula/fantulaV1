@@ -1,0 +1,290 @@
+import { E as ElIcon } from './index-Byc6LUYX.mjs';
+import { defineComponent, ref, mergeProps, unref, withCtx, createVNode, resolveDynamicComponent, openBlock, createBlock, TransitionGroup, Fragment, renderList, toDisplayString, createCommentVNode, useSSRContext } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue/index.mjs';
+import { ssrRenderAttrs, ssrIncludeBooleanAttr, ssrRenderComponent, ssrRenderList, ssrRenderClass, ssrInterpolate, ssrRenderVNode } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue/server-renderer/index.mjs';
+import { useRouter } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue-router/vue-router.node.mjs';
+import { u as useUserStore, m as messageApi } from './user-CzJGyf4T.mjs';
+import { u as useInfiniteScroll, B as BaseInfiniteList } from './BaseInfiniteList-C6mBVzQc.mjs';
+import { l as loading_default, X as bell_default, P as warning_default, a7 as chat_dot_round_default, ae as shopping_cart_default } from './index-CmsdIFY8.mjs';
+import { _ as _export_sfc } from './server.mjs';
+import './install-VBSKbHUK.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/lodash-unified/import.js';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@vue/shared/dist/shared.cjs.prod.js';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@vueuse/core/index.mjs';
+import './objects-Bz74KHmq.mjs';
+import './auth-BCuS92ob.mjs';
+import './supabase-jxF0-7J3.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ofetch/dist/node.mjs';
+import '../_/renderer.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue-bundle-renderer/dist/runtime.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ufo/dist/index.mjs';
+import '../nitro/nitro.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/destr/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/hookable/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/node-mock-http/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/drivers/fs.mjs';
+import 'node:crypto';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/drivers/fs-lite.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/drivers/lru-cache.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ohash/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/klona/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/defu/dist/defu.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/scule/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unctx/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/radix3/dist/index.mjs';
+import 'node:fs';
+import 'node:url';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/pathe/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unhead/dist/server.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/devalue/index.js';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unhead/dist/utils.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unhead/dist/plugins.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/form-data/lib/form_data.js';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/proxy-from-env/index.js';
+import 'node:http';
+import 'node:https';
+import 'node:http2';
+import 'node:util';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/follow-redirects/index.js';
+import 'node:zlib';
+import 'node:stream';
+import 'node:events';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/nuxt/node_modules/cookie-es/dist/index.mjs';
+import './common-DNRu9xdu.mjs';
+import './request-n20yf-Kr.mjs';
+import './cart-D8FaBhjU.mjs';
+
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "messages",
+  __ssrInlineRender: true,
+  setup(__props) {
+    useRouter();
+    const userStore = useUserStore();
+    const markingAll = ref(false);
+    const activeTab = ref("all");
+    const unreadCount = ref(0);
+    const tabs = [
+      { key: "all", label: "\u5168\u90E8" },
+      { key: "unread", label: "\u672A\u8BFB" },
+      { key: "order", label: "\u8BA2\u5355" },
+      { key: "system", label: "\u7CFB\u7EDF" }
+    ];
+    const fetchMessages = async (page, size) => {
+      const res = await messageApi.getMessages(page, size);
+      if (res.success && res.data) {
+        let list = res.data.messages || [];
+        if (activeTab.value === "unread") {
+          list = list.filter((m) => !m.is_read);
+        } else if (activeTab.value !== "all") {
+          list = list.filter((m) => m.type === activeTab.value);
+        }
+        return {
+          list,
+          total: res.data.total,
+          hasMore: list.length > 0
+          // Simple assumption
+        };
+      }
+      return { list: [], hasMore: false };
+    };
+    const { displayList, loading, finished, error, loadMore } = useInfiniteScroll({
+      fetchData: fetchMessages,
+      pageSize: 10
+    });
+    const handleMessageClick = async (msg) => {
+      if (!msg.is_read) {
+        await messageApi.markAsRead(msg.id);
+        msg.is_read = true;
+        unreadCount.value = Math.max(0, unreadCount.value - 1);
+        await userStore.fetchUnreadMessageCount();
+      }
+    };
+    const getIconClass = (type) => `type-${type}`;
+    const getIconComponent = (type) => {
+      const map = {
+        system: bell_default,
+        order: shopping_cart_default,
+        activity: chat_dot_round_default,
+        security: warning_default
+      };
+      return map[type] || bell_default;
+    };
+    const formatTime = (dateStr) => {
+      const date = new Date(dateStr);
+      const now = /* @__PURE__ */ new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / 6e4);
+      const diffHours = Math.floor(diffMs / 36e5);
+      const diffDays = Math.floor(diffMs / 864e5);
+      if (diffMins < 1) return "\u521A\u521A";
+      if (diffMins < 60) return `${diffMins} \u5206\u949F\u524D`;
+      if (diffHours < 24) return `${diffHours} \u5C0F\u65F6\u524D`;
+      if (diffDays < 7) return `${diffDays} \u5929\u524D`;
+      return date.toLocaleDateString("zh-CN");
+    };
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_el_icon = ElIcon;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "messages-section" }, _attrs))} data-v-e7eb80d1><div class="section-header" data-v-e7eb80d1><div class="header-left" data-v-e7eb80d1><h2 class="section-title" data-v-e7eb80d1>\u6D88\u606F\u4E2D\u5FC3</h2><div class="section-subtitle" data-v-e7eb80d1>Notifications</div></div>`);
+      if (unref(displayList).length > 0) {
+        _push(`<button class="read-all-btn"${ssrIncludeBooleanAttr(markingAll.value) ? " disabled" : ""} data-v-e7eb80d1>`);
+        if (markingAll.value) {
+          _push(ssrRenderComponent(_component_el_icon, null, {
+            default: withCtx((_, _push2, _parent2, _scopeId) => {
+              if (_push2) {
+                _push2(ssrRenderComponent(unref(loading_default), null, null, _parent2, _scopeId));
+              } else {
+                return [
+                  createVNode(unref(loading_default))
+                ];
+              }
+            }),
+            _: 1
+          }, _parent));
+        } else {
+          _push(`<span data-v-e7eb80d1>\u5168\u90E8\u5DF2\u8BFB</span>`);
+        }
+        _push(`</button>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div><div class="message-tabs" data-v-e7eb80d1><!--[-->`);
+      ssrRenderList(tabs, (tab) => {
+        _push(`<div class="${ssrRenderClass([{ active: activeTab.value === tab.key }, "tab-item"])}" data-v-e7eb80d1>${ssrInterpolate(tab.label)} `);
+        if (tab.key === "unread" && unreadCount.value > 0) {
+          _push(`<div class="tab-unread-dot" data-v-e7eb80d1></div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        if (activeTab.value === tab.key) {
+          _push(`<div class="active-indicator" data-v-e7eb80d1></div>`);
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</div>`);
+      });
+      _push(`<!--]--></div><div class="message-list-container" data-v-e7eb80d1>`);
+      _push(ssrRenderComponent(BaseInfiniteList, {
+        loading: unref(loading),
+        finished: unref(finished),
+        error: unref(error),
+        onLoad: unref(loadMore)
+      }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            if (unref(displayList).length === 0 && !unref(loading) && !unref(error)) {
+              _push2(`<div class="empty-state" data-v-e7eb80d1${_scopeId}><div class="empty-icon-wrap" data-v-e7eb80d1${_scopeId}>`);
+              _push2(ssrRenderComponent(_component_el_icon, { class: "empty-icon" }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(ssrRenderComponent(unref(bell_default), null, null, _parent3, _scopeId2));
+                  } else {
+                    return [
+                      createVNode(unref(bell_default))
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              _push2(`</div><div class="empty-text" data-v-e7eb80d1${_scopeId}>\u6682\u65E0\u6D88\u606F</div><div class="empty-desc" data-v-e7eb80d1${_scopeId}>\u6240\u6709\u901A\u77E5\u548C\u63D0\u9192\u90FD\u4F1A\u663E\u793A\u5728\u8FD9\u91CC</div></div>`);
+            } else {
+              _push2(`<div class="message-list" data-v-e7eb80d1${_scopeId}><!--[-->`);
+              ssrRenderList(unref(displayList), (msg) => {
+                _push2(`<div class="${ssrRenderClass([{ unread: !msg.is_read }, "message-card"])}" data-v-e7eb80d1${_scopeId}><div class="${ssrRenderClass([getIconClass(msg.type), "message-icon"])}" data-v-e7eb80d1${_scopeId}>`);
+                _push2(ssrRenderComponent(_component_el_icon, null, {
+                  default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                    if (_push3) {
+                      ssrRenderVNode(_push3, createVNode(resolveDynamicComponent(getIconComponent(msg.type)), null, null), _parent3, _scopeId2);
+                    } else {
+                      return [
+                        (openBlock(), createBlock(resolveDynamicComponent(getIconComponent(msg.type))))
+                      ];
+                    }
+                  }),
+                  _: 2
+                }, _parent2, _scopeId));
+                _push2(`</div><div class="message-content" data-v-e7eb80d1${_scopeId}><div class="message-top" data-v-e7eb80d1${_scopeId}><span class="message-title" data-v-e7eb80d1${_scopeId}>${ssrInterpolate(msg.title)}</span><span class="message-time" data-v-e7eb80d1${_scopeId}>${ssrInterpolate(formatTime(msg.created_at))}</span></div><div class="message-body" data-v-e7eb80d1${_scopeId}>${ssrInterpolate(msg.content)}</div></div>`);
+                if (!msg.is_read) {
+                  _push2(`<div class="unread-dot" data-v-e7eb80d1${_scopeId}></div>`);
+                } else {
+                  _push2(`<!---->`);
+                }
+                _push2(`</div>`);
+              });
+              _push2(`<!--]--></div>`);
+            }
+          } else {
+            return [
+              unref(displayList).length === 0 && !unref(loading) && !unref(error) ? (openBlock(), createBlock("div", {
+                key: 0,
+                class: "empty-state"
+              }, [
+                createVNode("div", { class: "empty-icon-wrap" }, [
+                  createVNode(_component_el_icon, { class: "empty-icon" }, {
+                    default: withCtx(() => [
+                      createVNode(unref(bell_default))
+                    ]),
+                    _: 1
+                  })
+                ]),
+                createVNode("div", { class: "empty-text" }, "\u6682\u65E0\u6D88\u606F"),
+                createVNode("div", { class: "empty-desc" }, "\u6240\u6709\u901A\u77E5\u548C\u63D0\u9192\u90FD\u4F1A\u663E\u793A\u5728\u8FD9\u91CC")
+              ])) : (openBlock(), createBlock("div", {
+                key: 1,
+                class: "message-list"
+              }, [
+                createVNode(TransitionGroup, { name: "list" }, {
+                  default: withCtx(() => [
+                    (openBlock(true), createBlock(Fragment, null, renderList(unref(displayList), (msg) => {
+                      return openBlock(), createBlock("div", {
+                        key: msg.id,
+                        class: ["message-card", { unread: !msg.is_read }],
+                        onClick: ($event) => handleMessageClick(msg)
+                      }, [
+                        createVNode("div", {
+                          class: ["message-icon", getIconClass(msg.type)]
+                        }, [
+                          createVNode(_component_el_icon, null, {
+                            default: withCtx(() => [
+                              (openBlock(), createBlock(resolveDynamicComponent(getIconComponent(msg.type))))
+                            ]),
+                            _: 2
+                          }, 1024)
+                        ], 2),
+                        createVNode("div", { class: "message-content" }, [
+                          createVNode("div", { class: "message-top" }, [
+                            createVNode("span", { class: "message-title" }, toDisplayString(msg.title), 1),
+                            createVNode("span", { class: "message-time" }, toDisplayString(formatTime(msg.created_at)), 1)
+                          ]),
+                          createVNode("div", { class: "message-body" }, toDisplayString(msg.content), 1)
+                        ]),
+                        !msg.is_read ? (openBlock(), createBlock("div", {
+                          key: 0,
+                          class: "unread-dot"
+                        })) : createCommentVNode("", true)
+                      ], 10, ["onClick"]);
+                    }), 128))
+                  ]),
+                  _: 1
+                })
+              ]))
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div></div>`);
+    };
+  }
+});
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/pc/profile/messages.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+const messages = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-e7eb80d1"]]);
+
+export { messages as default };
+//# sourceMappingURL=messages-Q3eeQASy.mjs.map

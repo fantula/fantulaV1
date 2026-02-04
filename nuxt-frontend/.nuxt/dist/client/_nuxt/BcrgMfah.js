@@ -1,0 +1,1 @@
+import{bP as r,bQ as o,q as n}from"./Cw8CLAr8.js";import{u as s}from"./NqAzWWHm.js";import"./0ly95yqk.js";const f=r(async t=>{let e,a;if(t.path==="/admin/login")return;const i=s();if(i.isInitialized||([e,a]=o(()=>i.init()),await e,a()),!i.isLoggedIn)return n("/admin/login");if(!i.hasPermission(t.path))return n("/admin")});export{f as default};

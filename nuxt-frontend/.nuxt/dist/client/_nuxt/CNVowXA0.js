@@ -1,1 +1,0 @@
-import{ae as n,af as s,ag as r,ah as u,ai as o}from"./DCI-1gnX.js";function i(e){const t=e||s();return t?.ssrContext?.head||t?.runWithContext(()=>{if(r())return u(o)})}function x(e,t={}){const a=i(t.nuxt);if(a)return n(e,{head:a,...t})}export{x as u};

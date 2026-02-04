@@ -1,1 +1,0 @@
-import{e as o,c as t,b as n,o as _,C as a}from"./DCI-1gnX.js";const c={class:"mobile-profile-layout"},m=o({__name:"profile",setup(s){return(r,p)=>{const e=a;return _(),t("div",c,[n(e)])}}});export{m as default};

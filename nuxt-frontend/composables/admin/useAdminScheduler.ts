@@ -40,7 +40,7 @@ export const useAdminScheduler = () => {
     const fetchLogs = async () => {
         logsLoading.value = true
         try {
-            const res = await adminSchedulerApi.getLogs()
+            const res = await adminSchedulerApi.getLogs(50)
             if (res.success && res.data) {
                 logs.value = res.data.logs
             }

@@ -12,6 +12,7 @@
 | [ADMIN_AUTH_PERMISSION.md](./ADMIN_AUTH_PERMISSION.md) | 登录与权限策略 | 架构师、安全审计 |
 | [ADMIN_ENGINEERING_STANDARD.md](./ADMIN_ENGINEERING_STANDARD.md) | 工程开发规范 | 所有开发者 |
 | [ADMIN_SYSTEM_CONFIG.md](./ADMIN_SYSTEM_CONFIG.md) | 系统配置参考 | 前端开发、运维 |
+| [ADMIN_SCHEDULER.md](./ADMIN_SCHEDULER.md) | 定时任务系统 | 后端开发、运维 |
 
 ---
 
