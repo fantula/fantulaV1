@@ -13,30 +13,8 @@
     @submit="submit"
   >
       <div class="modal-body">
-         <!-- Rich Order Info Card -->
-         <div class="order-card-glass" v-if="orderDetail">
-            <div class="card-image">
-               <img :src="orderDetail.product_snapshot?.image" alt="Product" />
-            </div>
-            <div class="card-info">
-               <div class="info-top">
-                  <span class="order-no">订单号 {{ orderDetail.order_no }}</span>
-                  <span class="status-badge">{{ formatStatus(orderDetail.status) }}</span>
-               </div>
-               <div class="product-name">{{ orderDetail.product_snapshot?.product_name }}</div>
-               <div class="specs" v-if="orderDetail.sku_snapshot">
-                  <span v-for="(val, key) in orderDetail.sku_snapshot.spec_combination" :key="key">{{ val }}</span>
-               </div>
-               <div class="price-row">
-                  <span class="price">¥{{ orderDetail.total_amount?.toFixed(2) }}</span>
-                  <span class="quantity">x{{ orderDetail.quantity }}</span>
-               </div>
-            </div>
-         </div>
-         <!-- Loading State for Order Info -->
-         <div class="order-card-loading" v-else-if="loadingOrder">
-            <span class="loading-spinner"></span> 加载订单信息...
-         </div>
+         <!-- Order Info Card -->
+         <OrderInfoCard :order="orderDetail" :loading="loadingOrder" />
 
          <!-- Type/Title -->
          <div class="form-group">
@@ -92,8 +70,9 @@
 import { ref, computed, reactive, onMounted } from 'vue'
 import { ticketApi } from '@/api/client/ticket'
 import { clientOrderApi, type ClientOrder } from '@/api/client/order'
-import { getSupabaseClient } from '@/utils/supabase'
+import { uploadImageToStorage } from '@/utils/uploadImage'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
+import OrderInfoCard from '@/components/pc/order/OrderInfoCard.vue'
 
 const props = defineProps({
   orderId: { type: String, required: true }
@@ -123,19 +102,6 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const isValid = computed(() => {
   return form.title.trim() && form.content.trim()
 })
-
-const formatStatus = (status: string) => {
-  const map: Record<string, string> = {
-    'active': '使用中',
-    'completed': '已完成',
-    'pending': '处理中',
-    'expired': '已过期',
-    'refunding': '退款中',
-    'refunded': '已退款',
-    'pending_delivery': '待发货'
-  }
-  return map[status] || status
-}
 
 onMounted(async () => {
    if (props.orderId) {
@@ -169,17 +135,15 @@ const handleFileChange = async (e: Event) => {
 
   try {
     uploading.value = true
-    const client = getSupabaseClient()
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${file.name.split('.').pop()}`
-    const { data, error } = await client.storage
-       .from('tickets')
-       .upload(`${props.orderId}/${fileName}`, file)
-
-    if (error) throw error
     
-    // Get Public URL
-    const { data: { publicUrl } } = client.storage.from('tickets').getPublicUrl(data.path)
-    form.attachments.push(publicUrl)
+    // 上传到 R2 云储存 (tickets 文件夹)
+    const result = await uploadImageToStorage(file, `tickets/${props.orderId}`)
+    
+    if (result.success && result.url) {
+      form.attachments.push(result.url)
+    } else {
+      alert(result.error || '上传失败')
+    }
 
   } catch (err: any) {
     console.error(err)
@@ -222,56 +186,6 @@ const submit = async () => {
 
 <style scoped>
 .modal-body { display: flex; flex-direction: column; gap: 20px; }
-
-/* Rich Order Glass Card */
-.order-card-glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08); /* Glass Border */
-  border-radius: 12px;
-  padding: 12px;
-  display: flex; gap: 14px;
-  transition: all 0.3s;
-}
-.order-card-glass:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.card-image {
-  width: 72px; height: 72px; border-radius: 8px; overflow: hidden; flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.05);
-  background: #0F172A;
-}
-.card-image img { width: 100%; height: 100%; object-fit: cover; }
-
-.card-info {
-  flex: 1; display: flex; flex-direction: column; justify-content: space-between; py: 2px;
-}
-
-.info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.order-no { font-size: 12px; color: #64748B; font-family: monospace; }
-.status-badge { 
-  font-size: 10px; padding: 2px 6px; border-radius: 4px; 
-  background: rgba(59, 130, 246, 0.1); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.product-name { font-size: 14px; font-weight: 600; color: #F1F5F9; line-height: 1.3; }
-
-.specs { font-size: 12px; color: #94A3B8; display: flex; gap: 8px; margin-top: 2px; }
-.price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
-.price { font-size: 15px; font-weight: 700; color: #F97316; font-family: 'Outfit', sans-serif; }
-.quantity { font-size: 12px; color: #64748B; }
-
-.order-card-loading {
-  height: 90px; display: flex; align-items: center; justify-content: center; 
-  background: rgba(255,255,255,0.02); border-radius: 12px; color: #64748B; font-size: 13px; gap: 8px;
-}
-.loading-spinner {
-  width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #3B82F6;
-  border-radius: 50%; animation: spin 1s linear infinite;
-}
 
 .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #F1F5F9; }
 .required { color: #EF4444; }

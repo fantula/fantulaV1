@@ -12,11 +12,8 @@
     @submit="handleSubmit"
   >
     <div class="refund-form">
-      <!-- Order Info -->
-      <div class="info-box">
-        <div class="label">订单号</div>
-        <div class="value">{{ orderNo }}</div>
-      </div>
+      <!-- Order Info Card -->
+      <OrderInfoCard :order="orderDetail" :loading="loadingOrder" />
 
       <!-- Warning -->
       <div class="warning-box">
@@ -56,10 +53,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
+import OrderInfoCard from '@/components/pc/order/OrderInfoCard.vue'
 import { Warning } from '@element-plus/icons-vue'
-import { clientOrderApi } from '@/api/client/order'
+import { clientOrderApi, type ClientOrder } from '@/api/client/order'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
@@ -76,6 +74,8 @@ const visible = computed({
 })
 
 const submitting = ref(false)
+const loadingOrder = ref(false)
+const orderDetail = ref<ClientOrder | null>(null)
 const form = reactive({
   reason: '',
   detail: ''
@@ -120,11 +120,25 @@ const handleSubmit = async () => {
   }
 }
 
-// Reset form on open
-watch(() => props.modelValue, (val) => {
+// Reset form on open and load order
+watch(() => props.modelValue, async (val) => {
   if (val) {
     form.reason = ''
     form.detail = ''
+    // Load order detail
+    if (props.orderId) {
+      loadingOrder.value = true
+      try {
+        const res = await clientOrderApi.getOrderDetail(props.orderId)
+        if (res.success && res.data) {
+          orderDetail.value = res.data
+        }
+      } catch (e) {
+        console.error('Load order failed:', e)
+      } finally {
+        loadingOrder.value = false
+      }
+    }
   }
 })
 </script>

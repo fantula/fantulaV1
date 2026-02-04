@@ -80,7 +80,7 @@
 import { ref, reactive, computed } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { ticketApi } from '@/api/client/ticket'
-import { getSupabaseClient } from '@/utils/supabase'
+import { uploadImageToStorage } from '@/utils/uploadImage'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
@@ -124,12 +124,13 @@ const handleFile = async (e: Event) => {
    uploading.value = true
    try {
       const file = files[0]
-      const client = getSupabaseClient()
-      const path = `${props.orderId}/${Date.now()}_${file.name}`
-      const { data, error } = await client.storage.from('tickets').upload(path, file)
-      if (error) throw error
-      const { data: { publicUrl } } = client.storage.from('tickets').getPublicUrl(data.path)
-      form.attachments.push(publicUrl)
+      // 上传到 R2 云储存 (tickets 文件夹)
+      const result = await uploadImageToStorage(file, `tickets/${props.orderId}`)
+      if (result.success && result.url) {
+         form.attachments.push(result.url)
+      } else {
+         ElMessage.error(result.error || '上传失败')
+      }
    } catch(e) { ElMessage.error('上传失败') }
    finally { uploading.value = false; if(fileRaw.value) fileRaw.value.value = '' }
 }

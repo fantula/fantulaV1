@@ -43,11 +43,15 @@
                 <el-icon><Tickets /></el-icon> 报障
              </button>
 
-             <!-- Dynamic Buttons -->
+             <!-- Dynamic Buttons - 退款按钮组（与PC端逻辑对齐） -->
              <button v-if="canRenew" class="op-btn primary" @click="handleAction('renew')">续费</button>
              
-             <button v-if="order.status === 'refunding' || pendingRefundRequest" class="op-btn warning" @click="handleAction('cancel_refund')">取消退款</button>
+             <!-- 1. 可取消退款（有待审核申请） -->
+             <button v-if="canCancelRefund" class="op-btn warning" @click="handleAction('cancel_refund')">取消退款</button>
+             <!-- 2. 可申请退款 -->
              <button v-else-if="canRefund" class="op-btn danger" @click="handleAction('apply_refund')">退款</button>
+             <!-- 3. 退款次数已达上限 -->
+             <button v-else-if="isRefundBlocked" class="op-btn disabled" disabled>退款已达上限</button>
           </div>
       </div>
     </div>
@@ -74,54 +78,61 @@
           </div>
        </div>
 
-       <!-- Fulfillment Section -->
-       <div class="fulfillment-container" v-if="['pending_delivery', 'active', 'completed', 'refunding'].includes(order.status || '')">
-           
-           <!-- Shared Account -->
-           <template v-if="order.orderType === 'shared_account'">
-              <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="section-group">
-                  <FulfillmentShared 
-                      :cdk-item="getCdkForSlot(slot)"
-                      :slot-index="slot.slot_index"
-                  />
-              </div>
-           </template>
+       <!-- Fulfillment Section - 退款中时显示处理中卡片 -->
+       <template v-if="order.status === 'refunding' && pendingRefundRequest">
+          <MobileRefundingCard :refund-request="pendingRefundRequest" />
+       </template>
+       
+       <!-- 正常状态显示交付内容 -->
+       <template v-else-if="['pending_delivery', 'active', 'completed'].includes(order.status || '')">
+          <div class="fulfillment-container">
+              
+              <!-- Shared Account -->
+              <template v-if="order.orderType === 'shared_account'">
+                 <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="section-group">
+                     <FulfillmentShared 
+                         :cdk-item="getCdkForSlot(slot)"
+                         :slot-index="slot.slot_index"
+                     />
+                 </div>
+              </template>
 
-           <!-- One Time CDK -->
-           <template v-else-if="order.orderType === 'one_time_cdk'">
-               <div class="section-group">
-                   <div class="section-title">卡密信息</div>
-                   <FulfillmentCdk :cdk-list="cdkList" />
-               </div>
-           </template>
-
-           <!-- Virtual -->
-           <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
-               <div class="section-group">
-                  <div class="section-title">充值进度</div>
-                  
-                  <div class="virtual-item-group">
-                      <FulfillmentSubmitForm
-                         :order-id="order.id"
-                         :order-status="order.status"
-                         :cdk-fields="getFieldsForCdk(cdkList[0])"
-                         :cdk-id="cdkList[0].id"
-                         @submit-success="handleFulfillmentSuccess"
-                      />
-
-                      <FulfillmentHistory
-                         ref="historyRef"
-                         :order-id="order.id"
-                         :filter-cdk-id="cdkList[0].id"
-                      />
+              <!-- One Time CDK -->
+              <template v-else-if="order.orderType === 'one_time_cdk'">
+                  <div class="section-group">
+                      <div class="section-title">卡密信息</div>
+                      <FulfillmentCdk :cdk-list="cdkList" />
                   </div>
-               </div>
-           </template>
+              </template>
 
-       </div>
+              <!-- Virtual -->
+              <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
+                  <div class="section-group">
+                     <div class="section-title">充值进度</div>
+                     
+                     <div class="virtual-item-group">
+                         <FulfillmentSubmitForm
+                            :order-id="order.id"
+                            :order-status="order.status"
+                            :cdk-fields="getFieldsForCdk(cdkList[0])"
+                            :cdk-id="cdkList[0].id"
+                            @submit-success="handleFulfillmentSuccess"
+                         />
+
+                         <FulfillmentHistory
+                            ref="historyRef"
+                            :order-id="order.id"
+                            :filter-cdk-id="cdkList[0].id"
+                         />
+                     </div>
+                  </div>
+              </template>
+
+          </div>
+       </template>
 
        <!-- Tutorial -->
-       <div class="section-group" v-if="instructionImage">
+       <div class="section-group" v-if="instructionImage && order.status !== 'refunding'">
            <div class="section-title">使用说明</div>
            <div class="tutorial-box" @click="previewImage(instructionImage)">
               <el-image :src="instructionImage" fit="cover" />
@@ -137,8 +148,17 @@
 
     <!-- Sheets -->
     <MobileRenewalSheet v-if="order.id" v-model="showRenewalSheet" :order-id="order.id" @success="loadData" />
-    <MobileRefundSheet v-if="order.id" v-model="showRefundSheet" :order-id="order.id" :order-no="order.order_no" @success="loadData" />
+    <MobileRefundSheet v-if="order.id" v-model="showRefundSheet" :order-id="order.id" :order-no="order.order_no" @success="handleRefundSuccess" />
     <MobileTicketSheet v-if="showTicketSheet && order.id" v-model="showTicketSheet" :order-id="order.id" :order-info="order" @success="onTicketSuccess" />
+    <MobileCancelRefundSheet 
+       v-if="order.id" 
+       v-model="showCancelRefundSheet" 
+       :order-id="order.id" 
+       :order-no="order.order_no"
+       :refund-request="pendingRefundRequest"
+       :cancelled-count="refundCancelledCount"
+       @success="handleCancelRefundSuccess"
+    />
     
     <ContactModal v-if="showContactModal" @close="showContactModal = false" />
 
@@ -148,7 +168,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, InfoFilled, 
   Box, RefreshLeft, Headset, Tickets, ZoomIn
@@ -166,6 +186,8 @@ import FulfillmentHistory from '@/components/mobile/order/FulfillmentHistory.vue
 import MobileRenewalSheet from '@/components/mobile/order/MobileRenewalSheet.vue'
 import MobileRefundSheet from '@/components/mobile/order/MobileRefundSheet.vue'
 import MobileTicketSheet from '@/components/mobile/order/MobileTicketSheet.vue'
+import MobileCancelRefundSheet from '@/components/mobile/order/MobileCancelRefundSheet.vue'
+import MobileRefundingCard from '@/components/mobile/order/MobileRefundingCard.vue'
 // Reuse PC Contact Modal as it's simple enough or fallback
 import ContactModal from '@/components/pc/modal/ContactModal.vue'
 
@@ -187,6 +209,7 @@ const slotList = ref<any[]>([])
 const instructionImage = ref('')
 const activeTicketId = ref<string | null>(null)
 const pendingRefundRequest = ref<any>(null)
+const refundCancelledCount = ref(0)
 
 // Virtual Component Refs
 const historyRef = ref<any>(null)
@@ -196,6 +219,7 @@ const showRenewalSheet = ref(false)
 const showRefundSheet = ref(false)
 const showTicketSheet = ref(false)
 const showContactModal = ref(false)
+const showCancelRefundSheet = ref(false)
 
 // Logic
 const statusText = computed(() => {
@@ -207,9 +231,42 @@ const statusText = computed(() => {
   return getOrderStatusLabel(s || '')
 })
 
+// 类型判断 (与PC端保持一致)
 const isOneTime = computed(() => order.value.orderType === 'one_time_cdk')
-const canRenew = computed(() => !isOneTime.value && ['active', 'expired'].includes(order.value.status || ''))
-const canRefund = computed(() => !isOneTime.value && ['pending_delivery', 'active'].includes(order.value.status || ''))
+const isVirtualOrShared = computed(() => {
+  if (!order.value.orderType) return false
+  return ['virtual', 'shared_account'].includes(order.value.orderType)
+})
+
+// 续费条件
+const canRenew = computed(() => 
+  isVirtualOrShared.value && 
+  ['active', 'expired'].includes(order.value.status || '')
+)
+
+// 退款条件 - 与PC端 OrderActions.vue 保持一致
+// 1. 可申请退款: 虚拟/合租类型 + pending_delivery/active + 无待审核申请 + 取消次数未达上限
+const canRefund = computed(() => 
+  isVirtualOrShared.value &&
+  ['pending_delivery', 'active'].includes(order.value.status || '') &&
+  !pendingRefundRequest.value &&
+  refundCancelledCount.value < 3
+)
+
+// 2. 可取消退款: 有待审核申请且状态为 refunding
+const canCancelRefund = computed(() =>
+  isVirtualOrShared.value &&
+  order.value.status === 'refunding' &&
+  !!pendingRefundRequest.value
+)
+
+// 3. 退款次数已达上限
+const isRefundBlocked = computed(() =>
+  isVirtualOrShared.value &&
+  ['pending_delivery', 'active'].includes(order.value.status || '') &&
+  !pendingRefundRequest.value &&
+  refundCancelledCount.value >= 3
+)
 
 const loadData = async () => {
     if (!orderId) return
@@ -243,11 +300,10 @@ const loadData = async () => {
             }
             slotList.value = d.slotList || []
 
-            // Extras
-            if (['refunding', 'active', 'pending_delivery'].includes(d.status)) {
-                const r = await clientOrderApi.getRefundRequest(orderId)
-                if (r.success) pendingRefundRequest.value = r.data
-            }
+            // 加载退款状态
+            await loadRefundInfo()
+            
+            // 加载工单信息
             const t = await ticketApi.getList('processing')
             if (t.success && t.data) {
                 const match = t.data.find((x:any) => x.order_id === orderId)
@@ -256,6 +312,25 @@ const loadData = async () => {
         }
     } catch(e) { console.error(e) } 
     finally { loading.value = false }
+}
+
+// 加载退款状态 (待审核请求 + 取消次数)
+const loadRefundInfo = async () => {
+    if (!orderId || !isVirtualOrShared.value) {
+        pendingRefundRequest.value = null
+        refundCancelledCount.value = 0
+        return
+    }
+    
+    try {
+        const res = await clientOrderApi.getOrderRefundInfo(orderId)
+        if (res.success) {
+            pendingRefundRequest.value = res.pendingRequest || null
+            refundCancelledCount.value = res.cancelledCount ?? 0
+        }
+    } catch (e) {
+        console.error('Failed to load refund info:', e)
+    }
 }
 
 const getCdkForSlot = (slot: any) => cdkList.value.find(c => c.id === slot.cdk_id) || {}
@@ -290,13 +365,22 @@ const handleAction = async (type: string) => {
     else if (type === 'renew') showRenewalSheet.value = true
     else if (type === 'apply_refund') showRefundSheet.value = true
     else if (type === 'cancel_refund') {
-        try {
-            await ElMessageBox.confirm('确定撤销退款申请？', '提示', { type: 'warning' })
-            await clientOrderApi.cancelRefundRequest(orderId)
-            ElMessage.success('已撤销')
-            loadData()
-        } catch {}
+        // 打开取消退款确认弹窗
+        showCancelRefundSheet.value = true
     }
+}
+
+// 退款申请成功回调
+const handleRefundSuccess = () => {
+    loadRefundInfo()
+    loadData()
+}
+
+// 取消退款成功回调
+const handleCancelRefundSuccess = () => {
+    pendingRefundRequest.value = null
+    refundCancelledCount.value++
+    loadData()
 }
 
 const previewImage = (url: string) => {
@@ -374,6 +458,13 @@ onMounted(loadData)
 .op-btn.primary { background: #3B82F6; color: #fff; border: none; }
 .op-btn.warning { background: #F59E0B; color: #fff; border: none; }
 .op-btn.danger { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; border-color: rgba(239, 68, 68, 0.5); }
+.op-btn.disabled { 
+    background: rgba(100, 116, 139, 0.1); 
+    color: #64748B; 
+    border-color: rgba(100, 116, 139, 0.2); 
+    cursor: not-allowed; 
+    opacity: 0.7;
+}
 
 /* Content */
 .content-body { padding: 16px; display: flex; flex-direction: column; gap: 20px; }

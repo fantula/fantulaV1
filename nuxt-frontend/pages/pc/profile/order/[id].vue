@@ -81,13 +81,17 @@
                </button>
 
                <!-- 3. Refund Action (Hidden for One-Time) -->
-               <!-- Case A: Pending Refund -> Cancel Button -->
-               <button v-if="order.status === 'refunding' || pendingRefundRequest" class="hero-btn warning" @click="handleAction('cancel_refund')">
+               <!-- Case A: Can Cancel Refund -->
+               <button v-if="canCancelRefund" class="hero-btn warning" @click="handleAction('cancel_refund')">
                  <el-icon><CircleClose /></el-icon> 取消退款
                </button>
                <!-- Case B: Can Apply Refund -->
                <button v-else-if="canRefund" class="hero-btn danger" @click="handleAction('apply_refund')">
                  <el-icon><Money /></el-icon> 申请退款
+               </button>
+               <!-- Case C: Refund Blocked -->
+               <button v-else-if="isRefundBlocked" class="hero-btn disabled" disabled>
+                 <el-icon><CircleClose /></el-icon> 退款已达上限
                </button>
 
             </div>
@@ -113,58 +117,66 @@
       />
 
       <!-- Delivery / Fulfillment Section (The Core) -->
-      <!-- Only show for relevant statuses (including refunding to see what happened) -->
-      <!-- Delivery / Fulfillment Section (The Core) -->
-      <!-- Only show for relevant statuses (including refunding to see what happened) -->
-      <div v-if="['pending_delivery', 'active', 'completed', 'refunding'].includes(order.status || '')" class="fulfillment-section fade-in-up">
-        
-        <!-- Shared Account: STRICT LOOP by Slot List -->
-        <!-- Display Rule: Display Slot1 Content... Display Slot2 Content... -->
-        <template v-if="order.orderType === 'shared_account'">
-           <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="virtual-item-group">
-               
-               <!-- Separator if multiple -->
-               <div v-if="slotList.length > 1" class="item-separator">
-                  <span class="sep-label">车位 {{ idx + 1 }}</span>
-               </div>
+      <!-- 退款中时显示 RefundingCard -->
+      <template v-if="order.status === 'refunding' && pendingRefundRequest">
+        <RefundingCard 
+          class="fade-in-up" 
+          :refund-request="pendingRefundRequest" 
+        />
+      </template>
+      
+      <!-- 正常状态显示交付内容 -->
+      <template v-else-if="['pending_delivery', 'active', 'completed'].includes(order.status || '')">
+        <div class="fulfillment-section fade-in-up">
+          
+          <!-- Shared Account: STRICT LOOP by Slot List -->
+          <!-- Display Rule: Display Slot1 Content... Display Slot2 Content... -->
+          <template v-if="order.orderType === 'shared_account'">
+             <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="virtual-item-group">
+                 
+                 <!-- Separator if multiple -->
+                 <div v-if="slotList.length > 1" class="item-separator">
+                    <span class="sep-label">车位 {{ idx + 1 }}</span>
+                 </div>
 
-               <!-- Pass Single Slot Context -->
-               <FulfillmentShared 
-                  :cdk-item="getCdkForSlot(slot)"
-                  :slot-index="slot.slot_index"
+                 <!-- Pass Single Slot Context -->
+                 <FulfillmentShared 
+                    :cdk-item="getCdkForSlot(slot)"
+                    :slot-index="slot.slot_index"
+                 />
+             </div>
+          </template>
+          
+          <!-- One-Time CDK: Standard List -->
+          <template v-else-if="order.orderType === 'one_time_cdk'">
+              <FulfillmentCdk :cdk-list="cdkList" />
+          </template>
+
+          <!-- Virtual: Single View (First CDK only) -->
+          <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
+             <div class="virtual-item-group">
+               <FulfillmentSubmitForm
+                  :order-id="order.id || ''"
+                  :order-status="order.status || ''"
+                  :cdk-fields="getFieldsForCdk(cdkList[0])"
+                  :cdk-id="cdkList[0].id"
+                  @submit-success="handleFulfillmentSuccess"
                />
-           </div>
-        </template>
-        
-        <!-- One-Time CDK: Standard List -->
-        <template v-else-if="order.orderType === 'one_time_cdk'">
-            <FulfillmentCdk :cdk-list="cdkList" />
-        </template>
 
-        <!-- Virtual: Single View (First CDK only) -->
-        <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
-           <div class="virtual-item-group">
-             <FulfillmentSubmitForm
-                :order-id="order.id || ''"
-                :order-status="order.status || ''"
-                :cdk-fields="getFieldsForCdk(cdkList[0])"
-                :cdk-id="cdkList[0].id"
-                @submit-success="handleFulfillmentSuccess"
-             />
+               <FulfillmentHistory
+                  ref="historyRef"
+                  :order-id="order.id || ''"
+                  :filter-cdk-id="cdkList[0].id"
+               />
+             </div>
+          </template>
 
-             <FulfillmentHistory
-                ref="historyRef"
-                :order-id="order.id || ''"
-                :filter-cdk-id="cdkList[0].id"
-             />
-           </div>
-        </template>
-
-      </div>
+        </div>
+      </template>
 
       <!-- Tutorial Section -->
-      <!-- Tutorial Section -->
-      <div v-if="instructionImage" class="glass-tile tutorial-tile fade-in-up">
+      <!-- 退款中状态时不显示使用说明 -->
+      <div v-if="instructionImage && order.status !== 'refunding'" class="glass-tile tutorial-tile fade-in-up">
         <div class="tile-header">
           <div class="header-left">
              <el-icon class="header-icon"><Guide /></el-icon>
@@ -209,6 +221,16 @@
       @success="onTicketSuccess"
     />
 
+    <CancelRefundModal
+      v-if="order.id"
+      v-model="showCancelRefundModal"
+      :order-id="order.id"
+      :order-no="order.order_no || ''"
+      :refund-request="pendingRefundRequest"
+      :cancelled-count="refundCancelledCount"
+      @success="onCancelRefundSuccess"
+    />
+
     <ContactModal
       v-if="showContactModal"
       @close="showContactModal = false"
@@ -219,7 +241,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, Timer, CircleClose, InfoFilled, 
   ZoomIn, Box, Tickets, Refresh, Money, RefreshLeft, Headset, Guide
@@ -232,8 +254,10 @@ import FulfillmentShared from '@/components/pc/order/FulfillmentShared.vue'
 import FulfillmentCdk from '@/components/pc/order/FulfillmentCdk.vue'
 import FulfillmentSubmitForm from '@/components/pc/order/FulfillmentSubmitForm.vue'
 import FulfillmentHistory from '@/components/pc/order/FulfillmentHistory.vue'
+import RefundingCard from '@/components/pc/order/RefundingCard.vue'
 import RenewalModal from '@/components/pc/order/RenewalModal.vue'
 import RefundModal from '@/components/pc/order/RefundModal.vue'
+import CancelRefundModal from '@/components/pc/order/CancelRefundModal.vue'
 import TicketApplyModal from '@/components/pc/modal/business/TicketApplyModal.vue'
 import ContactModal from '@/components/pc/modal/ContactModal.vue'
 import ProductInfoCard from '@/components/pc/order/ProductInfoCard.vue'
@@ -283,6 +307,7 @@ const instructionImage = ref('')
 // Logic State
 const activeTicketId = ref<string | null>(null)
 const pendingRefundRequest = ref<any>(null)
+const refundCancelledCount = ref(0)
 
 // Computed Status Text
 const statusText = computed(() => {
@@ -314,6 +339,10 @@ const getTimeLevel = (days: number) => {
 // Logic Computed
 // Rule: One-time orders don't show Renew/Refund
 const isOneTime = computed(() => order.value.orderType === 'one_time_cdk')
+const isVirtualOrShared = computed(() => {
+  if (!order.value.orderType) return false
+  return ['virtual', 'shared_account'].includes(order.value.orderType)
+})
 
 const canRenew = computed(() => {
   if (isOneTime.value) return false
@@ -321,12 +350,29 @@ const canRenew = computed(() => {
   return ['active', 'expired'].includes(s || '')
 })
 
-const canRefund = computed(() => {
-  if (isOneTime.value) return false
-  const s = order.value.status
-  // Usually refund allowed for pending_delivery or active (within X days, ignoring X days for now as per user just status)
-  return ['pending_delivery', 'active'].includes(s || '')
-})
+// 退款条件 - 与移动端保持一致
+// 1. 可申请退款: 虚拟/合租类型 + pending_delivery/active + 无待审核申请 + 取消次数<3
+const canRefund = computed(() => 
+  isVirtualOrShared.value &&
+  ['pending_delivery', 'active'].includes(order.value.status || '') &&
+  !pendingRefundRequest.value &&
+  refundCancelledCount.value < 3
+)
+
+// 2. 可取消退款: 有待审核申请且状态为 refunding
+const canCancelRefund = computed(() =>
+  isVirtualOrShared.value &&
+  order.value.status === 'refunding' &&
+  !!pendingRefundRequest.value
+)
+
+// 3. 退款次数已达上限
+const isRefundBlocked = computed(() =>
+  isVirtualOrShared.value &&
+  ['pending_delivery', 'active'].includes(order.value.status || '') &&
+  !pendingRefundRequest.value &&
+  refundCancelledCount.value >= 3
+)
 
 
 // Amount Helpers
@@ -401,23 +447,8 @@ const copyText = (text?: string) => {
     showRefundModal.value = true
   } 
   else if (type === 'cancel_refund') {
-    try {
-      await ElMessageBox.confirm('确定要撤销退款申请并恢复订单吗？', '撤销退款', {
-         confirmButtonText: '确定撤销',
-         cancelButtonText: '暂不撤销',
-         type: 'warning'
-      })
-      
-      const res = await clientOrderApi.cancelRefundRequest(orderId)
-      if (res.success) {
-        ElMessage.success(res.message || '已撤销')
-        loadData() // Refresh status
-      } else {
-        ElMessage.error(res.error || '撤销失败')
-      }
-    } catch {
-      // Cancelled
-    }
+    // 打开取消退款弹窗
+    showCancelRefundModal.value = true
   }
 }
 
@@ -436,9 +467,17 @@ const onRefundSuccess = () => {
     loadData() // Refresh to see "Cancel Refund" button
 }
 
+const onCancelRefundSuccess = () => {
+    // 关键: 立即更新本地状态
+    pendingRefundRequest.value = null
+    refundCancelledCount.value++
+    loadData()
+}
+
 // Fetch
 const showRenewalModal = ref(false)
 const showRefundModal = ref(false)
+const showCancelRefundModal = ref(false)
 const showTicketModal = ref(false)
 const showContactModal = ref(false)
 const ticketRefreshKey = ref(0) // Used to force refresh ticket list if needed
@@ -492,15 +531,8 @@ const loadData = async () => {
           slotList.value = []
       }
 
-      // 3. Check Refund Request (If status is 'refunding' OR checking just in case)
-      if (d.status === 'refunding' || d.status === 'active' || d.status === 'pending_delivery') {
-         const refundRes = await clientOrderApi.getRefundRequest(orderId)
-         if (refundRes.success && refundRes.data) {
-             pendingRefundRequest.value = refundRes.data
-         } else {
-             pendingRefundRequest.value = null
-         }
-      }
+      // 3. Check Refund Request and Cancelled Count
+      await loadRefundInfo()
 
       // 4. Check Active Tickets
       // We look for any currently processing ticket for this order
@@ -524,6 +556,25 @@ const loadData = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 加载退款状态 (待审核请求 + 取消次数)
+const loadRefundInfo = async () => {
+    if (!orderId || !isVirtualOrShared.value) {
+        pendingRefundRequest.value = null
+        refundCancelledCount.value = 0
+        return
+    }
+    
+    try {
+        const res = await clientOrderApi.getOrderRefundInfo(orderId)
+        if (res.success) {
+            pendingRefundRequest.value = res.pendingRequest || null
+            refundCancelledCount.value = res.cancelledCount ?? 0
+        }
+    } catch (e) {
+        console.error('Failed to load refund info:', e)
+    }
 }
 
 onMounted(loadData)
@@ -659,6 +710,16 @@ onMounted(loadData)
 .hero-btn.primary:hover { background: #2563EB; }
 .hero-btn.danger { background: rgba(239, 68, 68, 0.15); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.3); }
 .hero-btn.danger:hover { background: rgba(239, 68, 68, 0.25); color: #fff; border-color: rgba(239, 68, 68, 0.5); }
+.hero-btn.warning { background: rgba(245, 158, 11, 0.15); color: #FDE68A; border: 1px solid rgba(245, 158, 11, 0.3); }
+.hero-btn.warning:hover { background: rgba(245, 158, 11, 0.25); color: #fff; border-color: rgba(245, 158, 11, 0.5); }
+.hero-btn.disabled { 
+    background: rgba(100, 116, 139, 0.1); 
+    color: #64748B; 
+    border: 1px solid rgba(100, 116, 139, 0.2); 
+    cursor: not-allowed; 
+    opacity: 0.7;
+}
+.hero-btn.disabled:hover { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
 /* Gradients */
 .hero-aurora-bg {
