@@ -18,7 +18,7 @@
           :loading="redeeming" 
           :disabled="!redeemCode"
           @click="handleRedeem"
-          theme-id="primary"
+          themeId="primary"
         >
           立即兑换
         </BaseButton>

@@ -91,15 +91,19 @@
                   </div>
 
                   <div class="action-row">
-                    <button 
-                      class="btn-confirm" 
+                    <BaseButton 
+                      themeId="primary-orange"
+                      block
                       :disabled="!isValidAmount || loading"
+                      :loading="loading"
                       @click="handleRecharge"
                     >
-                      <span v-if="loading" class="btn-loading"></span>
-                      <span class="btn-text">{{ loading ? '正在发起支付...' : `立即支付 ¥${payAmount.toFixed(2)}` }}</span>
-                      <el-icon v-if="!loading" class="btn-icon"><ArrowRight /></el-icon>
-                    </button>
+                      <template v-if="!loading">
+                        <span class="btn-text">立即支付 ¥{{ payAmount.toFixed(2) }}</span>
+                        <el-icon class="btn-icon"><ArrowRight /></el-icon>
+                      </template>
+                      <template v-else>正在发起支付...</template>
+                    </BaseButton>
                   </div>
                   
                   <div class="security-tip">
@@ -150,9 +154,13 @@
             </div>
             
             <div class="qrcode-actions">
-              <button class="btn-back" @click="cancelPayment" :disabled="paymentStatus === 'checking'">
+              <BaseButton 
+                themeId="secondary"
+                @click="cancelPayment" 
+                :disabled="paymentStatus === 'checking'"
+              >
                 返回重新选择
-              </button>
+              </BaseButton>
             </div>
           </div>
         </template>
@@ -165,6 +173,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { authApi } from '@/api/client/auth'
 import { wechatPayApi } from '@/api/client/wechat-payment'
+import BaseButton from '@/components/shared/BaseButton.vue'
 import { Check, Select, ArrowRight, Lock, Present, CircleCheck } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import QRCode from 'qrcode'
@@ -503,18 +512,9 @@ onUnmounted(() => {
 .actual-arrival-info .value { font-size: 16px; font-weight: 700; color: #F97316; font-family: 'Outfit', sans-serif; }
 .actual-arrival-info .bonus-hint { font-size: 12px; color: #10B981; }
 
-.btn-confirm {
-  width: 100%; height: 50px; background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-  border: none; border-radius: 100px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.3); transition: all 0.3s;
-}
-.btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(234, 88, 12, 0.4); }
-.btn-confirm:disabled { background: #334155; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
-.btn-text { font-size: 16px; font-weight: 700; color: #fff; }
-.btn-loading {
-  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
+.actual-arrival-info .bonus-hint { font-size: 12px; color: #10B981; }
+
+.security-tip { font-size: 12px; color: #64748B; display: flex; align-items: center; justify-content: center; gap: 4px; }
 .security-tip { font-size: 12px; color: #64748B; display: flex; align-items: center; justify-content: center; gap: 4px; }
 
 /* QR Code Container */
@@ -563,13 +563,7 @@ onUnmounted(() => {
 }
 .qrcode-tips p { margin: 0; }
 
-.qrcode-actions { margin-top: 10px; }
-.btn-back {
-  padding: 10px 24px; background: transparent; border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px; color: #94A3B8; font-size: 14px; cursor: pointer; transition: all 0.2s;
-}
-.btn-back:hover { border-color: #F97316; color: #F97316; }
-.btn-back:disabled { opacity: 0.5; cursor: not-allowed; }
+.qrcode-actions { margin-top: 10px; display: flex; justify-content: center; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -18,6 +18,9 @@
     />
 
     <!-- Recharge Modal -->
+    <WalletRechargeModal 
+      v-if="showRechargeModal" 
+      :initial-amount="Number($route.query.amount)" 
       @close="handleModalClose" 
     />
   </div>

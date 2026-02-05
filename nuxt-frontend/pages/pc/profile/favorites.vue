@@ -51,10 +51,10 @@
           <el-icon class="empty-icon"><StarFilled /></el-icon>
           <div class="empty-text">你还没有收藏商品</div>
           <div class="empty-desc">去探索更多好物，填满您的收藏夹吧</div>
-          <button class="go-shopping-btn" @click="goShopping">
+          <BaseButton themeId="primary" @click="goShopping">
             去逛逛
             <el-icon><Right /></el-icon>
-          </button>
+          </BaseButton>
         </div>
 
         <!-- List Grid -->
@@ -89,12 +89,22 @@
 
                 <!-- Actions -->
                 <div class="card-actions">
-                  <button class="action-btn cancel-btn" @click.stop="removeFavorite(item.id)">
+                  <BaseButton 
+                    themeId="secondary" 
+                    size="small" 
+                    class="action-btn"
+                    @click.stop="removeFavorite(item.id)"
+                  >
                     取消收藏
-                  </button>
-                  <button class="action-btn buy-btn" @click.stop="goToProduct(item.productId)">
+                  </BaseButton>
+                  <BaseButton 
+                    themeId="marketing-buy" 
+                    size="small" 
+                    class="action-btn"
+                    @click.stop="goToProduct(item.productId)"
+                  >
                     立即查看
-                  </button>
+                  </BaseButton>
                 </div>
               </div>
             </div>
@@ -123,6 +133,7 @@ import { useUserStore } from '@/stores/client/user'
 import { useModalStore } from '@/stores/client/modal'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 import { ElMessage } from 'element-plus'
 import { StarFilled, Right, Operation } from '@element-plus/icons-vue'
 
@@ -396,38 +407,7 @@ const goShopping = () => {
 
 .action-btn {
   flex: 1;
-  padding: 8px 0; /* Slimmer */
-  border-radius: 100px; /* Pill Shape */
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  border: 1px solid transparent;
 }
-
-.cancel-btn {
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #94A3B8;
-}
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #EF4444;
-}
-
-.buy-btn {
-  background: linear-gradient(135deg, #3B82F6, #2563EB); /* Blue Gradient */
-  color: #fff;
-  border: none;
-  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-}
-.buy-btn:hover {
-  background: linear-gradient(135deg, #F97316, #EA580C); /* Orange Gradient */
-  transform: translateY(-1px);
-  box-shadow: 0 6px 15px rgba(249, 115, 22, 0.4);
-}
-.buy-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Responsive */
 @media (max-width: 1400px) { .favorites-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
@@ -442,7 +422,6 @@ const goShopping = () => {
 .empty-icon { font-size: 48px; color: #475569; margin-bottom: 16px; }
 .empty-text { font-size: 16px; font-weight: 600; color: #CBD5E1; margin-bottom: 8px; }
 .empty-desc { font-size: 13px; color: #64748B; margin-bottom: 24px; }
-.go-shopping-btn { display: flex; align-items: center; gap: 8px; padding: 10px 24px; background: linear-gradient(135deg, #3B82F6, #2563EB); border: none; border-radius: 100px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
 
 .list-move, .list-enter-active, .list-leave-active { transition: all 0.5s ease; }
 .list-enter-from, .list-leave-to { opacity: 0; transform: scale(0.9); }

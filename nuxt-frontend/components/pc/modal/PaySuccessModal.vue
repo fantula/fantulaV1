@@ -1,65 +1,68 @@
 <template>
-  <div class="modal-mask" @click.self="$emit('close')">
-    <div class="pay-success-modal glass-card">
-      <div class="success-header">
-        <div class="success-circle">
-          <div class="success-icon-wrapper">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+  <Teleport to="body">
+    <div class="modal-mask" @click.self="$emit('close')">
+      <div class="pay-success-modal glass-card">
+        <div class="success-header">
+          <div class="success-circle">
+            <div class="success-icon-wrapper">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="success-title">支付成功</div>
+          <div class="success-desc">您的订单已确认，感谢您的购买</div>
+        </div>
+        
+        <div class="success-info">
+          <div class="info-row">
+            <span class="info-label">订单编号</span>
+            <span class="info-value info-link">{{ safeOrderId }}</span>
+          </div>
+          <div class="info-divider"></div>
+          <div class="info-row">
+            <span class="info-label">支付金额</span>
+            <span class="info-value info-amount">¥{{ safeAmount }}</span>
+          </div>
+          <div class="info-divider"></div>
+          <div class="info-row">
+            <span class="info-label">支付方式</span>
+            <span class="info-value info-paytype">{{ safePayTypeName }}</span>
+          </div>
+          <div class="info-divider"></div>
+          <div class="info-row">
+            <span class="info-label">支付时间</span>
+            <span class="info-value info-time">{{ safeTime }}</span>
           </div>
         </div>
-        <div class="success-title">支付成功</div>
-        <div class="success-desc">您的订单已确认，感谢您的购买</div>
-      </div>
-      
-      <div class="success-info">
-        <div class="info-row">
-          <span class="info-label">订单编号</span>
-          <span class="info-value info-link">{{ safeOrderId }}</span>
+        
+        <!-- New Status Display -->
+        <div class="status-box">
+          <div class="status-icon">🚀</div>
+          <div class="status-text">系统正在为您自动发货，请稍候查看</div>
         </div>
-        <div class="info-divider"></div>
-        <div class="info-row">
-          <span class="info-label">支付金额</span>
-          <span class="info-value info-amount">¥{{ safeAmount }}</span>
+        
+        <div class="success-actions">
+          <BaseButton themeId="primary-orange" block @click="handleGoToOrders">
+            前往查看订单
+          </BaseButton>
+          <BaseButton themeId="secondary" block @click="handleGoToHome">
+            返回首页
+          </BaseButton>
         </div>
-        <div class="info-divider"></div>
-        <div class="info-row">
-          <span class="info-label">支付方式</span>
-          <span class="info-value info-paytype">{{ safePayTypeName }}</span>
+        
+        <div class="success-tip">
+          如有任何问题，请联系客服 
+          <span class="kefu-phone">在线客服</span>
         </div>
-        <div class="info-divider"></div>
-        <div class="info-row">
-          <span class="info-label">支付时间</span>
-          <span class="info-value info-time">{{ safeTime }}</span>
-        </div>
-      </div>
-      
-      <!-- New Status Display -->
-      <div class="status-box">
-        <div class="status-icon">🚀</div>
-        <div class="status-text">系统正在为您自动发货，请稍候查看</div>
-      </div>
-      
-      <div class="success-actions">
-        <button class="order-btn" @click="handleGoToOrders">
-          前往查看订单
-        </button>
-        <button class="home-btn" @click="handleGoToHome">
-          返回首页
-        </button>
-      </div>
-      
-      <div class="success-tip">
-        如有任何问题，请联系客服 
-        <span class="kefu-phone">在线客服</span>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 const props = defineProps({
   orderId: { 
@@ -278,44 +281,6 @@ const handleGoToOrders = () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.order-btn {
-  width: 100%;
-  background: linear-gradient(90deg, var(--active-orange) 0%, #FB923C 100%);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  padding: 14px 0;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-}
-
-.order-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
-}
-
-.home-btn {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-sub);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 14px 0;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.home-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .success-tip {

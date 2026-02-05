@@ -36,9 +36,14 @@
         <div class="ticket-action" @click.stop>
           <slot name="action">
             <template v-if="status === 'unused' && !disabled">
-                <button class="action-btn" @click="$emit('action')">
+                <BaseButton 
+                  :themeId="buttonTheme" 
+                  size="small" 
+                  class="action-btn-wrapper"
+                  @click="$emit('action')"
+                >
                   {{ actionText }}
-                </button>
+                </BaseButton>
             </template>
             <div v-else class="status-badge">{{ statusText }}</div>
           </slot>
@@ -55,6 +60,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Clock } from '@element-plus/icons-vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 interface Props {
   color?: 'purple' | 'gold' | 'cyan' | 'default'
@@ -85,6 +91,15 @@ const statusText = computed(() => {
   if (props.status === 'used') return '已使用'
   if (props.status === 'expired') return '已过期'
   return ''
+})
+
+const buttonTheme = computed(() => {
+  switch (props.color) {
+    case 'purple': return 'coupon-purple'
+    case 'gold': return 'coupon-gold'
+    case 'cyan': return 'coupon-cyan'
+    default: return 'coupon-purple'
+  }
 })
 </script>
 
@@ -156,12 +171,7 @@ const statusText = computed(() => {
   background: rgba(255,255,255,0.02);
   cursor: not-allowed;
 }
-.coupon-ticket.is-disabled:hover {
-    /* Slight re-color on hover to indicate interactable (e.g. delete) if needed, 
-       but BaseTicket handles visual only. Parent handles click logic. 
-       Usually we don't want hover effect on disabled unless it's a delete action. 
-       Let's keep it minimal. */
-}
+
 .coupon-ticket.is-disabled .value-amount { color: #94A3B8; }
 
 
@@ -239,25 +249,10 @@ const statusText = computed(() => {
   display: flex; align-items: center; gap: 4px; font-size: 12px; color: #64748B;
 }
 
-/* Action Button */
-.action-btn {
-  padding: 6px 16px;
-  border-radius: 8px;
-  font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; border: none;
-  background: rgba(255,255,255,0.1); color: #fff;
+/* Action Button Wrapper */
+.action-btn-wrapper {
+  font-size: 12px;
 }
-/* Theme-specific button colors could be passed or handled by parent class, 
-   but defaulting to white/glass is safe or using the theme color. 
-   Let's use a generic primary style or rely on specific overrides. */
-.color-purple .action-btn { background: rgba(217, 70, 239, 0.2); color: #E879F9; }
-.color-purple .action-btn:hover { background: rgba(217, 70, 239, 0.3); color: #fff; }
-
-.color-gold .action-btn { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
-.color-gold .action-btn:hover { background: rgba(245, 158, 11, 0.3); color: #fff; }
-
-.color-cyan .action-btn { background: rgba(6, 182, 212, 0.2); color: #22D3EE; }
-.color-cyan .action-btn:hover { background: rgba(6, 182, 212, 0.3); color: #fff; }
 
 /* Status Badge */
 .status-badge {

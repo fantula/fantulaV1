@@ -5,11 +5,20 @@ export interface ButtonTheme {
 }
 
 export const BUTTON_THEMES: Record<string, ButtonTheme> = {
-    // [Primary] Standard Blue Gradient (Modals, Forms)
     'primary': {
         id: 'primary',
         variantClass: 'btn-primary'
     },
+    // [Primary Orange] - Orange Gradient (Recharge, VIP)
+    'primary-orange': {
+        id: 'primary-orange',
+        variantClass: 'btn-primary-orange'
+    },
+    // [Coupon Themes]
+    'coupon-purple': { id: 'coupon-purple', variantClass: 'btn-coupon-purple' },
+    'coupon-gold': { id: 'coupon-gold', variantClass: 'btn-coupon-gold' },
+    'coupon-cyan': { id: 'coupon-cyan', variantClass: 'btn-coupon-cyan' },
+
     // [Suite 001] Classic Phantom - Neon Glass
     'suit-001-primary': {
         id: 'suit-001-primary',

@@ -1,6 +1,16 @@
 <template>
-  <div class="modal-mask">
-    <div class="order-pay-modal">
+  <BaseModal
+    :visible="true"
+    width="420px"
+    :showHeader="false"
+    :showFooter="false"
+    contentPadding="0"
+    customClass="pay-modal-container"
+    themeId="suit-001"
+    @update:visible="$emit('close')"
+    @close="$emit('close')"
+  >
+    <div class="pay-modal-content">
       <div class="modal-header">
         <div class="modal-title">订单支付</div>
         <div class="modal-subtitle">请选择支付方式完成付款</div>
@@ -68,23 +78,26 @@
         </div>
       </div>
     </div>
-    <BalanceNotEnoughModal
-      v-if="showBalanceModal"
-      :balance="userBalance"
-      :needAmount="Number(price)"
-      @close="handleBalanceClose"
-    />
-    <PaySuccessModal
-      v-if="showSuccessModal"
-      :orderId="props.orderId || 'DEFAULT_ORDER'"
-      :payType="payType"
-      :amount="props.price || 0"
-      @close="handleSuccessClose"
-    />
-  </div>
+    
+  </BaseModal>
+  
+  <BalanceNotEnoughModal
+    v-if="showBalanceModal"
+    :balance="userBalance"
+    :needAmount="Number(price)"
+    @close="handleBalanceClose"
+  />
+  <PaySuccessModal
+    v-if="showSuccessModal"
+    :orderId="props.orderId || 'DEFAULT_ORDER'"
+    :payType="payType"
+    :amount="props.price || 0"
+    @close="handleSuccessClose"
+  />
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import BaseModal from '@/components/shared/BaseModal.vue'
 import BalanceNotEnoughModal from './BalanceNotEnoughModal.vue'
 import PaySuccessModal from './PaySuccessModal.vue'
 import { useUserStore } from '@/stores/client/user'
@@ -272,29 +285,18 @@ function handleSuccessClose() {
 }
 </script>
 <style scoped>
-.modal-mask {
-  position: fixed;
-  z-index: 2000;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.order-pay-modal {
-  width: 420px;
-  background: #fff;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+.pay-modal-content {
   display: flex;
   flex-direction: column;
 }
+/* BaseModal already handles the glass glass morphism, so we just style inner content */
+
 .modal-header {
   background: linear-gradient(135deg, #2196F3 0%, #2575FC 100%);
   padding: 32px 32px 18px 32px;
   position: relative;
   text-align: center;
+  border-radius: 28px 28px 0 0; /* Match BaseModal */
 }
 .modal-title {
   font-size: 28px;
@@ -321,6 +323,13 @@ function handleSuccessClose() {
   border-radius: 4px;
   transition: background 0.2s;
 }
+/* Ensure correct white background for the pay modal content */
+.pay-modal-content {
+  background: #fff; /* Restore white background */
+  border-radius: 28px; /* Match container */
+  overflow: hidden;
+}
+
 .order-info-bar {
   display: flex;
   align-items: center;

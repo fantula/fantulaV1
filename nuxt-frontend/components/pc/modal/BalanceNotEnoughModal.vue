@@ -1,34 +1,36 @@
 <template>
-  <div class="modal-mask">
-    <div class="balance-modal">
-      <div class="modal-header">
-        <div class="title">余额不足</div>
-        <button class="close-btn" @click="$emit('close')">×</button>
-      </div>
-      <div class="modal-content">
-        <div class="icon-area">
-          <el-icon :size="48" color="#F56C6C"><Warning /></el-icon>
+  <Teleport to="body">
+    <div class="modal-mask">
+      <div class="balance-modal">
+        <div class="modal-header">
+          <div class="title">余额不足</div>
+          <button class="close-btn" @click="$emit('close')">×</button>
         </div>
-        <p class="message">当前余额不足以支付订单</p>
-        <div class="info-row">
-          <span>当前余额：</span>
-          <span class="amount">¥{{ balance.toFixed(2) }}</span>
+        <div class="modal-content">
+          <div class="icon-area">
+            <el-icon :size="48" color="#F56C6C"><Warning /></el-icon>
+          </div>
+          <p class="message">当前余额不足以支付订单</p>
+          <div class="info-row">
+            <span>当前余额：</span>
+            <span class="amount">¥{{ balance.toFixed(2) }}</span>
+          </div>
+          <div class="info-row">
+            <span>需要支付：</span>
+            <span class="amount highlight">¥{{ needAmount.toFixed(2) }}</span>
+          </div>
+          <div class="info-row">
+            <span>还需充值：</span>
+            <span class="amount">¥{{ (needAmount - balance).toFixed(2) }}</span>
+          </div>
         </div>
-        <div class="info-row">
-          <span>需要支付：</span>
-          <span class="amount highlight">¥{{ needAmount.toFixed(2) }}</span>
+        <div class="modal-footer">
+          <button class="btn-cancel" @click="$emit('close')">取消</button>
+          <button class="btn-confirm" @click="handleRecharge">立即充值</button>
         </div>
-        <div class="info-row">
-          <span>还需充值：</span>
-          <span class="amount">¥{{ (needAmount - balance).toFixed(2) }}</span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" @click="$emit('close')">取消</button>
-        <button class="btn-confirm" @click="handleRecharge">立即充值</button>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

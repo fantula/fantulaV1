@@ -17,7 +17,7 @@
 
     <div class="form-group">
       <label class="form-label">邮箱验证</label>
-      <div class="captcha-row">
+      <div class="captcha-row relative-input-group">
         <input 
           v-model="otpCode" 
           type="text" 
@@ -28,13 +28,11 @@
           autocomplete="off"
           @input="otpCode = otpCode.replace(/\D/g, '')"
         />
-        <button 
-          class="send-code-btn" 
-          :disabled="countdown > 0 || loading" 
+        <SendCodeButton 
+          :loading="loading"
+          :countdown="countdown"
           @click="sendCode"
-        >
-          {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
-        </button>
+        />
       </div>
       <p class="form-tip">为了您的资产安全，请验证邮箱: {{ email }}</p>
     </div>
@@ -47,14 +45,15 @@
     </div>
 
     <template #footer>
-      <button class="base-modal-cancel" @click="$emit('close')">取消</button>
-      <button 
-        class="delete-btn" 
+      <BaseButton themeId="secondary" @click="$emit('close')">取消</BaseButton>
+      <BaseButton 
+        themeId="destructive" 
         :disabled="!isConfirmed || !otpCode || loading" 
+        :loading="loading"
         @click="handleDelete"
       >
         {{ loading ? '处理中...' : '确认注销' }}
-      </button>
+      </BaseButton>
     </template>
   </BaseModal>
 </template>
@@ -64,6 +63,8 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { authApi } from '@/api/client/auth'
 import { ElMessage } from 'element-plus'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+import BaseButton from '@/components/shared/BaseButton.vue'
+import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 
 const props = defineProps<{
   visible?: boolean
@@ -182,75 +183,10 @@ const handleDelete = async () => {
   color: #FCA5A5;
 }
 
-.captcha-row {
-  display: flex;
-  gap: 12px;
+.relative-input-group {
+  position: relative;
+  display: block; /* SendCodeButton is absolute inside */
 }
 
-.send-code-btn {
-  padding: 0 16px;
-  white-space: nowrap;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: #94A3B8;
-  font-size: 13px;
-  cursor: pointer;
-  height: 46px;
-  transition: all 0.2s;
-}
-.send-code-btn:hover { 
-  background: rgba(255, 255, 255, 0.1); 
-  color: #fff;
-}
-.send-code-btn:disabled { 
-  opacity: 0.5; 
-  cursor: not-allowed; 
-}
-
-.confirmation-area {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #CBD5E1;
-  user-select: none;
-}
-
-.checkbox-label input {
-  width: 18px;
-  height: 18px;
-  accent-color: #EF4444;
-}
-
-.delete-btn {
-  padding: 10px 24px;
-  background: #EF4444;
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.delete-btn:disabled {
-  background: #4B5563;
-  box-shadow: none;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.delete-btn:not(:disabled):hover {
-  background: #DC2626;
-  transform: translateY(-1px);
-}
+/* Removed legacy .send-code-btn, .delete-btn styles */
 </style>

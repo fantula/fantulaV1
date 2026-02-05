@@ -301,46 +301,6 @@ const isExpired = (coupon: UserCoupon) => {
   text-transform: uppercase; letter-spacing: 1px;
 }
 
-/* Redemption Card */
-.redemption-card {
-  flex-shrink: 0;
-  margin: 24px 32px;
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-  border: 1px solid rgba(249, 115, 22, 0.2);
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.redemption-header {
-  padding: 20px 24px; display: flex; align-items: center; gap: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-.redemption-icon { font-size: 24px; color: #F97316; }
-.redemption-title { font-size: 16px; font-weight: 600; color: #fff; }
-
-.redemption-body { padding: 24px; }
-.input-group { display: flex; gap: 12px; margin-bottom: 12px; }
-
-.redemption-input {
-  flex: 1; height: 48px; background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0 20px;
-  font-size: 15px; color: #fff; outline: none; transition: all 0.3s;
-}
-.redemption-input:focus { border-color: #F97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1); }
-.redemption-input::placeholder { color: #64748B; }
-
-.redemption-btn {
-  height: 48px; padding: 0 32px; background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-  border: none; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 600;
-  cursor: pointer; transition: all 0.3s; white-space: nowrap;
-}
-.redemption-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-  transform: translateY(-1px); box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
-}
-.redemption-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.redemption-tips { font-size: 12px; color: #64748B; margin: 0; }
-
 /* Tabs */
 .coupon-tabs {
   flex-shrink: 0; display: flex; gap: 32px; padding: 0 32px;

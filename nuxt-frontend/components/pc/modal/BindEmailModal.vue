@@ -24,27 +24,25 @@
 
       <div class="form-group">
         <label class="form-label">验证码</label>
-        <div class="input-with-action">
+        <div class="input-with-action relative-input-group">
           <input 
             v-model="oldCode" 
             class="form-input" 
             placeholder="请输入验证码"
             maxlength="6"
           />
-          <button 
-            class="send-code-btn" 
-            :disabled="countdown > 0 || loading"
+          <SendCodeButton 
+            :loading="loading"
+            :countdown="countdown"
             @click="sendOldCode"
-          >
-            {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
-          </button>
+          />
         </div>
       </div>
       
       <div class="step-actions">
-        <button class="primary-btn full-width" @click="verifyOldEmail" :disabled="loading || oldCode.length < 4">
+        <BaseButton themeId="primary" block @click="verifyOldEmail" :disabled="loading || oldCode.length < 4">
           下一步
-        </button>
+        </BaseButton>
       </div>
     </template>
 
@@ -62,20 +60,19 @@
 
       <div class="form-group">
         <label class="form-label">验证码</label>
-        <div class="input-with-action">
+        <div class="input-with-action relative-input-group">
           <input 
             v-model="form.code" 
             class="form-input" 
             placeholder="新邮箱验证码"
             maxlength="6"
           />
-          <button 
-            class="send-code-btn" 
-            :disabled="countdown > 0 || loading || !isEmailValid"
+          <SendCodeButton 
+            :loading="loading"
+            :countdown="countdown"
+            :disabled="!isEmailValid"
             @click="sendNewCode"
-          >
-            {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
-          </button>
+          />
         </div>
       </div>
     </template>
@@ -87,6 +84,8 @@ import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/client/auth'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
+import SendCodeButton from '@/components/shared/SendCodeButton.vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -340,59 +339,17 @@ const handleConfirm = async () => {
   background: rgba(59, 130, 246, 0.05);
 }
 
+.relative-input-group {
+  position: relative;
+}
+/* SendCodeButton is absolute, so we remove flex gap logic for it within this group if we move to absolute */
+/* However, input-with-action was display: flex. 
+   If SendCodeButton is absolute, input should take full width.
+*/
 .input-with-action {
-  display: flex;
-  gap: 12px;
+  display: block; /* Change from flex to block for absolute positioning context */
 }
 
-.send-code-btn {
-  height: 44px;
-  padding: 0 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 14px;
-  transition: all 0.3s;
-}
+/* Cleanup old buttons if unused */
 
-.send-code-btn:hover:not(:disabled) {
-  border-color: #3B82F6;
-  color: #3B82F6;
-}
-
-.send-code-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.step-actions {
-  margin-top: 10px;
-}
-
-.primary-btn {
-  height: 44px;
-  background: #3B82F6;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.primary-btn.full-width {
-  width: 100%;
-}
-
-.primary-btn:hover:not(:disabled) {
-  background: #2563EB;
-}
-
-.primary-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 </style>

@@ -46,16 +46,22 @@
            <div class="mc-empty">
              <div class="empty-icon">🛒</div>
              <p>购物车空空如也</p>
-             <button class="mc-btn secondary small" @click="emit('close')">去逛逛</button>
+             <BaseButton themeId="secondary" size="small" @click="emit('close')">去逛逛</BaseButton>
            </div>
         </template>
       </div>
       
       <!-- Footer -->
       <div class="mc-footer" v-if="hasItems">
-         <button class="mc-btn primary block" @click="handleCheckout" :disabled="checkingOut">
+         <BaseButton 
+           themeId="primary" 
+           block 
+           :loading="checkingOut"
+           :disabled="checkingOut"
+           @click="handleCheckout"
+         >
            {{ checkingOut ? '处理中...' : '去结算' }}
-         </button>
+         </BaseButton>
       </div>
     </div>
   </Transition>
@@ -68,6 +74,7 @@ import { useCartStore } from '@/stores/client/cart'
 import { supabasePreOrderApi } from '@/api/client/supabase'
 import { ElMessage } from 'element-plus'
 import { Delete } from '@element-plus/icons-vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -115,7 +122,7 @@ const handleCheckout = async () => {
        emit('close')
        router.push(`/checkout/${result.pre_order_id}`)
     } else {
-       ElMessage.error(result.error || result.msg || '创建订单失败')
+       ElMessage.error(result.error || '创建订单失败')
     }
   } catch (e: any) {
     ElMessage.error('结算失败: ' + (e.message || '未知错误'))
@@ -258,6 +265,7 @@ const updateQty = async (delta: number) => {
   margin-bottom: 4px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -344,56 +352,5 @@ const updateQty = async (delta: number) => {
 .mc-footer {
   padding: 16px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Buttons */
-.mc-btn {
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mc-btn.block {
-  width: 100%;
-  padding: 12px;
-}
-
-.mc-btn.small {
-  padding: 8px 16px;
-}
-
-.mc-btn.primary {
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-.mc-btn.primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-}
-.mc-btn.primary:active {
-  transform: scale(0.98);
-}
-.mc-btn.primary:disabled {
-  background: #334155;
-  color: #94A3B8;
-  box-shadow: none;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.mc-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #E2E8F0;
-}
-.mc-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
 }
 </style>

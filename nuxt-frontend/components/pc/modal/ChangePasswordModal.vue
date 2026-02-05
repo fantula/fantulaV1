@@ -18,20 +18,18 @@
     <template v-else>
       <div class="form-group">
         <label class="form-label">验证码</label>
-        <div class="input-with-action">
+        <div class="input-with-action relative-input-group">
           <input 
             v-model="form.code" 
             class="form-input" 
             placeholder="邮箱验证码"
             maxlength="6"
           />
-          <button 
-            class="send-code-btn" 
-            :disabled="countdown > 0 || loading"
+          <SendCodeButton 
+            :loading="loading"
+            :countdown="countdown"
             @click="sendCode"
-          >
-            {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
-          </button>
+          />
         </div>
       </div>
 
@@ -63,6 +61,7 @@ import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/client/auth'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
+import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -231,30 +230,9 @@ const handleConfirm = async () => {
 }
 
 .input-with-action {
-  display: flex;
-  gap: 12px;
+  position: relative;
+  display: block; /* Was flex, now block for absolute child */
 }
 
-.send-code-btn {
-  height: 44px;
-  padding: 0 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 14px;
-  transition: all 0.3s;
-}
-
-.send-code-btn:hover:not(:disabled) {
-  border-color: #3B82F6;
-  color: #3B82F6;
-}
-
-.send-code-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Removed legacy .send-code-btn styles */
 </style>

@@ -3,9 +3,9 @@
     <div class="checkout-content">
       <!-- 头部导航 -->
       <div class="checkout-header">
-        <button class="back-btn" @click="router.back()">
+        <BaseButton themeId="secondary" @click="router.back()">
           <el-icon><ArrowLeft /></el-icon> 返回
-        </button>
+        </BaseButton>
         <div class="page-title">订单结算</div>
       </div>
 
@@ -19,7 +19,7 @@
       <div class="checkout-error" v-else-if="error">
         <div class="error-icon">⚠️</div>
         <p>{{ error }}</p>
-        <button class="action-btn" @click="router.push('/')">返回首页</button>
+        <BaseButton themeId="secondary" @click="router.push('/')">返回首页</BaseButton>
       </div>
 
       <!-- 正常结算 -->
@@ -131,6 +131,7 @@ import WalletRechargeModal from '@/components/pc/modal/business/WalletRechargeMo
 import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
 import CheckoutOrderList from '@/components/pc/checkout/CheckoutOrderList.vue'
 import CheckoutSummary from '@/components/pc/checkout/CheckoutSummary.vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 definePageMeta({
   layout: 'pc', ssr: false })
@@ -237,25 +238,6 @@ const handlePaySuccessClose = () => {
   display: flex;
   align-items: center;
   margin-bottom: 32px;
-}
-
-.back-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-sub);
-  padding: 8px 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border-color: var(--active-orange);
 }
 
 .page-title {
@@ -395,21 +377,6 @@ const handlePaySuccessClose = () => {
   text-align: center;
   padding: 100px 0;
   color: var(--text-sub);
-}
-
-.action-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  margin-top: 16px;
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .glass-loader {

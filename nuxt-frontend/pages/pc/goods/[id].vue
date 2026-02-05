@@ -13,14 +13,10 @@
     <div class="goods-content">
       <!-- 返回按钮 -->
       <div class="back-btn-row">
-        <button class="back-btn" @click="goBack">
-          <span class="back-btn-icon">
-            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" style="display: block;">
-              <path d="M18.5 10L13 16L18.5 22" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="back-btn-text">返回上一页</span>
-        </button>
+        <BaseButton themeId="secondary" @click="goBack">
+          <el-icon><ArrowLeft /></el-icon>
+          返回上一页
+        </BaseButton>
       </div>
       
       <div class="goods-detail-content">
@@ -189,7 +185,8 @@ import {
   ShoppingCart, 
   Star, 
   StarFilled,
-  InfoFilled
+  InfoFilled,
+  ArrowLeft
 } from '@element-plus/icons-vue'
 import { onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'

@@ -7,15 +7,15 @@
         @mousedown="handleMouseDown"
         @click="handleOverlayClick"
       >
-        <div class="base-modal-container" :style="{ width: containerWidth }">
+        <div class="base-modal-container" :class="customClass" :style="{ width: containerWidth }">
           <!-- Header -->
-          <div class="base-modal-header">
+          <div v-if="showHeader" class="base-modal-header">
             <h3 class="base-modal-title">{{ title }}</h3>
             <button v-if="showClose" class="base-modal-close" @click="handleClose">×</button>
           </div>
 
           <!-- Body -->
-          <div class="base-modal-body">
+          <div class="base-modal-body" :style="{ padding: contentPadding }">
             <slot></slot>
           </div>
 
@@ -62,10 +62,13 @@ import BaseButton from '@/components/shared/BaseButton.vue'
 
 interface Props {
   visible: boolean
-  title: string
+  title?: string
   width?: string
   showClose?: boolean
   showFooter?: boolean
+  showHeader?: boolean
+  contentPadding?: string
+  customClass?: string
   cancelText?: string
   confirmText?: string
   loadingText?: string
@@ -82,6 +85,9 @@ const props = withDefaults(defineProps<Props>(), {
   width: '420px',
   showClose: true,
   showFooter: true,
+  showHeader: true,
+  contentPadding: '32px',
+  customClass: '',
   cancelText: '取消',
   confirmText: '确认',
   loadingText: '处理中...',
@@ -150,7 +156,8 @@ const handleClose = () => {
     0 0 0 1px rgba(0,0,0,0.4); /* Sharp Outer Edge */
     
   border-radius: 28px;
-  padding: 32px;
+  border-radius: 28px;
+  /* padding moved to body or contentPadding prop */
   display: flex;
   flex-direction: column;
   max-height: 90vh;

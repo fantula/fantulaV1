@@ -3,7 +3,12 @@
     class="base-button"
     :class="[
       theme.variantClass,
-      { 'is-loading': loading, 'is-disabled': disabled, 'is-block': block }
+      { 
+        'is-loading': loading, 
+        'is-disabled': disabled, 
+        'is-block': block,
+        [`is-${size}`]: size
+      }
     ]"
     :disabled="disabled || loading"
     @click="handleClick"
@@ -36,13 +41,15 @@ interface Props {
   loading?: boolean
   disabled?: boolean
   block?: boolean
+  size?: 'default' | 'small' | 'large'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   themeId: 'primary',
   loading: false,
   disabled: false,
-  block: false
+  block: false,
+  size: 'default'
 })
 
 const emit = defineEmits(['click'])
@@ -80,6 +87,12 @@ const handleClick = (e: MouseEvent) => {
 
 .base-button.is-block {
   width: 100%;
+}
+
+.base-button.is-small {
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 10px;
 }
 
 .base-button.is-disabled {
@@ -134,6 +147,18 @@ const handleClick = (e: MouseEvent) => {
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .btn-primary:active { transform: scale(0.98); }
+
+/* [Primary Orange] - Orange Gradient */
+.btn-primary-orange {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-primary-orange:not(.is-disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(234, 88, 12, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.btn-primary-orange:active { transform: scale(0.98); }
 
 /* [Suite 001] Classic Phantom - Neon Glass */
 .btn-suit-001-primary {
@@ -226,4 +251,35 @@ const handleClick = (e: MouseEvent) => {
    but simplisticly if we use this for active tab, we might need an 'active' prop or specialized theme.
    For now, we'll assume the parent toggles classes or we define a 'tab-active' theme if needed. 
 */
+/* [Coupon Themes] */
+.btn-coupon-purple {
+  background: rgba(217, 70, 239, 0.2);
+  color: #E879F9;
+  border: 1px solid rgba(217, 70, 239, 0.3);
+}
+.btn-coupon-purple:not(.is-disabled):hover {
+  background: rgba(217, 70, 239, 0.3);
+  color: #fff;
+}
+
+.btn-coupon-gold {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.btn-coupon-gold:not(.is-disabled):hover {
+  background: rgba(245, 158, 11, 0.3);
+  color: #fff;
+}
+
+.btn-coupon-cyan {
+  background: rgba(6, 182, 212, 0.2);
+  color: #22D3EE;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+.btn-coupon-cyan:not(.is-disabled):hover {
+  background: rgba(6, 182, 212, 0.3);
+  color: #fff;
+}
 </style>
+
