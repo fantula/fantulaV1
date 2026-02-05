@@ -59,24 +59,24 @@ export function useAdminTicketList() {
     }
 
     const handleCleanup = async () => {
-        try {
-            await ElMessageBox.confirm(
+        const handleCleanup = async () => {
+            await confirmAction(
                 '此操作将永久删除7天前的"已解决"工单中的所有图片附件以释放空间。聊天记录将保留，但图片将无法查看。确定要执行吗？',
-                '清理图片存储',
-                { confirmButtonText: '确定清理', cancelButtonText: '取消', type: 'warning' }
+                async () => {
+                    const session = useSupabaseSession()
+                    const token = session.value?.access_token
+                    const res = await adminTicketApi.cleanupImages(7, token)
+                    // Append concrete count info to success message if possible? 
+                    // Since confirmAction uses fixed success message, we accept generic message or rely on res.success
+                    return res
+                },
+                {
+                    title: '清理图片存储',
+                    confirmText: '确定清理',
+                    type: 'warning',
+                    successMessage: '图片清理完成'
+                }
             )
-
-            const session = useSupabaseSession()
-            const token = session.value?.access_token
-
-            const res = await adminTicketApi.cleanupImages(7, token)
-            if (res.success) {
-                ElMessage.success(`清理完成，共删除了 ${res.count} 个文件`)
-            } else {
-                ElMessage.error(res.error || '清理失败')
-            }
-        } catch (e) {
-            // Cancelled
         }
     }
 

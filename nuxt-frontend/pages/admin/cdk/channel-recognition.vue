@@ -1,36 +1,38 @@
 <template>
   <div class="channel-recognition-page">
-    <!-- Header Actions -->
-    <div class="page-header">
-      <div class="left-actions">
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索频道标识..."
-          style="width: 240px"
-          clearable
-          @clear="fetchData"
-          @keyup.enter="fetchData"
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
-        
-        <el-select 
-          v-model="filterStatus" 
-          placeholder="状态筛选" 
-          style="width: 140px" 
-          @change="fetchData"
-        >
-          <el-option label="全部" value="all" />
-          <el-option label="待处理 (未绑定)" value="unbound" />
-          <el-option label="已完成 (已绑定)" value="bound" />
-        </el-select>
-        
-        <el-button type="primary" @click="fetchData">查询</el-button>
-      </div>
+    <!-- Action Bar -->
+    <AdminActionCard>
+      <template #default>
+        <div class="filter-group">
+          <el-input
+            v-model="searchQuery"
+            placeholder="搜索频道标识..."
+            style="width: 240px"
+            clearable
+            @clear="fetchData"
+            @keyup.enter="fetchData"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+          
+          <el-select 
+            v-model="filterStatus" 
+            placeholder="状态筛选" 
+            style="width: 140px" 
+            @change="fetchData"
+          >
+            <el-option label="全部" value="all" />
+            <el-option label="待处理 (未绑定)" value="unbound" />
+            <el-option label="已完成 (已绑定)" value="bound" />
+          </el-select>
+          
+          <el-button type="primary" @click="fetchData">查询</el-button>
+        </div>
+      </template>
 
-      <div class="right-actions">
+      <template #actions>
         <el-button type="success" @click="batchModalVisible = true">
           <el-icon class="el-icon--left"><Plus /></el-icon>
           批量添加
@@ -38,11 +40,19 @@
         <el-button @click="fetchData">
           <el-icon><Refresh /></el-icon>
         </el-button>
-      </div>
-    </div>
+      </template>
+    </AdminActionCard>
 
     <!-- Data Table -->
-    <el-table :data="tableData" v-loading="loading" style="width: 100%" border stripe>
+    <AdminDataTable
+      :data="tableData"
+      :loading="loading"
+      :total="total"
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      @update:current-page="fetchData"
+      @update:page-size="fetchData"
+    >
       <el-table-column prop="channel_key" label="频道标识" min-width="180">
         <template #default="{ row }">
           <span class="channel-key">{{ row.channel_key }}</span>
@@ -90,20 +100,7 @@
           </el-popconfirm>
         </template>
       </el-table-column>
-    </el-table>
-
-    <!-- Pagination -->
-    <div class="pagination-container">
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :total="total"
-        layout="total, sizes, prev, pager, next, jumper"
-        :page-sizes="[10, 20, 50, 100]"
-        @size-change="fetchData"
-        @current-change="fetchData"
-      />
-    </div>
+    </AdminDataTable>
 
     <!-- Bind Product Modal -->
     <el-dialog v-model="bindModalVisible" title="绑定商品" width="500px" destroy-on-close>
@@ -188,6 +185,8 @@ import { ref, onMounted } from 'vue'
 import { Search, Plus, Refresh } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 
 const client = getAdminSupabaseClient()
 
@@ -413,43 +412,9 @@ const handleBatchAdd = async () => {
   border-radius: 8px;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.left-actions, .right-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.channel-key {
-  font-family: monospace;
-  font-weight: bold;
-  color: #409EFF;
-}
-
-.bound-product {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.product-name {
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 </style>

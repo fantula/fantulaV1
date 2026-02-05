@@ -1,13 +1,11 @@
 <template>
-  <div class="faq-list-page">
-    <div class="page-actions">
-      <el-button type="primary" @click="$router.push('/admin/help-center/faq/post')">
-        <el-icon><Plus /></el-icon> 添加问题
-      </el-button>
-    </div>
+  <div class="admin-page">
+    <AdminActionCard>
+      <el-button type="primary" :icon="Plus" @click="$router.push('/admin/help-center/faq/post')">添加问题</el-button>
+    </AdminActionCard>
 
     <!-- Toolbar -->
-    <div class="toolbar-card">
+    <AdminActionCard class="mt-4">
       <el-form :inline="true" class="search-form">
         <el-form-item>
           <el-select v-model="filterCategory" placeholder="全部分类" clearable style="width: 150px">
@@ -33,11 +31,19 @@
           <el-button @click="resetFilter">重置</el-button>
         </el-form-item>
       </el-form>
-    </div>
+    </AdminActionCard>
 
     <!-- Table -->
-    <div class="table-card" v-loading="loading">
-      <el-table :data="faqs" style="width: 100%" stripe>
+    <AdminDataTable
+      :data="faqs"
+      :loading="loading"
+      :total="total"
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      @update:current-page="fetchFaqs"
+      @update:page-size="fetchFaqs"
+      class="mt-4"
+    >
         <el-table-column prop="sort_order" label="排序" width="80" align="center" />
         
         <el-table-column label="问题" min-width="250">
@@ -75,39 +81,40 @@
             <el-button type="primary" link size="small" @click="$router.push(`/admin/help-center/faq/post?id=${row.id}`)">
               编辑
             </el-button>
-            <el-popconfirm title="确定要删除这个问题吗？" @confirm="handleDelete(row.id)">
-              <template #reference>
-                <el-button type="danger" link size="small">删除</el-button>
-              </template>
-            </el-popconfirm>
+            <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
-      </el-table>
-
-      <!-- Pagination -->
-      <div class="pagination-row">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :total="total"
-          layout="total, prev, pager, next"
-          @current-change="fetchFaqs"
-        />
-      </div>
-    </div>
+    </AdminDataTable>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { Plus, Search, Goods } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { adminFaqApi } from '@/api/admin/help-center'
+import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import { confirmDelete } from '@/composables/admin/useAdminDialog'
+
 definePageMeta({
   layout: 'mgmt',
   middleware: ["mgmt-auth"]
 })
 
-import { ref, onMounted } from 'vue'
-import { Plus, Search, Goods } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import { adminFaqApi, type AdminFaq, type AdminFaqCategory } from '@/api/admin/help-center'
+interface AdminFaqCategory {
+  id: string
+  name: string
+}
+
+interface AdminFaq {
+  id: string
+  question: string
+  sort_order: number
+  category?: AdminFaqCategory
+  product?: { product_name: string }
+  is_active: boolean
+}
 
 const loading = ref(false)
 const faqs = ref<AdminFaq[]>([])
@@ -121,7 +128,7 @@ const filterCategory = ref('')
 
 const fetchCategories = async () => {
   const res = await adminFaqApi.getCategories()
-  if (res.success) categories.value = res.categories
+  if (res.success) categories.value = res.categories || []
 }
 
 const fetchFaqs = async () => {
@@ -134,8 +141,8 @@ const fetchFaqs = async () => {
       category_id: filterCategory.value || undefined
     })
     if (res.success) {
-      faqs.value = res.faqs
-      total.value = res.total
+      faqs.value = res.faqs || []
+      total.value = res.total || 0
     } else {
       ElMessage.error(res.error || '获取列表失败')
     }
@@ -144,14 +151,16 @@ const fetchFaqs = async () => {
   }
 }
 
-const handleDelete = async (id: string) => {
-  const res = await adminFaqApi.deleteFaq(id)
-  if (res.success) {
-    ElMessage.success('删除成功')
-    fetchFaqs()
-  } else {
-    ElMessage.error(res.error || '删除失败')
-  }
+const handleDelete = async (row: AdminFaq) => {
+  await confirmDelete(
+      '确定要删除这个问题吗？',
+      async () => {
+         const res = await adminFaqApi.deleteFaq(row.id)
+         if (res.error) throw new Error((res.error as any).message || String(res.error))
+         await fetchFaqs()
+         return { success: true }
+      }
+  )
 }
 
 const resetFilter = () => {
@@ -167,48 +176,21 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.faq-list-page {
+.admin-page {
   padding: 0;
-}
-
-.page-actions {
-  margin-bottom: 20px;
-}
-
-.toolbar-card {
-  background: var(--el-bg-color);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: var(--el-box-shadow-lighter);
 }
 .search-form {
   margin-bottom: 0;
 }
-
-.table-card {
-  background: var(--el-bg-color);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: var(--el-box-shadow-lighter);
-}
-
 .question-text {
   font-weight: 500;
   color: var(--el-text-color-primary);
 }
-
 .bound-product {
   display: flex;
   align-items: center;
   gap: 6px;
   color: var(--el-color-primary);
   font-size: 13px;
-}
-
-.pagination-row {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
 }
 </style>

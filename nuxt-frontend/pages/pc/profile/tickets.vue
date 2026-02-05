@@ -28,71 +28,82 @@
 
     <!-- Ticket List Container -->
     <div class="tickets-list-container">
-      <!-- Loading -->
-      <div v-if="loading" class="loading-state">
-        <el-skeleton animated v-for="i in 3" :key="i" class="skeleton-item">
-          <template #template>
-            <div style="display: flex; gap: 16px; padding: 20px;">
-              <el-skeleton-item variant="circle" style="width: 48px; height: 48px;" />
-              <div style="flex: 1">
-                <el-skeleton-item variant="h3" style="width: 40%; margin-bottom: 12px" />
-                <el-skeleton-item variant="text" style="width: 80%" />
-              </div>
-            </div>
-          </template>
-        </el-skeleton>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="filteredTickets.length === 0" class="empty-state">
-        <div class="empty-icon-wrap">
-          <el-icon class="empty-icon"><Service /></el-icon>
-        </div>
-        <div class="empty-text">暂无工单</div>
-        <div class="empty-desc">您还没有提交过任何工单记录</div>
-      </div>
-
-      <!-- Ticket List -->
-      <div v-else class="tickets-list">
-        <transition-group name="list">
-          <div 
-            v-for="ticket in filteredTickets" 
-            :key="ticket.id" 
-            class="ticket-card"
-            :class="ticket.statusClass"
-            @click="openViewModal(ticket)"
-          >
-            <!-- Icon -->
-            <div class="ticket-icon" :class="ticket.statusClass">
-              <el-icon><Service /></el-icon>
-            </div>
-
-            <!-- Content -->
-            <div class="ticket-content">
-              <div class="ticket-top">
-                <div class="ticket-title-row">
-                  <span class="ticket-id">{{ ticket.shortId }}</span>
-                  <span class="status-tag" :class="ticket.statusClass">{{ ticket.statusText }}</span>
+      
+      <BaseInfiniteList 
+        :loading="loading" 
+        :finished="finished"
+        :error="error" 
+        @load="loadMore"
+        :offset="150"
+      >
+        <!-- Loading Skeleton (Initial) -->
+        <template #loading>
+           <div v-if="displayList.length === 0 && loading" class="loading-state">
+            <el-skeleton animated v-for="i in 3" :key="i" class="skeleton-item">
+              <template #template>
+                <div style="display: flex; gap: 16px; padding: 20px;">
+                  <el-skeleton-item variant="circle" style="width: 48px; height: 48px;" />
+                  <div style="flex: 1">
+                    <el-skeleton-item variant="h3" style="width: 40%; margin-bottom: 12px" />
+                    <el-skeleton-item variant="text" style="width: 80%" />
+                  </div>
                 </div>
-                <span class="ticket-time">{{ ticket.time }}</span>
-              </div>
-              
-              <div class="ticket-body">
-                {{ ticket.content }}
-              </div>
-              
-              <div class="ticket-meta" v-if="ticket.productName">
-                关联: {{ ticket.productName }}
-              </div>
-            </div>
-
-            <!-- Delete Action -->
-            <div class="delete-action" @click.stop="handleDeleteClick(ticket)">
-               <el-icon><Delete /></el-icon>
-            </div>
+              </template>
+            </el-skeleton>
           </div>
-        </transition-group>
-      </div>
+        </template>
+
+        <!-- Empty State -->
+        <div v-if="displayList.length === 0 && !loading" class="empty-state">
+          <div class="empty-icon-wrap">
+            <el-icon class="empty-icon"><Service /></el-icon>
+          </div>
+          <div class="empty-text">暂无工单</div>
+          <div class="empty-desc">您还没有提交过任何工单记录</div>
+        </div>
+
+        <!-- Ticket List -->
+        <div v-else class="tickets-list">
+          <transition-group name="list">
+            <div 
+              v-for="ticket in displayList" 
+              :key="ticket.id" 
+              class="ticket-card"
+              :class="ticket.statusClass"
+              @click="openViewModal(ticket)"
+            >
+              <!-- Icon -->
+              <div class="ticket-icon" :class="ticket.statusClass">
+                <el-icon><Service /></el-icon>
+              </div>
+
+              <!-- Content -->
+              <div class="ticket-content">
+                <div class="ticket-top">
+                  <div class="ticket-title-row">
+                    <span class="ticket-id">{{ ticket.shortId }}</span>
+                    <span class="status-tag" :class="ticket.statusClass">{{ ticket.statusText }}</span>
+                  </div>
+                  <span class="ticket-time">{{ ticket.time }}</span>
+                </div>
+                
+                <div class="ticket-body">
+                  {{ ticket.content }}
+                </div>
+                
+                <div class="ticket-meta" v-if="ticket.productName">
+                  关联: {{ ticket.productName }}
+                </div>
+              </div>
+
+              <!-- Delete Action -->
+              <div class="delete-action" @click.stop="handleDeleteClick(ticket)">
+                 <el-icon><Delete /></el-icon>
+              </div>
+            </div>
+          </transition-group>
+        </div>
+      </BaseInfiniteList>
     </div>
   </div>
 
@@ -124,9 +135,12 @@ definePageMeta({
 import { ref, computed, onMounted } from 'vue'
 import { ticketApi } from '@/api/client/ticket'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import { Service, Right, Delete } from '@element-plus/icons-vue'
 import TicketDetailModal from '@/components/pc/modal/business/TicketDetailModal.vue'
 import BaseConfirmModal from '@/components/pc/modal/base/BaseConfirmModal.vue'
+import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
+import { ElMessage } from 'element-plus'
 
 const { formatDate } = useBizFormat()
 const router = useRouter()
@@ -139,8 +153,7 @@ const tabs = [
 ]
 
 const activeTab = ref('all')
-const loading = ref(false)
-const tickets = ref<any[]>([])
+const tickets = ref<any[]>([]) // Raw data
 
 // Modal State
 const showDetailModal = ref(false)
@@ -151,11 +164,29 @@ const showDeleteModal = ref(false)
 const deleteTicketId = ref('')
 const deleteLoading = ref(false)
 
+// Select Tab
 const selectTab = (key: string) => { 
   activeTab.value = key 
+  // Composable auto-resets when filteredSource changes (if it watches it, or we trigger it)
+  // useInfiniteScroll (Client Mode) usually watches `data` source.
 }
 
+// === Infinite Scroll Logic (Client Mode) ===
+
+// 1. Computed Filtered Source
+const filteredTickets = computed(() => {
+  if (activeTab.value === 'all') return tickets.value
+  return tickets.value.filter((ticket: any) => ticket.status === activeTab.value)
+})
+
+// 2. Composable
+const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<any>({
+    data: filteredTickets,
+    pageSize: 10
+})
+
 const fetchTickets = async () => {
+  // Manual loading for initial fetch
   loading.value = true
   try {
     const res = await ticketApi.getList()
@@ -174,17 +205,13 @@ const fetchTickets = async () => {
     }
   } catch (e) {
     console.error('Fetch tickets failed', e)
+    error.value = true
   } finally {
     loading.value = false
   }
 }
 
 onMounted(fetchTickets)
-
-const filteredTickets = computed(() => {
-  if (activeTab.value === 'all') return tickets.value
-  return tickets.value.filter((ticket: any) => ticket.status === activeTab.value)
-})
 
 const openViewModal = (ticket: any) => {
   currentTicketId.value = ticket.id
@@ -205,7 +232,8 @@ const confirmDelete = async () => {
     if (res.success) {
       ElMessage.success('删除成功')
       showDeleteModal.value = false
-      fetchTickets() // Refresh list
+      // Remove from local source
+      tickets.value = tickets.value.filter(t => t.id !== deleteTicketId.value)
     } else {
       ElMessage.error(res.error || '删除失败')
     }
@@ -406,6 +434,7 @@ const confirmDelete = async () => {
   line-height: 1.5;
   margin-bottom: 6px;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;

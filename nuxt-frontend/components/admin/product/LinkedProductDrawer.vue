@@ -10,11 +10,12 @@
          <el-button :icon="Refresh" circle @click="loadData" />
       </div>
 
-      <el-table 
-        :data="list" 
-        v-loading="loading" 
-        border 
-        stripe 
+      <AdminDataTable 
+        :data="paginatedList" 
+        :loading="loading" 
+        :total="list.length"
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
         height="calc(100vh - 150px)"
       >
         <el-table-column label="商品信息" min-width="250">
@@ -31,23 +32,22 @@
            </template>
         </el-table-column>
         
-
-
         <el-table-column label="状态" width="80" align="center">
            <template #default="{ row }">
               <el-tag :type="row.status === 'on' ? 'success' : 'info'" size="small">{{ row.status === 'on' ? '上架' : '下架' }}</el-tag>
            </template>
         </el-table-column>
-      </el-table>
+      </AdminDataTable>
     </div>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Refresh, Picture as IconPicture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminSharedSkuApi } from '@/api/admin'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -60,6 +60,15 @@ const emit = defineEmits(['update:modelValue'])
 const visible = ref(false)
 const list = ref<any[]>([])
 const loading = ref(false)
+
+// Pagination
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+const paginatedList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return list.value.slice(start, start + pageSize.value)
+})
 
 watch(() => props.modelValue, (val) => {
   visible.value = val
@@ -79,6 +88,7 @@ const loadData = async () => {
     const res = await adminSharedSkuApi.getProductsBySharedTag(props.tag)
     if (res.success) {
       list.value = res.products || []
+      currentPage.value = 1
     } else {
       ElMessage.error(res.error || '加载失败')
     }

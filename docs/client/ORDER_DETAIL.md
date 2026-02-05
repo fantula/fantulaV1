@@ -200,13 +200,89 @@ const { data: order } = await orderApi.getDetail(orderId)
 
 ## 🔗 PC/Mobile 共享规则
 
+### 共享 Composable 架构
+
+**推荐入口**: `composables/client/useOrderDetail.ts`
+
+这是统一的订单详情 composable，封装了数据获取、状态管理和业务逻辑：
+
+```typescript
+import { useOrderDetail } from '@/composables/client/useOrderDetail'
+
+const orderId = route.params.id as string
+
+const {
+  // 核心数据
+  order,
+  cdkList,
+  slotList,
+  instructionImage,
+  loading,
+  error,
+  
+  // 退款状态
+  pendingRefundRequest,
+  refundCancelledCount,
+  
+  // 工单状态
+  activeTicketId,
+  hasActiveTicket,
+  canCreateTicket,
+  
+  // 业务逻辑 (来自 useOrderDetailLogic)
+  statusText,
+  remainingDays,
+  getTimeLevel,
+  isOneTime,
+  isVirtualOrShared,
+  canRenew,
+  canRefund,
+  canCancelRefund,
+  isRefundBlocked,
+  
+  // 显示控制
+  showFulfillment,
+  showExpiryWarning,
+  
+  // 工具函数
+  formatTime,
+  getAmountInteger,
+  getAmountDecimal,
+  getFieldsForCdk,
+  getCdkForSlot,
+  
+  // 操作方法
+  loadData,
+  handleRefundSuccess,
+  handleCancelRefundSuccess,
+  handleTicketSuccess,
+} = useOrderDetail(orderId)
+```
+
+### 底层逻辑 Composable
+
+**位置**: `composables/client/useOrderDetailLogic.ts`
+
+仅包含纯业务规则计算，无数据获取。可单独使用，但推荐通过 `useOrderDetail` 调用：
+
+```typescript
+// 仅需要规则计算时使用
+import { useOrderDetailLogic } from '@/composables/client/useOrderDetailLogic'
+
+const { canRefund, canRenew, ... } = useOrderDetailLogic({
+  order,
+  pendingRefundRequest,
+  refundCancelledCount
+})
+```
+
 ### 必须共享
 
 | 项目 | 说明 |
 |------|------|
 | API 调用 | 使用相同的 `api/client/order.ts` |
-| 数据结构 | 返回相同的订单结构 |
-| 状态逻辑 | 按钮显隐规则完全一致 |
+| 数据+逻辑 | 使用 `useOrderDetail` composable |
+| 业务规则 | 退款/续费规则完全一致 |
 | 业务流程 | 退款、续费流程一致 |
 
 ### 可以不同
@@ -214,7 +290,7 @@ const { data: order } = await orderApi.getDetail(orderId)
 | 项目 | 说明 |
 |------|------|
 | 布局 | PC 宽屏布局，Mobile 单列布局 |
-| 交互方式 | PC 悬停，Mobile 触摸 |
+| 交互方式 | PC 使用 Modal，Mobile 使用 Sheet |
 | 组件实现 | 可以有 PC/Mobile 专属组件 |
 
 ---

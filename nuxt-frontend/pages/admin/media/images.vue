@@ -137,7 +137,12 @@
     <ImageUploadModal v-model="uploadDialogVisible" :categories="categories" @success="handleUploadSuccess" />
 
     <!-- 编辑图片弹窗 -->
-    <el-dialog v-model="editDialogVisible" title="编辑图片信息" width="400px" append-to-body :z-index="2000">
+    <AdminDataDialog
+      v-model="editDialogVisible"
+      title="编辑图片信息"
+      :loading="editLoading"
+      @confirm="confirmEdit"
+    >
        <el-form :model="editForm" label-width="80px">
          <el-form-item label="名称">
            <el-input v-model="editForm.name" />
@@ -148,13 +153,7 @@
           </el-select>
          </el-form-item>
        </el-form>
-       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmEdit">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    </AdminDataDialog>
 
     <!-- 图片预览 (使用 el-image-viewer 无法直接嵌入，使用 el-image 的 preview 功能但需要手动触发) -->
     <!-- 由于 el-image 自带点击预览，这里我们在 overlay 里的预览按钮可以手动调用一个隐藏的 el-image 的预览，或者简单点直接弹个 dialog -->
@@ -176,10 +175,12 @@ import {
   Picture, Folder, FolderRemove, Setting, Search, 
   Upload, Refresh, Delete, Edit, View, Check 
 } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { adminImageApi, adminImageCategoryApi, type AdminImage, type AdminImageCategory } from '@/api/admin/media'
 import CategoryManagerModal from '@/components/admin/media/CategoryManagerModal.vue'
 import ImageUploadModal from '@/components/admin/media/ImageUploadModal.vue'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import { confirmDelete, confirmAction } from '@/composables/admin/useAdminDialog'
 
 // --- State ---
 const session = useSupabaseSession()
@@ -268,46 +269,54 @@ const handleEdit = (img: AdminImage) => {
   editDialogVisible.value = true
 }
 
+const editLoading = ref(false)
+
 const confirmEdit = async () => {
-  const res = await adminImageApi.updateImage(editForm.id, {
-    name: editForm.name,
-    category_id: editForm.category_id
-  })
-  if (res.success) {
-    ElMessage.success('更新成功')
-    editDialogVisible.value = false
-    fetchImages()
-  } else {
-    ElMessage.error(res.error || '更新失败')
+  editLoading.value = true
+  try {
+    const res = await adminImageApi.updateImage(editForm.id, {
+        name: editForm.name,
+        category_id: editForm.category_id
+    })
+    if (res.success) {
+        ElMessage.success('更新成功')
+        editDialogVisible.value = false
+        fetchImages()
+    } else {
+        ElMessage.error(res.error || '更新失败')
+    }
+  } finally {
+    editLoading.value = false
   }
 }
 
-const handleDelete = (img: AdminImage) => {
-   const token = session.value?.access_token
-   ElMessageBox.confirm('确认删除此图片？', '警告', { type: 'warning' })
-    .then(async () => {
-      const res = await adminImageApi.deleteImage(img.id, token)
-      if (res.success) {
-        ElMessage.success('删除成功')
-        fetchImages()
-      } else {
-        ElMessage.error(res.error)
+const handleDelete = async (img: AdminImage) => {
+   await confirmDelete(
+      '确认删除此图片？',
+      async () => {
+          const token = session.value?.access_token
+          const res = await adminImageApi.deleteImage(img.id, token)
+          if (res.success) {
+             fetchImages()
+          }
+          return res
       }
-    })
+   )
 }
 
-const handleBatchDelete = () => {
-  const token = session.value?.access_token
-  ElMessageBox.confirm(`确认删除选中的 ${selectedIds.value.length} 张图片？`, '批量删除', { type: 'warning' })
-    .then(async () => {
+const handleBatchDelete = async () => {
+  await confirmAction(
+    `确认删除选中的 ${selectedIds.value.length} 张图片？`,
+    async () => {
+        const token = session.value?.access_token
         const res = await adminImageApi.deleteImages(selectedIds.value, token)
         if (res.success) {
-             ElMessage.success('批量删除成功')
              fetchImages()
-        } else {
-             ElMessage.error(res.error)
         }
-    })
+        return res
+    },
+    { title: '批量删除', type: 'warning', successMessage: '批量删除成功' }
+  )
 }
 
 // --- R2 Sync ---

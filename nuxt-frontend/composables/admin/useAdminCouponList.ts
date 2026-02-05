@@ -1,144 +1,103 @@
-/**
- * 优惠券列表管理 Composable
- * 遵循 useAdminOrderList 模式
- */
-
-import { ref, reactive } from 'vue'
-import { adminCouponApi, type AdminCoupon } from '@/api/admin/coupon'
+import { useAdminList } from './useAdminList'
+import { adminCouponApi, type AdminCoupon } from '@/api/admin'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useBizConfig } from '@/composables/common/useBizConfig'
-import { useBizFormat } from '@/composables/common/useBizFormat'
 
-/**
- * 后台优惠券列表通用逻辑
- * @param couponType 优惠券类型 ('flat' | 'balance' | 'product')
- */
-export function useAdminCouponList(couponType: 'flat' | 'balance' | 'product') {
-    const loading = ref(false)
-    const list = ref<AdminCoupon[]>([])
-    const total = ref(0)
-    const pagination = reactive({
-        page: 1,
-        pageSize: 20
-    })
-    const selectedIds = ref<string[]>([])
-
-    // --- Global Formatters ---
-    const { formatPrice, formatDate } = useBizFormat()
-    const { getCouponTypeLabel, getCouponStatusLabel, getCouponStatusType } = useBizConfig()
-
-    // 加载列表
-    async function loadList() {
-        loading.value = true
-        try {
-            const { success, coupons, total: totalCount, error } = await adminCouponApi.getCoupons({
-                type: couponType,
-                limit: pagination.pageSize,
-                offset: (pagination.page - 1) * pagination.pageSize
-            })
-
-            if (!success) {
-                ElMessage.error(error || '加载失败')
-                return
-            }
-
-            list.value = coupons.map(item => ({ ...item, statusLoading: false }))
-            total.value = totalCount
-        } catch (e) {
-            console.error('加载优惠券失败:', e)
-            ElMessage.error('系统异常')
-        } finally {
-            loading.value = false
-        }
-    }
-
-    // 分页
-    function handlePageChange(val: number) {
-        pagination.page = val
-        loadList()
-    }
-
-    function handleSizeChange(val: number) {
-        pagination.pageSize = val
-        pagination.page = 1
-        loadList()
-    }
-
-    // 选中
-    function handleSelectionChange(selection: AdminCoupon[]) {
-        selectedIds.value = selection.map(item => item.id)
-    }
-
-    // 删除单个
-    async function handleDelete(id: string) {
-        try {
-            await ElMessageBox.confirm('确定要删除此优惠券规则吗？相关的兑换码也将被删除。', '删除确认', { type: 'warning' })
-            const { success, error } = await adminCouponApi.deleteCoupon(id)
-            if (success) {
-                ElMessage.success('删除成功')
-                loadList()
-            } else {
-                ElMessage.error(error || '删除失败')
-            }
-        } catch { /* cancelled */ }
-    }
-
-    // 批量删除
-    async function handleBulkDelete() {
-        if (!selectedIds.value.length) return
-        try {
-            await ElMessageBox.confirm(`确定要删除选中的 ${selectedIds.value.length} 个优惠券规则吗？`, '批量删除', { type: 'warning' })
-            let successCount = 0
-            for (const id of selectedIds.value) {
-                const res = await adminCouponApi.deleteCoupon(id)
-                if (res.success) successCount++
-            }
-            ElMessage.success(`成功删除 ${successCount} 个`)
-            selectedIds.value = []
-            loadList()
-        } catch { /* cancelled */ }
-    }
-
-    // 切换状态
-    async function handleToggleStatus(row: any) {
-        row.statusLoading = true
-        try {
-            const { success, error } = await adminCouponApi.toggleStatus(row.id, row.status)
-            if (success) {
-                ElMessage.success(`已${row.status ? '启用' : '停用'}`)
-            } else {
-                row.status = !row.status
-                ElMessage.error(error || '操作失败')
-            }
-        } catch {
-            row.status = !row.status
-        } finally {
-            row.statusLoading = false
-        }
-    }
-
-    return {
-        // State
+export function useAdminCouponList(type: 'balance' | 'flat' | 'product') {
+    const {
         loading,
         list,
         total,
-        pagination,
+        currentPage,
+        pageSize,
         selectedIds,
-
-        // Actions
-        loadList,
-        handlePageChange,
-        handleSizeChange,
+        hasSelection,
+        refresh,
+        handleFilterChange,
         handleSelectionChange,
+        loadList,
+        removeRow,
+        removeRows,
+        updateRow
+    } = useAdminList<AdminCoupon>({
+        defaultPageSize: 20,
+        fetchFn: async (params) => {
+            const res = await adminCouponApi.getCoupons({
+                type: type,
+                offset: (params.page - 1) * params.pageSize,
+                limit: params.pageSize
+            })
+            if (!res.success) {
+                return { success: false, error: res.error }
+            }
+            return {
+                success: true,
+                data: res.coupons,
+                total: res.total
+            }
+        }
+    })
+
+    // Coupon Specific Actions
+    const handleToggleStatus = async (row: AdminCoupon) => {
+        const newStatus = !row.status
+        const action = newStatus ? '启用' : '禁用'
+        try {
+            const res = await adminCouponApi.updateCoupon(row.id, { status: newStatus })
+            if (res.success) {
+                ElMessage.success(`${action}成功`)
+                updateRow(row.id, { status: newStatus })
+            } else {
+                ElMessage.error(res.error)
+            }
+        } catch (e: any) {
+            ElMessage.error(e.message || '操作失败')
+        }
+    }
+
+    const handleDelete = async (row: AdminCoupon) => {
+        ElMessageBox.confirm('确定要删除该优惠券吗？', '提示', { type: 'warning' })
+            .then(async () => {
+                const res = await adminCouponApi.deleteCoupon(row.id)
+                if (res.success) {
+                    ElMessage.success('删除成功')
+                    removeRow(row.id)
+                } else {
+                    ElMessage.error(res.error)
+                }
+            })
+    }
+
+    const handleBulkDelete = async () => {
+        if (!selectedIds.value.length) return
+        ElMessageBox.confirm(`确定要删除选中的 ${selectedIds.value.length} 个优惠券规则吗？`, '提示', { type: 'warning' })
+            .then(async () => {
+                // Loop delete since API does not support bulk
+                let successCount = 0
+                for (const id of selectedIds.value) {
+                    const res = await adminCouponApi.deleteCoupon(id)
+                    if (res.success) successCount++
+                }
+                ElMessage.success(`批量操作结束，成功删除 ${successCount} 个`)
+                removeRows(selectedIds.value) // Note: optimistic removal of all selected, or should we filter?
+                // Simplest user experience: remove selected, refresh.
+                refresh()
+            })
+    }
+
+    return {
+        loading,
+        list,
+        total,
+        currentPage,
+        pageSize,
+        selectedIds,
+        hasSelection,
+        refresh,
+        handleFilterChange,
+        handleSelectionChange,
+        handleToggleStatus,
         handleDelete,
         handleBulkDelete,
-        handleToggleStatus,
-
-        // Formatters
-        formatPrice,
-        formatDate,
-        getCouponTypeLabel,
-        getCouponStatusLabel,
-        getCouponStatusType
+        loadList
     }
 }

@@ -1,1 +1,0 @@
-import{e as o,f as n,c as t,G as a,o as s}from"./Cw8CLAr8.js";const c={class:"loading-redirect"},p=o({__name:"index",setup(r){const e=a();return n(()=>{e.replace("/admin/coupons/balance")}),(_,d)=>(s(),t("div",c))}});export{p as default};

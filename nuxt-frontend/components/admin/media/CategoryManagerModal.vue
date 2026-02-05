@@ -25,8 +25,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { adminImageCategoryApi, type AdminImageCategory } from '@/api/admin/media'
+import { confirmDelete } from '@/composables/admin/useAdminDialog'
 
 const props = defineProps<{
   modelValue: boolean
@@ -70,21 +71,23 @@ const handleAdd = async () => {
   loading.value = false
 }
 
-const handleDelete = (cat: AdminImageCategory) => {
-  ElMessageBox.confirm(`确认删除分类 "${cat.name}" 吗？`, '删除分类', {
-    type: 'warning'
-  }).then(async () => {
-    loading.value = true
-    const res = await adminImageCategoryApi.deleteCategory(cat.id)
-    if (res.success) {
-      ElMessage.success('分类删除成功')
-      await fetchCategories()
-      emit('change')
-    } else {
-      ElMessage.error('删除失败: ' + res.error)
+const handleDelete = async (cat: AdminImageCategory) => {
+  await confirmDelete(
+    `确认删除分类 "${cat.name}" 吗？`,
+    async () => {
+      loading.value = true
+      try {
+        const res = await adminImageCategoryApi.deleteCategory(cat.id)
+        if (res.success) {
+          await fetchCategories()
+          emit('change')
+        }
+        return res
+      } finally {
+        loading.value = false
+      }
     }
-    loading.value = false
-  })
+  )
 }
 </script>
 

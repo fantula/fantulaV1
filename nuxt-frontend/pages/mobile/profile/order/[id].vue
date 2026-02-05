@@ -71,7 +71,7 @@
                    <span class="tag">{{ order.skuSpec }}</span>
                    <span class="qty">x{{ order.quantity }}</span>
                 </div>
-                <div class="order-no" @click="copyText(order.order_no)">
+                <div class="order-no" @click="copyText(order.order_no || '')">
                    NO.{{ order.order_no }} <el-icon><CopyDocument /></el-icon>
                 </div>
              </div>
@@ -91,7 +91,7 @@
               <template v-if="order.orderType === 'shared_account'">
                  <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="section-group">
                      <FulfillmentShared 
-                         :cdk-item="getCdkForSlot(slot)"
+                         :cdk-item="getCdkForSlot(slot) as any"
                          :slot-index="slot.slot_index"
                      />
                  </div>
@@ -112,8 +112,8 @@
                      
                      <div class="virtual-item-group">
                          <FulfillmentSubmitForm
-                            :order-id="order.id"
-                            :order-status="order.status"
+                            :order-id="order.id || ''"
+                            :order-status="order.status || ''"
                             :cdk-fields="getFieldsForCdk(cdkList[0])"
                             :cdk-id="cdkList[0].id"
                             @submit-success="handleFulfillmentSuccess"
@@ -121,7 +121,7 @@
 
                          <FulfillmentHistory
                             ref="historyRef"
-                            :order-id="order.id"
+                            :order-id="order.id || ''"
                             :filter-cdk-id="cdkList[0].id"
                          />
                      </div>
@@ -147,14 +147,14 @@
     </div>
 
     <!-- Sheets -->
-    <MobileRenewalSheet v-if="order.id" v-model="showRenewalSheet" :order-id="order.id" @success="loadData" />
-    <MobileRefundSheet v-if="order.id" v-model="showRefundSheet" :order-id="order.id" :order-no="order.order_no" @success="handleRefundSuccess" />
+    <MobileRenewalSheet v-if="order.id" v-model="showRenewalSheet" :order-id="order.id || ''" @success="loadData" />
+    <MobileRefundSheet v-if="order.id" v-model="showRefundSheet" :order-id="order.id || ''" :order-no="order.order_no || ''" @success="handleRefundSuccess" />
     <MobileTicketSheet v-if="showTicketSheet && order.id" v-model="showTicketSheet" :order-id="order.id" :order-info="order" @success="onTicketSuccess" />
     <MobileCancelRefundSheet 
        v-if="order.id" 
        v-model="showCancelRefundSheet" 
-       :order-id="order.id" 
-       :order-no="order.order_no"
+       :order-id="order.id || ''" 
+       :order-no="order.order_no || ''"
        :refund-request="pendingRefundRequest"
        :cancelled-count="refundCancelledCount"
        @success="handleCancelRefundSuccess"
@@ -166,17 +166,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, InfoFilled, 
   Box, RefreshLeft, Headset, Tickets, ZoomIn
 } from '@element-plus/icons-vue'
-import { clientOrderApi } from '@/api/client'
-import { ticketApi } from '@/api/client/ticket'
-import { useBizConfig } from '@/composables/common/useBizConfig'
-import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useOrderDetail } from '@/composables/client/useOrderDetail'
 import FulfillmentShared from '@/components/mobile/order/FulfillmentShared.vue'
 import FulfillmentCdk from '@/components/mobile/order/FulfillmentCdk.vue'
 import FulfillmentSubmitForm from '@/components/mobile/order/FulfillmentSubmitForm.vue'
@@ -195,20 +192,33 @@ definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
 const route = useRoute()
 const router = useRouter()
 const orderId = route.params.id as string
-const loading = ref(true)
 
-const { getOrderStatusLabel } = useBizConfig()
-const { formatDate } = useBizFormat()
-const formatTime = (t?: string) => t ? formatDate(t) : '--'
-
-// Data
-const order = ref<any>({})
-const cdkList = ref<any[]>([])
-const slotList = ref<any[]>([])
-const instructionImage = ref('')
-const activeTicketId = ref<string | null>(null)
-const pendingRefundRequest = ref<any>(null)
-const refundCancelledCount = ref(0)
+// --- Use Unified Composable ---
+const {
+  order,
+  cdkList,
+  slotList,
+  instructionImage,
+  loading,
+  activeTicketId,
+  pendingRefundRequest,
+  refundCancelledCount,
+  // Logic
+  statusText,
+  isVirtualOrShared,
+  canRenew,
+  canRefund,
+  canCancelRefund,
+  isRefundBlocked,
+  // Helpers
+  formatTime,
+  getFieldsForCdk,
+  getCdkForSlot,
+  // Actions
+  loadData,
+  handleRefundSuccess,
+  handleCancelRefundSuccess,
+} = useOrderDetail(orderId)
 
 // Virtual Component Refs
 const historyRef = ref<any>(null)
@@ -220,139 +230,6 @@ const showTicketSheet = ref(false)
 const showContactModal = ref(false)
 const showCancelRefundSheet = ref(false)
 
-// Logic
-const statusText = computed(() => {
-  const s = order.value.status
-  if (s === 'pending_delivery') return '待发货'
-  if (s === 'active') return '使用中'
-  if (s === 'refunding') return '退款中'
-  if (s === 'refunded') return '已退款'
-  return getOrderStatusLabel(s || '')
-})
-
-// 类型判断 (与PC端保持一致)
-const isOneTime = computed(() => order.value.orderType === 'one_time_cdk')
-const isVirtualOrShared = computed(() => {
-  if (!order.value.orderType) return false
-  return ['virtual', 'shared_account'].includes(order.value.orderType)
-})
-
-// 续费条件
-const canRenew = computed(() => 
-  isVirtualOrShared.value && 
-  ['active', 'expired'].includes(order.value.status || '')
-)
-
-// 退款条件 - 与PC端 OrderActions.vue 保持一致
-// 1. 可申请退款: 虚拟/合租类型 + pending_delivery/active + 无待审核申请 + 取消次数未达上限
-const canRefund = computed(() => 
-  isVirtualOrShared.value &&
-  ['pending_delivery', 'active'].includes(order.value.status || '') &&
-  !pendingRefundRequest.value &&
-  refundCancelledCount.value < 3
-)
-
-// 2. 可取消退款: 有待审核申请且状态为 refunding
-const canCancelRefund = computed(() =>
-  isVirtualOrShared.value &&
-  order.value.status === 'refunding' &&
-  !!pendingRefundRequest.value
-)
-
-// 3. 退款次数已达上限
-const isRefundBlocked = computed(() =>
-  isVirtualOrShared.value &&
-  ['pending_delivery', 'active'].includes(order.value.status || '') &&
-  !pendingRefundRequest.value &&
-  refundCancelledCount.value >= 3
-)
-
-const loadData = async () => {
-    if (!orderId) return
-    loading.value = true
-    try {
-        const res = await clientOrderApi.getOrderDetail(orderId)
-        if (res.success && res.data) {
-            const d = res.data
-            order.value = {
-                id: d.id,
-                order_no: d.order_no,
-                orderType: d.order_type,
-                status: d.status,
-                quantity: d.quantity,
-                totalAmount: Number(d.total_amount).toFixed(2),
-                createdAt: d.created_at,
-                expires_at: d.expires_at,
-                productName: d.product_snapshot?.product_name || '',
-                productImage: d.product_snapshot?.image || '',
-                skuSpec: d.sku_snapshot?.spec_combination ? Object.values(d.sku_snapshot.spec_combination).join(' ') : '标准'
-            }
-
-            if (d.cdkList) {
-                cdkList.value = d.cdkList
-                 if (cdkList.value.length > 0) {
-                    const first = cdkList.value[0]
-                    if (first.accountData) {
-                       instructionImage.value = first.accountData.image || first.accountData.help_image || ''
-                    }
-                }
-            }
-            slotList.value = d.slotList || []
-
-            // 加载退款状态
-            await loadRefundInfo()
-            
-            // 加载工单信息
-            const t = await ticketApi.getList('processing')
-            if (t.success && t.data) {
-                const match = t.data.find((x:any) => x.order_id === orderId)
-                activeTicketId.value = match ? match.id : null
-            }
-        }
-    } catch(e) { console.error(e) } 
-    finally { loading.value = false }
-}
-
-// 加载退款状态 (待审核请求 + 取消次数)
-const loadRefundInfo = async () => {
-    if (!orderId || !isVirtualOrShared.value) {
-        pendingRefundRequest.value = null
-        refundCancelledCount.value = 0
-        return
-    }
-    
-    try {
-        const res = await clientOrderApi.getOrderRefundInfo(orderId)
-        if (res.success) {
-            pendingRefundRequest.value = res.pendingRequest || null
-            refundCancelledCount.value = res.cancelledCount ?? 0
-        }
-    } catch (e) {
-        console.error('Failed to load refund info:', e)
-    }
-}
-
-const getCdkForSlot = (slot: any) => cdkList.value.find(c => c.id === slot.cdk_id) || {}
-
-// Helper for Virtual Fields
-const getFieldsForCdk = (cdk: any) => {
-  let keys: string[] = []
-  if (cdk.parsed && typeof cdk.parsed === 'object') {
-    if (Array.isArray(cdk.parsed.fields) && cdk.parsed.fields.length > 0) {
-      keys = cdk.parsed.fields.filter((f: any) => typeof f === 'string')
-    } else if (Object.keys(cdk.parsed).length > 0) {
-      keys = Object.keys(cdk.parsed)
-    }
-  }
-  if (keys.length === 0) {
-    const raw = cdk.code?.trim() || ''
-    if (!raw) return []
-    let cleaned = raw.replace(/[\(\)（）\[\]【】]/g, '')
-    keys = cleaned.split(/[,，、]/).map((s: string) => s.trim()).filter((s: string) => s.length > 0)
-  }
-  return keys.map(key => ({ key, label: key, value: '' }))
-}
-
 const handleFulfillmentSuccess = () => {
     historyRef.value?.refresh()
 }
@@ -363,38 +240,23 @@ const handleAction = async (type: string) => {
     else if (type === 'view_ticket') router.push('/mobile/profile/tickets')
     else if (type === 'renew') showRenewalSheet.value = true
     else if (type === 'apply_refund') showRefundSheet.value = true
-    else if (type === 'cancel_refund') {
-        // 打开取消退款确认弹窗
-        showCancelRefundSheet.value = true
-    }
-}
-
-// 退款申请成功回调
-const handleRefundSuccess = () => {
-    loadRefundInfo()
-    loadData()
-}
-
-// 取消退款成功回调
-const handleCancelRefundSuccess = () => {
-    pendingRefundRequest.value = null
-    refundCancelledCount.value++
-    loadData()
+    else if (type === 'cancel_refund') showCancelRefundSheet.value = true
 }
 
 const previewImage = (url: string) => {
-    // Simple new tab preview for now
     window.open(url, '_blank')
 }
+
 const copyText = (t: string) => {
     navigator.clipboard.writeText(t).then(() => ElMessage.success('已复制'))
 }
+
 const onTicketSuccess = () => {
     ElMessage.success('工单已提交')
     loadData()
 }
 
-onMounted(loadData)
+
 
 </script>
 

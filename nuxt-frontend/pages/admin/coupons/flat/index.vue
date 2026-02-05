@@ -104,9 +104,9 @@ definePageMeta({
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Plus, Refresh } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { adminApi, adminCouponApi, type AdminCoupon } from '@/api/admin'
+import { type AdminCoupon } from '@/api/admin'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useAdminCouponList } from '@/composables/admin/useAdminCouponList'
 
 const { formatDate, formatPrice } = useBizFormat()
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
@@ -118,10 +118,6 @@ import CouponCodeDrawer from '@/components/admin/coupon/CouponCodeDrawer.vue'
 import CouponCodeEditor from '@/components/admin/coupon/CouponCodeEditor.vue'
 
 const router = useRouter()
-const loading = ref(false)
-const list = ref<AdminCoupon[]>([])
-const total = ref(0)
-const selectedIds = ref<string[]>([])
 
 // Generator Modal State
 const showGenerator = ref(false)
@@ -139,20 +135,19 @@ const codeEditorDialog = reactive<{ visible: boolean; coupon: any }>({
   coupon: null 
 })
 
-const loadList = async () => {
-  loading.value = true
-  try {
-    const res = await adminApi.coupon.getCoupons({ type: 'flat' })
-    if (res.success) {
-      list.value = (res.coupons as any[]).map(item => ({ ...item, statusLoading: false }))
-      total.value = res.total || list.value.length
-    }
-  } catch (e) {
-    ElMessage.error('加载异常')
-  } finally {
-    loading.value = false
-  }
-}
+// Composable
+const {
+    loading,
+    list,
+    total,
+    currentPage,
+    pageSize,
+    selectedIds,
+    refresh: loadList, // Alias for compatibility
+    handleSelectionChange,
+    handleToggleStatus: toggleStatus, // Alias
+    handleBulkDelete
+} = useAdminCouponList('flat')
 
 const handleCreate = () => {
   router.push('/admin/coupons/flat/post')
@@ -180,49 +175,6 @@ const handleEditCode = (row: AdminCoupon) => {
     codeEditorDialog.coupon = row
     codeEditorDialog.visible = true
 }
-
-const handleSelectionChange = (selection: AdminCoupon[]) => {
-  selectedIds.value = selection.map(item => item.id)
-}
-
-const handleBulkDelete = () => {
-  if (!selectedIds.value.length) return
-  ElMessageBox.confirm(`确定要删除选中的 ${selectedIds.value.length} 个优惠券吗？`, '批量删除', {
-    type: 'warning'
-  }).then(async () => {
-    let successCount = 0
-    for (const id of selectedIds.value) {
-        const res = await adminApi.coupon.deleteCoupon(id)
-        if (res.success) successCount++
-    }
-    ElMessage.success(`成功删除 ${successCount} 个优惠券`)
-    loadList()
-    selectedIds.value = []
-  })
-}
-
-const toggleStatus = async (row: any) => {
-  row.statusLoading = true
-  try {
-    const res = await adminApi.coupon.toggleStatus(row.id, row.status)
-    if (res.success) {
-      ElMessage.success(`已${row.status ? '启用' : '停用'}`)
-    } else {
-      row.status = !row.status
-      ElMessage.error(res.error || '操作失败')
-    }
-  } catch (e) {
-    row.status = !row.status
-  } finally {
-    row.statusLoading = false
-  }
-}
-
-// formatDate and formatPrice are now from useBizFormat
-
-onMounted(() => {
-  loadList()
-})
 </script>
 
 <style scoped>

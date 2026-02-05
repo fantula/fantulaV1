@@ -8,7 +8,7 @@
      <AdminActionCard>
         <template #default>
            <div class="filter-group">
-              <el-radio-group v-model="filterMode" @change="handleFilterChange">
+              <el-radio-group v-model="filters.mode" @change="handleFilterChange">
                  <el-radio-button label="all">全部</el-radio-button>
                  <el-radio-button label="unlinked">未连接</el-radio-button>
               </el-radio-group>
@@ -16,11 +16,11 @@
         </template>
         
         <template #actions>
-           <el-button @click="loadCdks" :icon="Refresh">刷新</el-button>
+           <el-button @click="refresh" :icon="Refresh">刷新</el-button>
            <el-button 
              type="danger" 
              :icon="Delete" 
-             :disabled="!selectedIds.length"
+             :disabled="!hasSelection"
              @click="handleBulkDelete"
            >
              批量删除
@@ -31,8 +31,11 @@
      <!-- Data Table -->
      <AdminDataTable 
         ref="adminTableRef"
-        :data="cdks" 
+        :data="list" 
         :loading="loading"
+        :total="total"
+        v-model:page="currentPage"
+        v-model:pageSize="pageSize"
         @selection-change="handleSelectionChange"
      >
         <el-table-column type="selection" width="55" :selectable="canSelectRow" />
@@ -121,7 +124,6 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { ref, onMounted } from 'vue'
 import { Refresh, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminCdkApi, type AdminCDK } from '@/api/admin'
@@ -129,48 +131,59 @@ import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useAdminList } from '@/composables/admin/useAdminList'
 
 const { getProductTypeLabel, getProductTypeTag, getCdkStatusLabel, getCdkStatusType } = useBizConfig()
-const { formatDate, formatPrice } = useBizFormat()
+const { formatDate } = useBizFormat()
 
-// State
-const loading = ref(false)
-const filterMode = ref('all') // 'all' | 'unlinked'
-const cdks = ref<AdminCDK[]>([])
-const selectedIds = ref<string[]>([])
+// 配置 useAdminList
+const {
+    loading,
+    list,
+    total,
+    currentPage,
+    pageSize,
+    filters,
+    selectedIds,
+    hasSelection,
+    selectedCount,
+    refresh,
+    handleFilterChange,
+    handleSelectionChange,
+    removeRow,
+    removeRows
+} = useAdminList<AdminCDK>({
+    defaultFilters: { mode: 'all' },
+    defaultPageSize: 50, // CDK 数据较多，默认 50
+    fetchFn: async (params) => {
+        // 由于 API 目前只支持 simple filter，这里先获取较多数据然后在前端 filter
+        // 如果数据量大，需要 API 支持 unlinked 只读过滤。目前假设量级可控。
+        const res = await adminCdkApi.getCdks({ limit: 500 }) // 获取 500 条
+        if (!res.success) throw new Error(res.error)
 
-// Load
-const loadCdks = async () => {
-    loading.value = true
-    try {
-        const res = await adminCdkApi.getCdks({ limit: 500 })
-        if (res.success) {
-            let data = res.cdks || []
-            // Client-side filter for unlinked
-            if (filterMode.value === 'unlinked') {
-                data = data.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
-            }
-            cdks.value = data
-        } else {
-            ElMessage.error(res.error)
+        let data = res.cdks || []
+        // Client-side filter
+        if (params.filters.mode === 'unlinked') {
+            data = data.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
         }
-    } catch (e: any) {
-        ElMessage.error(e.message || '加载失败')
-    } finally {
-        loading.value = false
+        
+        // Manual pagination since we are doing client-side filtering on a fetched set
+        const total = data.length
+        const start = (params.page - 1) * params.pageSize
+        const end = start + params.pageSize
+        const pagedData = data.slice(start, end)
+        
+        return {
+            success: true,
+            data: pagedData,
+            total
+        }
     }
-}
-
-const handleFilterChange = () => {
-    loadCdks()
-}
+})
 
 // Helpers
-// Date formatted by global formatDate, no local function needed
-
 const getCdkTypeLabel = (type: string) => getProductTypeLabel(type)
 const getCdkTypeTag = (type: string) => getProductTypeTag(type)
-
 const getStatusLabel = (s: string) => getCdkStatusLabel(s)
 const getStatusType = (s: string) => getCdkStatusType(s)
 
@@ -181,17 +194,18 @@ const formatSkuSpec = (spec: any) => {
 
 // Selection - only unlinked can be selected
 const canSelectRow = (row: AdminCDK) => !row.sku_mappings || row.sku_mappings.length === 0
-const handleSelectionChange = (val: any[]) => {
-    selectedIds.value = val.map(v => v.id)
-}
 
 // Actions
 const handleDelete = (row: AdminCDK) => {
     ElMessageBox.confirm('确认删除此未绑定的孤儿 CDK 吗？此操作无法恢复。', '警告', { type: 'warning' })
     .then(async () => {
         const res = await adminCdkApi.deleteCdk(row.id)
-        if(res.success) { ElMessage.success('删除成功'); loadCdks() }
-        else ElMessage.error(res.error)
+        if(res.success) { 
+            ElMessage.success('删除成功')
+            removeRow(row.id)
+        } else {
+            ElMessage.error(res.error)
+        }
     })
 }
 
@@ -205,16 +219,12 @@ const handleBulkDelete = () => {
         const res = await adminCdkApi.deleteCdks(selectedIds.value)
         if(res.success) { 
             ElMessage.success('批量删除成功')
-            selectedIds.value = []
-            loadCdks() 
+            removeRows(selectedIds.value)
+        } else {
+            ElMessage.error(res.error)
         }
-        else ElMessage.error(res.error)
     })
 }
-
-onMounted(() => {
-    loadCdks()
-})
 </script>
 
 <style scoped>

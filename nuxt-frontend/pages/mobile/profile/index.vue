@@ -4,32 +4,14 @@
     <!-- Top Bar with Settings -->
     <div class="top-nav">
         <div class="page-title">个人中心</div>
-        <button class="settings-btn" @click="router.push('/mobile/profile/account')">
-            <Setting class="w-6 h-6" />
+        <button class="settings-btn" @click="showSettings = true">
+            <el-icon class="settings-icon"><Setting /></el-icon>
         </button>
     </div>
     
     <!-- 1. Premium Member Card (Header) -->
     <div class="header-container">
-        <div class="member-card" @click="router.push('/mobile/profile/account')"> <!-- Placeholder route for details -->
-            <div class="card-content">
-                <div class="avatar-wrap">
-                    <img :src="userInfo.avatar || '/images/default-avatar.png'" class="avatar-img" />
-                </div>
-                <div class="user-details">
-                    <h1 class="username">{{ userInfo.nickname }}</h1>
-                    <div class="tags-row">
-                        <div class="tag-pill blue-pill">FANTULA Member</div>
-                        <div class="tag-pill green-pill">
-                            <CircleCheckFilled class="w-3 h-3 mr-1" /> 安全等级: 高
-                        </div>
-                    </div>
-                </div>
-                <ArrowRight class="card-arrow" />
-            </div>
-            <!-- Decorative background glow -->
-            <div class="card-glow"></div>
-        </div>
+        <MobileProfileHeader :user="userInfo" @click="router.push('/mobile/profile/account')" />
     </div>
 
     <!-- 2. Wallet / Quota Card -->
@@ -41,8 +23,8 @@
                 <div class="wallet-value">{{ Number(userStore.user?.balance || 0).toFixed(2) }}</div>
             </div>
             <div class="wallet-actions">
-                <button class="action-btn primary-btn pill-btn" @click="handleNotImplemented">充值</button>
-                <button class="action-btn outline-btn pill-btn" @click="openWalletSheet">
+                <button class="action-btn primary-btn pill-btn" @click="handleRecharge">充值</button>
+                <button class="action-btn outline-btn pill-btn" @click="navigateToWallet">
                     详情
                 </button>
             </div>
@@ -54,33 +36,33 @@
       <div class="card-header" @click="navigateToOrder('all')">
         <span class="card-title">我的订单</span>
         <div class="card-more">
-          全部订单 <ArrowRight class="w-3 h-3 ml-1" />
+          全部订单 <el-icon class="ml-1"><ArrowRight /></el-icon>
         </div>
       </div>
       <div class="order-grid">
-        <div class="order-item" @click="navigateToOrder('pending')">
+        <div class="order-item" @click="navigateToOrder('pending_payment')">
              <div class="icon-wrap">
-                <Wallet class="w-6 h-6" />
+                <el-icon class="order-icon"><Wallet /></el-icon>
                 <div class="badge-dot" v-if="orderCounts.pending > 0">{{ orderCounts.pending }}</div>
              </div>
              <span class="order-label">待支付</span>
         </div>
-        <div class="order-item" @click="navigateToOrder('paid')">
+        <div class="order-item" @click="navigateToOrder('pending_delivery')">
              <div class="icon-wrap">
-                <Box class="w-6 h-6" />
+                <el-icon class="order-icon"><Box /></el-icon>
                 <div class="badge-dot" v-if="orderCounts.paid > 0">{{ orderCounts.paid }}</div>
              </div>
              <span class="order-label">待发货</span>
         </div>
         <div class="order-item" @click="navigateToOrder('completed')">
              <div class="icon-wrap">
-                <CircleCheck class="w-6 h-6" />
+                <el-icon class="order-icon"><CircleCheck /></el-icon>
              </div>
              <span class="order-label">已完成</span>
         </div>
         <div class="order-item" @click="handleContactService">
              <div class="icon-wrap">
-                <Service class="w-6 h-6" />
+                <el-icon class="order-icon"><Service /></el-icon>
              </div>
              <span class="order-label">售后</span>
         </div>
@@ -90,64 +72,39 @@
     <!-- 4. Feature List Group -->
     <div class="menu-list-group">
         
-        <!-- Wallet removed from list -->
+        <!-- Using MobileMenuLink Component -->
+        <MobileMenuLink 
+            label="我的订单" 
+            :icon="List" 
+            @click="navigateToOrder('all')" 
+        />
 
-        <div class="menu-item" @click="navigateToOrder('all')">
-             <!-- Replicating "My Orders" in list? No, already have card. PC has separate "My Orders" menu? 
-                  The screenshot shows "My Orders" in list. But we have the card. 
-                  Let's stick to the card for orders as it's more functional, but continue with other items.
-             -->
-             <div class="menu-left">
-                <List class="w-5 h-5 text-icon" />
-                <span class="menu-text">我的订单</span>
-            </div>
-             <ArrowRight class="w-4 h-4 text-arrow" />
-        </div>
+        <MobileMenuLink 
+            label="兑换中心" 
+            :icon="Ticket" 
+            @click="router.push('/mobile/profile/redemption')" 
+        />
 
-        <div class="menu-item" @click="router.push('/mobile/profile/redemption')">
-            <div class="menu-left">
-                <Ticket class="w-5 h-5 text-icon" />
-                <span class="menu-text">兑换中心</span>
-            </div>
-             <ArrowRight class="w-4 h-4 text-arrow" />
-        </div>
+        <MobileMenuLink 
+            label="我的收藏" 
+            :icon="Star" 
+            @click="router.push('/mobile/profile/favorites')" 
+        />
 
-        <div class="menu-item" @click="router.push('/mobile/profile/favorites')">
-            <div class="menu-left">
-                <Star class="w-5 h-5 text-icon" />
-                <span class="menu-text">我的收藏</span>
-            </div>
-             <ArrowRight class="w-4 h-4 text-arrow" />
-        </div>
+        <MobileMenuLink 
+            label="我的工单" 
+            :icon="Headset" 
+            @click="router.push('/mobile/profile/tickets')" 
+        />
 
-        <div class="menu-item" @click="router.push('/mobile/profile/tickets')">
-            <div class="menu-left">
-                <Headset class="w-5 h-5 text-icon" />
-                <span class="menu-text">我的工单</span>
-            </div>
-             <ArrowRight class="w-4 h-4 text-arrow" />
-        </div>
-
-        <div class="menu-item" @click="router.push('/mobile/profile/messages')">
-            <div class="menu-left">
-                <Bell class="w-5 h-5 text-icon" />
-                <span class="menu-text">我的消息</span>
-                 <div class="list-dot" v-if="userStore.unreadMessageCount > 0"></div>
-            </div>
-             <ArrowRight class="w-4 h-4 text-arrow" />
-        </div>
-        
-        <!-- Logout item removed from list, moved to settings -->
+        <MobileMenuLink 
+            label="我的消息" 
+            :icon="Bell" 
+            :badge="userStore.unreadMessageCount > 0"
+            @click="router.push('/mobile/profile/messages')" 
+        />
 
     </div>
-
-    <!-- Wallet History Sheet -->
-    <MobileWalletSheet 
-        :visible="showWalletSheet" 
-        :transactions="userStore.transactions"
-        :loading="loadingWallet"
-        @close="showWalletSheet = false" 
-    />
 
     <!-- Settings Sheet -->
     <MobileSettingsSheet
@@ -173,13 +130,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
     ArrowRight, Wallet, Box, CircleCheck, Service, 
-    WalletFilled, Ticket, Star, Headset, Bell, List, SwitchButton, CircleCheckFilled, Setting
+    Ticket, Star, Headset, Bell, List, Setting
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
-import MobileWalletSheet from '@/components/mobile/profile/MobileWalletSheet.vue'
 import MobileSettingsSheet from '@/components/mobile/profile/MobileSettingsSheet.vue'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
+import MobileProfileHeader from '@/components/mobile/profile/MobileProfileHeader.vue'
+import MobileMenuLink from '@/components/mobile/profile/MobileMenuLink.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -188,11 +146,9 @@ definePageMeta({
 
 const router = useRouter()
 const userStore = useUserStore()
-const showWalletSheet = ref(false)
 const showSettings = ref(false)
 const showRecharge = ref(false)
 const showContactModal = ref(false)
-const loadingWallet = ref(false)
 
 const userInfo = computed(() => {
   const u = userStore.user
@@ -205,8 +161,9 @@ const userInfo = computed(() => {
 })
 
 const orderCounts = computed(() => {
-    const pending = userStore.getOrdersByStatus('待支付').length
-    const paid = userStore.getOrdersByStatus('已发货').length 
+    // Note: Adjust status strings to match backend ENUMs if needed
+    const pending = userStore.getOrdersByStatus('pending_payment').length
+    const paid = userStore.getOrdersByStatus('pending_delivery').length 
     return { pending, paid }
 })
 
@@ -214,15 +171,12 @@ const navigateToOrder = (tab: string) => {
     router.push({ path: '/mobile/profile/order', query: { tab } })
 }
 
-const handleNotImplemented = () => {
-   showRecharge.value = true
+const navigateToWallet = () => {
+    router.push('/mobile/profile/wallet')
 }
 
-const openWalletSheet = async () => {
-    showWalletSheet.value = true
-    loadingWallet.value = true
-    await userStore.fetchWalletData()
-    loadingWallet.value = false
+const handleRecharge = () => {
+   showRecharge.value = true
 }
 
 const handleContactService = () => {
@@ -252,66 +206,6 @@ onMounted(() => {
 .header-container {
     padding: 20px 20px 10px 20px;
 }
-
-/* Premium Member Card */
-.member-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
-    border: 1px solid rgba(255,255,255,0.08); /* Subtle border */
-    border-radius: 20px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.4);
-}
-
-/* Card Glow Effect */
-.card-glow {
-    position: absolute; top: -50px; right: -50px;
-    width: 150px; height: 150px;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
-}
-
-.card-content {
-    display: flex; align-items: center; gap: 16px;
-    position: relative; z-index: 2;
-}
-
-.avatar-wrap {
-    width: 60px; height: 60px; border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.9); /* Strong white border as in reference */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    overflow: hidden; flex-shrink: 0;
-    background: #fff; /* White background for transparent avatars */
-}
-.avatar-img { width: 100%; height: 100%; object-fit: cover; }
-
-.user-details { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
-.username { 
-    font-size: 22px; font-weight: 800; color: #fff; margin: 0; 
-    line-height: 1.2; letter-spacing: 0.5px;
-}
-
-.tags-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-.tag-pill {
-    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
-    display: inline-flex; align-items: center;
-    border: 1px solid transparent;
-}
-.blue-pill {
-    background: rgba(30, 58, 138, 0.6); color: #60A5FA; border-color: rgba(96, 165, 250, 0.3);
-}
-.green-pill {
-    background: rgba(6, 78, 59, 0.6); color: #34D399; border-color: rgba(52, 211, 153, 0.3);
-}
-
-.card-arrow {
-    width: 18px; height: 18px; color: #64748B; 
-    transition: transform 0.2s;
-}
-.member-card:active .card-arrow { transform: translateX(3px); }
 
 /* 2. Wallet Card specific */
 .wallet-section {
@@ -386,6 +280,7 @@ onMounted(() => {
     display: flex; align-items: center; justify-content: center;
     color: #CBD5E1;
 }
+.order-icon { font-size: 24px; }
 .badge-dot {
     position: absolute; top: -5px; right: -5px;
     background: #F43F5E; color: white; font-size: 10px; font-weight: 700;
@@ -399,24 +294,6 @@ onMounted(() => {
 .menu-list-group {
     margin: 0 20px;
     /* Optional: background for whole list or just transparent */
-}
-.menu-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 18px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    cursor: pointer;
-}
-.menu-item:last-child { border-bottom: none; }
-.menu-item:active { opacity: 0.7; }
-
-.menu-left { display: flex; align-items: center; gap: 12px; }
-.text-icon { color: #94A3B8; } /* Uniform icon color */
-.menu-text { font-size: 15px; color: #E2E8F0; font-weight: 500; }
-.text-arrow { color: #475569; }
-.text-red-400 { color: #F87171; }
-
-.list-dot {
-    width: 6px; height: 6px; background: #EF4444; border-radius: 50%; margin-left: 8px;
 }
 
 /* Tailwind sizes */

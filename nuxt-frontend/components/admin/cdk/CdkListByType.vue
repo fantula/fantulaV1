@@ -71,8 +71,11 @@
 
     <!-- Data Table -->
     <AdminDataTable 
-        :data="cdkList" 
+        :data="paginatedCdkList" 
         :loading="loading"
+        :total="cdkList.length"
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
         @selection-change="handleSelectionChange"
     >
         <el-table-column type="selection" width="55" />
@@ -190,6 +193,10 @@ const categoryOptions = ref<ProductCategory[]>([])
 const productOptions = ref<AdminProduct[]>([])
 const selectedRows = ref<AdminCDK[]>([])
 
+// Pagination
+const currentPage = ref(1)
+const pageSize = ref(20)
+
 const filters = reactive({
     categoryId: '',
     productId: '',
@@ -200,6 +207,12 @@ const filters = reactive({
 const filteredProducts = computed(() => {
     if (!filters.categoryId) return productOptions.value
     return productOptions.value.filter(p => p.category_id === filters.categoryId)
+})
+
+// Paginated List
+const paginatedCdkList = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return cdkList.value.slice(start, start + pageSize.value)
 })
 
 // Load Data
@@ -232,6 +245,7 @@ const loadCdks = async () => {
                 result = result.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
             }
             cdkList.value = result
+            currentPage.value = 1 // Reset pagination
         }
         else ElMessage.error(res.error)
     } catch(e: any) {

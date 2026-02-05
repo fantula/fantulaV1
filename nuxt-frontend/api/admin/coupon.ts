@@ -20,6 +20,7 @@ export interface AdminCoupon {
     end_date: string | null
     status: boolean
     created_at: string
+    code?: string
 }
 
 export interface AdminCouponStat {

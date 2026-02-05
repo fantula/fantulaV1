@@ -99,7 +99,13 @@
         <el-button :icon="Refresh" circle @click="fetchLogs" :loading="logsLoading" />
       </div>
       
-      <el-table :data="paginatedLogs" style="width: 100%" v-loading="logsLoading" stripe>
+      <AdminDataTable
+        :data="paginatedLogs"
+        :loading="logsLoading"
+        :total="logs.length"
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+      >
         <el-table-column label="执行时间" width="160">
           <template #default="{ row }">
             {{ formatTime(row.executed_at) }}
@@ -133,19 +139,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="error" label="错误信息" show-overflow-tooltip />
-      </el-table>
-
-      <!-- 分页 -->
-      <div class="logs-pagination" v-if="logs.length > pageSize">
-        <el-pagination
-          v-model:current-page="currentPage"
-          :page-size="pageSize"
-          :total="logs.length"
-          layout="prev, pager, next"
-          background
-          small
-        />
-      </div>
+      </AdminDataTable>
     </div>
   </div>
 </template>
@@ -158,6 +152,7 @@ definePageMeta({
 
 import { ref, computed, onMounted } from 'vue'
 import { Loading, VideoPause, CaretRight, Refresh, Timer, Sunny, Calendar, Document } from '@element-plus/icons-vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 
 // Task display name mapping
 const taskDisplayNames: Record<string, string> = {
@@ -173,7 +168,7 @@ const getTaskDisplayName = (key: string) => taskDisplayNames[key] || key
 
 // Pagination
 const currentPage = ref(1)
-const pageSize = 15
+const pageSize = ref(15)
 
 // Use Composable
 const {
@@ -193,8 +188,8 @@ const {
 
 // Computed
 const paginatedLogs = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return logs.value.slice(start, start + pageSize)
+  const start = (currentPage.value - 1) * pageSize.value
+  return logs.value.slice(start, start + pageSize.value)
 })
 
 // Methods
@@ -438,11 +433,7 @@ onMounted(() => {
   color: var(--el-color-primary);
 }
 
-.logs-pagination {
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
-}
+
 
 /* Responsive */
 @media (max-width: 768px) {

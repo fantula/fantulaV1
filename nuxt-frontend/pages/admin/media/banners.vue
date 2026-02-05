@@ -4,7 +4,7 @@
     <!-- 操作栏 -->
     <AdminActionCard>
       <div class="action-bar">
-         <el-button type="primary" :icon="Plus" @click="openCreateDialog">添加轮播图</el-button>
+         <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">添加轮播图</el-button>
          <el-button @click="fetchData" :icon="Refresh">刷新</el-button>
       </div>
       <div class="mt-2 text-gray-500 text-sm">
@@ -13,8 +13,13 @@
     </AdminActionCard>
 
     <!-- 列表 -->
-    <el-card shadow="never" class="list-card" v-loading="loading">
-      <el-table :data="banners" style="width: 100%" row-key="id">
+    <AdminDataTable
+        :data="banners"
+        :loading="loading"
+        :show-pagination="false"
+        class="list-card"
+        row-key="id"
+    >
         <el-table-column label="排序" width="100">
            <template #default="{ row }">
               <el-tag type="info">{{ row.sort_order }}</el-tag>
@@ -47,16 +52,20 @@
         </el-table-column>
         <el-table-column label="操作" width="150" align="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
+            <el-button link type="primary" @click="openEditWithType(row)">编辑</el-button>
             <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
-      </el-table>
-    </el-card>
+    </AdminDataTable>
 
     <!-- 编辑/添加弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑轮播图' : '添加轮播图'" width="500px" append-to-body :z-index="2000">
-      <el-form :model="form" label-width="80px">
+    <AdminDataDialog
+      v-model="dialog.visible.value"
+      :title="dialog.isEdit.value ? '编辑轮播图' : '添加轮播图'"
+      :loading="dialog.loading.value"
+      @confirm="dialog.submit"
+    >
+      <el-form :model="dialog.form" label-width="80px">
         <el-form-item label="封面图片" required>
            <div class="image-selector" @click="openImageSelector">
              <el-image v-if="selectedImage" :src="selectedImage.url" fit="cover" class="preview-img" />
@@ -67,23 +76,17 @@
            </div>
         </el-form-item>
         <el-form-item label="标题">
-          <el-input v-model="form.title" placeholder="可选" />
+          <el-input v-model="dialog.form.title" placeholder="可选" />
         </el-form-item>
         <el-form-item label="跳转链接">
-          <el-input v-model="form.link" placeholder="可选，例如 /activity/1" />
+          <el-input v-model="dialog.form.link" placeholder="可选，例如 /activity/1" />
         </el-form-item>
         <el-form-item label="排序值">
-          <el-input-number v-model="form.sort_order" :min="0" />
+          <el-input-number v-model="dialog.form.sort_order" :min="0" />
           <div class="tips">值越小越靠前</div>
         </el-form-item>
       </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitForm">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    </AdminDataDialog>
 
     <!-- 图片选择器 -->
     <el-dialog v-model="selectorVisible" title="选择图片" width="800px" append-to-body :z-index="2100">
@@ -121,9 +124,12 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { Plus, Refresh, Search } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { adminBannerApi, adminImageApi, type AdminBanner, type AdminImage } from '@/api/admin/media'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
 
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"],
@@ -132,6 +138,7 @@ definePageMeta({
 
 const loading = ref(false)
 const banners = ref<AdminBanner[]>([])
+const selectedImage = ref<AdminImage | null>(null)
 
 const fetchData = async () => {
   loading.value = true
@@ -142,79 +149,54 @@ const fetchData = async () => {
   loading.value = false
 }
 
-// Edit/Create Logic
-const dialogVisible = ref(false)
-const isEdit = ref(false)
-const form = reactive({
+// Dialog Logic
+const dialog = useAdminDialog({
   id: '',
   image_id: '',
   title: '',
   link: '',
   sort_order: 0
-})
-const selectedImage = ref<AdminImage | null>(null)
-
-const openCreateDialog = () => {
-  isEdit.value = false
-  form.id = ''
-  form.image_id = ''
-  form.title = ''
-  form.link = ''
-  form.sort_order = 0
-  selectedImage.value = null
-  dialogVisible.value = true
-}
-
-const handleEdit = (row: AdminBanner) => {
-  isEdit.value = true
-  form.id = row.id
-  form.image_id = row.image_id
-  form.title = row.title || ''
-  form.link = row.link || ''
-  form.sort_order = row.sort_order
-  selectedImage.value = row.image || null
-  dialogVisible.value = true
-}
-
-const submitForm = async () => {
-  if (!form.image_id) {
-    ElMessage.warning('请选择图片')
-    return
-  }
-
-  if (isEdit.value) {
-    const updatePayload: any = {
-        title: form.title,
-        link: form.link,
-        sort_order: form.sort_order,
-        image_id: form.image_id
+}, {
+  onSubmit: async (form, isEdit) => {
+    if (!form.image_id) {
+        ElMessage.warning('请选择图片')
+        return { success: false }
     }
     
-    // Call update
-    const resUpdate = await adminBannerApi.updateBanner(form.id, updatePayload)
-    if (resUpdate.success) {
-      ElMessage.success('更新成功')
-      dialogVisible.value = false
-      fetchData()
+    // We need to return the promise result
+    if (isEdit) {
+        return await adminBannerApi.updateBanner(form.id, {
+            title: form.title,
+            link: form.link,
+            sort_order: form.sort_order,
+            image_id: form.image_id
+        })
     } else {
-      ElMessage.error('更新失败: ' + resUpdate.error)
+        return await adminBannerApi.createBanner({
+            image_id: form.image_id,
+            title: form.title,
+            link: form.link,
+            sort_order: form.sort_order
+        })
     }
-
-  } else {
-    const res = await adminBannerApi.createBanner({
-      image_id: form.image_id,
-      title: form.title,
-      link: form.link,
-      sort_order: form.sort_order
-    })
-    if (res.success) {
-      ElMessage.success('创建成功')
-      dialogVisible.value = false
-      fetchData()
-    } else {
-      ElMessage.error('创建失败: ' + res.error)
-    }
+  },
+  onSuccess: async () => {
+    await fetchData()
+    // Reset selection visualization
+    if (!dialog.visible.value) selectedImage.value = null
   }
+})
+
+// Wrapper to handle selectedImage population
+const openEditWithType = (row: AdminBanner) => {
+    selectedImage.value = row.image || null
+    dialog.openEdit({
+        id: row.id,
+        image_id: row.image_id,
+        title: row.title || '',
+        link: row.link || '',
+        sort_order: row.sort_order
+    })
 }
 
 const handleStatusChange = async (row: AdminBanner, isActive: boolean) => {
@@ -228,20 +210,16 @@ const handleStatusChange = async (row: AdminBanner, isActive: boolean) => {
     }
 }
 
-const handleDelete = (row: AdminBanner) => {
-  ElMessageBox.confirm('确认删除该轮播图吗？', '删除提示', {
-    type: 'warning'
-  }).then(async () => {
-    const res = await adminBannerApi.deleteBanner(row.id)
-    if (res.success) {
-      ElMessage.success('删除成功')
-      fetchData()
-    } else {
-      ElMessage.error('删除失败')
-    }
-  })
+const handleDelete = async (row: AdminBanner) => {
+    await confirmDelete(
+        '确认删除该轮播图吗？',
+        async () => {
+            const res = await adminBannerApi.deleteBanner(row.id)
+            if (res.success) await fetchData()
+            return res
+        }
+    )
 }
-
 
 // Image Selector Logic
 const selectorVisible = ref(false)
@@ -268,15 +246,109 @@ const confirmImageSelection = () => {
   const img = imageList.value.find(i => i.id === tempSelectedImageId.value)
   if (img) {
     selectedImage.value = img
-    form.image_id = img.id
+    dialog.form.image_id = img.id
     selectorVisible.value = false
   }
 }
 
 onMounted(() => {
   fetchData()
+  
+  // Watch dialog close to reset selectedImage if adding
+  // Actually useAdminDialog resets form, but we need to reset selectedImage too
+  // We can't easily hook into close event of useAdminDialog unless we watch visible
+  // Or simply reset it when opening add
 })
+
+// Hook into openAdd to clear image
+const originalOpenAdd = dialog.openAdd
+dialog.openAdd = (initialData) => {
+    selectedImage.value = null
+    originalOpenAdd(initialData)
+}
+
 </script>
+
+<style scoped>
+.banner-page {
+  padding: 0;
+}
+.action-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.tips {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.2;
+    margin-top: 5px;
+}
+
+/* Image Selector Wrapper */
+.image-selector {
+    width: 200px;
+    height: 100px;
+    border: 1px dashed var(--el-border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+.image-selector:hover {
+    border-color: var(--el-color-primary);
+}
+.preview-img {
+    width: 100%;
+    height: 100%;
+}
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+}
+
+/* Selector Modal Grid */
+.selector-header {
+    margin-bottom: 15px;
+}
+.selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.selector-item {
+    border: 2px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+}
+.selector-item.active {
+    border-color: var(--el-color-primary);
+}
+.selector-img {
+    width: 100%;
+    height: 80px;
+    display: block;
+}
+.selector-name {
+    font-size: 12px;
+    padding: 4px;
+    text-align: center;
+    background: #f5f7fa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
 
 <style scoped>
 .banner-page {

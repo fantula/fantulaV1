@@ -209,6 +209,7 @@ definePageMeta({
 import { ref, computed, watch, nextTick } from 'vue'
 import { adminTicketApi, type TicketMessage } from '@/api/admin/ticket'
 import { useBizConfig } from '@/composables/common/useBizConfig'
+import { confirmAction } from '@/composables/admin/useAdminDialog'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, CircleCheckFilled, RefreshRight, Picture, Close } from '@element-plus/icons-vue'
 import { uploadImageToStorage } from '@/utils/uploadImage'
@@ -426,23 +427,28 @@ const handleReply = async () => {
 }
 
 const handleResolve = async () => {
-   try {
-      await ElMessageBox.confirm('确定要将此工单标记为已解决吗？用户将无法再回复。', '确认结单', { 
-          confirmButtonText: '确定结单',
-          cancelButtonText: '取消',
-          type: 'warning' 
-      })
-      resolving.value = true
-      const res = await adminTicketApi.resolve(props.ticketId)
-      if (res.success) {
-         ElMessage.success('工单已结单')
-         await loadData() 
-      } else {
-         ElMessage.error('操作失败')
-      }
-   } catch (e) {} finally {
-      resolving.value = false
-   }
+    const success = await confirmAction(
+        '确定要将此工单标记为已解决吗？用户将无法再回复。',
+        async () => {
+             resolving.value = true
+             try {
+                 const res = await adminTicketApi.resolve(props.ticketId)
+                 return res
+             } finally {
+                 resolving.value = false
+             }
+        },
+        { 
+            title: '确认结单', 
+            confirmText: '确定结单', 
+            type: 'warning',
+            successMessage: '工单已结单'
+        }
+    )
+    
+    if (success) {
+        await loadData()
+    }
 }
 
 watch(() => props.modelValue, (val) => {

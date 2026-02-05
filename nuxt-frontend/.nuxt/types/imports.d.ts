@@ -481,6 +481,8 @@ declare global {
   const useNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt').useNuxtApp
   const useNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useNuxtData
   const useNuxtDevTools: typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools').useNuxtDevTools
+  const useOrderDetail: typeof import('../../composables/client/useOrderDetail').useOrderDetail
+  const useOrderDetailLogic: typeof import('../../composables/client/useOrderDetailLogic').useOrderDetailLogic
   const useOrderList: typeof import('../../composables/client/useOrderList').useOrderList
   const usePageLoading: typeof import('../../composables/usePageLoading').usePageLoading
   const usePinia: typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables').usePinia
@@ -575,6 +577,9 @@ declare global {
   // @ts-ignore
   export type { GoodsData } from '../../composables/client/useGoodsDetail'
   import('../../composables/client/useGoodsDetail')
+  // @ts-ignore
+  export type { OrderDetail, CdkItem, SlotItem, FulfillmentField } from '../../composables/client/useOrderDetail'
+  import('../../composables/client/useOrderDetail')
   // @ts-ignore
   export type { ContactConfig } from '../../composables/client/useSystemConfig'
   import('../../composables/client/useSystemConfig')
@@ -1069,6 +1074,8 @@ declare module 'vue' {
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
     readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
+    readonly useOrderDetail: UnwrapRef<typeof import('../../composables/client/useOrderDetail')['useOrderDetail']>
+    readonly useOrderDetailLogic: UnwrapRef<typeof import('../../composables/client/useOrderDetailLogic')['useOrderDetailLogic']>
     readonly useOrderList: UnwrapRef<typeof import('../../composables/client/useOrderList')['useOrderList']>
     readonly usePageLoading: UnwrapRef<typeof import('../../composables/usePageLoading')['usePageLoading']>
     readonly usePinia: UnwrapRef<typeof import('../../node_modules/@pinia/nuxt/dist/runtime/composables')['usePinia']>

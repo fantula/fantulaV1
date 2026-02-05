@@ -110,84 +110,49 @@ const tabs = [
   { key: 'system', label: '系统' },
 ]
 
-// === Infinite Scroll Logic (Server Mode) ===
+// === Infinite Scroll Logic (Client Mode) ===
 
-// API Fetch Wrapper for useInfiniteScroll
-const fetchMessages = async (page: number, size: number) => {
-  // Construct params based on activeTab
-  // Note: backend API might accept type filter or is_read filter
-  // Assuming generic getMessages accepts filters or we filter post-fetch if API is limited.
-  // BUT the composable expects us to return the data for THAT page.
-  // Since the original code didn't show filter params in getMessages(page, size), 
-  // we assume the API gets ALL messages and we might need to filter client side OR 
-  // (Better) we assume the API *should* support it. 
-  // Let's stick to the original `messageApi.getMessages` signature for now.
-  // If the original API didn't support filtering params, the previous code was filtering client-side
-  // AFTER fetching a page... wait, original code:
-  // `getMessages(page, size)` -> `messages.value`
-  // `filteredMessages` computed property filtered `messages.value`.
-  // This implies the original implementation was FLAWED if it used server pagination but client filtering 
-  // (e.g. page 1 might have 0 'order' messages, so list is empty?).
-  
-  // CORRECT APPROACH for reliable Server-Side Infinite Scroll:
-  // We must fetch data that matches the tab. 
-  // Since I cannot change the backend API right now, I have to check `messageApi` definition.
-  // Assuming `getMessages` retrieves ALL messages for current user.
-  // To make "Client Filtering + Server Pagination" work with Infinite Scroll is tricky (hybrid).
-  // Strategy: 
-  // If API doesn't support filter, we fetch pages until we fill our pageSize or hit end.
-  // HOWEVER, for this task, I will assume we fetch standard pages and purely filter client side 
-  // if strictly necessary, BUT that breaks "10 items at a time".
-  
-  // Let's look at `messageApi.getMessages` usage in original file:
-  // `const res = await messageApi.getMessages(currentPage.value, pageSize)`
-  // `filteredMessages` computed was used.
-  // This confirms the previous code WAS flawed for pagination + filtering (typical legacy issue).
-  
-  // OPTIMIZATION:
-  // I will use Client-Side Mode of `useInfiniteScroll` for `messages` IF the API doesn't support filtering.
-  // But wait, `messages` usually can be many. 
-  // Let's try to pass params if possible. If not, I'll fallback to:
-  // 1. Fetch ALL messages (if count isn't huge) -> Client Infinite Scroll.
-  // OR
-  // 2. Fetch pages and filter.
-  
-  // Given user wants "Unified Solution", and `messages` can be long, Server Side is better.
-  // I will interpret `getMessages` as generic. I'll implement a wrapper that gets the raw page.
-  
-  const res = await messageApi.getMessages(page, size)
-  if (res.success && res.data) {
-    // If we need to filter by tab (e.g. 'unread'), we might filter the RESULT of this page
-    // But this results in uneven pages. 
-    // Ideally we pass params. I will try to pass params if the API allows, 
-    // otherwise I will do simple client filtering on the received chunk.
-    
-    let list = res.data.messages || []
-    
-    // Client-side filtering of the chunk (Not perfect but safer than changing API)
-    if (activeTab.value === 'unread') {
-        list = list.filter(m => !m.is_read)
-    } else if (activeTab.value !== 'all') {
-        list = list.filter(m => m.type === activeTab.value)
+const messages = ref<UserMessage[]>([])
+
+// 1. Computed Filtered Source
+const filteredMessages = computed(() => {
+  if (activeTab.value === 'all') return messages.value
+  if (activeTab.value === 'unread') return messages.value.filter(m => !m.is_read)
+  return messages.value.filter(m => m.type === activeTab.value)
+})
+
+// 2. Composable
+const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<UserMessage>({
+    data: filteredMessages,
+    pageSize: 10
+})
+
+const fetchMessages = async () => {
+    loading.value = true
+    try {
+        // Fetch ALL messages (Client Mode Strategy)
+        // Assuming API supports page size, we set a large number.
+        // If API supports 'all=true' that would be better, but assuming generic pagination:
+        const res = await messageApi.getMessages(1, 1000) 
+        if (res.success && res.data) {
+            messages.value = res.data.messages || []
+        }
+    } catch (e) {
+        console.error('Fetch messages failed', e)
+        error.value = true
+    } finally {
+        loading.value = false
     }
-    
-    return {
-      list: list,
-      total: res.data.total,
-      hasMore: list.length > 0 // Simple assumption
-    }
-  }
-  return { list: [], hasMore: false }
 }
 
-const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<UserMessage>({
-  fetchData: fetchMessages,
-  pageSize: 10
+onMounted(() => {
+    fetchMessages()
+    loadUnreadCount()
 })
 
 const switchTab = (tab: string) => {
-  activeTab.value = tab
-  reset()
+    activeTab.value = tab
+    // Auto reset by composable
 }
 
 // === Other Logic ===

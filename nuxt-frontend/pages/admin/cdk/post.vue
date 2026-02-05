@@ -51,7 +51,7 @@
                     :value="prod.id"
                   >
                     <span style="float: left">{{ prod.product_name }}</span>
-                    <span style="float: right; color: #8492a6; font-size: 13px">{{ getTypeText(prod.product_type) }}</span>
+                    <span style="float: right; color: #8492a6; font-size: 13px">{{ getTypeText((prod as any).product_type) }}</span>
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -112,7 +112,7 @@
                           <el-input v-model="formVirtual.fields[idx]" placeholder="输入字段名 (如: 游戏账号)" />
                           <el-button type="danger" circle plain @click="removeVirtualField(idx)"><el-icon><Delete /></el-icon></el-button>
                        </div>
-                       <el-button type="dashed" class="add-field-btn" @click="addVirtualField">
+                       <el-button class="add-field-btn" @click="addVirtualField">
                           <el-icon><Plus /></el-icon> 添加字段
                        </el-button>
                        <div class="form-tip">用户下单时需要填写的辅助信息字段。</div>
@@ -138,7 +138,7 @@
                             <el-icon><Minus /></el-icon>
                           </el-button>
                        </div>
-                       <el-button type="dashed" size="small" class="add-attr-btn" @click="formShared.attributes.push({ key: '', value: '' })">
+                       <el-button size="small" class="add-attr-btn" @click="formShared.attributes.push({ key: '', value: '' })">
                           + 添加属性
                        </el-button>
                     </div>
@@ -328,7 +328,7 @@ import {
 } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { adminCategoryApi, adminProductApi, adminCdkApi, adminApi, type AdminProduct, type AdminImage, type AdminImageCategory } from '@/api/admin';
-import { getAdminSupabaseClient } from '@/utils/supabase-admin';
+
 
 const router = useRouter();
 const route = useRoute();
@@ -391,57 +391,24 @@ const parseCards = async () => {
   parsing.value = true;
   
   try {
-    // 1. 解析输入，去重
-    const lines = formCard.rawContent.split('\n').map(l => l.trim()).filter(l => l);
-    const uniqueLines = [...new Set(lines)];
+    const lines = formCard.rawContent.split('\n');
     
     // 2. 查询当前选择 SKU 关联的 CDK codes（优化：不再查全库）
     const targetSkuIds = formStep1.skuIds.length > 0 
       ? formStep1.skuIds 
       : skuOptions.value.map(s => s.id);
     
-    let existingCodes = new Set<string>();
-    
-    if (targetSkuIds.length > 0) {
-      // 通过 cdk_sku_map 找到这些 SKU 关联的 CDK
-      const { data: mappings } = await getAdminSupabaseClient()
-        .from('cdk_sku_map')
-        .select('cdk:cdks!inner(code, cdk_type)')
-        .in('sku_id', targetSkuIds)
-        .eq('cdk.cdk_type', 'one_time');
-      
-      if (mappings) {
-        existingCodes = new Set(mappings.map((m: any) => m.cdk?.code).filter(Boolean));
-      }
-    }
-    
-    // 3. 分类
-    const valid: string[] = [];
-    const duplicates: string[] = [];
-    const invalid: string[] = [];
-    
-    uniqueLines.forEach(line => {
-      // 基本格式校验：至少4个字符
-      if (line.length < 4) {
-        invalid.push(line);
-      } else if (existingCodes.has(line)) {
-        duplicates.push(line);
-      } else {
-        valid.push(line);
-      }
-    });
+    // Use API instead of direct DB Access
+    const result = await adminCdkApi.validateCdkCandidates(lines, targetSkuIds);
     
     // 检查输入中的重复
+    const uniqueLines = [...new Set(lines.map(l => l.trim()).filter(l => l))];
     const inputDuplicates = lines.length - uniqueLines.length;
     if (inputDuplicates > 0) {
       ElMessage.info(`已自动去除 ${inputDuplicates} 条重复输入`);
     }
     
-    cardParsedResult.value = {
-      valid,
-      duplicates,
-      invalid
-    };
+    cardParsedResult.value = result;
   } catch (err) {
     ElMessage.error('解析校验失败，请重试');
     cardParsedResult.value = null;
@@ -486,12 +453,7 @@ const handleProductChange = async (productId: string) => {
       // Virtual 类型: 额外过滤掉已绑定 CDK 的 SKU
       let availableSkus = filteredSkus;
       if (targetType === 'virtual') {
-        const { data: boundSkuIds } = await getAdminSupabaseClient()
-          .from('cdk_sku_map')
-          .select('sku_id, cdk:cdks!inner(cdk_type)')
-          .eq('cdk.cdk_type', 'virtual');
-        
-        const boundSet = new Set((boundSkuIds || []).map((m: any) => m.sku_id));
+        const boundSet = new Set(await adminCdkApi.getVirtualBoundSkuIds());
         availableSkus = filteredSkus.filter((sku: any) => !boundSet.has(sku.id));
       }
       

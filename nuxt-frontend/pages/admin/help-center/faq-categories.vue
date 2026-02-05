@@ -1,13 +1,16 @@
 <template>
-  <div class="faq-category-page">
-    <div class="page-actions">
-      <el-button type="primary" @click="handleAdd">
-        <el-icon><Plus /></el-icon> 新增分类
-      </el-button>
-    </div>
+  <div class="admin-page">
+    <AdminActionCard>
+      <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">新增分类</el-button>
+    </AdminActionCard>
 
-    <div class="content-card" v-loading="loading">
-      <el-table :data="categories" style="width: 100%">
+    <AdminDataTable
+      :data="categories"
+      :loading="loading"
+      :show-pagination="false"
+      class="mt-4"
+      row-key="id"
+    >
         <el-table-column prop="sort_order" label="排序" width="100" align="center" />
         <el-table-column prop="name" label="分类名称" />
         <el-table-column label="状态" width="120" align="center">
@@ -27,162 +30,136 @@
             {{ new Date(row.created_at).toLocaleString() }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column label="操作" width="180" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-popconfirm title="确定删除此分类吗？" @confirm="handleDelete(row.id)">
-              <template #reference>
-                <el-button type="danger" link size="small">删除</el-button>
-              </template>
-            </el-popconfirm>
+            <el-button type="primary" link size="small" @click="dialog.openEdit(row)">编辑</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
-      </el-table>
-    </div>
+    </AdminDataTable>
 
     <!-- Dialog -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isEdit ? '编辑分类' : '新增分类'"
-      width="500px"
+    <AdminDataDialog
+      v-model="dialog.visible.value"
+      :title="dialog.isEdit.value ? '编辑分类' : '新增分类'"
+      :loading="dialog.loading.value"
+      @confirm="dialog.submit"
     >
-      <el-form :model="form" label-width="110px">
-        <el-form-item label="分类名称">
-          <el-input v-model="form.name" placeholder="请输入分类名称" />
+      <el-form :model="dialog.form" label-width="110px">
+        <el-form-item label="分类名称" required>
+          <el-input v-model="dialog.form.name" placeholder="请输入分类名称" />
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="form.sort_order" :min="0" />
+          <el-input-number v-model="dialog.form.sort_order" :min="0" />
         </el-form-item>
-        <el-form-item label="启用状态" v-if="isEdit">
-          <el-switch v-model="form.is_active" />
+        <el-form-item label="启用状态" v-if="dialog.isEdit.value">
+          <el-switch v-model="dialog.form.is_active" />
         </el-form-item>
         <el-form-item label="结算页显示">
-          <el-switch v-model="form.is_checkout_visible" />
-          <div class="form-tip">开启后，该分类下的问题将显示在结算界面。</div>
+          <el-switch v-model="dialog.form.is_checkout_visible" />
+          <div class="form-tip text-gray-400 text-xs mt-1">开启后，该分类下的问题将显示在结算界面。</div>
         </el-form-item>
       </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitForm" :loading="submitting">确定</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    </AdminDataDialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { adminFaqApi } from '@/api/admin/help-center'
+import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
+
 definePageMeta({
   layout: 'mgmt',
   middleware: ["mgmt-auth"]
 })
 
-import { ref, onMounted } from 'vue'
-import { Plus, ArrowLeft } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import { adminFaqApi, type AdminFaqCategory } from '@/api/admin/help-center'
+interface AdminFaqCategory {
+  id: string
+  name: string
+  sort_order: number
+  is_active: boolean
+  is_checkout_visible: boolean
+  created_at: string
+}
 
 const loading = ref(false)
 const categories = ref<AdminFaqCategory[]>([])
-const dialogVisible = ref(false)
-const submitting = ref(false)
-const isEdit = ref(false)
-const currentId = ref('')
-
-const form = ref({
-  name: '',
-  sort_order: 0,
-  is_active: true,
-  is_checkout_visible: false
-})
 
 const fetchCategories = async () => {
   loading.value = true
   const res = await adminFaqApi.getCategories()
   if (res.success) {
-    categories.value = res.categories
+    categories.value = res.categories || []
   }
   loading.value = false
 }
 
-const handleAdd = () => {
-  isEdit.value = false
-  form.value = { name: '', sort_order: 0, is_active: true, is_checkout_visible: false }
-  dialogVisible.value = true
-}
-
-const handleEdit = (row: AdminFaqCategory) => {
-  isEdit.value = true
-  currentId.value = row.id
-  form.value = {
-    name: row.name,
-    sort_order: row.sort_order,
-    is_active: row.is_active,
-    is_checkout_visible: row.is_checkout_visible
-  }
-  dialogVisible.value = true
-}
-
-const handleDelete = async (id: string) => {
-  const res = await adminFaqApi.deleteCategory(id)
-  if (res.success) {
-    ElMessage.success('删除成功')
-    fetchCategories()
-  } else {
-    ElMessage.error(res.error || '删除失败')
-  }
-}
-
-const submitForm = async () => {
-  if (!form.value.name) return ElMessage.warning('请输入分类名称')
-  
-  submitting.value = true
-  try {
-    if (isEdit.value) {
-      const res = await adminFaqApi.updateCategory(currentId.value, form.value)
-      if (res.success) {
-        ElMessage.success('更新成功')
-        dialogVisible.value = false
-        fetchCategories()
-      } else {
-        ElMessage.error(res.error || '更新失败')
-      }
-    } else {
-      const res = await adminFaqApi.createCategory({
-        name: form.value.name,
-        sort_order: form.value.sort_order,
-        is_checkout_visible: form.value.is_checkout_visible
-      })
-      if (res.success) {
-        ElMessage.success('创建成功')
-        dialogVisible.value = false
-        fetchCategories()
-      } else {
-        ElMessage.error(res.error || '创建失败')
-      }
+// Dialog Logic
+const dialog = useAdminDialog({
+  id: '',
+  name: '',
+  sort_order: 0,
+  is_active: true,
+  is_checkout_visible: false
+}, {
+  onSubmit: async (form, isEdit) => {
+    if (!form.name) {
+       ElMessage.warning('请输入分类名称')
+       return { success: false }
     }
-  } finally {
-    submitting.value = false
+  
+    let res
+    if (isEdit) {
+      res = await adminFaqApi.updateCategory(form.id, {
+        name: form.name,
+        sort_order: form.sort_order,
+        is_active: form.is_active,
+        is_checkout_visible: form.is_checkout_visible
+      })
+    } else {
+      res = await adminFaqApi.createCategory({
+        name: form.name,
+        sort_order: form.sort_order,
+        is_checkout_visible: form.is_checkout_visible
+      })
+    }
+
+    if (res.error) {
+        return { success: false, error: (res.error as any).message || String(res.error) }
+    }
+    return { success: true }
+  },
+  onSuccess: async () => {
+     await fetchCategories()
+     ElMessage.success(dialog.isEdit.value ? '更新成功' : '创建成功')
   }
+})
+
+const handleDelete = async (row: AdminFaqCategory) => {
+  await confirmDelete(
+      '确定要删除此分类吗？',
+      async () => {
+          const res = await adminFaqApi.deleteCategory(row.id)
+          if (res.error) {
+              throw new Error((res.error as any).message || String(res.error))
+          }
+          await fetchCategories()
+          return { success: true }
+      }
+  )
 }
 
 onMounted(fetchCategories)
 </script>
 
 <style scoped>
-.faq-category-page {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.page-actions {
-  margin-bottom: 24px;
-}
-
-.content-card {
-  background: var(--el-bg-color);
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+.admin-page {
+  padding: 0;
 }
 </style>

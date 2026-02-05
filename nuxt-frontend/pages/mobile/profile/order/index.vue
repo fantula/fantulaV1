@@ -27,91 +27,51 @@
 
     <!-- Order List -->
     <div class="list-container">
-        <BaseInfiniteList 
-            :loading="loading" 
-            :finished="finished"
-            :error="error" 
-            @load="loadMore"
-            :offset="200"
-        >
-          <template #loading>
-             <div v-if="displayList.length === 0 && loading" class="loading-state">
-                <div class="spinner"></div>
-                <span>正在加载订单...</span>
-             </div>
-          </template>
+        <!-- Loading State -->
+        <div v-if="loading && displayList.length === 0" class="loading-state">
+            <div class="spinner"></div>
+            <span>正在加载订单...</span>
+        </div>
 
-          <div v-if="displayList.length === 0 && !loading" class="empty-state">
-             <div class="empty-icon-wrapper">
+        <!-- Empty State -->
+        <div v-else-if="displayList.length === 0" class="empty-state">
+            <div class="empty-icon-wrapper">
                 <el-icon class="empty-icon"><Box /></el-icon>
-             </div>
-             <p class="empty-text">暂无相关订单</p>
-             <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
-          </div>
+            </div>
+            <p class="empty-text">暂无相关订单</p>
+            <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
+        </div>
 
-          <div v-else class="order-list">
-             <div 
-               v-for="item in displayList" 
-               :key="item.id" 
-               class="mobile-order-card"
-               :class="'status-' + (item.isPending ? 'pending' : item.status)"
+        <!-- List -->
+        <div v-else class="order-list">
+             <MobileOrderCard
+               v-for="item in displayList"
+               :key="item.id"
+               :order="item"
                @click="handleItemClick(item)"
              >
-                <!-- Card Header -->
-                <div class="card-header">
-                   <div class="order-no-group">
-                      <span class="label">NO.</span>
-                      <span class="value">{{ item.order_no.slice(-8) }}</span>
-                   </div>
-                   <!-- Status Pill (PC Style) -->
-                   <div class="status-pill" :class="item.isPending ? 'pending' : item.status">
-                      <div class="dot"></div>
-                      <span>{{ item.isPending ? '待支付' : getOrderStatusLabel(item.status) }}</span>
-                   </div>
-                </div>
-
-                <!-- Card Body -->
-                <div class="card-body">
-                   <div class="thumb">
-                      <el-image :src="item.product_image || '/images/placeholder.png'" fit="cover" />
-                   </div>
-                   <div class="info">
-                      <div class="name-row">
-                          <div class="name">{{ item.product_name }}</div>
-                          <span class="spec-tag">{{ item.spec_text || '标准规格' }}</span>
-                      </div>
-                      
-                      <div class="price-row">
-                         <div class="price">
-                            <span class="amount">{{ Number(item.total_amount).toFixed(2) }}</span>
-                            <span class="unit">点</span>
-                         </div>
-                         <div class="qty">x{{ item.quantity }}</div>
-                      </div>
-                   </div>
-                </div>
-
-                <!-- Card Footer -->
-                <div class="card-footer">
-                   <div class="time">{{ formatDate(item.created_at) }}</div>
-                   <div class="actions">
-                      <template v-if="item.isPending || item.status === 'pending'">
-                         <button class="btn delete" @click.stop="openConfirmModal(item, true)">
+                <template #actions="{ order }">
+                    <template v-if="order.isPending || order.status === 'pending'">
+                         <button class="btn delete" @click.stop="openConfirmModal(order, true)">
                              <el-icon><Delete /></el-icon>
                          </button>
-                         <button class="btn pay" @click.stop="handleItemClick(item)">去支付</button>
-                      </template>
-                      <template v-else-if="['expired', 'refunded', 'cancelled'].includes(item.status)">
-                          <button class="btn delete" @click.stop="openConfirmModal(item, false)">清理记录</button>
-                      </template>
-                      <template v-else>
-                          <button class="btn view" @click.stop="handleItemClick(item)">查看详情</button>
-                      </template>
-                   </div>
-                </div>
+                         <button class="btn pay" @click.stop="handleItemClick(order)">去支付</button>
+                    </template>
+                    <template v-else-if="['expired', 'refunded', 'cancelled'].includes(order.status)">
+                          <button class="btn delete" @click.stop="openConfirmModal(order, false)">清理记录</button>
+                    </template>
+                    <template v-else>
+                          <button class="btn view" @click.stop="handleItemClick(order)">查看详情</button>
+                    </template>
+                </template>
+             </MobileOrderCard>
+
+             <!-- Load More Trigger -->
+             <div v-if="!finished" class="load-more" @click="loadMore">
+                {{ loading ? '加载中...' : '点击加载更多' }}
              </div>
-          </div>
-        </BaseInfiniteList>
+             <div v-if="finished" class="no-more">--- 到底了 ---</div>
+        </div>
     </div>
 
     <!-- Confirm Modal -->
@@ -139,7 +99,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ArrowLeft, Box, Delete, WarningFilled } from '@element-plus/icons-vue'
 import { useOrderList } from '@/composables/client/useOrderList'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
-import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
+import MobileOrderCard from '@/components/mobile/profile/MobileOrderCard.vue'
 import { ElMessage } from 'element-plus'
 
 definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
@@ -149,10 +109,10 @@ const route = useRoute()
 
 const {
   filteredList, currentTab, tabs, loadList, changeTab,
-  deletePreOrder, getOrderStatusLabel, formatDate
+  deletePreOrder
 } = useOrderList()
 
-const { displayList, loading, finished, error, loadMore, reset } = useInfiniteScroll<any>({
+const { displayList, loading, finished, loadMore, reset } = useInfiniteScroll<any>({
     data: filteredList, pageSize: 10
 })
 
@@ -170,7 +130,11 @@ onMounted(async () => {
 // Interaction Logic
 const handleItemClick = (item: any) => {
     if (item.status === 'pending' || item.isPending) {
-        router.push(`/checkout/${item.id}`) 
+        // Assume checkout route exists or navigate to generic order detail
+        // Checking Mobile Order Detail implementation plan, it is /mobile/profile/order/[id]
+        // But for pending payment, usually it goes to a cashier. 
+        // For now, let's keep it consistent.
+        router.push(`/mobile/checkout/${item.id}`) 
     } else {
         router.push(`/mobile/profile/order/${item.id}`)
     }
@@ -287,66 +251,10 @@ const handleConfirmDelete = async () => {
 
 .order-list { display: flex; flex-direction: column; gap: 16px; }
 
-/* Mobile Order Card */
-.mobile-order-card {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 16px;
-    padding: 16px;
-    position: relative; overflow: hidden;
+/* List Status Indicators */
+.load-more, .no-more {
+    text-align: center; color: #64748B; font-size: 12px; padding: 10px;
 }
-/* Left Status Line */
-.mobile-order-card::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #64748B; opacity: 0.6;
-}
-.mobile-order-card.status-pending::before { background: #F97316; }
-.mobile-order-card.status-active::before { background: #22C55E; }
-.mobile-order-card.status-pending_delivery::before { background: #3B82F6; }
-
-/* Card Header */
-.card-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-}
-.order-no-group { font-size: 12px; font-family: 'Monaco', monospace; color: #64748B; display: flex; gap: 4px; }
-.order-no-group .value { color: #94A3B8; }
-
-.status-pill {
-    display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px;
-    background: rgba(255,255,255,0.05); color: #94A3B8; font-size: 11px; font-weight: 600;
-}
-.status-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 5px currentColor; }
-.status-pill.pending { color: #F97316; background: rgba(249, 115, 22, 0.1); }
-.status-pill.active { color: #22C55E; background: rgba(34, 197, 94, 0.1); }
-.status-pill.pending_delivery { color: #3B82F6; background: rgba(59, 130, 246, 0.1); }
-.status-pill.refunding { color: #EAB308; background: rgba(234, 179, 8, 0.1); }
-
-/* Card Body */
-.card-body { display: flex; gap: 12px; margin-bottom: 12px; }
-.thumb {
-    width: 64px; height: 64px; border-radius: 8px; overflow: hidden; background: #1E293B; flex-shrink: 0;
-}
-.thumb .el-image { width: 100%; height: 100%; }
-.info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
-.name-row { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-.name { color: #fff; font-size: 14px; font-weight: 500; line-height: 1.3; }
-.spec-tag {
-    font-size: 10px; color: #94A3B8; background: rgba(255,255,255,0.08);
-    padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);
-}
-
-.price-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 4px; }
-.price { color: #fff; font-family: 'DIN Alternate'; font-weight: 700; display: flex; align-items: baseline; gap: 2px; }
-.price .amount { font-size: 18px; }
-.price .unit { font-size: 11px; color: #F59E0B; }
-.qty { font-size: 12px; color: #64748B; }
-
-/* Card Footer */
-.card-footer {
-    display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;
-}
-.time { font-size: 11px; color: #475569; }
-.actions { display: flex; gap: 8px; }
 
 .btn {
     padding: 6px 14px; border-radius: 14px; font-size: 12px; font-weight: 500;

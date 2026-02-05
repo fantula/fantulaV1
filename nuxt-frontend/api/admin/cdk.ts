@@ -347,4 +347,49 @@ export const adminCdkApi = {
         if (error) return { success: false, error: error.message }
         return { success: true }
     },
+
+    /**
+     * 校验待添加的 CDK 列表
+     * 返回: valid (可用), duplicates (库内已存在), invalid (格式错误)
+     */
+    async validateCdkCandidates(candidates: string[], skuIds: string[] = []): Promise<{
+        valid: string[],
+        duplicates: string[],
+        invalid: string[]
+    }> {
+        const uniqueLines = [...new Set(candidates.map(l => l.trim()).filter(l => l))]
+
+        const valid: string[] = []
+        const duplicates: string[] = []
+        const invalid: string[] = []
+        let existingCodes = new Set<string>()
+
+        // 1. 如果指定了 SKU，则查询这些 SKU 下已有的 CDK codes
+        if (skuIds.length > 0) {
+            const client = getAdminSupabaseClient()
+            const { data: mappings } = await client
+                .from('cdk_sku_map')
+                .select('cdk:cdks!inner(code, cdk_type)')
+                .in('sku_id', skuIds)
+                .eq('cdk.cdk_type', 'one_time')
+
+            if (mappings) {
+                // @ts-ignore
+                mappings.forEach(m => { if (m.cdk?.code) existingCodes.add(m.cdk.code) })
+            }
+        }
+
+        // 2. 校验
+        uniqueLines.forEach(line => {
+            if (line.length < 4) {
+                invalid.push(line)
+            } else if (existingCodes.has(line)) {
+                duplicates.push(line)
+            } else {
+                valid.push(line)
+            }
+        })
+
+        return { valid, duplicates, invalid }
+    }
 }

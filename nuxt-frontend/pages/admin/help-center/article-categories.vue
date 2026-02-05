@@ -1,13 +1,17 @@
 <template>
   <div class="admin-page">
-    <div class="page-actions">
-      <el-button type="primary" @click="openCreate">
-        <el-icon class="mr-1"><Plus /></el-icon> 新增分类
-      </el-button>
-    </div>
+    
+    <AdminActionCard>
+      <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">新增分类</el-button>
+    </AdminActionCard>
 
-    <div class="table-container" v-loading="loading">
-      <el-table :data="categories" border style="width: 100%" row-key="id">
+    <AdminDataTable
+      :data="categories"
+      :loading="loading"
+      :show-pagination="false"
+      class="mt-4"
+      row-key="id"
+    >
         <el-table-column prop="sort_order" label="排序" width="80" align="center" />
         <el-table-column prop="icon" label="图标" width="80" align="center">
           <template #default="{ row }">
@@ -39,80 +43,74 @@
         </el-table-column>
         <el-table-column label="操作" width="180" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
+            <el-button link type="primary" @click="dialog.openEdit(row)">编辑</el-button>
             <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
-      </el-table>
-    </div>
+    </AdminDataTable>
 
     <!-- Edit/Create Dialog -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isEdit ? '编辑分类' : '新增分类'"
-      width="500px"
+    <AdminDataDialog
+      v-model="dialog.visible.value"
+      :title="dialog.isEdit.value ? '编辑分类' : '新增分类'"
+      :loading="dialog.loading.value"
+      @confirm="dialog.submit"
     >
-      <el-form :model="form" label-width="80px">
+      <el-form :model="dialog.form" label-width="80px">
         <el-form-item label="名称" required>
-          <el-input v-model="form.name" placeholder="例如: 使用攻略" />
+          <el-input v-model="dialog.form.name" placeholder="例如: 使用攻略" />
         </el-form-item>
         <el-form-item label="图标" required>
-          <el-input v-model="form.icon" placeholder="Emoji 或 Element 图标名" style="width: 100px;">
+          <el-input v-model="dialog.form.icon" placeholder="Emoji 或 Element 图标名" style="width: 100px;">
             <template #append>
-              <span v-if="form.icon">{{ form.icon }}</span>
+              <span v-if="dialog.form.icon">{{ dialog.form.icon }}</span>
             </template>
           </el-input>
           <span class="text-gray-400 text-xs ml-2">推荐使用 Emoji，如 📝</span>
         </el-form-item>
         <el-form-item label="颜色" required>
-          <el-color-picker v-model="form.color" />
-          <el-input v-model="form.color" style="width: 120px; margin-left: 10px;" />
+          <el-color-picker v-model="dialog.form.color" />
+          <el-input v-model="dialog.form.color" style="width: 120px; margin-left: 10px;" />
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="form.sort_order" :min="0" :max="999" />
+          <el-input-number v-model="dialog.form.sort_order" :min="0" :max="999" />
           <span class="text-gray-400 text-xs ml-2">数字越小越靠前</span>
         </el-form-item>
         <el-form-item label="状态">
-          <el-switch v-model="form.is_active" active-text="启用" inactive-text="禁用" />
+          <el-switch v-model="dialog.form.is_active" active-text="启用" inactive-text="禁用" />
         </el-form-item>
       </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            确定
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
+    </AdminDataDialog>
   </div>
 </template>
 
 <script setup lang="ts">
+
+import { ref, onMounted } from 'vue'
+import { adminArticleApi } from '@/api/admin/help-center'
+import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
+
 definePageMeta({
   layout: 'mgmt',
   middleware: ["mgmt-auth"]
 })
 
-import { ref, reactive, onMounted } from 'vue'
-import { adminArticleApi, type Category } from '@/api/admin/help-center'
-import { Plus } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+interface Category {
+  id: string
+  name: string
+  icon: string
+  color: string
+  sort_order: number
+  is_active: boolean
+}
 
 const loading = ref(false)
 const categories = ref<Category[]>([])
-const dialogVisible = ref(false)
-const submitting = ref(false)
-const isEdit = ref(false)
-
-const form = reactive({
-  id: '',
-  name: '',
-  icon: '📝',
-  color: '#409EFF',
-  sort_order: 0,
-  is_active: true
-})
 
 const fetchCategories = async () => {
   loading.value = true
@@ -127,31 +125,21 @@ const fetchCategories = async () => {
   }
 }
 
-const openCreate = () => {
-  isEdit.value = false
-  form.id = ''
-  form.name = ''
-  form.icon = '📝'
-  form.color = '#409EFF'
-  form.sort_order = 10
-  form.is_active = true
-  dialogVisible.value = true
-}
+// Dialog Logic
+const dialog = useAdminDialog({
+  id: '',
+  name: '',
+  icon: '📝',
+  color: '#409EFF',
+  sort_order: 10,
+  is_active: true
+}, {
+  onSubmit: async (form, isEdit) => {
+    if (!form.name) {
+      ElMessage.warning('请输入分类名称')
+      return { success: false }
+    }
 
-const openEdit = (row: Category) => {
-  isEdit.value = true
-  Object.assign(form, row)
-  dialogVisible.value = true
-}
-
-const handleSubmit = async () => {
-  if (!form.name) {
-    ElMessage.warning('请输入分类名称')
-    return
-  }
-
-  submitting.value = true
-  try {
     const payload = {
       name: form.name,
       icon: form.icon,
@@ -160,23 +148,26 @@ const handleSubmit = async () => {
       is_active: form.is_active
     }
 
-    if (isEdit.value) {
-      const { error } = await adminArticleApi.updateCategory(form.id, payload)
-      if (error) throw error
-      ElMessage.success('更新成功')
+    let res
+    if (isEdit) {
+      res = await adminArticleApi.updateCategory(form.id, payload)
     } else {
-      const { error } = await adminArticleApi.createCategory(payload)
-      if (error) throw error
-      ElMessage.success('创建成功')
+      res = await adminArticleApi.createCategory(payload)
     }
-    dialogVisible.value = false
-    fetchCategories()
-  } catch (error: any) {
-    ElMessage.error('操作失败: ' + error.message)
-  } finally {
-    submitting.value = false
+    
+    // Adapt response to standard format if needed, or just return it if it matches { success, error }
+    // Based on usage: { data, error } seems to be the return type from adminArticleApi
+    // useAdminDialog expects { success: boolean, error?: string }
+    if (res.error) {
+        return { success: false, error: res.error.message || String(res.error) }
+    }
+    return { success: true }
+  },
+  onSuccess: async () => {
+      await fetchCategories()
   }
-}
+})
+
 
 const handleStatusChange = async (row: Category) => {
   try {
@@ -187,25 +178,22 @@ const handleStatusChange = async (row: Category) => {
     }
     ElMessage.success(row.is_active ? '已启用' : '已禁用')
   } catch (error: any) {
-    ElMessage.error('更新状态失败: ' + error.message)
+    ElMessage.error('更新状态失败: ' + (error.message || String(error)))
   }
 }
 
-const handleDelete = (row: Category) => {
-  ElMessageBox.confirm('确定要删除这个分类吗？', '警告', {
-    confirmButtonText: '确定删除',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    try {
-      const { error } = await adminArticleApi.deleteCategory(row.id)
-      if (error) throw error
-      ElMessage.success('删除成功')
-      fetchCategories()
-    } catch (error: any) {
-      ElMessage.error('删除失败: ' + error.message)
-    }
-  })
+const handleDelete = async (row: Category) => {
+  await confirmDelete(
+      '确定要删除这个分类吗？',
+      async () => {
+         const res = await adminArticleApi.deleteCategory(row.id)
+         if (res.error) {
+             throw new Error(res.error.message || String(res.error))
+         }
+         await fetchCategories()
+         return { success: true }
+      }
+  )
 }
 
 onMounted(() => {
@@ -215,13 +203,6 @@ onMounted(() => {
 
 <style scoped>
 .admin-page {
-  padding: 20px;
-  background: var(--el-bg-color);
-  border-radius: 8px;
-  min-height: calc(100vh - 100px);
-}
-
-.page-actions {
-  margin-bottom: 20px;
+  padding: 0;
 }
 </style>

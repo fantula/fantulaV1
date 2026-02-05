@@ -1,5 +1,0 @@
-const index_vue_vue_type_style_index_0_scoped_82f82944_lang = ".code-info[data-v-82f82944]{display:flex;flex-direction:column}.code-name[data-v-82f82944]{font-size:14px;font-weight:600}.amount[data-v-82f82944]{color:var(--el-color-primary);font-weight:700}.product-tags[data-v-82f82944]{display:flex;flex-wrap:wrap;gap:4px}.product-tag[data-v-82f82944]{max-width:100%;overflow:hidden;text-overflow:ellipsis}.text-secondary[data-v-82f82944]{color:#909399;font-size:12px}.validity-range[data-v-82f82944]{color:var(--el-text-color-regular);font-size:12px}";
-export {
-  index_vue_vue_type_style_index_0_scoped_82f82944_lang as default
-};
-//# sourceMappingURL=index-styles-1.mjs-BjzECzQv.js.map

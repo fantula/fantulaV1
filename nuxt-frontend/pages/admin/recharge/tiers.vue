@@ -11,13 +11,17 @@
           :closable="false"
           style="margin-right: 20px; flex: 1;"
         />
-        <el-button type="primary" :icon="Plus" @click="openAddDialog">新增充值档位</el-button>
+        <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">新增充值档位</el-button>
       </div>
     </AdminActionCard>
 
     <!-- 列表 -->
-    <el-card shadow="never" class="list-card mt-4">
-      <el-table :data="sortedTiers" style="width: 100%" v-loading="loading" border stripe>
+    <AdminDataTable
+      :data="sortedTiers"
+      :loading="loading"
+      :show-pagination="false"
+      class="mt-4"
+    >
         <el-table-column prop="amount" label="充值金额 (元)" min-width="150" align="center">
            <template #default="{ row }">
              <span style="font-weight: bold; font-size: 16px;">¥{{ row.amount }}</span>
@@ -41,37 +45,35 @@
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
+            <el-button link type="primary" @click="dialog.openEdit(transformRow(row))">编辑</el-button>
             <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
-      </el-table>
-    </el-card>
+    </AdminDataTable>
 
     <!-- 添加/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑充值档位' : '新增充值档位'" width="500px" @closed="resetForm" append-to-body>
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
+    <AdminDataDialog
+      v-model="dialog.visible.value"
+      :title="dialog.isEdit.value ? '编辑充值档位' : '新增充值档位'"
+      :loading="dialog.loading.value"
+      @confirm="dialog.submit"
+    >
+      <el-form :model="dialog.form" :rules="rules" ref="formRef" label-width="100px">
         <el-form-item label="充值金额" prop="amount">
-          <el-input-number v-model="form.amount" :min="1" :precision="2" :step="1" style="width: 100%;" placeholder="请输入充值金额" />
+          <el-input-number v-model="dialog.form.amount" :min="1" :precision="2" :step="1" style="width: 100%;" placeholder="请输入充值金额" />
         </el-form-item>
         <el-form-item label="赠送金额" prop="bonus">
-          <el-input-number v-model="form.bonus" :min="0" :precision="2" :step="1" style="width: 100%;" placeholder="请输入赠送金额" />
+          <el-input-number v-model="dialog.form.bonus" :min="0" :precision="2" :step="1" style="width: 100%;" placeholder="请输入赠送金额" />
         </el-form-item>
         <el-form-item label="排序值" prop="sortOrder">
-          <el-input-number v-model="form.sortOrder" :min="0" :max="999" controls-position="right" />
+          <el-input-number v-model="dialog.form.sortOrder" :min="0" :max="999" controls-position="right" />
           <div class="form-tip">数值越小越靠前</div>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-switch v-model="form.status" active-text="启用" inactive-text="停用" />
+          <el-switch v-model="dialog.form.status" active-text="启用" inactive-text="停用" />
         </el-form-item>
       </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitForm" :loading="submitting">确认</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    </AdminDataDialog>
 
   </div>
 </template>
@@ -84,9 +86,12 @@ definePageMeta({
 
 import { ref, reactive, computed, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { adminRechargeApi } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
 
 interface TierItem {
   id: string
@@ -98,25 +103,41 @@ interface TierItem {
 }
 
 const loading = ref(false)
-const submitting = ref(false)
-const dialogVisible = ref(false)
-const isEdit = ref(false)
-const formRef = ref<FormInstance>()
-
 const tiers = ref<TierItem[]>([])
 
 const sortedTiers = computed(() => {
   return [...tiers.value].sort((a, b) => a.sortOrder - b.sortOrder)
 })
 
-// Form State
-const form = reactive({
+// Dialog Logic
+const dialog = useAdminDialog({
   id: '',
   amount: 6,
   bonus: 0,
   sortOrder: 0,
   status: true
+}, {
+  onSubmit: async (form, isEdit) => {
+    const payload = {
+      amount: form.amount,
+      bonus: form.bonus,
+      sort_order: form.sortOrder,
+      status: form.status ? 'on' as const : 'off' as const
+    }
+    
+    if (isEdit) {
+      return await adminRechargeApi.updateTier(form.id, payload)
+    } else {
+      return await adminRechargeApi.createTier(payload)
+    }
+  },
+  onSuccess: async () => {
+    await loadTiers()
+  }
 })
+
+// Bind formRef to the dialog's reference
+const formRef = dialog.formRef
 
 const rules = reactive<FormRules>({
   amount: [
@@ -127,6 +148,17 @@ const rules = reactive<FormRules>({
     { required: true, message: '请输入赠送金额', trigger: 'blur' }
   ]
 })
+
+// Helper to transform row data for editing
+const transformRow = (row: TierItem) => {
+  return {
+    id: row.id,
+    amount: row.amount,
+    bonus: row.bonus,
+    sortOrder: row.sortOrder,
+    status: row.status
+  }
+}
 
 // 加载数据
 const loadTiers = async () => {
@@ -152,74 +184,7 @@ const loadTiers = async () => {
   }
 }
 
-onMounted(loadTiers)
-
 // Actions
-const openAddDialog = () => {
-  isEdit.value = false
-  form.id = ''
-  form.amount = 6
-  form.bonus = 0
-  form.sortOrder = tiers.value.length + 1
-  form.status = true
-  dialogVisible.value = true
-}
-
-const openEditDialog = (row: TierItem) => {
-  isEdit.value = true
-  form.id = row.id
-  form.amount = row.amount
-  form.bonus = row.bonus
-  form.sortOrder = row.sortOrder
-  form.status = row.status
-  dialogVisible.value = true
-}
-
-const submitForm = async () => {
-  if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      submitting.value = true
-      try {
-        const tierData = {
-          amount: form.amount,
-          bonus: form.bonus,
-          sort_order: form.sortOrder,
-          status: form.status ? 'on' as const : 'off' as const
-        }
-        
-        if (isEdit.value) {
-          const res = await adminRechargeApi.updateTier(form.id, tierData)
-          if (res.success) {
-            ElMessage.success('更新成功')
-            dialogVisible.value = false
-            await loadTiers()
-          } else {
-            ElMessage.error(res.error || '更新失败')
-          }
-        } else {
-          const res = await adminRechargeApi.createTier(tierData)
-          if (res.success) {
-            ElMessage.success('添加成功')
-            dialogVisible.value = false
-            await loadTiers()
-          } else {
-            ElMessage.error(res.error || '添加失败')
-          }
-        }
-      } finally {
-        submitting.value = false
-      }
-    }
-  })
-}
-
-const resetForm = () => {
-  if (formRef.value) {
-    formRef.value.resetFields()
-  }
-}
-
 const handleSortChange = async () => {
   // 批量更新排序（简化实现：逐个更新）
   for (const tier of tiers.value) {
@@ -240,22 +205,24 @@ const handleStatusChange = async (row: TierItem) => {
   }
 }
 
-const handleDelete = (row: TierItem) => {
-  ElMessageBox.confirm(`确认删除充值档位 "¥${row.amount}" 吗？`, '删除', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    const res = await adminRechargeApi.deleteTier(row.id)
-    if (res.success) {
-      ElMessage.success('删除成功')
-      await loadTiers()
-    } else {
-      ElMessage.error(res.error || '删除失败')
+const handleDelete = async (row: TierItem) => {
+  await confirmDelete(
+    `确认删除充值档位 "¥${row.amount}" 吗？`,
+    async () => {
+      const res = await adminRechargeApi.deleteTier(row.id)
+      if (res.success) {
+         await loadTiers()
+      }
+      return res
     }
-  })
+  )
 }
 
+onMounted(() => {
+    loadTiers()
+    // Initialize default sort order for new items based on basic count
+    dialog.form.sortOrder = 0 // Will generally be set by user or we could check tiers.length here but it's reactive
+})
 </script>
 
 <style scoped>

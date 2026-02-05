@@ -209,7 +209,7 @@
       v-if="order.id"
       v-model="showRefundModal"
       :order-id="order.id"
-      :order-no="order.order_no"
+      :order-no="order.order_no || ''"
       @success="onRefundSuccess"
     />
 
@@ -250,6 +250,7 @@ import { clientOrderApi } from '@/api/client'
 import { ticketApi } from '@/api/client/ticket'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useOrderDetailLogic } from '@/composables/client/useOrderDetailLogic'
 import FulfillmentShared from '@/components/pc/order/FulfillmentShared.vue'
 import FulfillmentCdk from '@/components/pc/order/FulfillmentCdk.vue'
 import FulfillmentSubmitForm from '@/components/pc/order/FulfillmentSubmitForm.vue'
@@ -309,70 +310,24 @@ const activeTicketId = ref<string | null>(null)
 const pendingRefundRequest = ref<any>(null)
 const refundCancelledCount = ref(0)
 
-// Computed Status Text
-const statusText = computed(() => {
-  const s = order.value.status
-  if (s === 'pending_delivery') return '待发货'
-  if (s === 'active') return '使用中'
-  if (s === 'refunding') return '退款中'
-  if (s === 'refunded') return '已退款'
-  return getOrderStatusLabel(s || '')
+// --- Use Shared Logic ---
+const {
+  statusText,
+  remainingDays,
+  getTimeLevel,
+  isOneTime,
+  isVirtualOrShared,
+  canRenew,
+  canRefund,
+  canCancelRefund,
+  isRefundBlocked
+} = useOrderDetailLogic({
+  order,
+  pendingRefundRequest,
+  refundCancelledCount
 })
 
 const pendingRefundReason = computed(() => pendingRefundRequest.value?.reason)
-
-const remainingDays = computed(() => {
-  // @ts-ignore
-  if (!order.value.expires_at) return null
-  // @ts-ignore
-  const diff = new Date(order.value.expires_at).getTime() - Date.now()
-  if (diff <= 0) return 0
-  return Math.ceil(diff / (1000 * 60 * 60 * 24))
-})
-
-const getTimeLevel = (days: number) => {
-  if (days <= 3) return 'critical' // Red
-  if (days <= 7) return 'warning'  // Orange
-  return 'safe'                    // Green
-}
-
-// Logic Computed
-// Rule: One-time orders don't show Renew/Refund
-const isOneTime = computed(() => order.value.orderType === 'one_time_cdk')
-const isVirtualOrShared = computed(() => {
-  if (!order.value.orderType) return false
-  return ['virtual', 'shared_account'].includes(order.value.orderType)
-})
-
-const canRenew = computed(() => {
-  if (isOneTime.value) return false
-  const s = order.value.status
-  return ['active', 'expired'].includes(s || '')
-})
-
-// 退款条件 - 与移动端保持一致
-// 1. 可申请退款: 虚拟/合租类型 + pending_delivery/active + 无待审核申请 + 取消次数<3
-const canRefund = computed(() => 
-  isVirtualOrShared.value &&
-  ['pending_delivery', 'active'].includes(order.value.status || '') &&
-  !pendingRefundRequest.value &&
-  refundCancelledCount.value < 3
-)
-
-// 2. 可取消退款: 有待审核申请且状态为 refunding
-const canCancelRefund = computed(() =>
-  isVirtualOrShared.value &&
-  order.value.status === 'refunding' &&
-  !!pendingRefundRequest.value
-)
-
-// 3. 退款次数已达上限
-const isRefundBlocked = computed(() =>
-  isVirtualOrShared.value &&
-  ['pending_delivery', 'active'].includes(order.value.status || '') &&
-  !pendingRefundRequest.value &&
-  refundCancelledCount.value >= 3
-)
 
 
 // Amount Helpers
