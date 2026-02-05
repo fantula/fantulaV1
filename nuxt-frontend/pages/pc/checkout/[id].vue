@@ -32,33 +32,8 @@
             <span>请在 <strong class="time-highlight">{{ formatCountdown }}</strong> 内完成支付，超时将释放库存</span>
           </div>
 
-          <!-- 预订单列表 -->
-          <div class="order-list">
-            <div v-for="order in preOrders" :key="order.id" class="order-card glass-card">
-              <div class="order-header-row">
-                <span class="order-no">订单号: {{ order.order_no }}</span>
-                <span class="order-status">待支付</span>
-              </div>
-              
-              <div class="order-body">
-                <div class="product-thumb">
-                  <div class="sq-cover-img-container">
-                    <img :src="order.product_snapshot?.image || '/images/shared/logo.png'" class="sq-cover-img" />
-                  </div>
-                </div>
-                <div class="product-info">
-                  <div class="product-name">{{ order.product_snapshot?.product_name }}</div>
-                  <div class="product-meta-row">
-                     <el-tag size="small" effect="dark" class="spec-tag">{{ formatSpec(order.sku_snapshot?.spec_combination) }}</el-tag>
-                  </div>
-                </div>
-                <div class="product-price">
-                  <div class="price-val">{{ order.unit_price.toFixed(2) }} 点</div>
-                  <div class="qty">x{{ order.quantity }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- 预订单列表 (Extract: CheckoutOrderList) -->
+          <CheckoutOrderList :orders="preOrders" />
           
           <!-- FAQ Section -->
           <div class="faq-section" v-if="checkoutFaqs.length > 0">
@@ -96,85 +71,28 @@
           </div>
         </div>
 
-        <!-- 右侧：结算台 -->
+        <!-- 右侧：结算台 (Extract: CheckoutSummary) -->
         <div class="summary-section">
-          <div class="summary-card glass-card sticky-card">
-            <h3 class="card-title">支付详情</h3>
-            
-            <!-- 价格明细 -->
-            <div class="price-rows">
-              <div class="price-row">
-                <span>商品总额</span>
-                <span class="val">{{ totalProductAmount.toFixed(2) }} 点</span>
-              </div>
-              
-              <!-- 优惠券选择 -->
-              <div class="price-row coupon-row" @click="showCouponModal = true">
-                <div class="coupon-label">
-                  <span>优惠券</span>
-                  <el-tag v-if="selectedCoupon" size="small" type="danger" effect="dark" class="discount-tag">
-                    已抵扣 {{ couponDiscount.toFixed(2) }} 点
-                  </el-tag>
-                </div>
-                <div class="coupon-action">
-                  <span v-if="selectedCoupon" class="val discount">-{{ couponDiscount.toFixed(2) }} 点</span>
-                  <span v-else class="placeholder">选择优惠券</span>
-                  <el-icon><ArrowRight /></el-icon>
-                </div>
-              </div>
-
-              <div class="divider"></div>
-
-              <div class="price-row total">
-                <span>应付金额</span>
-                <span class="val final">{{ finalPayAmount.toFixed(2) }} 点</span>
-              </div>
-            </div>
-
-            <!-- 支付方式 (Changes: Balance -> Quota) -->
-            <div class="payment-method">
-              <div class="method-title">支付方式</div>
-              <div class="balance-card active">
-                <div class="balance-icon">
-                  <el-icon><Wallet /></el-icon>
-                </div>
-                <div class="balance-info">
-                  <div class="method-name">额度支付</div>
-                  <div class="user-balance-row">
-                      <span class="user-balance">可用额度: {{ userBalance.toFixed(2) }} 点</span>
-                      <el-button link type="primary" size="small" @click.stop="refreshBalance" :loading="refreshingBalance" class="refresh-btn">
-                          <el-icon><Refresh /></el-icon>
-                      </el-button>
-                  </div>
-                </div>
-                <div class="check-mark"><el-icon><Select /></el-icon></div>
-              </div>
-            </div>
-
-            <!-- 支付按钮 -->
-            <div class="action-area">
-              <button 
-                class="pay-btn" 
-                :class="{ 'insufficient': isBalanceInsufficient }"
-                :disabled="paying || remainingSeconds <= 0"
-                @click="handlePayAction"
-              >
-                <div v-if="paying" class="btn-loader"></div>
-                <!-- Logic change: If insufficient, show 'Go Recharge' -->
-                <span v-else-if="isBalanceInsufficient">额度不足，去充值</span>
-                <span v-else>立即支付 {{ finalPayAmount.toFixed(2) }} 点</span>
-              </button>
-              <div class="agreement-text">
-                点击支付即表示同意 <a href="/docs/terms" target="_blank">服务协议</a> 和 <a href="/docs/privacy" target="_blank">隐私协议</a>
-              </div>
-            </div>
-          </div>
+          <CheckoutSummary 
+            :amount-details="{
+                total: totalProductAmount,
+                discount: couponDiscount,
+                final: finalPayAmount
+            }"
+            :user-balance="userBalance"
+            :countdown-seconds="remainingSeconds"
+            :loading="refreshingBalance"
+            :paying="paying"
+            :coupon="selectedCoupon"
+            @select-coupon="showCouponModal = true"
+            @refresh-balance="refreshBalance"
+            @pay="handlePayActionFromComponent"
+          />
         </div>
       </div>
     </div>
 
     <!-- 弹窗组件 -->
-    <!-- BalanceNotEnoughModal removed -->
     
     <PaySuccessModal 
       v-if="showPaySuccess" 
@@ -204,13 +122,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, Timer, InfoFilled, ArrowRight, Wallet, Select, Refresh, QuestionFilled, ArrowDown } from '@element-plus/icons-vue'
+import { ArrowLeft, Timer, InfoFilled, QuestionFilled, ArrowDown } from '@element-plus/icons-vue'
 import { useCheckout } from '@/composables/client/useCheckout'
 // BalanceNotEnoughModal import removed
 import PaySuccessModal from '@/components/pc/modal/PaySuccessModal.vue'
 import CouponSelectorModal from '@/components/pc/modal/business/CouponSelectorModal.vue'
 import WalletRechargeModal from '@/components/pc/modal/business/WalletRechargeModal.vue'
 import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
+import CheckoutOrderList from '@/components/pc/checkout/CheckoutOrderList.vue'
+import CheckoutSummary from '@/components/pc/checkout/CheckoutSummary.vue'
 
 definePageMeta({
   layout: 'pc', ssr: false })
@@ -247,9 +167,8 @@ const {
   loadPreOrders,
   handleCouponSelect,
   handlePay,
-  formatSpec,
-  refreshBalance, // New
-  refreshingBalance // New
+  refreshBalance, 
+  refreshingBalance 
 } = useCheckout()
 
 // Computed
@@ -261,12 +180,8 @@ const preOrderIds = computed(() => {
   return []
 })
 
-const isBalanceInsufficient = computed(() => {
-    return userBalance.value < finalPayAmount.value
-})
-
-const handlePayAction = () => {
-    if (isBalanceInsufficient.value) {
+const handlePayActionFromComponent = (insufficient: boolean) => {
+    if (insufficient) {
         showRechargeModal.value = true
         return
     }
@@ -390,79 +305,6 @@ const handlePaySuccessClose = () => {
   font-weight: 700;
 }
 
-.order-card {
-  margin-bottom: 20px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.order-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--primary-blue);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
-
-.order-header-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 12px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: var(--text-sub);
-}
-
-.order-body {
-  display: flex;
-  gap: 16px;
-}
-
-.product-thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15); /* Slightly lighter border */
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.2); /* Inner shadow effect */
-}
-
-.product-info {
-  flex: 1;
-}
-
-.product-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 8px;
-}
-
-.product-meta-row {
-    display: flex; gap: 12px; align-items: center;
-}
-
-.spec-tag {
-    /* Element Plus Tag Override */
-    --el-tag-bg-color: rgba(255, 255, 255, 0.1);
-    --el-tag-border-color: rgba(255, 255, 255, 0.2);
-    --el-tag-text-color: var(--text-sub);
-}
-
-.product-price {
-  text-align: right;
-}
-
-.price-val {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--active-orange);
-}
-
-.qty {
-  font-size: 13px;
-  color: var(--text-sub);
-  margin-top: 4px;
-}
-
 /* FAQ Section */
 .faq-section {
     margin-top: 24px;
@@ -546,221 +388,6 @@ const handlePaySuccessClose = () => {
 .summary-section {
   display: flex;
   flex-direction: column;
-}
-
-.sticky-card {
-  /* position: sticky;  Removed to enforce equal height alignment as requested */
-  /* top: 100px; */
-  height: 100%;       /* Force full height */
-  min-height: 480px;
-  display: flex; 
-  flex-direction: column;
-}
-
-.card-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 24px 0;
-  color: #fff;
-  border-left: 4px solid var(--primary-blue);
-  padding-left: 12px;
-}
-
-.price-rows {
-  margin-bottom: 24px;
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-  font-size: 14px;
-  color: var(--text-sub);
-}
-
-.val {
-  color: var(--text-main);
-  font-weight: 500;
-}
-
-/* Coupon Row */
-.coupon-row {
-  cursor: pointer;
-  padding: 8px 0;
-  transition: opacity 0.2s;
-}
-
-.coupon-row:hover {
-  opacity: 0.8;
-}
-
-.coupon-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.discount-tag {
-  border: none;
-  background: rgba(239, 68, 68, 0.2);
-  color: #F87171;
-}
-
-.coupon-action {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.placeholder {
-  color: var(--text-sub);
-  font-size: 13px;
-}
-
-.val.discount {
-  color: #EF4444;
-}
-
-.divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 20px 0;
-}
-
-.price-row.total .val.final {
-  font-size: 28px;
-  color: var(--active-orange);
-  font-weight: 700;
-  text-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
-}
-
-/* Payment Method */
-.payment-method {
-    flex: 1; /* Push others */
-}
-.method-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-sub);
-  margin-bottom: 16px;
-}
-
-.balance-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: rgba(23, 143, 198, 0.1);
-  border: 1px solid rgba(23, 143, 198, 0.3);
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 32px;
-  position: relative;
-  transition: all 0.2s;
-}
-
-.balance-card.active {
-  background: rgba(23, 143, 198, 0.15);
-  border-color: var(--primary-blue);
-  box-shadow: 0 4px 20px rgba(23, 143, 198, 0.15);
-}
-
-.balance-icon {
-  font-size: 28px;
-  color: var(--primary-blue);
-}
-
-.balance-info {
-  flex: 1;
-}
-
-.method-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.user-balance-row {
-    display: flex; align-items: center; gap: 8px; margin-top: 4px;
-}
-
-.user-balance {
-  font-size: 13px;
-  color: var(--text-sub);
-}
-.refresh-btn {
-    padding: 0; height: auto;
-}
-.refresh-btn :deep(.el-icon) {
-    font-size: 14px; color: var(--text-sub);
-}
-.refresh-btn:hover :deep(.el-icon) {
-    color: var(--active-orange);
-}
-
-.check-mark {
-  margin-left: auto;
-  color: var(--primary-blue);
-  font-weight: bold;
-  font-size: 18px;
-}
-
-/* Action Area */
-.pay-btn {
-  width: 100%;
-  background: linear-gradient(90deg, var(--active-orange) 0%, #FB923C 100%);
-  color: #fff;
-  border: none;
-  padding: 16px;
-  border-radius: 14px;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-}
-
-.pay-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
-}
-
-.pay-btn.insufficient {
-    background: #334155;
-    box-shadow: none;
-    color: #94A3B8;
-}
-.pay-btn.insufficient:hover {
-    background: #475569;
-    color: #fff;
-}
-
-.pay-btn:disabled {
-  background: #1e293b;
-  color: #64748B;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.agreement-text {
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-sub);
-  margin-top: 16px;
-}
-
-.agreement-text a {
-  color: var(--primary-blue);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.agreement-text a:hover {
-  color: var(--active-orange);
 }
 
 /* Loading/Error */

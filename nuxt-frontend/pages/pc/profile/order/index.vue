@@ -173,12 +173,13 @@ import { useOrderList } from '@/composables/client/useOrderList'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import BaseModal from '@/components/shared/BaseModal.vue'
+import { useBizFormat } from '@/composables/common/useBizFormat'
 
 definePageMeta({
   layout: 'pc', ssr: false })
 
 const router = useRouter()
-
+const { formatDate: formatTime } = useBizFormat()
 const {
   loading: listLoading, // Rename because useInfiniteScroll has 'loading'
   filteredList,
@@ -189,7 +190,6 @@ const {
   deletePreOrder,
   formatSpec,
   getCurrentTabLabel,
-  formatDate,
   getOrderStatusLabel
 } = useOrderList()
 
@@ -216,7 +216,6 @@ const switchTab = (tabValue: string) => {
 
 // --- Methods ---
 const getStatusText = (status: string) => getOrderStatusLabel(status)
-const formatTime = (time: string) => formatDate(time)
 
 // 核心跳转逻辑 (Smart Intercept)
 const handleItemClick = (item: any) => {

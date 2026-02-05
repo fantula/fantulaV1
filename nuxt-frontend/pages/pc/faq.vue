@@ -33,50 +33,26 @@
           </button>
         </div>
 
-        <!-- 常见问题解答标题板块 (已删除) -->
-
-
         <!-- 问题列表板块 -->
         <div class="faq-list-section">
           <div v-if="loading" class="loading-state">加载中...</div>
           <div v-else-if="filteredFaqs.length === 0" class="empty-state">暂无相关问题</div>
           <div v-else class="faq-card-list">
-            <div 
-              v-for="(faq, index) in filteredFaqs" 
+            <!-- Extract: FaqAccordionItem -->
+            <FaqAccordionItem 
+              v-for="faq in filteredFaqs" 
               :key="faq.id"
-              :class="['faq-card', { active: expandedId === faq.id }]"
-              @click="toggleFaq(faq.id)"
-            >
-              <div class="faq-card-header">
-                <div class="q-badge">Q</div>
-                <div class="faq-question-text">{{ faq.question }}</div>
-                <div class="toggle-icon">
-                  <el-icon><Plus /></el-icon>
-                </div>
-              </div>
-              
-              <div class="faq-card-body-grid" :class="{ 'is-expanded': expandedId === faq.id }">
-                <div class="min-h-0-wrapper">
-                  <div class="answer-wrapper">
-                    <div class="a-badge">A</div>
-                    <div class="faq-answer-text">{{ faq.answer }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              :id="`faq-${faq.id}`"
+              :question="faq.question"
+              :answer="faq.answer"
+              :is-expanded="expandedId === faq.id"
+              @toggle="toggleFaq(faq.id)"
+            />
           </div>
         </div>
 
-        <div class="contact-section">
-          <h3 class="contact-title">没有找到您的问题？</h3>
-          <p class="contact-desc">我们的客服团队随时为您提供帮助，平均响应时间不超过3分钟，解决率高达99.8%!</p>
-          <button class="contact-btn">
-            <span class="contact-icon">
-              <el-icon><Service /></el-icon>
-            </span>
-            联系在线客服
-          </button>
-        </div>
+        <!-- Extract: SupportContactCard -->
+        <SupportContactCard />
       </div>
     </div>
 
@@ -89,8 +65,9 @@ definePageMeta({
 })
 
 import { ref, computed, onMounted } from 'vue'
-import { InfoFilled, Right, Plus, Service } from '@element-plus/icons-vue'
 import { supabaseFaqApi } from '@/api/client/supabase'
+import FaqAccordionItem from '@/components/pc/faq/FaqAccordionItem.vue'
+import SupportContactCard from '@/components/pc/support/SupportContactCard.vue'
 
 useHead({
   title: '常见问题 - 凡图拉',
@@ -193,7 +170,7 @@ onMounted(async () => {
         
         // Scroll to item after a short delay for DOM update
         setTimeout(() => {
-            const el = document.getElementById(`faq-${qId}`) // We need to add ID to the element
+            const el = document.getElementById(`faq-${qId}`)
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' })
             }
@@ -355,38 +332,6 @@ onMounted(async () => {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* FAQ Header Section */
-.faq-header-section {
-  background: rgba(59, 130, 246, 0.1) !important;
-  padding: 20px 30px;
-  border-radius: 16px 16px 0 0;
-  margin-bottom: 0;
-  display: flex;
-  justify-content: flex-start;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: none;
-}
-
-.faq-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.faq-icon img {
-  width: 24px;
-  height: 24px;
-  display: block;
-  filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.5));
-}
-
-.faq-title {
-  font-weight: 600;
-  font-size: 18px;
-  color: #60A5FA !important; /* Blue-400 */
-  margin: 0;
-}
-
 /* FAQ List - Card Style Redesign */
 .faq-list-section {
   background: transparent !important; /* Remove container bg */
@@ -399,173 +344,5 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.faq-card {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-.faq-card:hover {
-  background: rgba(30, 41, 59, 0.6);
-  border-color: rgba(96, 165, 250, 0.3); /* Blue hint */
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.faq-card.active {
-  background: rgba(30, 41, 59, 0.8);
-  border-color: rgba(96, 165, 250, 0.5);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* Card Header */
-.faq-card-header {
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.q-badge {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(96, 165, 250, 0.1);
-  color: #60A5FA;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-family: 'Outfit', sans-serif;
-  font-size: 16px;
-}
-
-.faq-question-text {
-  flex: 1; /* Keep flex: 1 but control width via max-width? No, remove flex: 1 if we want strict width, OR keep it and separate via margin-left auto on icon */
-  /* Actually, to support "narrow text" but "icon on far right": 
-     Text should take available space but STOP at 50%. 
-     Icon should stay at end. 
-     Solution: Text max-width 50%, Icon margin-left auto. */
-  flex: 0 1 auto; /* Don't grow indefinitely, but allow shrink */
-  font-size: 17px;
-  font-weight: 600;
-  color: #F1F5F9;
-  letter-spacing: 0.2px;
-  max-width: 50%; /* 继续收窄至 50% */
-  line-height: 1.5;
-}
-
-.toggle-icon {
-  margin-left: auto; /* Push to far right */
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94A3B8;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s;
-}
-
-.faq-card.active .toggle-icon {
-  transform: rotate(135deg); /* Rotate Plus to X */
-  color: #F97316; /* Orange active */
-}
-
-/* Card Body (Answer) */
-/* Card Body (Answer) - Grid Animation Trick */
-.faq-card-body-grid {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.faq-card-body-grid.is-expanded {
-  grid-template-rows: 1fr;
-}
-
-.min-h-0-wrapper {
-  overflow: hidden;
-  min-height: 0;
-}
-
-.answer-wrapper {
-  padding: 0 24px 24px 72px; /* Indent to align with text */
-  display: flex;
-  gap: 16px;
-  opacity: 0.9;
-}
-
-.a-badge {
-  display: none; /* Hidden for cleaner look, or enable if wanted */
-}
-
-.faq-answer-text {
-  font-size: 15px;
-  line-height: 1.8;
-  color: #94A3B8;
-  /* Width constraint as requested (narrower) */
-  max-width: 75%; 
-}
-
-/* Override previous styles */
-/* Override previous styles */
-.faq-question, .faq-answer { display: none; }
-
-.contact-section {
-  background: rgba(15, 23, 42, 0.6) !important; /* Darker Glass */
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: none;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.contact-title {
-  font-weight: 600;
-  font-size: 24px;
-  color: white !important;
-  margin-bottom: 15px;
-}
-
-.contact-desc {
-  font-size: 16px;
-  color: #94A3B8 !important;
-  margin-bottom: 30px;
-  line-height: 1.6;
-}
-
-.contact-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 32px;
-  background: linear-gradient(135deg, #F97316 0%, #FB923C 100%) !important; /* Orange Gradient for Support */
-  color: white !important;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-}
-
-.contact-btn:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
-}
-
-.contact-icon .el-icon {
-  font-size: 20px;
-  color: #fff;
 }
 </style>

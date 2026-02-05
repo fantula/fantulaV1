@@ -1,87 +1,94 @@
 <template>
-  <Transition name="modal-fade">
-    <div class="modal-backdrop" @click.self="$emit('close')">
-      <div class="modal-container">
-        
-        <!-- Decoration -->
-        <div class="glow-effect"></div>
-
-        <!-- Header -->
-        <div class="modal-header">
-           <div class="header-content">
+  <BaseModal
+    :visible="true"
+    title="联系图拉"
+    width="680px"
+    :show-close="true"
+    :show-footer="false"
+    theme-id="suit-001"
+    @close="$emit('close')"
+  >
+    <!-- Header Content injected via default slot or just part of body? 
+         BaseModal has a title prop, but ServiceModal had a custom header with logo and subtitle.
+         We can keep the custom header inside the body for now to preserve exact look, 
+         OR we can use BaseFormModal if it fits better, but BaseModal is more flexible.
+         
+         Decision: The original design had a very specific header layout with logo and subtitle inside the modal body area 
+         (visually). BaseModal's title is standard.
+         Let's try to adapt to BaseModal's standard title "联系图拉" and put the subtitle/logo inside the body content 
+         to maintain the rich feel, or use the subtitle slot if we switch to BaseFormModal.
+         
+         However, BaseModal is cleaner. Let's put the Logo and Subtitle at the top of the body.
+    -->
+    
+    <div class="service-modal-content">
+        <!-- Brand Header (Custom) -->
+        <div class="brand-header">
              <img src="/images/shared/logo_v3.png" alt="Logo" class="brand-logo" />
-             <h2 class="title">联系图拉</h2>
-             <p class="subtitle">7x24小时为您提供专业服务</p>
-           </div>
-           <button class="close-btn" @click="$emit('close')">
-             <el-icon><Close /></el-icon>
-           </button>
+             <p class="brand-subtitle">7x24小时为您提供专业服务</p>
         </div>
 
-        <!-- Content -->
-        <div class="modal-body">
-           <!-- QR Code Grid -->
-           <div class="qr-grid">
-              
-              <!-- WeChat -->
-              <div class="qr-card wechat">
-                 <div class="qr-box">
-                    <img :src="config.wechat_qr" class="qr-img" />
-                    <div class="scan-tip">
-                        <el-icon><Aim /></el-icon> 扫码添加
-                    </div>
-                 </div>
-                 <div class="info-box">
-                    <div class="icon-label">
-                        <el-icon color="#07C160"><ChatDotRound /></el-icon>
-                        <span class="label">微信客服</span>
-                    </div>
-                    <div class="value copyable" @click="copyText(config.wechat_id)">
-                        {{ config.wechat_id }} <el-icon class="copy-icon"><CopyDocument /></el-icon>
-                    </div>
-                 </div>
-              </div>
+        <!-- QR Code Grid -->
+        <div class="qr-grid">
+            
+            <!-- WeChat -->
+            <div class="qr-card wechat">
+                <div class="qr-box">
+                <img :src="config.wechat_qr" class="qr-img" />
+                <div class="scan-tip">
+                    <el-icon><Aim /></el-icon> 扫码添加
+                </div>
+                </div>
+                <div class="info-box">
+                <div class="icon-label">
+                    <el-icon color="#07C160"><ChatDotRound /></el-icon>
+                    <span class="label">微信客服</span>
+                </div>
+                <div class="value copyable" @click="copyText(config.wechat_id)">
+                    {{ config.wechat_id }} <el-icon class="copy-icon"><CopyDocument /></el-icon>
+                </div>
+                </div>
+            </div>
 
-              <!-- Telegram -->
-              <div class="qr-card telegram">
-                 <div class="qr-box">
-                    <img :src="config.telegram_qr" class="qr-img" />
-                    <div class="scan-tip">
-                        <el-icon><Aim /></el-icon> 扫码添加
-                    </div>
-                 </div>
-                 <div class="info-box">
-                    <div class="icon-label">
-                        <el-icon color="#2AABEE"><Position /></el-icon>
-                        <span class="label">Telegram</span>
-                    </div>
-                    <div class="value copyable" @click="copyText(config.telegram_id)">
-                        {{ config.telegram_id }} <el-icon class="copy-icon"><CopyDocument /></el-icon>
-                    </div>
-                 </div>
-              </div>
+            <!-- Telegram -->
+            <div class="qr-card telegram">
+                <div class="qr-box">
+                <img :src="config.telegram_qr" class="qr-img" />
+                <div class="scan-tip">
+                    <el-icon><Aim /></el-icon> 扫码添加
+                </div>
+                </div>
+                <div class="info-box">
+                <div class="icon-label">
+                    <el-icon color="#2AABEE"><Position /></el-icon>
+                    <span class="label">Telegram</span>
+                </div>
+                <div class="value copyable" @click="copyText(config.telegram_id)">
+                    {{ config.telegram_id }} <el-icon class="copy-icon"><CopyDocument /></el-icon>
+                </div>
+                </div>
+            </div>
 
-           </div>
         </div>
 
-        <!-- Footer -->
-        <div class="modal-footer">
+        <!-- Footer Info -->
+        <div class="service-footer">
             <div class="service-tag">
                 <el-icon><Timer /></el-icon>
                 <span>在线时间: {{ config.service_time }}</span>
             </div>
         </div>
-
-      </div>
     </div>
-  </Transition>
+
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { Close, ChatDotRound, Position, Timer, CopyDocument, Aim } from '@element-plus/icons-vue'
-import { useSystemConfig } from '@/composables/client/useSystemConfig' // Assuming this exists or create it
+import { ChatDotRound, Position, Timer, CopyDocument, Aim } from '@element-plus/icons-vue'
+import { useSystemConfig } from '@/composables/client/useSystemConfig'
 import { ElMessage } from 'element-plus'
+import BaseModal from '@/components/shared/BaseModal.vue'
 
 defineEmits(['close'])
 
@@ -112,99 +119,33 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-container {
-    position: relative;
-    width: 680px;
-    background: rgba(20, 20, 25, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+.service-modal-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden;
-}
-
-.glow-effect {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at center, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
+    gap: 32px;
 }
 
 /* Header */
-.modal-header {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 32px;
-}
-.header-content {
+.brand-header {
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
-}
-.brand-logo {
-    height: 40px;
-    width: auto;
     margin-bottom: 8px;
 }
-.title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
+.brand-logo {
+    height: 36px;
+    width: auto;
 }
-.subtitle {
-    font-size: 14px;
+.brand-subtitle {
+    font-size: 13px;
     color: #94a3b8;
     margin: 0;
 }
-.close-btn {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: rgba(255,255,255,0.05);
-    border: none;
-    color: #94a3b8;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-}
-.close-btn:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    transform: rotate(90deg);
-}
 
-/* Content */
-.modal-body {
-    width: 100%;
-    z-index: 1;
-}
-
+/* Internal Layout preserved but cleaned up */
 .qr-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -229,11 +170,10 @@ onMounted(() => {
 }
 .qr-box {
     position: relative;
-    width: 180px;
-    height: 180px;
-    background: #fff; /* Restored white background */
+    width: 160px; /* Slightly smaller to fit constrained width if needed */
+    height: 160px;
+    background: #fff;
     border-radius: 12px;
-    padding: 0; /* REMOVED white edge/padding as requested */
     margin-bottom: 20px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -241,20 +181,16 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
 }
-.qr-box:hover {
-    transform: none; /* Removed scale effect for cleaner feel */
-}
 .qr-img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Ensure code is visible */
+    object-fit: contain;
     border-radius: 12px;
 }
 .scan-tip {
     position: absolute;
     bottom: 0px;
-    left: 0;
-    right: 0;
+    left: 0; right: 0;
     background: rgba(0,0,0,0.6);
     color: #fff;
     font-size: 12px;
@@ -271,75 +207,33 @@ onMounted(() => {
     text-align: center;
 }
 .icon-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 6px;
-    font-size: 14px;
-    color: #e2e8f0;
-    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-bottom: 6px;
+    font-size: 14px; color: #e2e8f0; font-weight: 500;
 }
 .value {
-    color: #94a3b8;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: color 0.2s;
+    color: #94a3b8; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; cursor: pointer; transition: color 0.2s;
 }
 .value:hover { color: #fff; }
 .copy-icon { opacity: 0.5; }
 
-/* Wechat Specifics */
+/* Wechat/Telegram Specifics */
 .wechat .qr-card:hover { border-color: rgba(7, 193, 96, 0.3); }
-
-/* Telegram Specifics */
 .telegram .qr-card:hover { border-color: rgba(42, 171, 238, 0.3); }
 
 /* Footer */
-.modal-footer {
-    margin-top: 32px;
-    z-index: 1;
-}
 .service-tag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; align-items: center; gap: 8px;
     padding: 8px 16px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
-    color: #94a3b8;
-    font-size: 13px;
+    color: #94a3b8; font-size: 13px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Animations */
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-
-.modal-fade-enter-active .modal-container {
-    animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.modal-fade-leave-active .modal-container {
-    animation: modal-pop 0.2s reverse ease-in;
-}
-
-@keyframes modal-pop {
-    0% { transform: scale(0.95); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
 @media (max-width: 640px) {
-    .modal-container { width: 95vw; padding: 24px; }
     .qr-grid { grid-template-columns: 1fr; }
     .qr-card { flex-direction: row; padding: 16px; gap: 16px; }
     .qr-box { width: 80px; height: 80px; margin-bottom: 0; }
@@ -347,14 +241,12 @@ onMounted(() => {
     .icon-label, .value { justify-content: flex-start; }
 }
 
-/* Telegram Specific Override: Remove white box for the dark poster */
+/* Telegram Override */
 .telegram .qr-box {
     background: transparent;
     box-shadow: none;
 }
 .telegram .qr-img {
-    border-radius: 8px;
-    /* Optional: Add a subtle drop shadow to the image itself instead of the box */
     filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
 }
 </style>

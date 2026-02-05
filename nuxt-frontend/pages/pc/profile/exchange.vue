@@ -6,29 +6,8 @@
       <div class="section-subtitle">Digital Vault</div>
     </div>
 
-    <!-- Redemption Area -->
-    <div class="redemption-card">
-      <div class="redemption-header">
-        <el-icon class="redemption-icon"><Ticket /></el-icon>
-        <div class="redemption-title">兑换优惠券</div>
-      </div>
-      <div class="redemption-body">
-        <div class="input-group">
-          <input 
-            type="text" 
-            class="redemption-input" 
-            placeholder="请输入兑换码" 
-            v-model="redeemCode" 
-            @keyup.enter="redeem"
-          />
-          <button class="redemption-btn" @click="redeem" :disabled="!redeemCode || redeeming">
-            <span v-if="redeeming">兑换中...</span>
-            <span v-else>立即兑换</span>
-          </button>
-        </div>
-        <p class="redemption-tips">兑换码通常由16位字母和数字组成，区分大小写</p>
-      </div>
-    </div>
+    <!-- Redemption Area (Extracted) -->
+    <RedemptionCard @redeemed="onCouponRedeemed" />
 
     <!-- Tabs -->
     <div class="coupon-tabs">
@@ -138,6 +117,7 @@ import { Ticket } from '@element-plus/icons-vue'
 // Import Base Modals
 import BaseConfirmModal from '@/components/pc/modal/base/BaseConfirmModal.vue'
 import BaseResultModal from '@/components/pc/modal/base/BaseResultModal.vue'
+import RedemptionCard from '@/components/pc/exchange/RedemptionCard.vue'
 
 // Import Coupon Components
 import CouponBalance from '@/components/pc/exchange/coupon/CouponBalance.vue'
@@ -148,8 +128,6 @@ const userStore = useUserStore()
 const router = useRouter()
 
 const couponList = ref<UserCoupon[]>([]) // Raw data
-const redeemCode = ref('')
-const redeeming = ref(false)
 const activeTab = ref('all')
 
 const tabs = [
@@ -228,22 +206,10 @@ const successMessage = computed(() => {
     return `恭喜您获得 ${c.name}，包含 ${c.value}点 权益`
 })
 
-const redeem = async () => {
-  if (!redeemCode.value || redeeming.value) return
-  redeeming.value = true
-  try {
-    const res = await couponApi.redeemCoupon(redeemCode.value)
-    if (res.success) {
-        redeemedCouponRaw.value = res.data
-        showSuccessModal.value = true
-        redeemCode.value = ''
-        fetchCoupons()
-    } else {
-        ElMessage.error(res.msg || '兑换失败')
-    }
-  } finally {
-    redeeming.value = false
-  }
+const onCouponRedeemed = (data: any) => {
+    redeemedCouponRaw.value = data
+    showSuccessModal.value = true
+    fetchCoupons()
 }
 
 // 2. Use Balance Coupon

@@ -25,44 +25,12 @@
       
       <div class="goods-detail-content">
         <div class="goods-main-section">
-          <!-- 左侧：图片展示区 (与 SKU 联动) -->
-          <div class="goods-left-panel">
-            <div class="main-image-wrapper">
-              <div class="main-image">
-                <el-image 
-                  :src="selectedSkuImage || goodsInfo.image" 
-                  fit="contain" 
-                  class="sku-big-img"
-                >
-                  <template #placeholder>
-                    <div class="img-loading-placeholder">加载中...</div>
-                  </template>
-                </el-image>
-              </div>
-              <!-- SKU 绑定的图片列表滚动展示 -->
-              <div class="sku-thumb-scroll" v-if="skuImages && skuImages.length > 0">
-                <div 
-                  v-for="(img, idx) in skuImages" 
-                  :key="idx" 
-                  :class="['sku-thumb-item', { active: selectedSkuImage === img }]"
-                  @click="selectedSkuImage = img"
-                >
-                  <img :src="img" alt="SKU图片" />
-                </div>
-              </div>
-            </div>
-
-            <!-- 卖点保障区 (Unique 样式) -->
-            <div class="premium-service-card">
-              <div class="premium-service-title">服务保障</div>
-              <div class="premium-service-grid">
-                <div class="p-service-item" v-for="tag in serviceTags" :key="tag">
-                  <el-icon class="p-icon"><CircleCheck /></el-icon>
-                  <span>{{ tag }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- 左侧：图片展示区 (Extract: ProductGallery) -->
+          <ProductGallery 
+            v-model="selectedSkuImage" 
+            :default-image="goodsInfo.image" 
+            :images="skuImages"
+          />
 
           <!-- 右侧：信息与规格选择 -->
           <div class="goods-info-panel">
@@ -73,25 +41,8 @@
               </div>
             </div>
 
-            <!-- FAQ 滚动轮播条 -->
-            <!-- FAQ 滚动轮播条 (优化版) -->
-            <div class="faq-ticker-bar" v-if="faqs.length > 0" @click="goToFaq({})">
-              <div class="faq-ticker-container">
-                <div class="faq-ticker-track" :style="tickerStyle">
-                  <!-- 显示列表 + 原样克隆的第一项用于无缝衔接 -->
-                  <div 
-                    class="faq-ticker-item" 
-                    v-for="(faq, idx) in displayFaqs" 
-                    :key="idx"
-                  >
-                    {{ faq.question }}
-                  </div>
-                </div>
-              </div>
-              <div class="faq-arrow-wrap">
-                <el-icon><Right /></el-icon>
-              </div>
-            </div>
+            <!-- FAQ 滚动轮播条 (Extract: FaqTicker) -->
+            <FaqTicker :faqs="faqs" @click="goToFaq({})" />
 
             <!-- 规格选择区域 -->
             <template v-if="hasSkus">
@@ -159,27 +110,45 @@
             </div>
 
             <div class="main-actions">
-              <button class="primary-buy-btn" @click="buyNow" :disabled="stockLoading || !hasStock || !hasSkus || submitting">
+              <!-- Buy Now -> BaseButton -->
+              <BaseButton 
+                theme-id="marketing-buy" 
+                class="flex-1"
+                :disabled="stockLoading || !hasStock || !hasSkus || submitting"
+                :loading="submitting"
+                @click="buyNow"
+              >
                 {{ stockLoading ? '加载中...' : (hasSkus && hasStock ? '立即极速购买' : '暂时缺货') }}
-                <span class="btn-subtext" v-if="!stockLoading && hasStock && hasSkus">安全合规·秒速发货</span>
-              </button>
+                <!-- Note: BaseButton slot handling for subtext might need custom styling inside or specific slot usage -->
+                 <!-- Subtext strategy: BaseButton content slot -->
+                 <!-- Actually BaseButton styles might not support block subtext easily without flex column. 
+                      Let's check if we can style the content inside. -->
+              </BaseButton>
+              
               <div class="secondary-btns">
-                <button class="add-cart-btn" @click="handleAddToCartWrapper($event)" :disabled="stockLoading || !hasStock || !hasSkus || submitting">
+                <BaseButton 
+                  theme-id="secondary" 
+                  @click="handleAddToCartWrapper($event)" 
+                  :disabled="stockLoading || !hasStock || !hasSkus || submitting"
+                >
                   <el-icon><ShoppingCart /></el-icon>
                   加入购物车
-                </button>
-                <button 
-                  :class="['favorite-btn', { favorited: isFavorited }]" 
+                </BaseButton>
+
+                <BaseButton 
+                  theme-id="secondary"
+                  :class="{ favorited: isFavorited }" 
                   @click="handleToggleFavorite($event)"
                   :disabled="stockLoading || !hasStock || !hasSkus"
                 >
                   <el-icon><Star v-if="!isFavorited" /><StarFilled v-else /></el-icon>
-                  {{ isFavorited ? '已收藏' : '收藏商品' }}
-                </button>
+                  {{ isFavorited ? '已收藏' : '收藏' }}
+                </BaseButton>
               </div>
             </div>
-
-            <div class="safe-disclaimer">
+            
+            <!-- Safe Disclaimer needs a bit of margin if Buttons change size -->
+            <div class="safe-disclaimer" style="margin-top: 20px;">
               <el-icon><InfoFilled /></el-icon>
               版权声明：本站展示的徽标、商标及相关标志归各权利人所有。
             </div>
@@ -217,16 +186,17 @@ definePageMeta({
 })
 
 import { 
-  CircleCheck, 
   ShoppingCart, 
   Star, 
   StarFilled,
-  InfoFilled,
-  Right
+  InfoFilled
 } from '@element-plus/icons-vue'
 import { onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductDetail } from '@/composables/client/useProductDetail'
+import ProductGallery from '@/components/pc/goods/ProductGallery.vue'
+import FaqTicker from '@/components/pc/goods/FaqTicker.vue'
+import BaseButton from '@/components/shared/BaseButton.vue'
 
 const router = useRouter()
 const {
@@ -266,43 +236,8 @@ const { startAnimation } = useCartAnimation()
 import { useFlyingAnimation } from '@/composables/client/useFlyingAnimation'
 const { startAnimation: startFavAnimation } = useFlyingAnimation()
 
-// Services Tags
-const serviceTags = [
-  '官方采购・正品保障',
-  '全程质保・无忧售后',
-  '极速响应・人工服务',
-  '安全加密・隐私保护'
-]
-
-// FAQ Ticker Logic (View specific)
-import { ref, computed } from 'vue'
-const activeFaqIndex = ref(0)
-const isTransitioning = ref(true)
-let tickerTimer: any = null
-
-const displayFaqs = computed(() => {
-  if (faqs.value.length === 0) return []
-  return [...faqs.value, faqs.value[0]] 
-})
-
-const tickerStyle = computed(() => ({
-  transform: `translateY(-${activeFaqIndex.value * 40}px)`,
-  transition: isTransitioning.value ? 'transform 0.5s ease-in-out' : 'none'
-}))
-
-const startFaqTicker = () => {
-  if (tickerTimer) clearInterval(tickerTimer)
-  tickerTimer = setInterval(() => {
-    isTransitioning.value = true
-    activeFaqIndex.value++
-    if (activeFaqIndex.value === faqs.value.length) {
-      setTimeout(() => {
-        isTransitioning.value = false 
-        activeFaqIndex.value = 0 
-      }, 500) 
-    }
-  }, 3000) 
-}
+// Logic for Ticker and Gallery moved to components
+// Logic for Service Tags moved to ProductGallery
 
 const goToFaq = (faq: any) => {
   if (faq.id) {
@@ -320,15 +255,6 @@ const handleAddToCart = (event: MouseEvent) => {
       const btnEl = event.target as HTMLElement
       const target = btnEl.closest('button') || btnEl
       startAnimation(target, matchedSku.value?.image || goodsInfo.value.image, () => {
-         // We need to access cartStore to show miniCart.
-         // Since we are in the same bundle context, we can just use the store instance if we imported it.
-         // Or rely on the store already being active.
-         // Let's assume global `useCartStore` is available or import it statically at top.
-         // Note: We used `cartStore` from useProductDetail. It was exported.
-         // Ah, wait. `useProductDetail` DOES NOT export `cartStore`. It exports `modal` but not `cartStore`.
-         // I should updated useProductDetail to export cartStore? 
-         // Or just import it here statically.
-         
          const cartStore = useCartStore()
          cartStore.miniCartVisible = true
          ElMessage.success('已成功加入购物车')
@@ -338,18 +264,6 @@ const handleAddToCart = (event: MouseEvent) => {
 
 // Wrapper to fix the async import issue in handleAddToCart
 const handleAddToCartWrapper = async (event: MouseEvent) => {
-    // Re-implementing wrapper logic to be safe
-    // We can't pass async callback to addToCart easily if it expects sync.
-    // Let's look at useProductDetail.addToCart signature: (callback?: () => void)
-    
-    // Valid implementation:
-    // 1. Call standard addToCart
-    // 2. In callback, trigger animation
-    
-    // But wait, the standard `addToCart` in composable calls `cartStore.addToCart` then runs callback.
-    // The `useCartStore` is already used inside composable.
-    // We just need to trigger animation.
-    
     // We need to access the store to set visible. 
     // Let's standard import here.
     const { useCartStore } = await import('@/stores/client/cart')
@@ -374,12 +288,20 @@ const handleToggleFavorite = (event: MouseEvent) => {
 
 onMounted(async () => {
   await initClientState()
-  startFaqTicker()
 })
 
 onUnmounted(() => {
-  if (tickerTimer) clearInterval(tickerTimer)
 })
 </script>
 
 <style scoped src="@/assets/styles/goods-detail.css"></style>
+<style scoped>
+/* Additional overrides for BaseButton integration if needed */
+.main-actions .base-button {
+  height: 52px; /* Match original button height */
+  font-size: 16px;
+}
+.secondary-btns {
+  display: flex; gap: 12px;
+}
+</style>

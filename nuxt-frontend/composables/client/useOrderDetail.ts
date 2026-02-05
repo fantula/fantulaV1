@@ -18,6 +18,9 @@ export interface OrderDetail {
     productName: string
     productImage: string
     skuSpec: string
+    // Raw snapshots for components that need them
+    product_snapshot?: any
+    sku_snapshot?: any
 }
 
 export interface CdkItem {
@@ -118,9 +121,9 @@ export function useOrderDetail(orderId: string) {
     }
 
     // --- Slot CDK Lookup ---
-    const getCdkForSlot = (slot: SlotItem): CdkItem | {} => {
-        if (!slot || !slot.cdk_id) return {}
-        return cdkList.value.find(c => c.id === slot.cdk_id) || {}
+    const getCdkForSlot = (slot: SlotItem): CdkItem => {
+        if (!slot || !slot.cdk_id) return {} as CdkItem
+        return (cdkList.value.find(c => c.id === slot.cdk_id) || {}) as CdkItem
     }
 
     // --- Data Loading ---
@@ -151,7 +154,10 @@ export function useOrderDetail(orderId: string) {
                     productImage: pSnap.image || '',
                     skuSpec: sSnap.spec_combination
                         ? Object.values(sSnap.spec_combination).join(' ')
-                        : '默认'
+                        : '默认',
+                    // Include raw snapshots for components
+                    product_snapshot: pSnap,
+                    sku_snapshot: sSnap
                 }
 
                 // Parse CDKs
@@ -266,6 +272,7 @@ export function useOrderDetail(orderId: string) {
         getAmountInteger,
         getAmountDecimal,
         getFieldsForCdk,
+        // --- Slot CDK Lookup ---
         getCdkForSlot,
 
         // Actions

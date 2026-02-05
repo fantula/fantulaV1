@@ -92,7 +92,7 @@ const categories = ref<GoodsCategory[]>([])
 const currentGoods = ref<Goods[]>([])
 const activeCategoryId = ref<string | number>('')
 const goodsLoading = ref(false)
-const slideDirection = ref('slide-right')
+
 
 // 分页状态
 const currentPage = ref(1)
@@ -114,7 +114,7 @@ const fetchBanners = async () => {
       banners.value = res.data
       setCache('home_banners', res.data)
     }
-  } catch (error) { console.error('获取轮播图失败:', error) }
+  } catch (error) { /* handle error */ }
 }
 
 // 获取分类数据 (保持不变)
@@ -131,7 +131,7 @@ const fetchCategories = async (): Promise<string | number | null> => {
       setCache('home_categories', res.data)
       return res.data[0].id
     }
-  } catch (error) { console.error('获取分类失败:', error) }
+  } catch (error) { /* handle error */ }
   return null
 }
 
@@ -161,8 +161,7 @@ const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
       limit: PAGE_SIZE 
     })
     
-    // Artificial Delay for Testing Skeleton (Optional, remove in prod)
-    // await new Promise(r => setTimeout(r, 600))
+
 
     const newList = res?.success && res.data?.list ? res.data.list : []
     
@@ -180,7 +179,6 @@ const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
     }
 
   } catch (error) {
-    console.error('获取商品列表失败:', error)
     if (!isLoadMore) currentGoods.value = []
   } finally {
     goodsLoading.value = false
@@ -219,14 +217,6 @@ const initData = async () => {
 
 // 分类切换处理
 const handleCategoryChange = async (categoryId: string | number) => {
-  // 1. Calculate direction
-  const oldIndex = categories.value.findIndex(c => c.id === activeCategoryId.value)
-  const newIndex = categories.value.findIndex(c => c.id === categoryId)
-  
-  if (oldIndex !== -1 && newIndex !== -1) {
-    slideDirection.value = newIndex > oldIndex ? 'slide-right' : 'slide-left'
-  }
-
   activeCategoryId.value = categoryId
   
   // Sync URL
@@ -299,36 +289,8 @@ const modal = useModalStore()
   opacity: 0.6;
 }
 
-/* 左右滑动过渡动画 */
 .goods-container {
   min-height: 400px; /* 防止高度坍塌 */
   overflow: hidden;  /* 防止滚动条抖动 */
-}
-
-/* 向右滑动 (点右边按钮) */
-.slide-right-enter-active,
-.slide-right-leave-active,
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-/* 向左滑动 (点左边按钮) */
-.slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-.slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
 }
 </style>
