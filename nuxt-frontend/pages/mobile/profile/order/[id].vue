@@ -63,7 +63,7 @@
        <div class="info-card">
           <div class="prod-row">
              <div class="prod-thumb">
-                <el-image :src="order.productImage" fit="cover" />
+                <img :src="order.productImage" class="prod-img" />
              </div>
              <div class="prod-info">
                 <div class="prod-name">{{ order.productName }}</div>
@@ -135,7 +135,7 @@
        <div class="section-group" v-if="instructionImage && order.status !== 'refunding'">
            <div class="section-title">使用说明</div>
            <div class="tutorial-box" @click="previewImage(instructionImage)">
-              <el-image :src="instructionImage" fit="cover" />
+              <img :src="instructionImage" class="tutorial-img" loading="lazy" />
               <div class="zoom-hint"><el-icon><ZoomIn /></el-icon></div>
            </div>
        </div>
@@ -168,7 +168,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useToast } from '@/composables/mobile/useToast'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, InfoFilled, 
   Box, RefreshLeft, Headset, Tickets, ZoomIn
@@ -192,6 +192,7 @@ definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
 const route = useRoute()
 const router = useRouter()
 const orderId = route.params.id as string
+const { showToast } = useToast()
 
 // --- Use Unified Composable ---
 const {
@@ -248,11 +249,11 @@ const previewImage = (url: string) => {
 }
 
 const copyText = (t: string) => {
-    navigator.clipboard.writeText(t).then(() => ElMessage.success('已复制'))
+    navigator.clipboard.writeText(t).then(() => showToast('已复制', 'success'))
 }
 
 const onTicketSuccess = () => {
-    ElMessage.success('工单已提交')
+    showToast('工单已提交', 'success')
     loadData()
 }
 
@@ -337,7 +338,7 @@ const onTicketSuccess = () => {
 }
 .prod-row { display: flex; gap: 12px; }
 .prod-thumb { width: 72px; height: 72px; border-radius: 8px; overflow: hidden; background: #1E293B; flex-shrink: 0; }
-.prod-thumb .el-image { width: 100%; height: 100%; }
+.prod-img { width: 100%; height: 100%; object-fit: cover; }
 .prod-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .prod-name { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.3; }
 .prod-meta { display: flex; gap: 6px; font-size: 11px; color: #94A3B8; }
@@ -359,7 +360,7 @@ const onTicketSuccess = () => {
     border-radius: 12px; overflow: hidden; position: relative;
     border: 1px solid rgba(255,255,255,0.1);
 }
-.tutorial-box .el-image { display: block; width: 100%; }
+.tutorial-img { display: block; width: 100%; object-fit: cover; }
 .zoom-hint {
     position: absolute; bottom: 8px; right: 8px;
     background: rgba(0,0,0,0.5); color: #fff; padding: 4px;

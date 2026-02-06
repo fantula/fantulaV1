@@ -187,7 +187,8 @@ const {
   tabs,
   loadList,
   changeTab,
-  deletePreOrder,
+  deletePreOrder, // Keep for compatibility if needed, but we use deleteOrder now
+  deleteOrder,
   formatSpec,
   getCurrentTabLabel,
   getOrderStatusLabel
@@ -256,32 +257,25 @@ const openConfirmModal = (item: any, isPreOrder: boolean) => {
 }
 
 // 确认删除
+// 确认删除
 const handleConfirmDelete = async () => {
   if (!confirmTargetItem.value) return
   
   confirmLoading.value = true
   try {
-    if (confirmModalType.value === 'pending') {
-      const success = await deletePreOrder(confirmTargetItem.value.id)
-      if (success) {
-        ElMessage.success('订单已取消')
+    const isPreOrder = confirmModalType.value === 'pending'
+    const success = await deleteOrder(confirmTargetItem.value.id, isPreOrder)
+    
+    if (success) {
+        ElMessage.success(isPreOrder ? '订单已取消' : '记录已清理')
         confirmModalVisible.value = false
-        // Data update done in useOrderList, filteredList updates, composable auto-updates
-      } else {
-        ElMessage.error('操作失败')
-      }
+        // List auto-updates via composable reactivity
     } else {
-      // 模拟历史订单删除
-      // TODO: Call API
-      setTimeout(() => {
-         ElMessage.success('记录已清理')
-         confirmModalVisible.value = false
-         // 前端临时移除效果 (需重新加载列表刷新)
-         loadList() 
-      }, 500)
+        ElMessage.error('操作失败')
     }
   } catch (e) {
     console.error(e)
+    ElMessage.error('操作发生错误')
   } finally {
     confirmLoading.value = false
   }

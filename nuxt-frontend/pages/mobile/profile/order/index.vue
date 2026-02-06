@@ -100,7 +100,7 @@ import { ArrowLeft, Box, Delete, WarningFilled } from '@element-plus/icons-vue'
 import { useOrderList } from '@/composables/client/useOrderList'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import MobileOrderCard from '@/components/mobile/profile/MobileOrderCard.vue'
-import { ElMessage } from 'element-plus'
+import { useToast } from '@/composables/mobile/useToast'
 
 definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
 
@@ -145,6 +145,7 @@ const confirmModalVisible = ref(false)
 const confirmLoading = ref(false)
 const confirmModalType = ref<'pending' | 'cleanup'>('cleanup')
 const confirmTargetItem = ref<any>(null)
+const { showToast } = useToast()
 
 const confirmModalMessage = computed(() => 
   confirmModalType.value === 'pending'
@@ -165,13 +166,13 @@ const handleConfirmDelete = async () => {
         if (confirmModalType.value === 'pending') {
             const success = await deletePreOrder(confirmTargetItem.value.id)
             if (success) {
-                ElMessage.success('订单已取消')
+                showToast('订单已取消', 'success')
                 confirmModalVisible.value = false
-            } else ElMessage.error('操作失败')
+            } else showToast('操作失败', 'error')
         } else {
             // Mock cleanup
             setTimeout(() => {
-                ElMessage.success('记录已清理')
+                showToast('记录已清理', 'success')
                 confirmModalVisible.value = false
                 loadList()
             }, 500)

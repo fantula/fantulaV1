@@ -172,6 +172,7 @@ import { goodsApi } from '@/api/client/goods'
 import { supabaseFaqApi, supabaseProductApi } from '@/api/client/supabase'
 import { useCartStore } from '@/stores/client/cart'
 import { useUserStore } from '@/stores/client/user'
+import { useToast } from '@/composables/mobile/useToast'
 
 const props = defineProps<{
   visible: boolean
@@ -182,6 +183,7 @@ const emit = defineEmits(['update:visible'])
 const router = useRouter()
 const cartStore = useCartStore()
 const userStore = useUserStore()
+const { showToast } = useToast()
 
 // --- State ---
 const loading = ref(false)
@@ -276,22 +278,22 @@ const fetchData = async (id: string) => {
 }
 
 const addToCart = async () => {
-    if (!userStore.isLoggedIn) return ElMessage.warning('请登录')
-    if (!matchedSku.value && skus.value.length > 0) return ElMessage.warning('请选择规格')
+    if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
+    if (!matchedSku.value && skus.value.length > 0) return showToast('请选择规格', 'warning')
     const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id // Fallback if no sku
     
     const res = await cartStore.addToCart(skuId, qty.value)
     if (res.success) {
-        ElMessage.success('已加入购物车')
+        showToast('已加入购物车', 'success')
         handleClose()
     } else {
-        ElMessage.error(res.msg || '失败')
+        showToast(res.msg || '失败', 'error')
     }
 }
 
 const buyNow = async () => {
-     if (!userStore.isLoggedIn) return ElMessage.warning('请登录')
-     if (!matchedSku.value && skus.value.length > 0) return ElMessage.warning('请选择规格')
+     if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
+     if (!matchedSku.value && skus.value.length > 0) return showToast('请选择规格', 'warning')
      const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
 
      const { supabasePreOrderApi } = await import('@/api/client/supabase')
@@ -300,12 +302,12 @@ const buyNow = async () => {
          handleClose()
          router.push(`/mobile/checkout/${res.pre_order_id}`)
      } else {
-         ElMessage.error(res.error || '失败')
+         showToast(res.error || '失败', 'error')
      }
 }
 
-const handleToggleFavorite = () => { isFavorited.value = !isFavorited.value; ElMessage.success(isFavorited.value ? '已收藏' : '已取消') }
-const contactService = () => ElMessage.info('客服连接中...')
+const handleToggleFavorite = () => { isFavorited.value = !isFavorited.value; showToast(isFavorited.value ? '已收藏' : '已取消', 'success') }
+const contactService = () => showToast('客服连接中...', 'info')
 
 watch(() => props.visible, (val) => {
    if (val && props.goodsId) fetchData(String(props.goodsId))

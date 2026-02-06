@@ -1,13 +1,13 @@
 <template>
   <div class="banner-section">
     <!-- Collapsed State -->
-    <div v-if="isCollapsed" class="banner-placeholder-glass" @click="isCollapsed = false">
-         <span class="placeholder-text">查看推荐活动</span>
+    <div v-if="isCollapsed" class="banner-placeholder-glass" @click="toggleCollpase">
+         <span class="placeholder-text text-sm">展开推荐活动</span>
          <ArrowDown class="icon-down" />
     </div>
 
     <!-- Expanded State -->
-    <div v-else class="banner-container-3d" @click="handleBannerClick">
+    <div v-else class="banner-container-3d" @click="toggleCollpase">
       <!-- Glow Underlay -->
       <div class="banner-glow"></div>
       
@@ -38,9 +38,8 @@ defineProps<{
 
 const isCollapsed = ref(false)
 
-const handleBannerClick = () => {
-    // Optional: Tap to collapse or navigate
-    // if (!isCollapsed.value) isCollapsed.value = true
+const toggleCollpase = () => {
+    isCollapsed.value = !isCollapsed.value
 }
 </script>
 
@@ -71,8 +70,9 @@ const handleBannerClick = () => {
 .banner-placeholder-glass:active { 
     transform: scale(0.98); 
     background: rgba(59, 130, 246, 0.1); 
-    color: var(--primary-color); 
+    color: var(--primary); 
 }
+.icon-down { width: 14px; height: 14px; }
 
 /* Main Container */
 .banner-container-3d {

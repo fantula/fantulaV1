@@ -26,7 +26,7 @@
                 spellcheck="false"
              />
              <div v-if="loading" class="input-loader">
-                <el-icon class="is-loading"><Loading /></el-icon>
+                <div class="spinner-sm"></div>
              </div>
           </div>
           
@@ -72,9 +72,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Loading, CircleCheckFilled, WarningFilled, Right } from '@element-plus/icons-vue'
+import { Search, CircleCheckFilled, WarningFilled, Right } from '@element-plus/icons-vue'
 import { getSupabaseClient } from '@/utils/supabase'
-import { ElMessage } from 'element-plus'
+import { useToast } from '@/composables/mobile/useToast'
 
 definePageMeta({
   layout: 'mobile'
@@ -83,6 +83,7 @@ definePageMeta({
 const client = getSupabaseClient()
 const router = useRouter()
 const inputRef = ref<HTMLInputElement | null>(null)
+const { showToast } = useToast()
 
 // State
 type PageState = 'input' | 'bound' | 'pending'
@@ -114,7 +115,7 @@ const handleInput = (e: Event) => {
 
 const handleRecognize = async () => {
   if (!isValidInput.value) {
-    ElMessage.warning({ message: '请输入有效的频道标识', offset: 100, customClass: 'mobile-message' })
+    showToast('请输入有效的频道标识', 'warning')
     return
   }
 
@@ -136,7 +137,7 @@ const handleRecognize = async () => {
     }
   } catch (err: any) {
     console.error('Channel recognition error:', err)
-    ElMessage.error({ message: '识别失败，请重试', offset: 100, customClass: 'mobile-message' })
+    showToast('识别失败，请重试', 'error')
   } finally {
     loading.value = false
   }
@@ -231,4 +232,13 @@ onMounted(() => {
 .text-btn {
   background: none; border: none; color: #94A3B8; font-size: 15px; padding: 12px;
 }
+
+/* Simple Spinner */
+.spinner-sm {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.1); border-top-color: #38BDF8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

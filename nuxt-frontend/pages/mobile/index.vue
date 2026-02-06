@@ -21,14 +21,14 @@
       <!-- 3. Goods List -->
       <div class="goods-list-section">
         
-        <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
+        <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state bg-glass-card">
           <div class="spinner-premium"></div>
-          <span>正在加载好物...</span>
+          <span class="text-muted text-sm">正在加载好物...</span>
         </div>
         
-        <div v-else-if="currentGoods.length === 0" class="empty-state">
+        <div v-else-if="currentGoods.length === 0" class="empty-state bg-glass-card">
            <div class="empty-icon">📦</div>
-           <p>暂无相关商品</p>
+           <p class="text-muted text-sm">暂无相关商品</p>
         </div>
 
         <div v-else class="goods-list">
@@ -299,35 +299,36 @@ onUnmounted(() => {
 .content-scroll {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 20px;
+  padding-bottom: var(--sp-5);
   scroll-behavior: smooth;
 }
 
 .goods-list-section { 
-  padding: 0 16px; 
+  padding: 0 var(--sp-4);
   min-height: 500px; 
   position: relative;
   z-index: 10;
 }
 
 .section-header {
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-4);
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--sp-2);
 }
 .section-title {
-  font-size: 18px;
+  font-size: var(--text-xl);
   font-weight: 700;
   display: flex; align-items: center; gap: 4px;
 }
 .section-dot {
-  width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent-color);
+  width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent);
 }
 .section-subtitle {
-  font-size: 12px; color: var(--text-muted);
+  font-size: var(--text-xs); color: var(--text-muted);
 }
+
 
 .goods-list {
   display: flex;
@@ -335,10 +336,12 @@ onUnmounted(() => {
   gap: 12px;
 }
 
+/* Updated Loading/Empty States using Glass */
 .loading-state, .empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 200px; color: var(--text-muted); font-size: 13px;
-  background: rgba(255,255,255,0.02); border-radius: 12px;
+  height: 200px;
+  padding: var(--sp-5);
+  /* Handled by .bg-glass-card */
 }
 .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
 

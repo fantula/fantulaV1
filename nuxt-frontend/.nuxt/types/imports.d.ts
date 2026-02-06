@@ -480,7 +480,6 @@ declare global {
   const useModel: typeof import('vue').useModel
   const useNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt').useNuxtApp
   const useNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useNuxtData
-  const useNuxtDevTools: typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools').useNuxtDevTools
   const useOrderDetail: typeof import('../../composables/client/useOrderDetail').useOrderDetail
   const useOrderDetailLogic: typeof import('../../composables/client/useOrderDetailLogic').useOrderDetailLogic
   const useOrderList: typeof import('../../composables/client/useOrderList').useOrderList
@@ -541,6 +540,7 @@ declare global {
   const useSupabaseUserStore: typeof import('../../stores/shared/supabase-user').useSupabaseUserStore
   const useSystemConfig: typeof import('../../composables/client/useSystemConfig').useSystemConfig
   const useTemplateRef: typeof import('vue').useTemplateRef
+  const useToast: typeof import('../../composables/mobile/useToast').useToast
   const useTransitionState: typeof import('vue').useTransitionState
   const useUserStore: typeof import('../../stores/client/user').useUserStore
   const watch: typeof import('vue').watch
@@ -586,6 +586,9 @@ declare global {
   // @ts-ignore
   export type { ProductTypeKey } from '../../composables/common/useBizConfig'
   import('../../composables/common/useBizConfig')
+  // @ts-ignore
+  export type { ToastType } from '../../composables/mobile/useToast'
+  import('../../composables/mobile/useToast')
   // @ts-ignore
   export type { CartItem } from '../../stores/client/cart'
   import('../../stores/client/cart')
@@ -1073,7 +1076,6 @@ declare module 'vue' {
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
-    readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
     readonly useOrderDetail: UnwrapRef<typeof import('../../composables/client/useOrderDetail')['useOrderDetail']>
     readonly useOrderDetailLogic: UnwrapRef<typeof import('../../composables/client/useOrderDetailLogic')['useOrderDetailLogic']>
     readonly useOrderList: UnwrapRef<typeof import('../../composables/client/useOrderList')['useOrderList']>
@@ -1134,6 +1136,7 @@ declare module 'vue' {
     readonly useSupabaseUserStore: UnwrapRef<typeof import('../../stores/shared/supabase-user')['useSupabaseUserStore']>
     readonly useSystemConfig: UnwrapRef<typeof import('../../composables/client/useSystemConfig')['useSystemConfig']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
+    readonly useToast: UnwrapRef<typeof import('../../composables/mobile/useToast')['useToast']>
     readonly useTransitionState: UnwrapRef<typeof import('vue')['useTransitionState']>
     readonly useUserStore: UnwrapRef<typeof import('../../stores/client/user')['useUserStore']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>

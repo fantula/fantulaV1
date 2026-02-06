@@ -10,12 +10,16 @@
 
     <!-- Bottom Navigation -->
     <MobileTabBar v-if="!route.meta.hideTabBar" />
+
+    <!-- Global Toast -->
+    <MobileToast />
   </div>
 </template>
 
 <script setup lang="ts">
 import '@/assets/styles/mobile.css'
 import MobileTabBar from '@/components/mobile/MobileTabBar.vue'
+import MobileToast from '@/components/mobile/base/MobileToast.vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()

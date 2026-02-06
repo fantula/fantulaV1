@@ -3,12 +3,31 @@
     <!-- Top Row: Logo & Actions -->
     <div class="header-top">
       <div class="logo-area">
-         <span class="logo-text">FANTULA</span>
+         <img src="/images/shared/logo_v3.png" class="logo-img" alt="FANTULA" />
       </div>
       
       <div class="header-actions">
+         <!-- Search Icon -->
+         <button class="icon-btn" @click="$emit('open-search')">
+            <el-icon><Search /></el-icon>
+         </button>
+         
+         <!-- Favorites Icon -->
+         <button class="icon-btn" @click="router.push('/mobile/profile/favorites')">
+            <el-icon><Star /></el-icon>
+         </button>
+
+         <!-- Cart Icon -->
+         <button class="icon-btn" @click="showCartSheet = true">
+            <el-icon><ShoppingCart /></el-icon>
+             <div v-if="cartStore.totalCount > 0" class="badge-dot-header"></div>
+         </button>
+
+         <!-- User/Login Icon -->
          <template v-if="!userStore.isLoggedIn">
-            <button class="btn btn-glass btn-sm login-btn" @click="$emit('open-login')">登录</button>
+             <button class="icon-btn" @click="$emit('open-login')">
+                <el-icon><User /></el-icon>
+             </button>
          </template>
          <template v-else>
             <div class="header-avatar" @click="router.push('/mobile/profile')">
@@ -18,12 +37,24 @@
          </template>
       </div>
     </div>
+    
+    <!-- Cart Sheet -->
+    <ClientOnly>
+        <MobileCartSheet 
+          :visible="showCartSheet" 
+          @close="showCartSheet = false" 
+        />
+    </ClientOnly>
   </header>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/client/user'
+import { useCartStore } from '@/stores/client/cart'
+import { Search, ShoppingCart, User, Star } from '@element-plus/icons-vue'
+import MobileCartSheet from '@/components/mobile/cart/MobileCartSheet.vue'
 
 defineProps<{
   isScrolled: boolean
@@ -32,7 +63,10 @@ defineProps<{
 defineEmits(['open-login'])
 
 const router = useRouter()
+const router = useRouter()
 const userStore = useUserStore()
+const cartStore = useCartStore()
+const showCartSheet = ref(false)
 </script>
 
 <style scoped>
@@ -64,22 +98,35 @@ const userStore = useUserStore()
   height: 44px;
 }
 
-.logo-text {
-  font-family: 'DIN', sans-serif;
-  font-weight: 700; 
-  font-size: 24px; 
-  letter-spacing: 1px;
-  background: linear-gradient(90deg, #fff, #94A3B8);
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent;
-  /* Removed extreme text shadow */
+.logo-area {
+  display: flex; align-items: center;
+}
+.logo-img {
+  height: 28px; width: auto; object-fit: contain;
 }
 
 /* Actions */
-.login-btn {
-  padding: 6px 16px;
-  font-size: 13px;
-  border-radius: 20px;
+/* Actions */
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05); /* Glassy button */
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  font-size: 18px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+/* Button Active State */
+.icon-btn:active { background: rgba(255,255,255,0.1); }
+.icon-btn { position: relative; }
+
+.badge-dot-header {
+    position: absolute; top: 8px; right: 8px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 4px var(--accent);
 }
 
 .header-avatar {

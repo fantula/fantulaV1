@@ -20,7 +20,7 @@
         <div class="wallet-content">
             <div class="wallet-left">
                 <div class="wallet-label">我的额度</div>
-                <div class="wallet-value">{{ Number(userStore.user?.balance || 0).toFixed(2) }}</div>
+                <div class="wallet-value text-price">{{ Number(userStore.user?.balance || 0).toFixed(2) }}</div>
             </div>
             <div class="wallet-actions">
                 <button class="action-btn primary-btn pill-btn" @click="handleRecharge">充值</button>
@@ -32,7 +32,7 @@
     </div>
 
     <!-- 3. Orders Card -->
-    <div class="section-card order-card">
+    <div class="section-card order-card bg-glass-card">
       <div class="card-header" @click="navigateToOrder('all')">
         <span class="card-title">我的订单</span>
         <div class="card-more">
@@ -204,15 +204,15 @@ onMounted(() => {
 
 /* 1. Header Container */
 .header-container {
-    padding: 20px 20px 10px 20px;
+    padding: var(--sp-5) var(--sp-5) var(--sp-2) var(--sp-5);
 }
 
 /* 2. Wallet Card specific */
 .wallet-section {
     position: relative; overflow: hidden;
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, var(--bg-deep) 0%, #1E293B 100%);
+    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--glass-border);
 }
 
 .wallet-background {
@@ -228,11 +228,11 @@ onMounted(() => {
 
 .wallet-left { display: flex; flex-direction: column; gap: 2px; }
 .wallet-label { 
-    font-size: 13px; color: #94A3B8; font-weight: 500; letter-spacing: 0.5px; 
+    font-size: var(--text-sm); color: var(--text-secondary); font-weight: 500; letter-spacing: 0.5px; 
 }
 .wallet-value { 
-    font-size: 32px; font-weight: 800; color: #fff; 
-    font-family: 'DIN Alternate', 'Outfit', sans-serif; /* Try to use a number font */
+    font-size: 32px; font-weight: 800; color: var(--text-primary); 
+    font-family: var(--font-digit);
     letter-spacing: -1px; line-height: 1.1;
 }
 
@@ -245,49 +245,41 @@ onMounted(() => {
 }
 .pill-btn { border-radius: 99px; } /* High border radius for rounded buttons */
 
-.primary-btn {
-    background: linear-gradient(90deg, #F97316, #EA580C); 
-    color: #fff; border: none;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+/* Replaced by .m-btn-* utilities */
+.action-btn {
+    min-width: 70px;
 }
-.primary-btn:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(249, 115, 22, 0.2); }
-
-.outline-btn {
-    background: rgba(255,255,255,0.05); color: #CBD5E1; 
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.outline-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.96); color: #fff; }
 
 /* 3. Order Card & Common Section */
 .section-card {
-    margin: 0 20px 24px 20px;
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 16px;
-    padding: 20px;
+    margin: 0 var(--sp-5) var(--sp-6) var(--sp-5);
+    /* Glass styles handled by .bg-glass-card utility */
+    padding: var(--sp-5);
 }
 .card-header {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 20px;
 }
-.card-title { font-size: 15px; font-weight: 600; color: #fff; }
-.card-more { font-size: 12px; color: #64748B; display: flex; align-items: center; }
+/* Titles */
+.card-title { font-size: var(--text-base); font-weight: 600; color: var(--text-primary); }
+.card-more { font-size: var(--text-xs); color: var(--text-muted); display: flex; align-items: center; }
 
 .order-grid { display: flex; justify-content: space-between; }
 .order-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+/* Order Icons */
 .icon-wrap {
     position: relative; width: 40px; height: 40px;
     display: flex; align-items: center; justify-content: center;
-    color: #CBD5E1;
+    color: var(--text-secondary);
 }
 .order-icon { font-size: 24px; }
 .badge-dot {
     position: absolute; top: -5px; right: -5px;
     background: #F43F5E; color: white; font-size: 10px; font-weight: 700;
     min-width: 16px; height: 16px; line-height: 16px; text-align: center;
-    border-radius: 8px; border: 2px solid #1E293B;
+    border-radius: 8px; border: 2px solid var(--bg-deep); /* Match bg */
 }
-.order-label { font-size: 12px; color: #94A3B8; }
+.order-label { font-size: var(--text-xs); color: var(--text-secondary); }
 
 
 /* 3. Menu List Group */
@@ -307,19 +299,19 @@ onMounted(() => {
 /* Top Nav */
 .top-nav {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 20px 0 20px;
-    margin-bottom: 10px;
+    padding: var(--sp-3) var(--sp-5) 0 var(--sp-5);
+    margin-bottom: var(--sp-3);
 }
 .page-title {
-    font-size: 24px; font-weight: 800; color: #fff;
+    font-size: var(--text-2xl); font-weight: 800; color: var(--text-primary);
 }
 .settings-btn {
     width: 40px; height: 40px; 
     border-radius: 50%;
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
     display: flex; align-items: center; justify-content: center;
-    color: #fff; cursor: pointer;
+    color: var(--text-primary); cursor: pointer;
     transition: all 0.2s;
 }
 .settings-btn:active {

@@ -137,6 +137,23 @@ export function useOrderList() {
     }
 
     /**
+     * 删除订单 (隐藏历史订单)
+     */
+    async function deleteOrder(orderId: string, isPreOrder: boolean = false): Promise<boolean> {
+        if (isPreOrder) {
+            return deletePreOrder(orderId)
+        } else {
+            const res = await clientOrderApi.hideOrder(orderId)
+            if (res.success) {
+                // Update local list to reflect change immediately
+                orders.value = orders.value.filter(o => o.id !== orderId)
+                return true
+            }
+            return false
+        }
+    }
+
+    /**
      * 删除预订单 (取消待支付订单)
      */
     async function deletePreOrder(preOrderId: string): Promise<boolean> {
@@ -181,6 +198,7 @@ export function useOrderList() {
         loadList,
         changeTab,
         deletePreOrder,
+        deleteOrder,
         formatSpec,
         getCurrentTabLabel,
 

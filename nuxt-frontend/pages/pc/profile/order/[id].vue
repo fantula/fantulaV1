@@ -214,9 +214,9 @@ const {
   isRefundBlocked,
   
   // Helpers
-  formatTime,
-  getAmountInteger,
-  getAmountDecimal,
+  // formatTime,
+  // getAmountInteger,
+  // getAmountDecimal,
   getFieldsForCdk,
   getCdkForSlot,
   
@@ -293,7 +293,6 @@ const onTicketSuccess = () => {
   display: flex; flex-direction: column; 
   width: 100%; max-width: 100%;
   padding: 0; /* No global padding to allow full-bleed header */
-  /* overflow-x: hidden;  <-- REMOVED to fix sticky behavior */
   padding-bottom: 40px;
 }
 

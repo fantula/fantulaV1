@@ -527,4 +527,27 @@ export const clientOrderApi = {
             cancelledCount: data.cancelled_count
         }
     },
+    // ========================================
+    // 订单管理 API
+    // ========================================
+
+    /**
+     * 隐藏/删除订单 (软删除)
+     * 目前后端暂无 hide_order 接口，前端模拟成功以保持 UI 交互一致性
+     */
+    async hideOrder(orderId: string): Promise<{
+        success: boolean
+        error?: string
+    }> {
+        // TODO: Replace with real RPC 'hide_user_order' when backend is ready
+        // const client = getSupabaseClient()
+        // const { data, error } = await client.rpc('hide_user_order', { p_order_id: orderId })
+
+        // Mock implementation
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({ success: true })
+            }, 500)
+        })
+    }
 }

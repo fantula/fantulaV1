@@ -231,25 +231,7 @@ onMounted(() => {
   initData()
 })
 
-import { Loading } from '@element-plus/icons-vue'
 
-// Custom Directive for Intersection Observer (Simplest implementation)
-const vIntersectionObserver = {
-  mounted: (el: HTMLElement, binding: any) => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        binding.value()
-      }
-    }, { rootMargin: '100px' }) // Trigger 100px before bottom
-    observer.observe(el)
-    // @ts-ignore
-    el._observer = observer
-  },
-  unmounted: (el: HTMLElement) => {
-    // @ts-ignore
-    if (el._observer) el._observer.disconnect()
-  }
-}
 
 const modal = useModalStore()
 </script>
