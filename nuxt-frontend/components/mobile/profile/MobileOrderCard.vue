@@ -23,15 +23,16 @@
           <img :src="order.product_image || '/images/placeholder.png'" class="product-img" loading="lazy" />
        </div>
        <div class="info">
+          <!-- Name & Spec Inline -->
           <div class="name-row">
-              <div class="name">{{ order.product_name }}</div>
-              <span class="spec-tag">{{ order.spec_text || '标准规格' }}</span>
+              <span class="name-text">{{ order.product_name }}</span>
+              <span class="spec-inline">{{ order.spec_text || '标准规格' }}</span>
           </div>
           
           <div class="price-row">
              <div class="price">
+                <span class="unit">¥</span>
                 <span class="amount">{{ Number(order.total_amount).toFixed(2) }}</span>
-                <span class="unit">点</span>
              </div>
              <div class="qty">x{{ order.quantity }}</div>
           </div>
@@ -63,64 +64,74 @@ const { formatDate } = useBizFormat()
 </script>
 
 <style scoped>
-/* Mobile Order Card */
+/* Mobile Order Card (Compact) */
 .mobile-order-card {
-    background: rgba(30, 41, 59, 0.4);
+    background: #1E293B;
     border: 1px solid rgba(255,255,255,0.05);
     border-radius: 16px;
-    padding: 16px;
+    padding: 12px; /* Reduced from 16px */
     position: relative; overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.2s;
 }
-/* Left Status Line */
-.mobile-order-card::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #64748B; opacity: 0.6;
+.mobile-order-card:active {
+    transform: scale(0.98);
+    background: #252f45;
 }
-.mobile-order-card.status-pending::before { background: #F97316; }
-.mobile-order-card.status-active::before { background: #22C55E; }
-.mobile-order-card.status-pending_delivery::before { background: #3B82F6; }
 
 /* Card Header */
 .card-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; /* Reduced margin */
 }
-.order-no-group { font-size: 12px; font-family: 'Monaco', monospace; color: #64748B; display: flex; gap: 4px; }
+.order-no-group { font-size: 11px; font-family: 'Monaco', monospace; color: #64748B; display: flex; gap: 4px; }
 .order-no-group .value { color: #94A3B8; }
 
 .status-pill {
-    display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px;
-    background: rgba(255,255,255,0.05); color: #94A3B8; font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px;
+    background: rgba(255,255,255,0.05); color: #94A3B8; font-size: 10px; font-weight: 500;
 }
-.status-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 5px currentColor; }
+.status-pill .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* Status Colors */
 .status-pill.pending { color: #F97316; background: rgba(249, 115, 22, 0.1); }
-.status-pill.active { color: #22C55E; background: rgba(34, 197, 94, 0.1); }
+.status-pill.active { color: #10B981; background: rgba(16, 185, 129, 0.1); }
 .status-pill.pending_delivery { color: #3B82F6; background: rgba(59, 130, 246, 0.1); }
 .status-pill.refunding { color: #EAB308; background: rgba(234, 179, 8, 0.1); }
+.status-pill.expired, .status-pill.cancelled { color: #64748B; background: rgba(100, 116, 139, 0.1); }
 
 /* Card Body */
-.card-body { display: flex; gap: 12px; margin-bottom: 12px; }
+.card-body { display: flex; gap: 10px; margin-bottom: 10px; }
 .thumb {
-    width: 64px; height: 64px; border-radius: 8px; overflow: hidden; background: #1E293B; flex-shrink: 0;
+    width: 64px; height: 64px; border-radius: 12px; /* Match Detail Radius */
+    overflow: hidden; background: #0F172A; flex-shrink: 0;
+    border: 1px solid rgba(23, 143, 198, 0.3); /* Primary Blue Border */
 }
 .product-img { width: 100%; height: 100%; object-fit: cover; }
 .info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; }
-.name-row { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-.name { color: #fff; font-size: 14px; font-weight: 500; line-height: 1.3; }
-.spec-tag {
-    font-size: 10px; color: #94A3B8; background: rgba(255,255,255,0.08);
-    padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);
+
+.name-row { 
+    font-size: 13px; color: #E2E8F0; line-height: 1.4; 
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.name-text { font-weight: 500; margin-right: 6px; }
+.spec-inline {
+    font-size: 11px; color: #64748B; background: rgba(255,255,255,0.03);
+    padding: 1px 4px; border-radius: 4px; display: inline-block; vertical-align: middle;
+    margin-top: -2px;
 }
 
 .price-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 4px; }
-.price { color: #fff; font-family: 'DIN Alternate'; font-weight: 700; display: flex; align-items: baseline; gap: 2px; }
+/* Price: Orange #F97316 */
+.price { color: #F97316; font-family: 'DIN Alternate'; font-weight: 700; display: flex; align-items: baseline; gap: 1px; }
 .price .amount { font-size: 18px; }
-.price .unit { font-size: 11px; color: #F59E0B; }
+.price .unit { font-size: 11px; font-weight: normal; margin-right: 1px; }
 .qty { font-size: 12px; color: #64748B; }
 
 /* Card Footer */
 .card-footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;
 }
-.time { font-size: 11px; color: #475569; }
+.time { font-size: 10px; color: #475569; }
 .actions { display: flex; gap: 8px; }
 </style>

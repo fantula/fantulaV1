@@ -45,7 +45,7 @@
       :loading="dialog.loading.value"
       @confirm="dialog.submit"
     >
-      <el-form :model="dialog.form" label-width="110px">
+      <el-form ref="formRef" :model="dialog.form" label-width="110px">
         <el-form-item label="分类名称" required>
           <el-input v-model="dialog.form.name" placeholder="请输入分类名称" />
         </el-form-item>
@@ -140,6 +140,9 @@ const dialog = useAdminDialog({
      ElMessage.success(dialog.isEdit.value ? '更新成功' : '创建成功')
   }
 })
+
+// Bind formRef to the dialog's reference
+const formRef = dialog.formRef
 
 const handleDelete = async (row: AdminFaqCategory) => {
   await confirmDelete(

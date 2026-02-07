@@ -1,11 +1,11 @@
 <template>
   <div class="mobile-cdk-list">
-    <div v-for="(item, index) in cdkList" :key="item.id || index" class="cdk-item">
+    <div v-for="(item, index) in cdkList" :key="item.id || index" class="info-card-glass">
       <div class="cdk-header">
         <span class="cdk-label">卡密 {{ index + 1 }}</span>
-        <button class="copy-btn" @click="copyText(item.code)">
-           <el-icon><CopyDocument /></el-icon> 复制
-        </button>
+        <div class="copy-tag" @click="copyText(item.code)">
+           <el-icon><CopyDocument /></el-icon>
+        </div>
       </div>
       <div class="cdk-content">
         <div class="code-box">{{ item.code }}</div>
@@ -15,19 +15,21 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
 import { CopyDocument } from '@element-plus/icons-vue'
+import { useToast } from '@/composables/mobile/useToast'
 
 defineProps<{
   cdkList: any[]
 }>()
 
+const { showToast } = useToast()
+
 const copyText = (text: string) => {
   if (!text) return
   navigator.clipboard.writeText(text).then(() => {
-    ElMessage.success('已复制')
+    showToast('已复制', 'success')
   }).catch(() => {
-    ElMessage.error('复制失败')
+    showToast('复制失败', 'error')
   })
 }
 </script>
@@ -40,48 +42,50 @@ const copyText = (text: string) => {
   width: 100%;
 }
 
-.cdk-item {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  overflow: hidden;
+.info-card-glass {
+    background: #1E293B; /* Slate 800 base */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; 
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
 .cdk-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .cdk-label {
-  font-size: 12px;
+  font-size: 13px;
   color: #94A3B8;
   font-weight: 600;
 }
 
-.copy-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  font-size: 11px;
-  color: #3B82F6;
-  padding: 0;
+.copy-tag {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #CBD5E1; cursor: pointer;
+  transition: all 0.2s;
 }
+.copy-tag:active { background: rgba(255,255,255,0.2); color: #fff; }
+.copy-tag .el-icon { font-size: 14px; }
 
 .cdk-content {
-  padding: 12px;
+  padding: 16px;
 }
 
 .code-box {
   font-family: 'Monaco', monospace;
-  font-size: 13px;
+  font-size: 14px;
   color: #fff;
   word-break: break-all;
-  line-height: 1.4;
+  line-height: 1.5;
+  background: rgba(0,0,0,0.2);
+  padding: 10px; border-radius: 8px;
 }
 </style>

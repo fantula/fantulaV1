@@ -107,6 +107,10 @@ export default defineNuxtConfig({
 
   // 代理配置
   nitro: {
+    // 路由规则 - 为 admin 路由禁用 SSR
+    routeRules: {
+      '/admin/**': { ssr: false }
+    },
     devProxy: {
       // 统一API代理地址为 Supabase 本地服务
       // 注意: /api/wechat 由 Nuxt Server API 处理，不代理

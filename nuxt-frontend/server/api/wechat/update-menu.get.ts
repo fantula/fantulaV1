@@ -48,6 +48,11 @@ export default defineEventHandler(async (event) => {
                             url: "https://www.fantula.com/mobile/help"
                         }
                     ]
+                },
+                {
+                    type: "view",
+                    name: "登录旧版",
+                    url: "https://en.jjhezu.com/pages/login/login"
                 }
             ]
         }

@@ -189,7 +189,7 @@ watch(() => props.cdkItem, fetchCoSharingUsers, { deep: true })
 }
 .cred-copy:active { background: rgba(255,255,255,0.1); }
 
-/* Roommates */
+/* Roommates (Glass) */
 .roommates-box {
   padding: 16px; background: rgba(15, 23, 42, 0.4);
   border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);

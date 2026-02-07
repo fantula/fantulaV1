@@ -164,89 +164,127 @@ const handleDelete = async () => {
 
 <style scoped>
 .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
     z-index: 2000; display: flex; align-items: center; justify-content: center;
     padding: 20px;
 }
 
 .modal-content {
-    background: #1E293B; width: 100%; max-width: 340px;
-    border-radius: 16px; padding: 20px;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    animation: popIn 0.2s ease-out;
+    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.85));
+    width: 100%; max-width: 340px;
+    border-radius: 20px; padding: 24px;
+    border: 1px solid rgba(239, 68, 68, 0.3); /* Red Border for Danger */
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.15), 0 10px 40px rgba(0,0,0,0.5);
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(20px);
 }
 
 @keyframes popIn {
-    from { transform: scale(0.95); opacity: 0; }
+    from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
 
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.modal-title { font-size: 18px; font-weight: 600; color: #fff; margin: 0; }
-.text-danger { color: #EF4444; }
-.close-btn { background: none; border: none; color: #94A3B8; padding: 4px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-title { 
+    font-size: 18px; font-weight: 700; color: #fff; margin: 0; 
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+.text-danger { color: #F87171; }
+.close-btn { 
+    background: none; border: none; color: #94A3B8; padding: 4px; 
+    cursor: pointer; transition: color 0.2s;
+}
+.close-btn:hover { color: #fff; }
 
 .modal-body { padding: 0 0 20px 0; }
 
 .warning-box {
     background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);
-    padding: 12px; border-radius: 12px;
-    display: flex; gap: 12px; margin-bottom: 20px;
+    padding: 16px; border-radius: 12px;
+    display: flex; gap: 12px; margin-bottom: 24px;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.1) inset;
 }
 .warning-icon {
-    width: 20px; height: 20px; background: #EF4444; color: white;
+    width: 24px; height: 24px; background: #EF4444; color: white;
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-weight: bold; flex-shrink: 0; font-size: 12px;
+    font-weight: bold; flex-shrink: 0; font-size: 14px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
 }
 .warning-box p {
-    margin: 0; font-size: 13px; color: #FCA5A5; line-height: 1.4;
+    margin: 0; font-size: 13px; color: #FCA5A5; line-height: 1.5;
 }
 
-.form-item { margin-bottom: 16px; }
-.form-item label { display: block; font-size: 13px; color: #94A3B8; margin-bottom: 6px; }
+.form-item { margin-bottom: 20px; }
+.form-item label { display: block; font-size: 13px; color: #94A3B8; margin-bottom: 8px; font-weight: 500; }
 .form-item input {
-    width: 100%; height: 44px; background: #0F172A;
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
-    padding: 0 12px; color: #fff; font-size: 15px;
+    width: 100%; height: 48px; 
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    padding: 0 16px; color: #fff; font-size: 16px;
+    transition: all 0.2s;
+}
+.form-item input:focus {
+    border-color: #EF4444; /* Red focus for danger */
+    background: rgba(15, 23, 42, 0.9);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+    outline: none;
 }
 
-.input-row { display: flex; gap: 8px; }
+.input-row { display: flex; gap: 10px; }
 .code-btn {
-    height: 44px; padding: 0 12px; font-size: 13px; white-space: nowrap;
-    background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
+    height: 48px; padding: 0 16px; font-size: 13px; white-space: nowrap;
+    background: rgba(255,255,255,0.05); color: #E0F2FE; 
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; cursor: pointer;
+    transition: all 0.2s;
 }
-.code-btn:disabled { opacity: 0.5; }
+.code-btn:active { background: rgba(255,255,255,0.1); }
+.code-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .checkbox-row {
-    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    padding: 8px 0;
 }
 .checkbox {
-    width: 20px; height: 20px; border: 2px solid #475569; border-radius: 6px;
+    width: 22px; height: 22px; 
+    border: 2px solid #475569; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.2s;
+    background: rgba(255,255,255,0.05);
 }
 .checkbox.checked {
     background: #EF4444; border-color: #EF4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    animation: pulse 0.3s;
 }
+@keyframes pulse { 50% { transform: scale(1.1); } }
+
 .check-icon { color: white; width: 14px; height: 14px; }
-.checkbox-row span { font-size: 13px; color: #CBD5E1; }
+.checkbox-row span { font-size: 14px; color: #CBD5E1; transition: color 0.2s; }
+.checkbox-row:hover span { color: #fff; }
 
 .modal-footer { display: flex; gap: 12px; }
 .cancel-btn, .save-btn {
-    flex: 1; height: 44px; border-radius: 8px; font-size: 15px; font-weight: 600; border: none;
+    flex: 1; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
+    transition: all 0.2s;
 }
-.cancel-btn { background: rgba(255,255,255,0.05); color: #94A3B8; }
+.cancel-btn { 
+    background: rgba(255,255,255,0.05); color: #94A3B8;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.cancel-btn:active { background: rgba(255,255,255,0.1); }
+
 .btn-danger { 
     background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%); 
     color: white; 
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
     display: flex; justify-content: center; align-items: center;
 }
-.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-danger:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2); }
+.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 
 .spinner {
-    width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
+    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

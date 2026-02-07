@@ -2,13 +2,7 @@
   <div class="mobile-wallet-page">
     
     <!-- Top Nav -->
-    <div class="top-nav">
-      <div class="back-btn" @click="router.back()">
-        <el-icon><ArrowLeft /></el-icon>
-      </div>
-      <div class="page-title">我的额度</div>
-      <div class="placeholder"></div>
-    </div>
+    <MobileSubPageHeader title="我的额度" />
 
     <!-- 1. Asset Hero Card (Mobile Version) -->
     <div class="asset-card">
@@ -43,16 +37,13 @@
             </div>
         </div>
 
-        <div class="list-container">
-            <div v-if="loading && displayList.length === 0" class="loading-state">
-                加载中...
-            </div>
-            <div v-else-if="displayList.length === 0" class="empty-state">
-                暂无记录
-            </div>
-            
-            <div 
-                v-else
+        <MobileInfiniteList 
+            :loading="loading" 
+            :finished="finished" 
+            :list="displayList" 
+            @load="loadMore"
+        >
+             <div 
                 class="txn-item" 
                 v-for="(item, index) in displayList" 
                 :key="index"
@@ -62,25 +53,29 @@
                     <div class="txn-time">{{ formatDate(item.createdAt) }}</div>
                 </div>
                 <div class="txn-right" :class="getAmountClass(item.amount)">
-                    {{ item.amount > 0 ? '+' : '' }}{{ item.amount }}
+                    {{ item.amount > 0 ? '+' : '' }}{{ Number(item.amount).toFixed(2) }}
                 </div>
             </div>
-
-            <div v-if="!finished && displayList.length > 0" class="load-more" @click="loadMore">
-                {{ loading ? '加载中...' : '加载更多' }}
-            </div>
-            <div v-if="finished && displayList.length > 0" class="no-more">
-                没有更多了
-            </div>
-        </div>
+        </MobileInfiniteList>
     </div>
 
-    <!-- Recharge Modal -->
-    <RechargeModal
-        :visible="showRecharge"
-        @close="showRecharge = false"
-        @success="refreshData"
-    />
+    <!-- Custom Tip Modal -->
+    <Teleport to="body">
+        <div v-if="showTipModal" class="modal-overlay" @click="showTipModal = false">
+            <div class="tip-content" @click.stop>
+                <div class="tip-header">
+                    <el-icon class="tip-icon"><InfoFilled /></el-icon>
+                    <span>额度说明</span>
+                </div>
+                <div class="tip-body">
+                    凡图拉额度仅用于平台内服务使用，不可提现或转让。
+                </div>
+                <div class="tip-footer">
+                    <button class="modal-confirm-btn" @click="showTipModal = false">我知道了</button>
+                </div>
+            </div>
+        </div>
+    </Teleport>
 
   </div>
 </template>
@@ -94,7 +89,8 @@ import { useUserStore } from '@/stores/client/user'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
-import { ElMessage } from 'element-plus'
+import MobileInfiniteList from '@/components/mobile/list/MobileInfiniteList.vue'
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -105,6 +101,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const { formatDate } = useBizFormat()
 const showRecharge = ref(false)
+const showTipModal = ref(false)
 
 // Data
 const balance = computed(() => userStore.user?.balance || 0)
@@ -127,10 +124,10 @@ const filteredTransactions = computed(() => {
     return transactions.value
 })
 
-// Infinite Scroll Logic
+// Infinite Scroll Logic - Use default pageSize 10 as requested
 const { displayList, loading, finished, loadMore, reset } = useInfiniteScroll({
     data: filteredTransactions,
-    pageSize: 15
+    pageSize: 10
 })
 
 // Fetch Data
@@ -139,7 +136,6 @@ const fetchData = async () => {
     try {
         const res = await authApi.getWalletData()
         if (res.success && res.data) {
-            // Balance should be synced via fetchUserInfo, not direct assignment
             transactions.value = res.data.transactions || []
         }
     } finally {
@@ -153,8 +149,7 @@ const refreshData = async () => {
 }
 
 const showTip = () => {
-    // Simple alert for mobile, or better use a Toast
-    alert('凡图拉额度仅用于平台内服务使用，不可提现或转让')
+    showTipModal.value = true
 }
 
 const getAmountClass = (amt: number) => {
@@ -169,10 +164,13 @@ onMounted(() => {
     fetchData()
 })
 
-// Reset scroll when tab changes
 watch(currentTab, () => {
-    // useInfiniteScroll watches data source, but since source computed changes, it should verify reset.
-    // The composable watches 'data', so it should auto-reset.
+    // handled by useInfiniteScroll via watch(data) if data ref changed, but here computed changes.
+    // The composable watches 'data' ref. Since we passed a computed, we might need manual reset if composable doesn't watch deeply or ref value change.
+    // Actually useInfiniteScroll expects a Ref. filteredTransactions is a Ref.
+    // We should double check if useInfiniteScroll watches the ref value change. 
+    // Looking at useInfiniteScroll code: "if (isClientMode) { watch(data!, () => { reset() }) }"
+    // So it should auto-reset.
 })
 
 </script>
@@ -181,88 +179,88 @@ watch(currentTab, () => {
 .mobile-wallet-page {
     min-height: 100vh;
     padding-bottom: 40px;
-    background: #0F172A; /* Dark BG */
+    background: #020617; /* Very Dark BG */
     color: #fff;
-    padding-top: 60px; /* Space for Top Nav */
+    padding-top: 0;
 }
 
-/* Top Nav */
-.top-nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: 50px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px;
-    background: rgba(15, 23, 42, 0.9);
-    backdrop-filter: blur(10px);
-    z-index: 50;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.page-title { font-size: 17px; font-weight: 600; }
-.back-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
-
-/* Asset Card */
+/* Asset Card - Optimized Styling */
 .asset-card {
-    margin: 16px 16px 0 16px;
+    margin: 16px 12px 0 12px; /* Wider: 12px margin instead of 20px */
     position: relative;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
-    background: linear-gradient(135deg, #1e293b, #0f172a);
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    /* Darker, flatter look */
+    background: #0F172A; 
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 .aurora-bg {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.2), transparent 70%);
+    /* Subtle central glow */
+    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.5) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .card-content {
     position: relative; z-index: 2;
-    padding: 24px;
+    padding: 24px 20px; /* Reduced vertical padding */
     display: flex; flex-direction: column; align-items: center;
 }
 
 .card-top {
     display: flex; align-items: center; gap: 6px;
-    color: #94A3B8; font-size: 13px; margin-bottom: 8px;
+    color: #64748B; font-size: 13px; margin-bottom: 16px; font-weight: 500;
 }
-.info-icon { opacity: 0.7; }
+.info-icon { opacity: 0.6; cursor: pointer; transition: color 0.2s; font-size: 14px; }
+.info-icon:hover { color: #fff; opacity: 1; }
 
-.balance-row { margin-bottom: 24px; }
-.amount { font-size: 42px; font-weight: 800; font-family: 'DIN Alternate', sans-serif; letter-spacing: -1px; }
-.unit { font-size: 14px; color: #94A3B8; margin-left: 4px; }
+.balance-row { margin-bottom: 32px; text-align: center; }
+.amount { 
+    font-size: 52px; font-weight: 700; font-family: 'DIN Alternate', sans-serif; letter-spacing: -2px; 
+    color: #fff; 
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    /* White glow text */
+}
+.unit { font-size: 14px; color: #64748B; margin-left: 6px; font-weight: 500; }
 
 .recharge-btn {
-    background: linear-gradient(90deg, #F97316, #EA580C);
+    /* Orange Gradient Button */
+    background: linear-gradient(90deg, #FF6B00 0%, #FF2E00 100%);
     border: none; color: #fff;
-    padding: 10px 32px; border-radius: 99px;
-    font-size: 15px; font-weight: 600;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-    display: flex; align-items: center; gap: 6px;
+    padding: 12px 48px; border-radius: 99px;
+    font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(255, 46, 0, 0.25);
+    transition: all 0.2s;
 }
-.recharge-btn:active { transform: scale(0.96); }
+.recharge-btn:active { transform: scale(0.96); box-shadow: 0 2px 10px rgba(255, 46, 0, 0.2); }
 
 /* Transaction Section */
 .transaction-section {
     margin-top: 24px;
-    background: #1E293B;
-    border-top-left-radius: 24px; border-top-right-radius: 24px;
-    min-height: 400px; /* Fill rest */
-    padding: 20px 16px;
+    background: transparent; /* Remove container bg for cleaner look */
+    /* border-top: 1px solid rgba(255,255,255,0.05); */
+    min-height: 400px;
+    padding: 0 16px;
 }
 
 .tabs-row {
-    display: flex; gap: 12px; margin-bottom: 20px;
+    display: flex; gap: 12px; margin-bottom: 16px;
 }
 
 .tab-pill {
     padding: 6px 16px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 99px; font-size: 13px; color: #94A3B8;
+    background: transparent;
+    border-radius: 99px; font-size: 14px; color: #64748B;
     transition: all 0.2s;
+    border: 1px solid transparent;
 }
 .tab-pill.active {
-    background: rgba(255,255,255,0.15); color: #fff; font-weight: 600;
+    background: #1E293B; 
+    color: #F8FAFC; font-weight: 600;
+    border-color: rgba(255,255,255,0.1);
 }
 
 .list-container {
@@ -272,16 +270,51 @@ watch(currentTab, () => {
 .txn-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 16px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
 }
-.txn-title { font-size: 15px; color: #fff; margin-bottom: 4px; }
-.txn-time { font-size: 12px; color: #64748B; }
+.txn-item:last-child { border-bottom: none; }
+.txn-title { font-size: 14px; color: #CBD5E1; margin-bottom: 6px; font-weight: 400; }
+.txn-time { font-size: 12px; color: #475569; }
 
 .txn-right { font-size: 16px; font-weight: 600; font-family: 'DIN Alternate', sans-serif; }
-.text-green { color: #34D399; }
-.text-white { color: #fff; }
+.text-green { color: #10B981; }
+.text-white { color: #E2E8F0; }
 
-.load-more, .no-more, .loading-state, .empty-state {
-    padding: 20px; text-align: center; color: #64748B; font-size: 13px;
+/* Tip Modal Styles */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+    z-index: 2000; display: flex; align-items: center; justify-content: center;
+    padding: 30px; animation: fadeIn 0.3s ease;
 }
+.tip-content {
+    background: #1E293B;
+    width: 100%; max-width: 300px;
+    border-radius: 20px; padding: 24px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.tip-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 16px; font-weight: 600; color: #fff;
+}
+.tip-icon { color: #94A3B8; font-size: 18px; }
+
+.tip-body {
+    font-size: 14px; color: #94A3B8; line-height: 1.5; margin-bottom: 20px;
+}
+
+.tip-footer { text-align: right; }
+.modal-confirm-btn {
+    padding: 8px 20px;
+    background: #3B82F6;
+    color: #fff; border: none;
+    border-radius: 8px; font-size: 14px; font-weight: 600;
+    transition: all 0.2s;
+}
+.modal-confirm-btn:active { background: #2563EB; }
+
 </style>

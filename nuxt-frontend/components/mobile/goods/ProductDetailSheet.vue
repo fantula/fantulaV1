@@ -8,16 +8,18 @@
       <transition name="sheet-slide">
         <div v-if="visible" class="sheet-panel" @click.stop>
           
-          <!-- Top Marketing Strip -->
-          <div class="marketing-strip">
+          <!-- Top Marketing Strip (Premium Glass) -->
+          <div class="marketing-strip-glass">
              <div class="ms-item">
-                <CircleCheckFilled class="ms-icon" /> 官方正品
+                <el-icon class="ms-icon-gold"><CircleCheckFilled /></el-icon> 官方正品保证
              </div>
+             <div class="ms-divider"></div>
              <div class="ms-item">
-                <Lightning class="ms-icon" /> 自动发货
+                <el-icon class="ms-icon-blue"><Lightning /></el-icon> 24h自动发货
              </div>
+             <div class="ms-divider"></div>
              <div class="ms-item">
-                <Umbrella class="ms-icon" /> 售后无忧
+                <el-icon class="ms-icon-purple"><Umbrella /></el-icon> 售后无忧
              </div>
           </div>
 
@@ -41,27 +43,29 @@
                 </div>
              </div>
              
+
              <!-- Detail Button (Top Right) -->
-             <button class="detail-btn" @click="showDetailViewer = true">
-                <div class="d-icon-circle">
-                   <Document class="d-icon" />
-                </div>
-                <span>图文详情</span>
+             <!-- Help Button (Top Right, Refined) -->
+             <button class="help-btn" @click="showDetailViewer = true">
+                <el-icon class="h-icon"><QuestionFilled /></el-icon>
+                <span>显示帮助</span>
              </button>
           </div>
 
           <!-- Scrollable Body -->
           <div class="sheet-body">
               <!-- FAQ Ticker -->
-              <div class="faq-bar" v-if="faqs.length > 0">
-                 <div class="faq-label">常见问题</div>
-                 <div class="faq-text-wrap">
-                    <div class="faq-scroll-track">
-                       <span v-for="(f,i) in faqs" :key="i" class="faq-item">{{ f.question }}</span>
-                       <!-- Duplicate for seamless loop -->
-                       <span v-for="(f,i) in faqs" :key="`dup-${i}`" class="faq-item">{{ f.question }}</span>
+              <!-- FAQ Ticker (Re-inserted) -->
+              <!-- FAQ Ticker (Vertical Pill) -->
+              <div class="faq-sticker-pill" v-if="faqs.length > 0" @click="showDetailViewer = true">
+                 <div class="faq-pill-text-wrap">
+                    <div class="faq-pill-track" :style="trackStyle">
+                       <div v-for="(f,i) in displayFaqs" :key="i" class="faq-pill-item">
+                           {{ f.question }}
+                       </div>
                     </div>
                  </div>
+                 <el-icon class="faq-arrow"><ArrowRight /></el-icon>
               </div>
 
               <!-- Specs -->
@@ -102,29 +106,25 @@
           <div class="sheet-footer">
               <div class="icon-btns">
                  <div class="ib-item" @click="handleToggleFavorite">
-                    <component :is="isFavorited ? StarFilled : Star" class="action-icon" :class="{ active: isFavorited }" />
+                    <el-icon :class="['action-icon', { active: isFavorited }]">
+                        <component :is="isFavorited ? StarFilled : Star" />
+                    </el-icon>
                     <span>收藏</span>
-                 </div>
-                 <div class="ib-item" @click="contactService">
-                    <Service class="action-icon" />
-                    <span>客服</span>
                  </div>
               </div>
               
               <div class="main-btns">
                   <button 
-                    v-if="allowAddon" 
-                    class="btn-cart" 
+                    class="btn-mobile-base btn-mobile-ghost btn-cart" 
                     @click="addToCart" 
                     :disabled="!hasStock || loading"
                   >
                      加入购物车
                   </button>
                   <button 
-                    class="btn-buy" 
+                    class="btn-mobile-base btn-mobile-accent btn-buy-now" 
                     @click="buyNow" 
                     :disabled="!hasStock || loading"
-                    :style="{ flex: allowAddon ? 1 : 2 }"
                   >
                      立即购买
                   </button>
@@ -134,17 +134,16 @@
         </div>
       </transition>
       
-      <!-- Centered Detail Viewer Modal -->
+      <!-- Centered Detail Viewer Modal (Custom Popup) -->
       <transition name="pop-scale">
          <div v-if="showDetailViewer" class="detail-modal-mask" @click="showDetailViewer = false">
-            <div class="detail-modal" @click.stop>
-               <div class="dm-header">
-                  <span>商品详情</span>
-                  <div class="dm-close" @click="showDetailViewer = false">
-                     <Close class="close-icon" />
-                  </div>
+            <div class="detail-modal simple-popup" @click.stop>
+               <!-- Close Button Only (Overlay) -->
+               <div class="simple-close" @click="showDetailViewer = false">
+                  <Close class="close-icon" />
                </div>
-               <div class="dm-content">
+               
+               <div class="dm-content no-header">
                   <div v-if="detailModules.length === 0" class="empty-detail">
                      <div class="empty-icon">📦</div>
                      <span>暂无详情</span>
@@ -166,7 +165,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   Picture, CircleCheckFilled, Star, StarFilled, Service, Close, 
-  Lightning, Umbrella, Document, InfoFilled
+  Lightning, Umbrella, Document, InfoFilled, ArrowRight, QuestionFilled
 } from '@element-plus/icons-vue'
 import { goodsApi } from '@/api/client/goods'
 import { supabaseFaqApi, supabaseProductApi } from '@/api/client/supabase'
@@ -190,7 +189,12 @@ const loading = ref(false)
 const goodsInfo = ref<any>({})
 const skus = ref<any[]>([])
 const specGroups = ref<any[]>([])
-const faqs = ref<any[]>([])
+const faqs = ref<any[]>([
+  { id: '1', question: '下单后多久发货？一般为秒级自动发货。' },
+  { id: '2', question: '账号无法登录怎么办？请联系在线人工客服处理。' },
+  { id: '3', question: '支持退款吗？虚拟商品发货后非质量问题不支持退款。' },
+  { id: '4', question: '可以长期续费吗？支持同号续费，请关注订阅到期提醒。' }
+])
 const detailModules = ref<any[]>([])
 
 const selectedSpecs = ref<Record<string, string>>({})
@@ -199,6 +203,49 @@ const stock = ref(0)
 const isFavorited = ref(false)
 const showDetailViewer = ref(false)
 const allowAddon = ref(true) // Default true, fetch to confirm
+
+// FAQ Ticker Logic (Seamless Loop)
+const activeFaqIndex = ref(0)
+const isTransitioning = ref(true)
+let faqTimer: any = null
+
+const displayFaqs = computed(() => {
+    if (faqs.value.length === 0) return []
+    return [...faqs.value, faqs.value[0]] // Add clone at end
+})
+
+const trackStyle = computed(() => ({
+    transform: `translateY(-${activeFaqIndex.value * 100}%)`,
+    transition: isTransitioning.value ? 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none'
+}))
+
+const startFaqTicker = () => {
+    if (faqTimer) clearInterval(faqTimer)
+    faqTimer = setInterval(() => {
+        // Normal Move
+        isTransitioning.value = true
+        activeFaqIndex.value += 1
+        
+        // If moved to the Clone (last item)
+        if (activeFaqIndex.value === faqs.value.length) {
+            // Wait for transition to finish, then snap back
+            setTimeout(() => {
+                isTransitioning.value = false
+                activeFaqIndex.value = 0
+            }, 500) // Match transition duration
+        }
+    }, 3000)
+}
+
+onMounted(() => {
+    if (faqs.value.length > 0) startFaqTicker()
+})
+
+onUnmounted(() => {
+    if (faqTimer) clearInterval(faqTimer)
+})
+
+watch(() => faqs.value, () => startFaqTicker())
 
 // --- Computed ---
 const matchedSku = computed(() => {
@@ -257,10 +304,15 @@ const fetchData = async (id: string) => {
              })
              specGroups.value = Object.keys(groups).map(k => ({ name: k, values: Array.from(groups[k]) }))
              
-             // Default Select
-             specGroups.value.forEach(g => {
-                if (!selectedSpecs.value[g.name]) selectedSpecs.value[g.name] = g.values[0]
-             })
+             // Default Select (Match PC Logic: First SKU)
+             if (skus.value[0] && skus.value[0].spec_combination) {
+                 selectedSpecs.value = { ...skus.value[0].spec_combination }
+             } else {
+                 // Fallback (shouldn't happen if data integrity is good)
+                 specGroups.value.forEach(g => {
+                    if (!selectedSpecs.value[g.name]) selectedSpecs.value[g.name] = g.values[0]
+                 })
+             }
              
              // Initial Check
              if (matchedSku.value) await checkSkuAvailability(matchedSku.value.id)
@@ -271,10 +323,29 @@ const fetchData = async (id: string) => {
           }
       }
       
-      const fRes = await supabaseFaqApi.getFaqsByProduct(id)
-      if (fRes.success) faqs.value = fRes.faqs
-   } catch(e) { console.error(e) }
-   finally { loading.value = false }
+       // FAQ Logic: Specific -> General -> Fallback
+       let finalFaqs: any[] = []
+       const fRes = await supabaseFaqApi.getFaqsByProduct(id)
+       if (fRes.success && fRes.faqs.length > 0) finalFaqs = [...fRes.faqs]
+       
+       // Backfill if needed
+       if (finalFaqs.length < 5) {
+          const fGen = await supabaseFaqApi.getFaqs()
+          if (fGen.success && fGen.faqs.length > 0) {
+             const existingIds = new Set(finalFaqs.map(f => f.id))
+             const add = fGen.faqs.filter((f: any) => !existingIds.has(f.id))
+             finalFaqs = [...finalFaqs, ...add]
+          }
+       }
+       
+       // Only override if we actually found something. 
+       // If finalFaqs is empty, we keep the static fallback initialized in ref.
+       if (finalFaqs.length > 0) {
+           faqs.value = finalFaqs.slice(0, 5)
+       }
+       
+    } catch(e) { console.error(e) }
+    finally { loading.value = false }
 }
 
 const addToCart = async () => {
@@ -325,27 +396,34 @@ watch(() => props.visible, (val) => {
 
 .sheet-panel {
   position: fixed; bottom: 0; left: 0; width: 100%; 
-  background: #111827;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 24px 24px 0 0;
   z-index: 3051;
   padding-bottom: 0; /* Footer handles padding */
   max-height: 85vh;
   display: flex; flex-direction: column;
   box-shadow: 0 -8px 30px rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(255,255,255,0.1);
   overflow: hidden;
 }
 
-/* Marketing Strip */
-.marketing-strip {
-  background: linear-gradient(90deg, #F59E0B20, #F9731620);
-  height: 36px;
-  display: flex; align-items: center; justify-content: space-around;
+/* Marketing Strip (New) */
+.marketing-strip-glass {
+  height: 40px;
+  background: rgba(255,255,255,0.02);
   border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center; gap: 16px;
 }
 .ms-item {
-  color: #F59E0B; font-size: 11px; display: flex; align-items: center; gap: 4px; font-weight: 500;
+  font-size: 11px; color: #94A3B8; display: flex; align-items: center; gap: 4px; font-weight: 500;
 }
-.ms-icon { width: 14px; height: 14px; }
+.ms-icon-gold { color: #F59E0B; font-size: 14px; }
+.ms-icon-blue { color: #38BDF8; font-size: 14px; }
+.ms-icon-purple { color: #A855F7; font-size: 14px; }
+
+.ms-divider { width: 1px; height: 12px; background: rgba(255,255,255,0.1); }
 
 /* Header */
 .sheet-header {
@@ -354,7 +432,7 @@ watch(() => props.visible, (val) => {
 .header-left { display: flex; gap: 12px; flex: 1; }
 .thumb-box { 
    width: 88px; height: 88px; border-radius: 12px; overflow: hidden; 
-   background: #000; border: 1px solid rgba(255,255,255,0.1); 
+   background: #000; border: 1px solid var(--primary); 
    flex-shrink: 0;
 }
 .sheet-thumb-img { width: 100%; height: 100%; object-fit: cover; }
@@ -364,7 +442,7 @@ watch(() => props.visible, (val) => {
    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .h-price-row { display: flex; align-items: center; gap: 8px; }
-.price-wrap { color: #F97316; display: flex; align-items: baseline; }
+.price-wrap { color: var(--accent); display: flex; align-items: baseline; }
 .cy { font-size: 12px; font-weight: 600; margin-right: 2px; }
 .val { font-size: 22px; font-family: 'DIN Alternates'; font-weight: 700; }
 .stock-tag { 
@@ -372,32 +450,46 @@ watch(() => props.visible, (val) => {
 }
 .stock-tag.no-stock { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
 
-.detail-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px; padding: 8px 10px; cursor: pointer;
-  margin-left: 10px;
+.help-btn {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(56, 189, 248, 0.1); 
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 14px; padding: 4px 10px; cursor: pointer;
+  margin-left: 10px; height: 28px;
 }
-.d-icon-circle {
-   width: 24px; height: 24px; border-radius: 50%; background: rgba(249, 115, 22, 0.2);
-   display: flex; align-items: center; justify-content: center; color: #F97316;
-}
-.d-icon { width: 14px; height: 14px; }
-.detail-btn span { color: #94A3B8; font-size: 10px; }
+.help-btn .h-icon { font-size: 14px; color: #38BDF8; }
+.help-btn span { color: #38BDF8; font-size: 11px; font-weight: 500; }
 
 /* Body */
 .sheet-body { flex: 1; overflow-y: auto; padding: 10px 16px 20px; }
 
-/* FAQ */
-.faq-bar {
-  background: rgba(30, 41, 59, 1); border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+/* FAQ Ticker (Vertical Pill Style) */
+.faq-sticker-pill {
+  margin: 0 0 16px; /* Remove side margin to fill container */
+  height: 40px; 
+  background: rgba(255, 255, 255, 0.05); /* Ghost Style */
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  border-radius: 20px; 
+  padding: 0 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.faq-label { font-size: 11px; font-weight: 600; color: #64748B; background: #0F172A; padding: 2px 6px; border-radius: 4px; }
-.faq-text-wrap { flex: 1; overflow: hidden; height: 16px; position: relative; }
-.faq-scroll-track { display: flex; animation: faq-marquee 12s linear infinite; white-space: nowrap; }
-.faq-item { margin-right: 24px; font-size: 12px; color: #94A3B8; }
-@keyframes faq-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.faq-pill-text-wrap {
+    flex: 1; height: 100%; overflow: hidden; position: relative;
+    /* Optional mask for smooth text entry */
+}
+.faq-pill-track {
+    display: flex; flex-direction: column; height: 100%;
+}
+.faq-pill-item {
+    height: 100%; flex-shrink: 0;
+    display: flex; align-items: center;
+    font-size: 13px; color: #E2E8F0; /* Brighter text */
+    font-weight: 500;
+}
+.faq-arrow { color: #64748B; font-size: 14px; margin-left: 8px; }
 
 /* Specs */
 .specs-area { margin-bottom: 20px; }
@@ -405,12 +497,13 @@ watch(() => props.visible, (val) => {
 .s-label { font-size: 12px; color: #94A3B8; margin-bottom: 8px; }
 .s-vals { display: flex; flex-wrap: wrap; gap: 10px; }
 .val-chip {
-  padding: 6px 14px; background: #1F2937; border-radius: 8px;
-  font-size: 12px; color: #CBD5E1; border: 1px solid transparent;
+  padding: 6px 14px; background: rgba(255,255,255,0.05); border-radius: 8px;
+  font-size: 12px; color: #CBD5E1; border: 1px solid rgba(255,255,255,0.1);
   transition: all 0.2s;
 }
 .val-chip.active {
-  background: rgba(249, 115, 22, 0.2); color: #F97316; border-color: #F97316;
+  background: rgba(249, 115, 22, 0.2); color: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
 }
 
 /* SKU Intro */
@@ -441,8 +534,9 @@ watch(() => props.visible, (val) => {
 .sheet-footer {
   padding: 12px 16px;
   padding-bottom: calc(env(safe-area-inset-bottom) + 30px); /* Extra lift */
-  background: #111827;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.1);
   display: flex; gap: 16px; align-items: center;
 }
 .icon-btns { display: flex; gap: 16px; }
@@ -451,38 +545,59 @@ watch(() => props.visible, (val) => {
 .action-icon { width: 20px; height: 20px; color: #94A3B8; }
 .action-icon.active { color: #F59E0B; }
 
-.main-btns { flex: 1; display: flex; gap: 10px; }
-.btn-cart, .btn-buy {
-  height: 44px; border-radius: 22px; border: none; font-size: 14px; font-weight: 600; color: #fff;
-  flex: 1; cursor: pointer;
+.main-btns { flex: 1; display: flex; gap: 12px; }
+
+.btn-cart { 
+    flex: 1; 
+    height: 50px; /* Taller */
+    border-radius: 14px; /* Squircle, not pill */
+    font-size: 15px; 
+    font-weight: 600;
+    color: #fff !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
 }
-.btn-cart { background: #374151; color: #F3F4F6; }
-.btn-buy { background: linear-gradient(135deg, #F97316, #EA580C); box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
-.btn-cart:disabled, .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; background: #333; }
+.btn-buy-now { 
+    flex: 1.5; 
+    height: 50px; /* Taller */
+    border-radius: 14px; /* Squircle */
+    font-size: 16px; 
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4); /* Stronger shadow */
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+}
+
+.btn-cart:disabled, .btn-buy-now:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; filter: grayscale(100%); }
 
 /* Centered Pop Modal */
 .detail-modal-mask {
-   position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000;
+   position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3100;
    display: flex; align-items: center; justify-content: center;
    backdrop-filter: blur(5px);
 }
 .detail-modal {
-   width: 90%; max-height: 70vh; background: #1E293B; border-radius: 16px;
+   width: 85%; max-height: 70vh; 
+   background: #1E293B; border-radius: 16px;
    display: flex; flex-direction: column; overflow: hidden;
    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
    border: 1px solid rgba(255,255,255,0.1);
 }
-.dm-header {
-   padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
-   display: flex; justify-content: space-between; align-items: center;
-   background: #0F172A;
+/* Simple Popup Style */
+.detail-modal.simple-popup {
+   width: 80%; max-height: 60vh;
+   background: #1E293B; border-radius: 12px;
+   overflow: hidden; position: relative;
+   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
-.dm-header span { color: #fff; font-size: 16px; font-weight: 600; }
-.dm-close { 
-   width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; 
-   display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer;
+.simple-close {
+   position: absolute; top: 10px; right: 10px; z-index: 10;
+   width: 24px; height: 24px;
+   background: rgba(0,0,0,0.3); border-radius: 50%;
+   display: flex; align-items: center; justify-content: center;
+   color: #fff; cursor: pointer; backdrop-filter: blur(4px);
 }
-.close-icon { width: 16px; height: 16px; }
+.dm-content.no-header { padding-top: 0; background: #000; }
+.close-icon { width: 12px; height: 12px; }
 
 /* Empty Detail */
 .empty-detail { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: #64748B; gap: 10px; }

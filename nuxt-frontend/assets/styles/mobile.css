@@ -3,7 +3,7 @@
 
 :root {
   /* --- 1. Background System (Synced with theme-dark.css) --- */
-  --bg-deep: #0F172A;
+  --bg-deep: #020617;
   /* Slate 900 */
   --bg-darker: #020617;
   /* Slate 950 */
@@ -17,8 +17,8 @@
 
   /* --- 2. Color Palette (Premium) --- */
   /* Brand */
-  --primary: #3B82F6;
-  --primary-glow: rgba(59, 130, 246, 0.4);
+  --primary: #178fc6;
+  --primary-glow: rgba(23, 143, 198, 0.4);
 
   /* Accent (Price/Action) */
   --accent: #F97316;
@@ -175,7 +175,7 @@ body {
 
 /* Primary (Blue Gradient) */
 .btn-primary {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: linear-gradient(135deg, #178fc6 0%, #0c6a96 100%);
   color: #fff;
   box-shadow: 0 4px 15px var(--primary-glow);
 }
@@ -227,4 +227,103 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* --- Mobile Design System V1 (2026) --- */
+
+/* 1. Button Base */
+.btn-mobile-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  /* Squircle */
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-mobile-base:active {
+  transform: scale(0.96);
+}
+
+/* Primary */
+.btn-mobile-primary {
+  background: linear-gradient(135deg, #178fc6 0%, #0c6a96 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(23, 143, 198, 0.4);
+}
+
+/* Accent */
+.btn-mobile-accent {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+
+/* Ghost */
+.btn-mobile-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+/* 2. Glass Panels */
+.glass-panel-deep {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* --- Cyber Theme (Cart Exclusive) --- */
+:root {
+  --cyber-bg-deep: #050510;
+  /* Deep Space Black */
+  --cyber-bg-glass: rgba(10, 10, 25, 0.85);
+  /* Slightly transparent dark */
+
+  --cyber-primary: #06B6D4;
+  /* Cyan */
+  --cyber-accent: #F97316;
+  /* Orange */
+  --cyber-neon-blue: #00FFFF;
+  /* Neon Cyan */
+  --cyber-neon-pink: #FF00FF;
+  /* Neon Pink */
+
+  --cyber-border: rgba(6, 182, 212, 0.3);
+  /* Cyan border */
+  --cyber-glow-blue: 0 0 15px rgba(6, 182, 212, 0.4);
+  --cyber-glow-orange: 0 0 15px rgba(249, 115, 22, 0.4);
+
+  --cyber-text-main: #E0F2FE;
+  --cyber-text-dim: #94A3B8;
+
+  --cyber-gradient-btn: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+}
+
+/* Cyber Utility Classes */
+.text-cyber-neon {
+  color: var(--cyber-neon-blue);
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+}
+
+.border-cyber {
+  border: 1px solid var(--cyber-border);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
+}
+
+.bg-cyber-glass {
+  background: var(--cyber-bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--cyber-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.15);
+  /* Stronger glow */
 }

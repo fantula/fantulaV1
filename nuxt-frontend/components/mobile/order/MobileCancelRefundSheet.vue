@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="visible" class="modal-overlay" @click="handleClose">
-        <div class="modal-panel" @click.stop>
+        <div class="modal-panel-glass" @click.stop>
           <!-- Header -->
           <div class="modal-header">
             <div class="header-icon warning">
@@ -16,12 +16,14 @@
 
           <!-- Body -->
           <div class="modal-body">
-            <div class="warning-tip">
-              <el-icon><InfoFilled /></el-icon>
-              <span>取消后订单将恢复正常状态，您可以继续使用商品服务。</span>
+            <div class="warning-tip-glass">
+              <div class="tip-icon"><el-icon><InfoFilled /></el-icon></div>
+              <div class="tip-content">取消后订单将恢复正常状态，您可以继续使用商品服务。</div>
             </div>
 
-            <div class="info-section">
+            <MobileOrderProductInfo v-if="order" :order="order" :compact="true" style="margin-bottom: 12px;" />
+
+            <div class="info-card-glass">
               <div class="info-row">
                 <span class="label">订单号</span>
                 <span class="value mono">{{ orderNo }}</span>
@@ -48,11 +50,11 @@
 
           <!-- Footer -->
           <div class="modal-footer">
-            <button class="btn secondary" @click="handleClose">
+            <button class="btn-glass secondary" @click="handleClose">
               暂不取消
             </button>
             <button 
-              class="btn primary"
+              class="btn-glass primary"
               :disabled="submitting"
               @click="handleConfirm"
             >
@@ -71,6 +73,7 @@ import { Close, Warning, WarningFilled, InfoFilled } from '@element-plus/icons-v
 import { clientOrderApi } from '@/api/client/order'
 import { ElMessage } from 'element-plus'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -82,6 +85,7 @@ const props = defineProps<{
     created_at: string
   } | null
   cancelledCount: number
+  order?: any
 }>()
 
 const emit = defineEmits(['update:modelValue', 'success'])
@@ -124,22 +128,21 @@ const handleConfirm = async () => {
   inset: 0;
   z-index: 2000;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
 }
 
-.modal-panel {
+.modal-panel-glass {
   width: 100%;
-  max-width: 380px;
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
-  border-radius: 16px;
+  max-width: 340px;
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
   overflow: hidden;
 }
 
@@ -154,184 +157,99 @@ const handleConfirm = async () => {
 }
 
 .header-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
   font-size: 20px;
 }
 .header-icon.warning {
   background: rgba(245, 158, 11, 0.15);
   color: #F59E0B;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .modal-title {
-  flex: 1;
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;
-  margin: 0;
+  flex: 1; font-size: 16px; font-weight: 700; color: #fff; margin: 0;
 }
 
 .close-btn {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  position: absolute; right: 16px; top: 16px;
+  width: 32px; height: 32px; border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94A3B8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  border: none; color: #94A3B8;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px;
 }
 
 /* Body */
 .modal-body {
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
 }
 
-.warning-tip {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
+.warning-tip-glass {
+  display: flex; gap: 10px; padding: 12px 14px;
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 10px;
-  font-size: 12px;
-  color: #93C5FD;
-  line-height: 1.5;
+  border-radius: 12px;
+  font-size: 13px; color: #93C5FD; line-height: 1.5;
 }
-.warning-tip .el-icon {
-  flex-shrink: 0;
-  font-size: 16px;
-  margin-top: 1px;
-}
+.tip-icon { flex-shrink: 0; font-size: 16px; margin-top: 2px; }
 
-.info-section {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.info-card-glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
 }
 
 .info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: flex; justify-content: space-between; align-items: center;
   font-size: 13px;
 }
-.info-row .label {
-  color: #94A3B8;
-}
-.info-row .value {
-  color: #E2E8F0;
-  font-weight: 500;
-  max-width: 60%;
-  text-align: right;
-  word-break: break-all;
-}
-.info-row .value.mono {
-  font-family: 'Monaco', monospace;
-  font-size: 12px;
-}
-.info-row.highlight .value {
-  color: #F59E0B;
-  font-weight: 700;
-}
+.info-row .label { color: #94A3B8; }
+.info-row .value { color: #E2E8F0; font-weight: 500; text-align: right; }
+.info-row .value.mono { font-family: 'Monaco', monospace; font-size: 12px; }
+.info-row.highlight .value { color: #F59E0B; font-weight: 700; }
 
 .limit-warning {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
+  display: flex; gap: 8px; padding: 12px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 10px;
-  font-size: 12px;
-  color: #FCA5A5;
-  line-height: 1.5;
-}
-.limit-warning .el-icon {
-  flex-shrink: 0;
-  font-size: 16px;
-  color: #F87171;
-}
-.limit-warning strong {
-  color: #F87171;
+  border-radius: 10px; font-size: 12px; color: #FCA5A5; line-height: 1.5;
 }
 
 /* Footer */
 .modal-footer {
-  padding: 14px 20px 20px;
-  display: flex;
-  gap: 10px;
+  padding: 0 20px 20px; display: flex; gap: 12px;
 }
 
-.btn {
-  flex: 1;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
+.btn-glass {
+  flex: 1; padding: 12px; border-radius: 12px;
+  font-size: 14px; font-weight: 600; cursor: pointer; border: none;
 }
-.btn.secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: #CBD5E1;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.btn-glass.secondary {
+  background: rgba(255, 255, 255, 0.05); color: #CBD5E1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-.btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-.btn.primary {
+.btn-glass.primary {
   background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
 }
-.btn.primary:hover {
-  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
-}
-.btn.primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.btn-glass.primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Transition */
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.25s ease;
+.modal-fade-enter-active, .modal-fade-leave-active { transition: opacity 0.25s ease; }
+.modal-fade-enter-active .modal-panel-glass { animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal-fade-leave-active .modal-panel-glass { animation: pop-out 0.25s ease; }
+
+@keyframes pop-in {
+  from { transform: scale(0.95) translateY(10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
 }
-.modal-fade-enter-active .modal-panel,
-.modal-fade-leave-active .modal-panel {
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-.modal-fade-enter-from .modal-panel,
-.modal-fade-leave-to .modal-panel {
-  transform: scale(0.95);
-  opacity: 0;
+@keyframes pop-out {
+  from { transform: scale(1) translateY(0); opacity: 1; }
+  to { transform: scale(0.95) translateY(10px); opacity: 0; }
 }
 </style>

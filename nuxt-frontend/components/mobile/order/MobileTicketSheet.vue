@@ -1,6 +1,8 @@
 <template>
+  <Teleport to="body">
+  <Transition name="fade">
   <div v-if="visible" class="sheet-mask" @click="handleClose">
-    <div class="sheet-panel" @click.stop>
+    <div class="sheet-panel-glass" @click.stop>
        <div class="sheet-header">
           <div class="title">提交工单</div>
           <div class="close-btn" @click="handleClose"><el-icon><Close /></el-icon></div>
@@ -8,28 +10,11 @@
 
        <div class="sheet-body">
           <!-- Rich Order Info Card -->
-           <div class="order-card-glass" v-if="orderInfo">
-              <div class="card-image">
-                 <img :src="orderInfo.productImage" alt="Product" />
-              </div>
-              <div class="card-info">
-                 <div class="info-top">
-                    <span class="order-no">订单号 {{ orderInfo.order_no }}</span>
-                 </div>
-                 <div class="product-name">{{ orderInfo.productName }}</div>
-                 <div class="specs">
-                    <span>{{ orderInfo.skuSpec }}</span>
-                 </div>
-                 <div class="price-row">
-                    <span class="price">¥{{ orderInfo.totalAmount }}</span>
-                    <span class="quantity">x{{ orderInfo.quantity }}</span>
-                 </div>
-              </div>
-           </div>
+           <MobileOrderProductInfo v-if="orderInfo" :order="orderInfo" :compact="true" />
 
           <div class="form-group">
              <label>标题 <span class="req">*</span></label>
-             <input v-model="form.title" class="m-input" placeholder="简要描述问题" />
+             <input v-model="form.title" class="input-glass" placeholder="简要描述问题" />
           </div>
 
           <div class="form-group">
@@ -37,7 +22,7 @@
              <div class="priority-row">
                 <div 
                    v-for="p in priorities" :key="p.val" 
-                   class="p-chip"
+                   class="p-chip-glass"
                    :class="{ active: form.priority === p.val, [p.val]: true }"
                    @click="form.priority = p.val"
                 >
@@ -48,7 +33,7 @@
 
           <div class="form-group">
              <label>详细描述 <span class="req">*</span></label>
-             <textarea v-model="form.content" class="m-input area" rows="4" placeholder="请详细描述..."></textarea>
+             <textarea v-model="form.content" class="input-glass area" rows="4" placeholder="请详细描述..."></textarea>
           </div>
 
           <div class="form-group">
@@ -58,8 +43,8 @@
                    <img :src="url" />
                    <div class="del-btn" @click="form.attachments.splice(idx, 1)">×</div>
                 </div>
-                <div v-if="form.attachments.length < 3" class="add-btn" @click="triggerUpload">
-                   <span v-if="uploading">...</span>
+                <div v-if="form.attachments.length < 3" class="add-btn-glass" @click="triggerUpload">
+                   <span v-if="uploading" class="loading-spin">C</span>
                    <span v-else>+</span>
                 </div>
              </div>
@@ -68,12 +53,14 @@
        </div>
 
        <div class="sheet-footer">
-          <button class="submit-btn" :disabled="!isValid || submitting" @click="submit">
+          <button class="submit-btn-glow" :disabled="!isValid || submitting" @click="submit">
              {{ submitting ? '提交中...' : '提交工单' }}
           </button>
        </div>
     </div>
   </div>
+  </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -82,6 +69,7 @@ import { Close } from '@element-plus/icons-vue'
 import { ticketApi } from '@/api/client/ticket'
 import { uploadImageToStorage } from '@/utils/uploadImage'
 import { ElMessage } from 'element-plus'
+import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -152,76 +140,69 @@ const submit = async () => {
 <style scoped>
 .sheet-mask {
     position: fixed; inset: 0; z-index: 2000;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
     display: flex; flex-direction: column; justify-content: flex-end;
 }
-.sheet-panel {
-    background: #1E293B; border-top-left-radius: 20px; border-top-right-radius: 20px;
-    padding-bottom: env(safe-area-inset-bottom);
+.sheet-panel-glass {
+    background: rgba(15, 23, 42, 0.95); /* Deep Blue Glass */
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top-left-radius: 24px; border-top-right-radius: 24px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 60px);
     max-height: 90vh; display: flex; flex-direction: column;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 .sheet-header {
-    padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
     display: flex; justify-content: space-between; align-items: center;
 }
-.title { color: #fff; font-weight: 700; }
-.close-btn { font-size: 20px; color: #94A3B8; }
+.title { color: #fff; font-weight: 700; font-size: 15px; }
+.close-btn { font-size: 20px; color: #94A3B8; padding: 4px; }
 
-.sheet-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+.sheet-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
 
-/* Rich Order Glass Card */
-.order-card-glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex; gap: 12px;
-}
-.card-image {
-  width: 60px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.05); background: #0F172A;
-}
-.card-image img { width: 100%; height: 100%; object-fit: cover; }
-.card-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.info-top { display: flex; justify-content: space-between; align-items: center; }
-.order-no { font-size: 11px; color: #64748B; font-family: monospace; }
-.product-name { font-size: 13px; font-weight: 600; color: #F1F5F9; line-height: 1.3; margin-top: 2px; }
-.specs { font-size: 11px; color: #94A3B8; margin-top: 2px; }
-.price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 4px; }
-.price { font-size: 14px; font-weight: 700; color: #F97316; font-family: 'DIN Alternate'; }
-.quantity { font-size: 11px; color: #64748B; }
 
-.form-group label { display: block; font-size: 13px; color: #CBD5E1; margin-bottom: 6px; }
+
+.form-group label { display: block; font-size: 12px; color: #CBD5E1; margin-bottom: 6px; font-weight: 500; }
 .req { color: #EF4444; }
 
-.m-input {
+.input-glass {
     width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
-    padding: 10px; color: #fff; font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    padding: 10px; color: #fff; font-size: 13px;
+    transition: all 0.2s;
 }
+.input-glass:focus { border-color: #3B82F6; background: rgba(59, 130, 246, 0.05); outline: none; }
 .area { resize: none; }
 
 .priority-row { display: flex; gap: 8px; }
-.p-chip {
-    flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 13px;
-    background: rgba(255,255,255,0.05); color: #94A3B8;
+.p-chip-glass {
+    flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 500;
+    background: rgba(255,255,255,0.05); color: #94A3B8; border: 1px solid transparent;
+    transition: all 0.2s;
 }
-.p-chip.active.low { background: #10B981; color: #fff; }
-.p-chip.active.medium { background: #F59E0B; color: #fff; }
-.p-chip.active.high { background: #EF4444; color: #fff; }
+.p-chip-glass.active.low { background: rgba(16, 185, 129, 0.15); color: #34D399; border-color: rgba(16, 185, 129, 0.3); }
+.p-chip-glass.active.medium { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border-color: rgba(245, 158, 11, 0.3); }
+.p-chip-glass.active.high { background: rgba(239, 68, 68, 0.15); color: #F87171; border-color: rgba(239, 68, 68, 0.3); }
 
 .upload-row { display: flex; gap: 10px; }
-.add-btn {
-    width: 60px; height: 60px; border: 1px dashed rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center; color: #64748B; border-radius: 8px;
+.add-btn-glass {
+    width: 64px; height: 64px; border: 1px dashed rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center; color: #64748B; border-radius: 12px;
+    background: rgba(255,255,255,0.02);
 }
-.img-preview { width: 60px; height: 60px; position: relative; border-radius: 8px; overflow: hidden; }
+.add-btn-glass:active { background: rgba(255,255,255,0.05); }
+.img-preview { width: 64px; height: 64px; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
 .img-preview img { width: 100%; height: 100%; object-fit: cover; }
-.del-btn { position: absolute; top:0; right:0; background: rgba(0,0,0,0.6); color: #fff; width: 16px; height: 16px; text-align: center; font-size: 12px; }
+.del-btn { position: absolute; top:0; right:0; background: rgba(0,0,0,0.6); color: #fff; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 
-.sheet-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
-.submit-btn {
-    width: 100%; padding: 12px; background: #3B82F6; color: #fff; font-weight: 600; border-radius: 10px; border: none;
+.sheet-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+.submit-btn-glow {
+    width: 100%; padding: 14px; background: linear-gradient(90deg, #3B82F6, #2563EB);
+    color: #fff; font-weight: 600; border-radius: 12px; border: none; font-size: 15px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
-.submit-btn:disabled { opacity: 0.5; }
+.submit-btn-glow:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
+
+.loading-spin { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>

@@ -2,88 +2,59 @@
   <div class="mobile-order-detail">
     
     <!-- Sticky Header -->
-    <div class="sticky-header">
-      <div class="header-top">
-         <div class="back-btn" @click="router.back()">
-            <el-icon><ArrowLeft /></el-icon>
-         </div>
-         <div class="header-title">订单详情</div>
-         <div class="header-action"></div> <!-- Placeholder -->
-      </div>
-      
-      <!-- Status Card inside Header (Collapsible feel) -->
-      <div class="status-card" :class="order.status">
-          <div class="status-main">
-             <div class="status-icon">
-                <el-icon v-if="order.status === 'active'"><CircleCheck /></el-icon>
-                <el-icon v-else-if="order.status === 'pending_delivery'"><Box /></el-icon>
-                <el-icon v-else-if="order.status === 'refunding'"><RefreshLeft /></el-icon>
-                <el-icon v-else><InfoFilled /></el-icon>
-             </div>
-             <div class="status-text">
-                <div class="status-label">{{ statusText }}</div>
-                <div class="status-sub" v-if="order.status === 'active'">到期: {{ formatTime(order.expires_at) }}</div>
-                <div class="status-sub" v-else>下单: {{ formatTime(order.createdAt) }}</div>
-             </div>
-             <div class="status-amount">
-                <span class="symbol">¥</span>
-                <span class="val">{{ order.totalAmount }}</span>
-             </div>
-          </div>
-          
-          <!-- Operation Bar -->
-          <div class="ops-bar">
-             <button class="op-btn" @click="handleAction('contact')">
-                <el-icon><Headset /></el-icon> 客服
-             </button>
-             <button v-if="activeTicketId" class="op-btn" @click="handleAction('view_ticket')">
-                <el-icon><Tickets /></el-icon> 工单
-             </button>
-             <button v-else class="op-btn" @click="handleAction('create_ticket')">
-                <el-icon><Tickets /></el-icon> 报障
-             </button>
+    <MobileSubPageHeader title="订单详情" />
 
-             <!-- Dynamic Buttons - 退款按钮组（与PC端逻辑对齐） -->
-             <button v-if="canRenew" class="op-btn primary" @click="handleAction('renew')">续费</button>
-             
-             <!-- 1. 可取消退款（有待审核申请） -->
-             <button v-if="canCancelRefund" class="op-btn warning" @click="handleAction('cancel_refund')">取消退款</button>
-             <!-- 2. 可申请退款 -->
-             <button v-else-if="canRefund" class="op-btn danger" @click="handleAction('apply_refund')">退款</button>
-             <!-- 3. 退款次数已达上限 -->
-             <button v-else-if="isRefundBlocked" class="op-btn disabled" disabled>退款已达上限</button>
+    <!-- Status Card (Glass & Neon & Colored) -->
+    <div class="status-card-glass" :class="order.status">
+       <div class="status-main">
+          <div class="status-icon-wrapper">
+             <el-icon v-if="order.status === 'active'"><CircleCheck /></el-icon>
+             <el-icon v-else-if="order.status === 'pending_delivery'"><Box /></el-icon>
+             <el-icon v-else-if="order.status === 'refunding'"><RefreshLeft /></el-icon>
+             <el-icon v-else><InfoFilled /></el-icon>
           </div>
-      </div>
+          <div class="status-content">
+             <div class="status-title">{{ statusText }}</div>
+             <div class="status-desc" v-if="order.status === 'active'">到期: {{ formatTime(order.expires_at) }}</div>
+             <div class="status-desc" v-else>下单: {{ formatTime(order.createdAt) }}</div>
+          </div>
+          <div class="status-price">
+             <span class="val">{{ Number(order.totalAmount).toFixed(2) }}</span>
+          </div>
+       </div>
+       
+       <!-- Operation Bar (Gradient Pills) -->
+       <div class="ops-bar-glass">
+          <button class="action-btn ghost" @click="handleAction('contact')">
+             <el-icon><Headset /></el-icon> 联系客服
+          </button>
+          <button v-if="activeTicketId" class="action-btn ghost" @click="handleAction('view_ticket')">
+             <el-icon><Tickets /></el-icon> 查看工单
+          </button>
+          <button v-else class="action-btn ghost" @click="handleAction('create_ticket')">
+             <el-icon><Tickets /></el-icon> 申请工单
+          </button>
+
+          <!-- Dynamic Buttons -->
+          <button v-if="canRenew" class="action-btn primary" @click="handleAction('renew')">续费</button>
+          
+          <button v-if="canCancelRefund" class="action-btn warning" @click="handleAction('cancel_refund')">取消退款</button>
+          <button v-else-if="canRefund" class="action-btn danger" @click="handleAction('apply_refund')">申请退款</button>
+          <button v-else-if="isRefundBlocked" class="action-btn disabled" disabled>退款上限</button>
+       </div>
     </div>
 
     <!-- Scroll Content -->
     <div class="content-body" v-if="!loading">
        
-       <!-- Product Card -->
-       <div class="info-card">
-          <div class="prod-row">
-             <div class="prod-thumb">
-                <img :src="order.productImage" class="prod-img" />
-             </div>
-             <div class="prod-info">
-                <div class="prod-name">{{ order.productName }}</div>
-                <div class="prod-meta">
-                   <span class="tag">{{ order.skuSpec }}</span>
-                   <span class="qty">x{{ order.quantity }}</span>
-                </div>
-                <div class="order-no" @click="copyText(order.order_no || '')">
-                   NO.{{ order.order_no }} <el-icon><CopyDocument /></el-icon>
-                </div>
-             </div>
-          </div>
-       </div>
+       <!-- Product Card Component -->
+       <MobileOrderProductInfo :order="order" />
 
-       <!-- Fulfillment Section - 退款中时显示处理中卡片 -->
+       <!-- Fulfillment Section -->
        <template v-if="order.status === 'refunding' && pendingRefundRequest">
           <MobileRefundingCard :refund-request="pendingRefundRequest" />
        </template>
        
-       <!-- 正常状态显示交付内容 -->
        <template v-else-if="['pending_delivery', 'active', 'completed'].includes(order.status || '')">
           <div class="fulfillment-container">
               
@@ -100,7 +71,7 @@
               <!-- One Time CDK -->
               <template v-else-if="order.orderType === 'one_time_cdk'">
                   <div class="section-group">
-                      <div class="section-title">卡密信息</div>
+                      <div class="section-header">卡密信息</div>
                       <FulfillmentCdk :cdk-list="cdkList" />
                   </div>
               </template>
@@ -108,7 +79,7 @@
               <!-- Virtual -->
               <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
                   <div class="section-group">
-                     <div class="section-title">充值进度</div>
+                     <div class="section-header">充值进度</div>
                      
                      <div class="virtual-item-group">
                          <FulfillmentSubmitForm
@@ -133,7 +104,7 @@
 
        <!-- Tutorial -->
        <div class="section-group" v-if="instructionImage && order.status !== 'refunding'">
-           <div class="section-title">使用说明</div>
+           <div class="section-header">使用说明</div>
            <div class="tutorial-box" @click="previewImage(instructionImage)">
               <img :src="instructionImage" class="tutorial-img" loading="lazy" />
               <div class="zoom-hint"><el-icon><ZoomIn /></el-icon></div>
@@ -147,14 +118,15 @@
     </div>
 
     <!-- Sheets -->
-    <MobileRenewalSheet v-if="order.id" v-model="showRenewalSheet" :order-id="order.id || ''" @success="loadData" />
-    <MobileRefundSheet v-if="order.id" v-model="showRefundSheet" :order-id="order.id || ''" :order-no="order.order_no || ''" @success="handleRefundSuccess" />
+    <MobileRenewalSheet v-if="order.id" v-model="showRenewalSheet" :order-id="order.id || ''" :order="order" @success="loadData" />
+    <MobileRefundSheet v-if="order.id" v-model="showRefundSheet" :order-id="order.id || ''" :order-no="order.order_no || ''" :order="order" @success="handleRefundSuccess" />
     <MobileTicketSheet v-if="showTicketSheet && order.id" v-model="showTicketSheet" :order-id="order.id" :order-info="order" @success="onTicketSuccess" />
     <MobileCancelRefundSheet 
        v-if="order.id" 
        v-model="showCancelRefundSheet" 
        :order-id="order.id || ''" 
        :order-no="order.order_no || ''"
+       :order="order"
        :refund-request="pendingRefundRequest"
        :cancelled-count="refundCancelledCount"
        @success="handleCancelRefundSuccess"
@@ -173,6 +145,8 @@ import {
   ArrowLeft, CopyDocument, CircleCheck, InfoFilled, 
   Box, RefreshLeft, Headset, Tickets, ZoomIn
 } from '@element-plus/icons-vue'
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
+import MobileOrderProductInfo from '@/components/mobile/order/MobileOrderProductInfo.vue'
 import { useOrderDetail } from '@/composables/client/useOrderDetail'
 import FulfillmentShared from '@/components/mobile/order/FulfillmentShared.vue'
 import FulfillmentCdk from '@/components/mobile/order/FulfillmentCdk.vue'
@@ -248,17 +222,10 @@ const previewImage = (url: string) => {
     window.open(url, '_blank')
 }
 
-const copyText = (t: string) => {
-    navigator.clipboard.writeText(t).then(() => showToast('已复制', 'success'))
-}
-
 const onTicketSuccess = () => {
     showToast('工单已提交', 'success')
     loadData()
 }
-
-
-
 </script>
 
 <style scoped>
@@ -268,94 +235,82 @@ const onTicketSuccess = () => {
     padding-bottom: 40px;
 }
 
-/* Header */
-.sticky-header {
-    position: sticky; top: 0; z-index: 100;
-    background: #0F172A;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.header-top {
-    height: 44px; display: flex; align-items: center; justify-content: space-between;
-    padding: 0 12px;
-}
-.back-btn {
-    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-    color: #fff;
-}
-.header-title { font-weight: 700; color: #fff; }
-.header-action { width: 32px; }
-
-/* Status Card */
-.status-card {
-    padding: 16px 20px;
-    background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
+/* Status Card Glass (Colored) */
+.status-card-glass {
+    margin: 16px;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     transition: all 0.3s;
 }
-.status-card.active { border-bottom: 2px solid #22C55E; }
-.status-card.pending_delivery { border-bottom: 2px solid #3B82F6; }
-.status-card.refunding { border-bottom: 2px solid #F59E0B; }
 
-.status-main { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.status-icon {
-    font-size: 28px; color: #94A3B8;
+/* Active: Green Scheme */
+.status-card-glass.active { 
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.4));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
 }
-.status-card.active .status-icon { color: #22C55E; }
-.status-card.pending_delivery .status-icon { color: #3B82F6; }
-
-.status-text { flex: 1; }
-.status-label { font-size: 18px; font-weight: 700; color: #fff; }
-.status-sub { font-size: 11px; color: #64748B; margin-top: 2px; }
-
-.status-amount { font-family: 'DIN Alternate'; font-weight: 700; color: #fff; }
-.status-amount .symbol { font-size: 12px; color: #F59E0B; }
-.status-amount .val { font-size: 20px; }
-
-.ops-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-.ops-bar::-webkit-scrollbar { display: none; }
-.op-btn {
-    padding: 6px 12px; border-radius: 20px; font-size: 12px; flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #CBD5E1;
-    display: flex; align-items: center; gap: 4px;
+/* Pending: Blue Scheme */
+.status-card-glass.pending_delivery { 
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.15), rgba(30, 58, 138, 0.4));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
 }
-.op-btn.primary { background: #3B82F6; color: #fff; border: none; }
-.op-btn.warning { background: #F59E0B; color: #fff; border: none; }
-.op-btn.danger { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; border-color: rgba(239, 68, 68, 0.5); }
-.op-btn.disabled { 
-    background: rgba(100, 116, 139, 0.1); 
-    color: #64748B; 
-    border-color: rgba(100, 116, 139, 0.2); 
-    cursor: not-allowed; 
-    opacity: 0.7;
+/* Refunding: Orange Scheme */
+.status-card-glass.refunding { 
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.15), rgba(120, 53, 15, 0.4));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
 }
 
-/* Content */
-.content-body { padding: 16px; display: flex; flex-direction: column; gap: 20px; }
-
-.info-card {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 12px; padding: 16px;
+.status-main { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+.status-icon-wrapper {
+    width: 40px; height: 40px; border-radius: 12px; 
+    background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;
+    color: #94A3B8; font-size: 20px;
 }
-.prod-row { display: flex; gap: 12px; }
-.prod-thumb { width: 72px; height: 72px; border-radius: 8px; overflow: hidden; background: #1E293B; flex-shrink: 0; }
-.prod-img { width: 100%; height: 100%; object-fit: cover; }
-.prod-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.prod-name { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.3; }
-.prod-meta { display: flex; gap: 6px; font-size: 11px; color: #94A3B8; }
-.tag { background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
-.order-no {
-    font-size: 11px; color: #64748B; font-family: 'Monaco', monospace; margin-top: 4px;
-    display: flex; align-items: center; gap: 4px;
-}
+.status-card-glass.active .status-icon-wrapper { background: rgba(34, 197, 94, 0.2); color: #4ADE80; }
+.status-card-glass.pending_delivery .status-icon-wrapper { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+.status-card-glass.refunding .status-icon-wrapper { background: rgba(251, 191, 36, 0.2); color: #FCD34D; }
 
+.status-content { flex: 1; padding-top: 2px; }
+.status-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.status-desc { font-size: 11px; color: #94A3B8; }
+.status-card-glass.active .status-desc { color: #A7F3D0; }
+
+.status-price { font-family: 'DIN Alternate'; font-weight: 700; color: #fff; display: flex; align-items: baseline; }
+.status-price .val { font-size: 24px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+
+/* Ops Bar */
+.ops-bar-glass { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
+.ops-bar-glass::-webkit-scrollbar { display: none; }
+
+.action-btn {
+    padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap;
+    border: none; display: flex; align-items: center; gap: 4px; transition: all 0.2s;
+}
+.action-btn.ghost { background: rgba(255,255,255,0.1); color: #E2E8F0; border: 1px solid rgba(255,255,255,0.1); }
+.action-btn.ghost:active { background: rgba(255,255,255,0.2); }
+
+.action-btn.primary { background: linear-gradient(90deg, #3B82F6, #2563EB); color: #fff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+.action-btn.warning { background: linear-gradient(90deg, #F97316, #EA580C); color: #fff; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+.action-btn.danger { background: rgba(239, 68, 68, 0.15); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4); }
+.action-btn.disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
+
+/* Content Body */
+.content-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Section Headers */
 .section-group { display: flex; flex-direction: column; gap: 10px; }
-.section-title { font-size: 14px; font-weight: 600; color: #E2E8F0; padding-left: 8px; border-left: 3px solid #3B82F6; }
-
-.virtual-status-box {
-    padding: 16px; background: rgba(30, 41, 59, 0.4); border-radius: 12px;
-    color: #94A3B8; font-size: 13px; text-align: center;
+.section-header { 
+    font-size: 13px; font-weight: 600; color: #94A3B8; 
+    padding-left: 10px; border-left: 2px solid #3B82F6; 
 }
 
+/* Tutorial */
 .tutorial-box {
     border-radius: 12px; overflow: hidden; position: relative;
     border: 1px solid rgba(255,255,255,0.1);
@@ -363,8 +318,7 @@ const onTicketSuccess = () => {
 .tutorial-img { display: block; width: 100%; object-fit: cover; }
 .zoom-hint {
     position: absolute; bottom: 8px; right: 8px;
-    background: rgba(0,0,0,0.5); color: #fff; padding: 4px;
-    border-radius: 50%;
+    background: rgba(0,0,0,0.5); color: #fff; padding: 4px; border-radius: 50%;
 }
 
 .loading-screen { padding: 40px; display: flex; justify-content: center; }
@@ -373,4 +327,6 @@ const onTicketSuccess = () => {
     border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.fulfillment-container { display: flex; flex-direction: column; gap: 20px; }
 </style>

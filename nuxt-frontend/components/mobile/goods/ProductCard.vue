@@ -27,13 +27,12 @@
       
       <div class="goods-bottom">
         <div class="goods-price-row">
-          <span class="currency">¥</span>
           <span class="price-val text-price">{{ formatPrice(goods.display_price || goods.price) }}</span>
         </div>
         
         <!-- Action Button -->
-        <button class="buy-btn btn-primary">
-          购买
+        <button class="buy-btn btn-marketing-buy">
+          查看详情
         </button>
       </div>
     </div>
@@ -76,9 +75,9 @@ const getBadgeClass = (label: string) => {
   const map: Record<string, string> = {
     '热卖': 'badge-hot',
     '新品': 'badge-new',
-    '推荐': 'badge-hot',
-    '限时': 'badge-new',
-    '优惠': 'badge-hot'
+    '推荐': 'badge-recommend',
+    '限时': 'badge-limited',
+    '优惠': 'badge-promo'
   }
   return map[label] || 'badge-new'
 }
@@ -91,6 +90,8 @@ const getBadgeClass = (label: string) => {
   padding: 12px;
   transition: active 0.2s;
   background: var(--glass-bg); /* Explicit fallback */
+  border: 1px solid var(--primary); /* Global Border Style */
+  border-radius: var(--radius-lg);
 }
 
 .goods-thumb {
@@ -101,7 +102,9 @@ const getBadgeClass = (label: string) => {
   border-radius: var(--radius-md);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--primary); /* Image Border */
 }
 .goods-thumb img { 
     width: 100%; height: 100%; object-fit: cover; 
@@ -118,7 +121,15 @@ const getBadgeClass = (label: string) => {
     border-radius: 0 0 8px 0;
     z-index: 5;
     font-size: 10px;
+    color: #fff;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 }
+
+.badge-hot { background: linear-gradient(135deg, var(--accent) 0%, #EA580C 100%); }
+.badge-new { background: linear-gradient(135deg, var(--primary) 0%, #0284C7 100%); }
+.badge-recommend { background: linear-gradient(135deg, var(--accent) 0%, #F97316 100%); }
+.badge-limited { background: linear-gradient(135deg, var(--primary) 0%, #0369A1 100%); }
+.badge-promo { background: linear-gradient(135deg, var(--primary) 0%, #0EA5E9 100%); }
 
 .goods-info {
   flex: 1;
@@ -177,5 +188,14 @@ const getBadgeClass = (label: string) => {
     font-size: 12px;
     border-radius: 16px; 
     /* Button styles from global class but overridden size */
+}
+
+/* Marketing Buy Style (to match PC) */
+.btn-marketing-buy {
+  background: linear-gradient(135deg, var(--primary) 0%, #0c6a96 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 12px var(--primary-glow);
+
 }
 </style>

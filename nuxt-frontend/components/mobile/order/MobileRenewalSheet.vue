@@ -1,24 +1,23 @@
 <template>
+  <Teleport to="body">
+  <Transition name="fade">
   <div v-if="visible" class="sheet-mask" @click="handleClose">
-    <div class="sheet-panel" @click.stop>
+    <div class="sheet-panel-glass" @click.stop>
        <div class="sheet-header">
           <div class="title">续费订单</div>
           <div class="close-btn" @click="handleClose"><el-icon><Close /></el-icon></div>
        </div>
 
        <div class="sheet-body" v-if="loading">
-          <div class="loading-box">加载中...</div>
+          <div class="loading-box">
+             <div class="spinner"></div>
+             <div>加载中...</div>
+          </div>
        </div>
 
        <div class="sheet-body" v-else>
           <!-- Product -->
-          <div class="prod-row">
-             <div class="thumb"><img :src="productInfo.image" /></div>
-             <div class="info">
-                <div class="name">{{ productInfo.name }}</div>
-                <div class="expire">当前到期: {{ formatDate(currentEndTime) }}</div>
-             </div>
-          </div>
+          <MobileOrderProductInfo :order="productInfoAsOrder" />
 
           <!-- Specs -->
           <div class="specs-section">
@@ -26,7 +25,7 @@
                 <div class="g-name">{{ group.name }}</div>
                 <div class="g-vals">
                    <div v-for="val in group.values" :key="val.value" 
-                        class="val-chip"
+                        class="val-chip-glass"
                         :class="{ active: selectedSpecs[group.name] === val.value }"
                         @click="handleSpec(group.name, val.value)"
                    >
@@ -40,7 +39,7 @@
                  <div class="g-name">选择时长</div>
                  <div class="g-vals">
                      <div v-for="sku in skuList" :key="sku.sku_id"
-                          class="val-chip"
+                          class="val-chip-glass"
                           :class="{ active: selectedSkuId === sku.sku_id }"
                           @click="handleSku(sku.sku_id)"
                      >
@@ -56,24 +55,30 @@
              <div class="coupon-list">
                  <!-- No Coupon Option -->
                  <div 
-                    class="coupon-item" 
+                    class="coupon-item-glass" 
                     :class="{ active: !selectedCoupon }"
                     @click="handleCouponSelect(null)"
                  >
                     不使用优惠券
+                    <el-icon v-if="!selectedCoupon" class="chk"><Select /></el-icon>
                  </div>
                  
                  <!-- Coupon Items -->
                  <div 
                    v-for="coupon in availableCoupons" 
                    :key="coupon.id" 
-                   class="coupon-item"
+                   class="coupon-item-glass"
                    :class="{ active: selectedCoupon?.id === coupon.id }"
                    @click="handleCouponSelect(coupon)"
                  >
-                    <span class="c-name">{{ coupon.coupon.name }}</span>
-                    <span class="c-val" v-if="coupon.coupon.type === 'flat'">-¥{{ coupon.coupon.value }}</span>
-                    <span class="c-val" v-else-if="coupon.coupon.type === 'product'">免单</span>
+                    <div class="c-left">
+                       <span class="c-name">{{ coupon.coupon.name }}</span>
+                    </div>
+                    <div class="c-right">
+                       <span class="c-val" v-if="coupon.coupon.type === 'flat'">-¥{{ coupon.coupon.value }}</span>
+                       <span class="c-val" v-else-if="coupon.coupon.type === 'product'">免单</span>
+                       <el-icon v-if="selectedCoupon?.id === coupon.id" class="chk"><Select /></el-icon>
+                    </div>
                  </div>
              </div>
           </div>
@@ -83,32 +88,36 @@
           <div class="price-info">
              <div class="total-label">总计</div>
              <div class="price-row">
-                <div class="price">¥{{ finalAmount }}</div>
-                <div v-if="discountAmount > 0" class="discount-tag">-¥{{ discountAmount }}</div>
+                <!-- <span class="currency">¥</span> -->
+                <span class="price-val">{{ finalAmount }}</span>
+                <div v-if="discountAmount > 0" class="discount-tag">已省 ¥{{ discountAmount }}</div>
              </div>
           </div>
-          <button class="pay-btn" :disabled="!selectedSkuId || paying" @click="handlePay">
-             {{ paying ? '支付中...' : '立即支付' }}
+          <button class="pay-btn-glow" :disabled="!selectedSkuId || paying" @click="handlePay">
+             {{ paying ? '支付中...' : '立即续费' }}
           </button>
        </div>
     </div>
   </div>
+  </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { Close } from '@element-plus/icons-vue'
+import { Close, Clock, Select } from '@element-plus/icons-vue'
 import { clientOrderApi } from '@/api/client'
+import { couponApi } from '@/api/client/coupon'
 import { useUserStore } from '@/stores/client/user'
 import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
+import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
 const props = defineProps<{
   modelValue: boolean
   orderId: string
+  order: any
 }>()
 const emit = defineEmits(['update:modelValue', 'success'])
-const router = useRouter()
 const userStore = useUserStore()
 
 const visible = computed({
@@ -128,7 +137,13 @@ const selectedSpecs = reactive<Record<string,string>>({})
 // Coupons
 const availableCoupons = ref<any[]>([])
 const selectedCoupon = ref<any>(null)
-const discountAmount = ref(0)
+const discountAmount = ref(0) // Should reset when amount changes
+
+const productInfoAsOrder = computed(() => ({
+    ...props.order,
+    productName: productInfo.name || props.order.productName,
+    productImage: productInfo.image || props.order.productImage,
+}))
 
 const specGroups = computed(() => {
    if (!skuList.value.length) return []
@@ -185,14 +200,18 @@ const loadData = async () => {
 }
 
 const fetchCoupons = async () => {
-   // Assuming there's an API to get usable coupons for this product/renewal
    try {
-      const res = await clientOrderApi.getUsableCoupons({
-          product_ids: [productInfo.id],
-          amount: originalAmount.value
-      })
-      if (res.success) {
-          availableCoupons.value = res.data || []
+      // Use client coupon API to get all coupons and filter locally
+      const res = await couponApi.getUserCoupons()
+      if (res.success && res.data) {
+          availableCoupons.value = res.data.filter(c => {
+              if (c.status !== 'unused') return false
+              // Min usage check
+              if (c.coupon.min_usage > originalAmount.value) return false
+              // Expiry check
+              if (c.coupon.end_date && new Date(c.coupon.end_date) < new Date()) return false
+              return true
+          })
       }
    } catch(e) { console.error('Failed to fetch coupons', e) }
 }
@@ -272,60 +291,93 @@ watch(originalAmount, () => fetchCoupons()) // Refresh coupons if price changes 
 <style scoped>
 .sheet-mask {
     position: fixed; inset: 0; z-index: 2000;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
     display: flex; flex-direction: column; justify-content: flex-end;
 }
-.sheet-panel {
-    background: #1E293B; border-top-left-radius: 20px; border-top-right-radius: 20px;
-    padding-bottom: env(safe-area-inset-bottom);
+.sheet-panel-glass {
+    background: rgba(15, 23, 42, 0.95);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top-left-radius: 24px; border-top-right-radius: 24px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 60px); /* Add extra padding for Nav bar */
     max-height: 85vh; display: flex; flex-direction: column;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
-.sheet-header { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; }
-.title { color: #fff; font-weight: 700; }
-.close-btn { color: #94A3B8; font-size: 20px; }
+.sheet-header { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+.title { color: #fff; font-weight: 700; font-size: 16px; }
+.close-btn { color: #94A3B8; font-size: 20px; padding: 4px; }
 
-.sheet-body { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-.loading-box { color: #64748B; text-align: center; padding: 20px; }
+.sheet-body { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+.loading-box { color: #64748B; text-align: center; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; }
+.spinner { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #3B82F6; border-radius: 50%; animation: spin 1s linear infinite; }
 
-.prod-row { display: flex; gap: 12px; align-items: center; }
-.thumb { width: 56px; height: 56px; border-radius: 8px; overflow: hidden; background: #0F172A; }
+.prod-card-glass {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px; padding: 12px;
+    display: flex; gap: 12px; align-items: center;
+}
+.thumb { width: 48px; height: 48px; border-radius: 12px; overflow: hidden; background: #0F172A;border: 1px solid rgba(255,255,255,0.05); }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .info { flex: 1; }
-.name { color: #fff; font-size: 14px; font-weight: 600; }
-.expire { color: #94A3B8; font-size: 12px; }
+.name { color: #F1F5F9; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.expire { color: #94A3B8; font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
 
 .specs-section { display: flex; flex-direction: column; gap: 16px; }
-.g-name { color: #CBD5E1; font-size: 13px; margin-bottom: 8px; }
-.g-vals { display: flex; flex-wrap: wrap; gap: 8px; }
-.val-chip {
-    padding: 8px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 8px; color: #94A3B8; font-size: 13px;
-}
-.val-chip.active { background: #3B82F6; color: #fff; border-color: #3B82F6; }
+.g-name { color: #CBD5E1; font-size: 13px; margin-bottom: 10px; font-weight: 500; }
+.g-vals { display: flex; flex-wrap: wrap; gap: 10px; }
 
-.coupon-section { margin-top: 10px; }
-.coupon-list { display: flex; flex-direction: column; gap: 8px; }
-.coupon-item {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-    padding: 10px 12px; border-radius: 8px; 
-    display: flex; justify-content: space-between; align-items: center;
-    color: #94A3B8; font-size: 13px;
+.val-chip-glass {
+    padding: 10px 16px; 
+    background: rgba(255,255,255,0.03); 
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; color: #94A3B8; font-size: 13px; font-weight: 500;
+    transition: all 0.2s; min-width: 60px; text-align: center;
 }
-.coupon-item.active { border-color: #3B82F6; background: rgba(59,130,246,0.1); color: #fff; }
-.c-val { color: #F97316; font-weight: 600; }
+.val-chip-glass.active {
+    background: rgba(59, 130, 246, 0.15); 
+    color: #60A5FA; 
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+}
+
+.coupon-section { margin-top: 0; }
+.coupon-list { display: flex; flex-direction: column; gap: 10px; }
+.coupon-item-glass {
+    background: rgba(255,255,255,0.03); 
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 12px 16px; border-radius: 12px; 
+    display: flex; justify-content: space-between; align-items: center;
+    color: #94A3B8; font-size: 13px; transition: all 0.2s;
+}
+.coupon-item-glass.active {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34D399;
+}
+.c-val { color: #F97316; font-weight: 700; margin-right: 6px; }
+.chk { font-size: 16px; }
 
 .sheet-footer {
-    padding: 16px; border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 20px; border-top: 1px solid rgba(255,255,255,0.05);
     display: flex; gap: 16px; align-items: center;
 }
 .price-info { flex: 1; }
-.total-label { font-size: 11px; color: #64748B; }
-.price-row { display: flex; align-items: baseline; gap: 6px; }
-.price { font-size: 20px; font-weight: 700; color: #fff; font-family: 'DIN Alternate'; }
-.discount-tag { font-size: 12px; color: #EF4444; }
-
-.pay-btn {
-    padding: 12px 32px; background: #3B82F6; color: #fff; font-weight: 600; border-radius: 20px; border: none;
+.total-label { font-size: 11px; color: #64748B; margin-bottom: 2px; }
+.price-row { display: flex; align-items: baseline; gap: 2px; }
+/* .currencyRemoved { font-size: 14px; color: #fff; font-weight: 600; } */
+.price-val { font-size: 24px; font-weight: 700; color: #F59E0B; font-family: 'DIN Alternate'; margin-right: 8px; }
+.discount-tag { 
+    font-size: 10px; color: #fff; background: #EF4444; 
+    padding: 1px 6px; border-radius: 4px; transform: translateY(-3px);
 }
-.pay-btn:disabled { opacity: 0.5; }
+
+.pay-btn-glow {
+    padding: 12px 40px; 
+    background: linear-gradient(90deg, #3B82F6, #2563EB);
+    color: #fff; font-weight: 600; border-radius: 30px; border: none; font-size: 15px;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+.pay-btn-glow:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>

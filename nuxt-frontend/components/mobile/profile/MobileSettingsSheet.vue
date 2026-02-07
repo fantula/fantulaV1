@@ -140,7 +140,7 @@ const handleSuccess = (msg: string) => {
 <style scoped>
 .sheet-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7); 
+    background: rgba(0,0,0,0.6); 
     z-index: 4000;
     display: flex; flex-direction: column; justify-content: flex-end;
     animation: fadeIn 0.3s forwards;
@@ -148,14 +148,14 @@ const handleSuccess = (msg: string) => {
 }
 
 .sheet-content {
-    background: #1E293B;
+    background: var(--cyber-bg-deep, #0F172A);
     border-top-left-radius: 20px; border-top-right-radius: 20px;
     padding: 10px 24px 40px 24px;
     max-height: 80vh; overflow-y: auto;
     display: flex; flex-direction: column;
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    border-top: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(6, 182, 212, 0.1);
 }
 
 .sheet-handle-bar {
@@ -168,35 +168,39 @@ const handleSuccess = (msg: string) => {
 .sheet-header {
     margin-bottom: 20px; padding-top: 10px;
 }
-.sheet-title { font-size: 20px; font-weight: 700; color: #fff; }
+.sheet-title { font-size: 20px; font-weight: 700; color: #fff; text-align: center; }
 
-.sheet-body { display: flex; flex-direction: column; gap: 24px; }
+.sheet-body { display: flex; flex-direction: column; gap: 20px; }
 
 .group-title {
-    font-size: 13px; color: #94A3B8; margin-bottom: 10px; padding-left: 4px;
+    font-size: 12px; color: #94A3B8; margin-bottom: 8px; padding-left: 4px; font-weight: 600;
 }
 
 .setting-group {
-    background: rgba(255,255,255,0.03); border-radius: 16px; overflow: hidden;
+    background: rgba(255,255,255,0.02); 
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px; overflow: hidden;
 }
 
 .setting-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
     cursor: pointer;
     transition: background 0.2s;
 }
 .setting-item:last-child { border-bottom: none; }
-.setting-item:active { background: rgba(255,255,255,0.06); }
+.setting-item:active { background: rgba(6, 182, 212, 0.05); }
 
 .item-left { display: flex; align-items: center; gap: 12px; }
-.item-left span { font-size: 15px; color: #E2E8F0; font-weight: 500; }
-.text-icon { color: #94A3B8; }
+.item-left span { font-size: 15px; color: #E0F2FE; font-weight: 500; }
+.text-icon { color: var(--cyber-primary, #06B6D4); }
 .text-arrow { color: #475569; }
 
 .logout-item {
     justify-content: center; gap: 10px;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    background: rgba(248, 113, 113, 0.05);
 }
 .logout-item span { color: #F87171; }
 .logout-item .text-icon { color: #F87171; }

@@ -1,7 +1,8 @@
 <template>
+  <Teleport to="body">
   <Transition name="fade">
     <div v-if="visible" class="modal-overlay" @click="handleClose">
-      <div class="modal-panel" @click.stop>
+      <div class="modal-panel-glass" @click.stop>
         <!-- Header -->
         <div class="modal-header">
            <div class="header-title">联系我们</div>
@@ -14,7 +15,7 @@
         <div class="modal-body">
            
            <!-- WeChat -->
-           <div class="contact-card wechat">
+           <div class="contact-card-glass wechat" @click="copyText(config.wechat_id || 'Spotify-cn')">
               <div class="card-icon">
                  <el-icon><ChatDotRound /></el-icon>
               </div>
@@ -22,9 +23,10 @@
                  <div class="label">微信客服</div>
                  <div class="value">{{ config.wechat_id || 'Spotify-cn' }}</div>
               </div>
-              <button class="action-btn" @click="copyText(config.wechat_id || 'Spotify-cn')">
-                 复制
-              </button>
+              <div class="copy-tag">
+                 <el-icon><CopyDocument /></el-icon>
+                 <span>复制</span>
+              </div>
            </div>
 
            <!-- Service Time -->
@@ -34,7 +36,7 @@
            </div>
 
            <!-- Telegram -->
-           <div class="contact-card telegram">
+           <div class="contact-card-glass telegram" @click="copyText(config.telegram_id || '@Fantula_Support')">
               <div class="card-icon">
                  <el-icon><Position /></el-icon>
               </div>
@@ -42,20 +44,22 @@
                  <div class="label">Telegram</div>
                  <div class="value">{{ config.telegram_id || '@Fantula_Support' }}</div>
               </div>
-              <button class="action-btn" @click="copyText(config.telegram_id || '@Fantula_Support')">
-                 复制
-              </button>
+              <div class="copy-tag">
+                 <el-icon><CopyDocument /></el-icon>
+                 <span>复制</span>
+              </div>
            </div>
 
         </div>
       </div>
     </div>
   </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { Close, ChatDotRound, Position, Clock } from '@element-plus/icons-vue'
+import { Close, ChatDotRound, Position, Clock, CopyDocument } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useSystemConfig } from '@/composables/client/useSystemConfig'
 
@@ -105,14 +109,15 @@ const copyText = (text: string) => {
 .modal-overlay {
   position: fixed; inset: 0; z-index: 9999;
   background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px); /* Deeper blur */
   display: flex; align-items: center; justify-content: center;
   padding: 20px;
 }
 
-.modal-panel {
-  width: 100%; max-width: 340px;
-  background: linear-gradient(145deg, #1E293B, #0F172A);
+.modal-panel-glass {
+  width: 100%; max-width: 320px;
+  background: rgba(30, 41, 59, 0.9); /* Dark Glass */
+  backdrop-filter: blur(12px);
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.08);
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
@@ -136,55 +141,61 @@ const copyText = (text: string) => {
   display: flex; flex-direction: column; gap: 16px;
 }
 
-.contact-card {
+/* Contact Cards */
+.contact-card-glass {
   display: flex; align-items: center; gap: 12px;
   padding: 16px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+.contact-card-glass:active { background: rgba(255,255,255,0.06); transform: scale(0.98); }
 
 /* WeChat Style */
-.contact-card.wechat .card-icon {
+.contact-card-glass.wechat .card-icon {
    color: #10B981; background: rgba(16, 185, 129, 0.15);
+   box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
 }
-
 /* Telegram Style */
-.contact-card.telegram .card-icon {
-   color: #3B82F6; background: rgba(59, 130, 246, 0.15);
+.contact-card-glass.telegram .card-icon {
+   color: #38BDF8; background: rgba(56, 189, 248, 0.15);
+   box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
 }
 
 .card-icon {
-  width: 44px; height: 44px; border-radius: 10px;
+  width: 44px; height: 44px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
+  font-size: 20px; flex-shrink: 0;
 }
 
 .card-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.label { font-size: 12px; color: #94A3B8; }
-.value { font-size: 15px; color: #fff; font-weight: 600; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; }
+.label { font-size: 11px; color: #94A3B8; }
+.value { font-size: 14px; color: #F1F5F9; font-weight: 600; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px; }
 
-.action-btn {
-  padding: 6px 14px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.05);
+.copy-tag {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.1);
   border-radius: 8px;
-  color: #CBD5E1; font-size: 12px; font-weight: 500;
-  cursor: pointer;
+  color: #CBD5E1; cursor: pointer;
+  transition: all 0.2s;
 }
-.action-btn:active { background: rgba(255,255,255,0.15); color: #fff; }
+.copy-tag:active { background: rgba(255,255,255,0.2); color: #fff; }
+.copy-tag .el-icon { font-size: 14px; }
 
 .time-tip {
   display: flex; align-items: center; justify-content: center; gap: 6px;
-  font-size: 12px; color: #64748B;
+  font-size: 11px; color: #64748B;
   padding: 4px 0;
 }
 
 /* Transitions */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-.fade-enter-active .modal-panel { animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.fade-leave-active .modal-panel { animation: pop-out 0.2s ease; }
+.fade-enter-active .modal-panel-glass { animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.fade-leave-active .modal-panel-glass { animation: pop-out 0.2s ease; }
 
 @keyframes pop-in {
   from { transform: scale(0.9); opacity: 0; }

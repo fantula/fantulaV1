@@ -16,7 +16,7 @@
 
          <!-- Header -->
          <div class="sheet-header">
-            <div class="h-title">Welcome Back (v2)</div>
+            <div class="h-title">欢迎回来</div>
             <div class="h-sub">登录您的凡图拉账户</div>
             
             <!-- Tabs -->
@@ -116,15 +116,12 @@
                </form>
             </div>
 
-            <!-- Social Login -->
-            <div class="social-divider">
-               <span>或者</span>
-            </div>
+
             <div class="social-login">
-               <button class="google-btn" @click="oauth('google')">
+               <!-- <button class="google-btn" @click="oauth('google')">
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
                   <span>Google</span>
-               </button>
+               </button> -->
                <button class="wechat-btn" @click="onWechatLogin">
                   <svg class="wechat-icon" viewBox="0 0 24 24" width="22" height="22">
                      <path fill="#07C160" d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.045c.134 0 .24-.11.24-.245 0-.06-.023-.118-.04-.177l-.325-1.233a.49.49 0 0 1 .177-.554c1.525-1.122 2.502-2.779 2.502-4.608-.001-3.248-2.913-5.935-7.061-6.135zm-2.344 3.363c.534 0 .967.44.967.982a.975.975 0 0 1-.967.981.976.976 0 0 1-.967-.981c0-.542.433-.982.967-.982zm4.726 0c.534 0 .967.44.967.982a.975.975 0 0 1-.967.981.976.976 0 0 1-.967-.981c0-.542.433-.982.967-.982z"/>
@@ -286,12 +283,15 @@ const onWechatLogin = () => {
 }
 .sheet-panel {
    position: fixed; bottom: 0; left: 0; right: 0;
-   background: #0F172A;
+   background: rgba(15, 23, 42, 0.9);
+   backdrop-filter: blur(20px);
+   -webkit-backdrop-filter: blur(20px);
    border-radius: 24px 24px 0 0;
    z-index: 10001;
    padding-bottom: max(20px, env(safe-area-inset-bottom));
    max-height: 90vh; overflow-y: auto;
    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
 .sheet-handle-bar {
@@ -315,7 +315,7 @@ const onWechatLogin = () => {
    color: #94A3B8; border-radius: 8px; transition: all 0.3s;
 }
 .tab-item.active {
-   background: #1E293B; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+   background: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 .sheet-body { padding: 0 24px; }
@@ -323,16 +323,16 @@ const onWechatLogin = () => {
    display: flex; gap: 20px; margin-bottom: 16px; font-size: 14px; color: #64748B;
 }
 .login-type-switch span { cursor: pointer; padding-bottom: 4px; border-bottom: 2px solid transparent; transition: all 0.2s; }
-.login-type-switch span.active { color: #fff; border-color: #F97316; }
+.login-type-switch span.active { color: #fff; border-color: var(--primary); }
 
 .input-group { margin-bottom: 16px; position: relative; } /* Constraint for absolute button */
 .input-group input,
 :deep(.custom-email-input) {
    width: 100%; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
    border-radius: 12px; padding: 0 16px; color: #fff; font-size: 15px; outline: none;
-   transition: border 0.2s;
+   transition: border 0.2s, background 0.2s;
 }
-.input-group input:focus { border-color: #F97316; }
+.input-group input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
 
 /* Code Row: Button sits INSIDE the input now */
 .code-row input { padding-right: 120px; } /* Space for SendCodeButton */
@@ -342,24 +342,19 @@ const onWechatLogin = () => {
 }
 .form-agreement { margin-bottom: 24px; font-size: 12px; color: #64748B; display: flex; align-items: center; }
 .form-agreement input { margin-right: 8px; }
-.link { color: #3B82F6; }
+.link { color: var(--primary); }
 
 .submit-btn {
-   width: 100%; height: 50px; background: linear-gradient(135deg, #F97316, #EA580C);
-   border: none; border-radius: 25px; color: #fff; font-size: 16px; font-weight: 600;
-   box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+   width: 100%; height: 50px; background: linear-gradient(135deg, var(--primary), #0c6a96);
+   border: none; border-radius: 16px; /* Exquisite Squircle-ish */
+   color: #fff; font-size: 16px; font-weight: 600; text-letter-spacing: 1px;
+   box-shadow: 0 4px 20px rgba(23, 143, 198, 0.4);
+   transition: transform 0.2s, box-shadow 0.2s;
 }
+.submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(23, 143, 198, 0.3); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.social-divider {
-   margin: 30px 0 20px; text-align: center; position: relative;
-}
-.social-divider span {
-   background: #0F172A; padding: 0 10px; color: #475569; position: relative; z-index: 1; font-size: 12px;
-}
-.social-divider::before {
-   content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(255,255,255,0.05);
-}
+
 
 .google-btn {
    width: 100%; height: 50px; background: #fff; border-radius: 25px; border: none;
@@ -371,6 +366,7 @@ const onWechatLogin = () => {
 .social-login {
    display: flex;
    gap: 12px;
+   margin-top: 24px; /* Increased separation */
 }
 .google-btn, .wechat-btn {
    flex: 1;
@@ -378,8 +374,8 @@ const onWechatLogin = () => {
 
 .wechat-btn {
    height: 50px;
-   background: #07C160;
-   border-radius: 25px;
+   background: linear-gradient(135deg, #07C160, #059669); /* Richer Green */
+   border-radius: 16px; /* Exquisite Squircle-ish */
    border: none;
    display: flex;
    align-items: center;
@@ -388,7 +384,10 @@ const onWechatLogin = () => {
    font-size: 15px;
    font-weight: 600;
    color: #fff;
+   box-shadow: 0 4px 20px rgba(7, 193, 96, 0.3);
+   transition: transform 0.2s;
 }
+.wechat-btn:active { transform: scale(0.98); }
 
 /* Transitions */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }

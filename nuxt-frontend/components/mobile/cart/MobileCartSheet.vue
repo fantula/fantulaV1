@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="sheet-fade">
       <div v-if="visible" class="mobile-sheet-overlay" @click="$emit('close')">
-        <div class="mobile-sheet-content bg-glass-card" @click.stop>
+        <div class="mobile-sheet-content cyber-sheet" @click.stop>
           
           <!-- Header -->
           <div class="sheet-header">
@@ -20,7 +20,7 @@
              <div v-if="!hasItems" class="empty-cart">
                 <div class="empty-icon">🛒</div>
                 <p>购物车还是空的</p>
-                <button class="btn-v3 btn-ghost btn-sm" @click="$emit('close')">去逛逛</button>
+                <button class="btn-cyber-ghost btn-sm" @click="$emit('close')">去逛逛</button>
              </div>
 
              <div v-else class="cart-item-card">
@@ -43,7 +43,7 @@
 
           <!-- Footer -->
           <div class="sheet-footer" v-if="hasItems">
-             <button class="btn-v3 btn-accent w-full" :disabled="checkingOut" @click="handleCheckout">
+             <button class="btn-cyber-primary w-full" :disabled="checkingOut" @click="handleCheckout">
                 {{ checkingOut ? '处理中...' : '去结算' }}
              </button>
           </div>
@@ -111,14 +111,99 @@ const updateQty = (delta: number) => {
 <style scoped>
 .mobile-sheet-overlay {
     position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.7); /* Darker overlay */
+    backdrop-filter: blur(4px);
     display: flex; align-items: flex-end;
 }
 .mobile-sheet-content {
     width: 100%;
-    border-radius: 20px 20px 0 0;
-    background: var(--bg-deep); /* Fallback */
-    /* Handled by bg-glass-card + tweaks */
-    border-bottom: none;
+    border-radius: 24px 24px 0 0;
+    
+    /* Cyber Theme Application */
+    background: var(--cyber-bg-glass, rgba(10, 10, 25, 0.95));
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6), 0 -2px 20px rgba(6, 182, 212, 0.15); /* Top glow */
+    
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Header */
+.sheet-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.sheet-title { 
+    font-size: 16px; font-weight: 700; color: var(--cyber-text-main, #E0F2FE);
+    text-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+.clear-btn { 
+    font-size: 13px; color: var(--cyber-text-dim, #94A3B8); 
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
+}
+.close-icon { color: #fff; font-size: 18px; }
+
+/* Body */
+.sheet-body { padding: 20px; min-height: 150px; }
+
+.empty-cart { 
+    text-align: center; padding: 40px 0; color: var(--cyber-text-dim); 
+}
+.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+
+/* Product Card */
+.cart-item-card {
+    display: flex; gap: 16px;
+    background: rgba(255,255,255,0.03);
+    padding: 12px; border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.item-img {
+    width: 80px; height: 80px; border-radius: 12px; object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.item-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.item-name { font-size: 15px; color: #fff; font-weight: 500; margin-bottom: 4px; }
+.item-spec { font-size: 12px; color: var(--cyber-text-dim); margin-bottom: 8px; }
+.item-row { display: flex; justify-content: space-between; align-items: center; }
+
+.text-price { 
+    color: var(--cyber-primary, #06B6D4);
+    font-size: 18px; font-weight: 700; font-family: 'DIN', sans-serif;
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+/* Qty Control */
+.qty-control {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.4); padding: 4px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.qty-btn {
+    width: 24px; height: 24px; border: none; background: rgba(255,255,255,0.1);
+    color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+}
+.qty-num { min-width: 20px; text-align: center; color: #fff; font-weight: 600; }
+
+/* Footer */
+.sheet-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+
+/* Buttons */
+.btn-cyber-primary {
+    background: var(--cyber-gradient-btn);
+    color: #fff; border: none; padding: 14px; border-radius: 14px;
+    font-size: 16px; font-weight: 700; width: 100%;
+    box-shadow: var(--cyber-glow-orange);
+    transition: all 0.2s;
+}
+.btn-cyber-primary:active { transform: scale(0.98); }
+
+.btn-cyber-ghost {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cyber-text-main);
+    padding: 8px 16px; border-radius: 20px; margin-top: 10px;
 }
 </style>

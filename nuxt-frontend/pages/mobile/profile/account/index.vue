@@ -1,83 +1,88 @@
 <template>
   <div class="mobile-page">
-    <div class="page-header">
-      <div class="back-btn" @click="router.back()">
-        <el-icon><ArrowLeft /></el-icon>
-      </div>
-      <h1 class="page-title">账号设置</h1>
-      <div class="header-right"></div>
-    </div>
+    <MobileSubPageHeader title="账号设置" />
 
     <div class="settings-content">
-       <!-- Avatar Section -->
-       <div class="setting-item avatar-item" @click="triggerUpload">
-          <span class="label">头像</span>
-          <div class="value-wrap">
-             <img :src="userStore.user?.avatar || '/images/default-avatar.png'" class="avatar-img" />
-             <el-icon class="arrow"><ArrowRight /></el-icon>
-          </div>
-          <input 
-             type="file" 
-             ref="fileInput" 
-             class="hidden-input" 
-             accept="image/*"
-             @change="handleFileChange"
-          />
+       <!-- Group 1: Basic Info -->
+
+       <!-- Group 2: Account Binding -->
+       <div class="setting-container">
+            <!-- Avatar Item -->
+            <div class="setting-item" @click="activeModal = 'avatar'">
+                <div class="left">
+                    <span class="label">头像</span>
+                </div>
+                <div class="right">
+                    <img :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" class="avatar-img" @error="handleImageError" />
+                    <el-icon class="arrow"><ArrowRight /></el-icon>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Nickname Item -->
+            <div class="setting-item" @click="activeModal = 'nickname'">
+                <div class="left">
+                    <span class="label">昵称</span>
+                </div>
+                <div class="right">
+                    <span class="value">{{ userStore.user?.nickName || '未设置' }}</span>
+                    <el-icon class="arrow"><ArrowRight /></el-icon>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+             <!-- UID Item -->
+             <div class="setting-item" @click="copyUID">
+                <div class="left">
+                    <span class="label">UID</span>
+                </div>
+                <div class="right">
+                    <span class="value uid-text">{{ userStore.user?.uid || userStore.user?.id }}</span>
+                    <el-icon class="copy-icon"><DocumentCopy /></el-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Group -->
+        <h3 class="group-title">账号安全</h3>
+        <div class="setting-container">
+            <div class="setting-item" @click="activeModal = 'wechat'">
+                <div class="left">
+                    <span class="label">微信绑定</span>
+                </div>
+                <div class="right">
+                    <span class="value">{{ userStore.user?.openId ? '已绑定' : '未绑定' }}</span>
+                    <el-icon class="arrow"><ArrowRight /></el-icon>
+                </div>
+            </div>
+
+           <div class="setting-item" @click="activeModal = 'email'">
+              <span class="label">邮箱</span>
+              <div class="value-wrap">
+                 <span class="text-val">{{ userStore.user?.email }}</span>
+                 <el-icon class="arrow"><ArrowRight /></el-icon>
+              </div>
+           </div>
+
+           <div class="setting-item" @click="activeModal = 'password'">
+              <span class="label">登录密码</span>
+              <div class="value-wrap">
+                 <span class="text-val muted">修改</span>
+                 <el-icon class="arrow"><ArrowRight /></el-icon>
+              </div>
+           </div>
        </div>
 
-       <!-- Nickname Section -->
-       <div class="setting-item" @click="activeModal = 'nickname'">
-          <span class="label">昵称</span>
-          <div class="value-wrap">
-             <span class="text-val">{{ userStore.user?.nickName || userStore.user?.nickname || '未设置' }}</span>
-             <el-icon class="arrow"><ArrowRight /></el-icon>
-          </div>
-       </div>
-
-       <!-- Read-only Info -->
-       <div class="setting-item">
-          <span class="label">UID</span>
-          <div class="value-wrap">
-             <span class="text-val muted">{{ userStore.user?.uid || userStore.user?.id?.toString().slice(0,8) || '---' }}</span>
-          </div>
-       </div>
-
-       <div class="divider"></div>
-
-       <!-- Security Section -->
-       <div class="setting-item" @click="handleWechatBindAction">
-          <span class="label">微信绑定</span>
-          <div class="value-wrap">
-             <span class="text-val success" v-if="userStore.user?.openId">已绑定</span>
-             <span class="text-val muted" v-else>未绑定</span>
-             <el-icon class="arrow"><ArrowRight /></el-icon>
-          </div>
-       </div>
-
-       <div class="setting-item" @click="activeModal = 'email'">
-          <span class="label">邮箱</span>
-          <div class="value-wrap">
-             <span class="text-val">{{ userStore.user?.email }}</span>
-             <el-icon class="arrow"><ArrowRight /></el-icon>
-          </div>
-       </div>
-
-       <div class="setting-item" @click="activeModal = 'password'">
-          <span class="label">登录密码</span>
-          <div class="value-wrap">
-             <span class="text-val muted">修改</span>
-             <el-icon class="arrow"><ArrowRight /></el-icon>
-          </div>
-       </div>
-
-       <div class="divider"></div>
-
-       <!-- Danger Zone -->
-       <div class="setting-item" @click="activeModal = 'delete'">
-          <span class="label text-danger">注销账号</span>
-          <div class="value-wrap">
-             <el-icon class="arrow"><ArrowRight /></el-icon>
-          </div>
+       <!-- Group 3: Danger Zone -->
+       <div class="setting-container">
+           <div class="setting-item" @click="activeModal = 'delete'">
+              <span class="label text-danger">注销账号</span>
+              <div class="value-wrap">
+                 <el-icon class="arrow"><ArrowRight /></el-icon>
+              </div>
+           </div>
        </div>
 
        <!-- Actions -->
@@ -111,6 +116,25 @@
         @close="activeModal = null"
     />
 
+    <LogoutModal 
+        :visible="activeModal === 'logout'"
+        :loading="loading"
+        @close="activeModal = null"
+        @confirm="handleLogoutConfirm"
+    />
+
+    <SelectAvatarModal
+        :visible="activeModal === 'avatar'"
+        :current-avatar="user?.avatar"
+        @close="activeModal = null"
+        @success="handleSuccess('头像已更新')"
+    />
+
+    <WechatBindModal
+        :visible="activeModal === 'wechat'"
+        @close="activeModal = null"
+    />
+
   </div>
 </template>
 
@@ -130,6 +154,10 @@ import EditNicknameModal from '@/components/mobile/profile/modals/EditNicknameMo
 import ChangePasswordModal from '@/components/mobile/profile/modals/ChangePasswordModal.vue'
 import ChangeEmailModal from '@/components/mobile/profile/modals/ChangeEmailModal.vue'
 import DeleteAccountModal from '@/components/mobile/profile/modals/DeleteAccountModal.vue'
+import LogoutModal from '@/components/mobile/profile/modals/LogoutModal.vue'
+import SelectAvatarModal from '@/components/mobile/profile/modals/SelectAvatarModal.vue' // New
+import WechatBindModal from '@/components/mobile/profile/modals/WechatBindModal.vue' // New
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -138,144 +166,140 @@ definePageMeta({
 
 const router = useRouter()
 const userStore = useUserStore()
-const fileInput = ref<HTMLInputElement | null>(null)
 const loading = ref(false)
-
 const activeModal = ref<string | null>(null)
-
-const triggerUpload = () => {
-    fileInput.value?.click()
-}
-
-const handleWechatBindAction = () => {
-    if (userStore.user?.openId) {
-        ElMessage.info({ message: '您已绑定微信', offset: 100, customClass: 'mobile-message' })
-        return
-    }
-    // Redirect to WeChat Auth
-    const redirectUri = window.location.origin + '/mobile/wechat-callback'
-    const authUrl = wechatLoginApi.getOAuthUrl(redirectUri, 'bind') // state='bind'
-    window.location.href = authUrl
-}
-
-
-const handleFileChange = async (e: Event) => {
-    const files = (e.target as HTMLInputElement).files
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-    // Basic validation
-    if (file.size > 2 * 1024 * 1024) {
-        ElMessage.warning('图片大小不能超过 2MB')
-        return
-    }
-
-    loading.value = true
-    try {
-        // 1. Upload
-        const uploadRes = await commonApi.uploadFile(file)
-        if (uploadRes.success && uploadRes.data && uploadRes.data.src) {
-            const newUrl = uploadRes.data.src
-            
-            // 2. Update Profile
-            const updateRes = await clientUserApi.updateAvatar(newUrl)
-            if (updateRes.success) {
-                ElMessage.success({ message: '头像更新成功', offset: 100, customClass: 'mobile-message' })
-                userStore.fetchUserInfo()
-            } else {
-                ElMessage.error(updateRes.error || '更新头像失败')
-            }
-        } else {
-             ElMessage.error(uploadRes.msg || '上传失败')
-        }
-    } catch (err) {
-        ElMessage.error('网络错误')
-    } finally {
-        loading.value = false
-        // Reset input
-        if (fileInput.value) fileInput.value.value = ''
-    }
-}
-
 const handleSuccess = (msg: string) => {
     ElMessage.success({ message: msg, offset: 100, customClass: 'mobile-message' })
     userStore.fetchUserInfo()
 }
 
-const handleLogout = async () => {
-    if (confirm('确定要退出登录吗？')) {
-        try {
-            await authApi.logout()
-        } catch (e) {
-            console.error('Logout API failed:', e)
-        } finally {
-            userStore.logout()
-            router.replace('/mobile')
-        }
+const handleLogout = () => {
+    activeModal.value = 'logout'
+}
+
+const handleLogoutConfirm = async () => {
+    loading.value = true
+    try {
+        await authApi.logout()
+    } catch (e) {
+        console.error('Logout API failed:', e)
+    } finally {
+        userStore.logout()
+        router.replace('/mobile')
+        loading.value = false
     }
+}
+
+const copyUID = () => {
+    const uid = userStore.user?.uid || userStore.user?.id?.toString()
+    if (!uid) return
+    
+    // Simple copy fallback
+    const textArea = document.createElement('textarea')
+    textArea.value = uid
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+        document.execCommand('copy')
+        ElMessage.success({ message: 'UID 已复制', offset: 100, customClass: 'mobile-message' })
+    } catch (err) {
+        ElMessage.error('复制失败')
+    }
+    document.body.removeChild(textArea)
 }
 </script>
 
 <style scoped>
+/* -------------------------------------------
+   Account Page Styles (Cyber/Neon Theme)
+------------------------------------------- */
 .mobile-page {
   min-height: 100vh;
-  background: #0F172A;
+  /* background: #0F172A; REMOVED for global bg */
   color: #fff;
   display: flex; flex-direction: column;
 }
 
-.page-header {
-  display: flex; align-items: center; padding: 20px;
-  background: rgba(15, 23, 42, 0.95);
-  position: sticky; top: 0; z-index: 20;
-}
-.back-btn {
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.1); border-radius: 50%;
-}
-.page-title { flex: 1; text-align: center; font-size: 18px; font-weight: 600; margin: 0; padding-right: 32px; }
 
-.settings-content { padding: 20px; }
+
+.settings-content { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Setting Item Container */
+.setting-container {
+    background: var(--cyber-bg-glass, rgba(30, 41, 59, 0.4));
+    border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+}
 
 .setting-item {
-    background: rgba(30, 41, 59, 0.4);
+    background: transparent;
     border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: 16px;
+    padding: 18px 20px;
     display: flex; justify-content: space-between; align-items: center;
     cursor: pointer;
+    transition: background 0.2s;
+    min-height: 60px; /* Ensure consistent height */
 }
-.setting-item:first-child { border-top-left-radius: 12px; border-top-right-radius: 12px; }
-.setting-item:last-of-type { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; border-bottom: none; }
-.setting-item:active { background: rgba(30, 41, 59, 0.8); }
+.setting-item:last-child { border-bottom: none; }
+.setting-item:active { background: rgba(6, 182, 212, 0.1); }
 
-.label { font-size: 15px; color: #E2E8F0; }
-.value-wrap { display: flex; align-items: center; gap: 8px; }
+.label { font-size: 15px; color: #E2E8F0; font-weight: 500; } /* Lighter text */
+
+.right { 
+    display: flex; align-items: center; gap: 8px; 
+    color: #94A3B8;
+}
+
+.value { font-size: 14px; color: #94A3B8; }
+.value-wrap { display: flex; align-items: center; gap: 10px; } /* Keep for legacy if needed or remove */
 .text-val { font-size: 14px; color: #94A3B8; }
 .text-val.muted { color: #64748B; }
-.text-val.success { color: #34D399; }
-.arrow { color: #64748B; font-size: 14px; }
+.text-val.success { color: #10B981; } /* Green */
+
+.arrow { 
+    color: #475569; font-size: 16px; transition: color 0.2s; 
+    display: flex; align-items: center; /* Fix icon vertical alignment */
+}
+.setting-item:hover .arrow { color: #06B6D4; }
 
 .avatar-img {
-    width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
-    border: 2px solid rgba(255,255,255,0.1);
+    width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--cyber-primary, #06B6D4);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
 }
 
 .hidden-input { display: none; }
 
-.action-group { margin-top: 40px; }
+.copy-hint { font-size: 10px; color: var(--cyber-primary); margin-left: 4px; opacity: 0.8; }
+
+.action-group { margin-top: 30px; }
 
 .logout-btn {
-    width: 100%; height: 48px;
-    background: rgba(239, 68, 68, 0.1);
-    color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2);
-    border-radius: 12px;
-    font-size: 15px; font-weight: 600;
+    width: 100%; height: 50px;
+    background: rgba(239, 68, 68, 0.05);
+    color: #F87171; 
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 16px;
+    font-size: 16px; font-weight: 600;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+    transition: all 0.2s;
 }
-.logout-btn:active { background: rgba(239, 68, 68, 0.2); }
-
-.text-danger { color: #EF4444; }
-
-.divider {
-    height: 12px;
+.logout-btn:active { 
+    background: rgba(239, 68, 68, 0.15); 
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    border-color: #F87171;
 }
+
+.text-danger { color: #F87171; text-shadow: 0 0 5px rgba(248, 113, 113, 0.3); }
+
+.text-copy {
+    cursor: pointer; position: relative;
+    display: flex; align-items: center; gap: 4px;
+}
+.text-copy:active { opacity: 0.7; }
+
+/* Divider replaced by gap in flex container */
+.divider { display: none; }
 </style>

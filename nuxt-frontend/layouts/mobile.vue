@@ -13,6 +13,11 @@
 
     <!-- Global Toast -->
     <MobileToast />
+
+    <!-- Particle Background (Synced with PC) -->
+    <ClientOnly>
+      <ParticleBackground />
+    </ClientOnly>
   </div>
 </template>
 
@@ -20,6 +25,7 @@
 import '@/assets/styles/mobile.css'
 import MobileTabBar from '@/components/mobile/MobileTabBar.vue'
 import MobileToast from '@/components/mobile/base/MobileToast.vue'
+import ParticleBackground from '@/components/pc/ParticleBackground.vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -42,13 +48,15 @@ useHead({
   display: flex;
   flex-direction: column;
   position: relative;
-  background: #0F172A; /* Fallback color */
+  /* background: #020617; REMOVED to allow ParticleBackground to show */
+  background: transparent; 
 }
 
 .mobile-bg-layer {
-  position: absolute; inset: 0; z-index: 0;
-  background: radial-gradient(circle at top, #1e293b, #0f172a);
-  pointer-events: none;
+  /* Deprecated: Replaced by ParticleBackground. 
+     Keeping as a subtle gradient overlay if needed, or remove. 
+     For now, let's make it very subtle or invisible to let particles shine. */
+  display: none; 
 }
 
 .mobile-content {

@@ -87,7 +87,7 @@ const handleTabClick = (tab: any) => {
 }
 
 .tab-item.active {
-  color: #F97316; /* Primary Orange */
+  color: var(--accent); /* Primary Orange */
 }
 
 .icon-wrapper {
@@ -106,14 +106,14 @@ const handleTabClick = (tab: any) => {
 .tab-item.active .tab-icon {
   transform: translateY(-3px);
   color: #fff; /* Icon turns white on active maybe? Or keep orange. Let's keep orange text, white icon? No, consistent color is better. */
-  color: #F97316;
+  color: var(--accent);
 }
 
 /* Optional Active Dot */
 .active-dot {
   position: absolute; bottom: -8px; width: 4px; height: 4px; border-radius: 50%;
-  background: #F97316;
-  box-shadow: 0 0 8px #F97316;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
 }
 .scale-enter-active, .scale-leave-active { transition: transform 0.2s; }
 .scale-enter-from, .scale-leave-to { transform: scale(0); }

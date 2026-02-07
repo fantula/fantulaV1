@@ -89,10 +89,10 @@ watch(() => props.modelValue, () => {
 
 .category-pill.active {
   color: #fff;
-  background: var(--primary-color); /* Solid Primary Color */
+  background: var(--accent); /* Orange for active state (Match PC) */
   border-color: transparent;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); /* Clean shadow */
+  box-shadow: 0 4px 12px var(--accent-glow); /* Orange shadow */
 }
 
 .pill-text {
@@ -100,4 +100,3 @@ watch(() => props.modelValue, () => {
   z-index: 2;
 }
 </style>
-
