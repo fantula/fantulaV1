@@ -100,6 +100,7 @@ interface _GlobalComponents {
   'WalletLedger': typeof import("../../components/pc/wallet/WalletLedger.vue").default
   'MobileTabBar': typeof import("../../components/mobile/MobileTabBar.vue").default
   'MobileLoginSheet': typeof import("../../components/mobile/auth/MobileLoginSheet.vue").default
+  'MobileConfirmModal': typeof import("../../components/mobile/base/MobileConfirmModal.vue").default
   'MobileToast': typeof import("../../components/mobile/base/MobileToast.vue").default
   'MobileCartSheet': typeof import("../../components/mobile/cart/MobileCartSheet.vue").default
   'MobileMiniCart': typeof import("../../components/mobile/cart/MobileMiniCart.vue").default
@@ -663,6 +664,7 @@ interface _GlobalComponents {
   'LazyWalletLedger': LazyComponent<typeof import("../../components/pc/wallet/WalletLedger.vue").default>
   'LazyMobileTabBar': LazyComponent<typeof import("../../components/mobile/MobileTabBar.vue").default>
   'LazyMobileLoginSheet': LazyComponent<typeof import("../../components/mobile/auth/MobileLoginSheet.vue").default>
+  'LazyMobileConfirmModal': LazyComponent<typeof import("../../components/mobile/base/MobileConfirmModal.vue").default>
   'LazyMobileToast': LazyComponent<typeof import("../../components/mobile/base/MobileToast.vue").default>
   'LazyMobileCartSheet': LazyComponent<typeof import("../../components/mobile/cart/MobileCartSheet.vue").default>
   'LazyMobileMiniCart': LazyComponent<typeof import("../../components/mobile/cart/MobileMiniCart.vue").default>

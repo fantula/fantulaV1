@@ -100,6 +100,7 @@ export const AssetHeroCard: typeof import("../components/pc/wallet/AssetHeroCard
 export const WalletLedger: typeof import("../components/pc/wallet/WalletLedger.vue").default
 export const MobileTabBar: typeof import("../components/mobile/MobileTabBar.vue").default
 export const MobileLoginSheet: typeof import("../components/mobile/auth/MobileLoginSheet.vue").default
+export const MobileConfirmModal: typeof import("../components/mobile/base/MobileConfirmModal.vue").default
 export const MobileToast: typeof import("../components/mobile/base/MobileToast.vue").default
 export const MobileCartSheet: typeof import("../components/mobile/cart/MobileCartSheet.vue").default
 export const MobileMiniCart: typeof import("../components/mobile/cart/MobileMiniCart.vue").default
@@ -663,6 +664,7 @@ export const LazyAssetHeroCard: LazyComponent<typeof import("../components/pc/wa
 export const LazyWalletLedger: LazyComponent<typeof import("../components/pc/wallet/WalletLedger.vue").default>
 export const LazyMobileTabBar: LazyComponent<typeof import("../components/mobile/MobileTabBar.vue").default>
 export const LazyMobileLoginSheet: LazyComponent<typeof import("../components/mobile/auth/MobileLoginSheet.vue").default>
+export const LazyMobileConfirmModal: LazyComponent<typeof import("../components/mobile/base/MobileConfirmModal.vue").default>
 export const LazyMobileToast: LazyComponent<typeof import("../components/mobile/base/MobileToast.vue").default>
 export const LazyMobileCartSheet: LazyComponent<typeof import("../components/mobile/cart/MobileCartSheet.vue").default>
 export const LazyMobileMiniCart: LazyComponent<typeof import("../components/mobile/cart/MobileMiniCart.vue").default>
