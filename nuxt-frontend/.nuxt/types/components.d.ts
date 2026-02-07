@@ -103,6 +103,8 @@ interface _GlobalComponents {
   'MobileToast': typeof import("../../components/mobile/base/MobileToast.vue").default
   'MobileCartSheet': typeof import("../../components/mobile/cart/MobileCartSheet.vue").default
   'MobileMiniCart': typeof import("../../components/mobile/cart/MobileMiniCart.vue").default
+  'MobileCouponSelectorSheet': typeof import("../../components/mobile/checkout/MobileCouponSelectorSheet.vue").default
+  'MobilePaySuccessModal': typeof import("../../components/mobile/checkout/MobilePaySuccessModal.vue").default
   'ProductDetailSheet': typeof import("../../components/mobile/goods/ProductDetailSheet.vue").default
   'HomeBanner': typeof import("../../components/mobile/home/HomeBanner.vue").default
   'HomeCategoryNav': typeof import("../../components/mobile/home/HomeCategoryNav.vue").default
@@ -127,6 +129,7 @@ interface _GlobalComponents {
   'SelectAvatarModal': typeof import("../../components/mobile/profile/modals/SelectAvatarModal.vue").default
   'WechatBindModal': typeof import("../../components/mobile/profile/modals/WechatBindModal.vue").default
   'TempStyleRef': typeof import("../../components/mobile/profile/modals/temp_style_ref.vue").default
+  'MobileCouponTicket': typeof import("../../components/mobile/redemption/MobileCouponTicket.vue").default
   'BaseButton': typeof import("../../components/shared/BaseButton.vue").default
   'BaseInfiniteList': typeof import("../../components/shared/BaseInfiniteList.vue").default
   'BaseModal': typeof import("../../components/shared/BaseModal.vue").default
@@ -663,6 +666,8 @@ interface _GlobalComponents {
   'LazyMobileToast': LazyComponent<typeof import("../../components/mobile/base/MobileToast.vue").default>
   'LazyMobileCartSheet': LazyComponent<typeof import("../../components/mobile/cart/MobileCartSheet.vue").default>
   'LazyMobileMiniCart': LazyComponent<typeof import("../../components/mobile/cart/MobileMiniCart.vue").default>
+  'LazyMobileCouponSelectorSheet': LazyComponent<typeof import("../../components/mobile/checkout/MobileCouponSelectorSheet.vue").default>
+  'LazyMobilePaySuccessModal': LazyComponent<typeof import("../../components/mobile/checkout/MobilePaySuccessModal.vue").default>
   'LazyProductDetailSheet': LazyComponent<typeof import("../../components/mobile/goods/ProductDetailSheet.vue").default>
   'LazyHomeBanner': LazyComponent<typeof import("../../components/mobile/home/HomeBanner.vue").default>
   'LazyHomeCategoryNav': LazyComponent<typeof import("../../components/mobile/home/HomeCategoryNav.vue").default>
@@ -687,6 +692,7 @@ interface _GlobalComponents {
   'LazySelectAvatarModal': LazyComponent<typeof import("../../components/mobile/profile/modals/SelectAvatarModal.vue").default>
   'LazyWechatBindModal': LazyComponent<typeof import("../../components/mobile/profile/modals/WechatBindModal.vue").default>
   'LazyTempStyleRef': LazyComponent<typeof import("../../components/mobile/profile/modals/temp_style_ref.vue").default>
+  'LazyMobileCouponTicket': LazyComponent<typeof import("../../components/mobile/redemption/MobileCouponTicket.vue").default>
   'LazyBaseButton': LazyComponent<typeof import("../../components/shared/BaseButton.vue").default>
   'LazyBaseInfiniteList': LazyComponent<typeof import("../../components/shared/BaseInfiniteList.vue").default>
   'LazyBaseModal': LazyComponent<typeof import("../../components/shared/BaseModal.vue").default>

@@ -1,19 +1,15 @@
 <template>
   <div class="mobile-page">
-    <div class="page-header">
-      <div class="back-btn" @click="router.back()">
-        <el-icon><ArrowLeft /></el-icon>
-      </div>
-      <h1 class="page-title">消息中心</h1>
-      <div class="header-right">
+    <MobileSubPageHeader title="消息中心">
+      <template #right>
          <span class="read-all-btn" @click="handleReadAll" :class="{ disabled: markingAll }">
             {{ markingAll ? '...' : '已读' }}
          </span>
-      </div>
-    </div>
+      </template>
+    </MobileSubPageHeader>
 
     <!-- Tabs -->
-    <div class="tabs-header">
+    <div class="tabs-header glass-tabs">
       <div 
         v-for="tab in tabs" 
         :key="tab.key"
@@ -43,7 +39,7 @@
             <div 
               v-for="msg in displayList" 
               :key="msg.id" 
-              class="message-card"
+              class="info-card-glass message-card"
               :class="{ 'is-unread': !msg.is_read }"
               @click="handleClick(msg)"
             >
@@ -68,12 +64,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, Bell, ShoppingCart, Warning, ChatDotRound } from '@element-plus/icons-vue'
+import { Bell, ShoppingCart, Warning, ChatDotRound } from '@element-plus/icons-vue'
 import { messageApi, type UserMessage } from '@/api/client/message'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useToast } from '@/composables/mobile/useToast'
 
 definePageMeta({
   layout: 'mobile',
@@ -82,6 +79,7 @@ definePageMeta({
 
 const router = useRouter()
 const userStore = useUserStore()
+const { showToast } = useToast()
 const activeTab = ref('all')
 const unreadCount = ref(0)
 const markingAll = ref(false)
@@ -147,7 +145,7 @@ const handleReadAll = async () => {
     try {
         const res = await messageApi.markAllAsRead()
         if(res.success) {
-            ElMessage.success({ message: '全部已读', offset: 100, customClass: 'mobile-message' })
+            showToast('全部已读', 'success')
             displayList.value.forEach(m => m.is_read = true)
             unreadCount.value = 0
             userStore.fetchUnreadMessageCount()
@@ -199,41 +197,32 @@ onMounted(() => {
   display: flex; flex-direction: column;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.95);
-  position: sticky; top: 0; z-index: 20;
-}
-.back-btn {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-}
-.page-title {
-  flex: 1; text-align: center; font-size: 18px; font-weight: 600; margin: 0;
-}
-.header-right { width: 32px; text-align: right; } /* Balance back btn */
-.read-all-btn { font-size: 14px; color: #3B82F6; }
+.read-all-btn { font-size: 14px; color: #3B82F6; cursor: pointer; }
 .read-all-btn.disabled { opacity: 0.5; }
+
+/* Glass Tabs */
+.glass-tabs {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
 
 .tabs-header {
     display: flex;
-    background: #0F172A;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    position: sticky; top: 72px; z-index: 10;
+    position: sticky; top: 70px; z-index: 10;
 }
 .tab-item {
     flex: 1; text-align: center;
     padding: 14px 0;
     font-size: 14px; color: #94A3B8;
-    border-bottom: 2px solid transparent;
-    transition: all 0.3s;
     position: relative;
+    transition: all 0.3s;
 }
-.tab-item.active { color: #fff; font-weight: 600; border-bottom-color: #3B82F6; }
+.tab-item.active { color: #fff; font-weight: 600; }
+.tab-item.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 3px; background: #3B82F6; border-radius: 2px;
+}
 .dot {
     position: absolute; top: 10px; right: 25%;
     width: 6px; height: 6px; background: #EF4444; border-radius: 50%;
@@ -243,41 +232,49 @@ onMounted(() => {
 
 .message-list { display: flex; flex-direction: column; gap: 12px; }
 
+/* Glass Card */
+.info-card-glass {
+    background: #1E293B; /* Slate 800 base */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; 
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
 .message-card {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 12px;
     padding: 16px;
     display: flex; gap: 12px;
     position: relative;
+    transition: all 0.2s;
 }
 .message-card.is-unread {
-    background: rgba(30, 41, 59, 0.7);
+    background: rgba(30, 41, 59, 0.9);
     border-left: 3px solid #3B82F6;
 }
 
 .msg-icon {
-    width: 40px; height: 40px; border-radius: 10px;
+    width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
+    font-size: 22px; flex-shrink: 0;
 }
 .msg-icon.system { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
 .msg-icon.order { background: rgba(249, 115, 22, 0.1); color: #F97316; }
 .msg-icon.activity { background: rgba(168, 85, 247, 0.1); color: #A855F7; }
 .msg-icon.security { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
 
-.msg-content { flex: 1; overflow: hidden; }
+.msg-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding-top: 2px; }
 
 .msg-top {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 4px;
 }
-.msg-title { font-size: 15px; font-weight: 500; color: #E2E8F0; }
+.msg-title { font-size: 15px; font-weight: 600; color: #E2E8F0; }
 .msg-time { font-size: 12px; color: #64748B; }
 
 .msg-body {
     font-size: 13px; color: #94A3B8;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    line-height: 1.4;
 }
 
 .unread-dot {
@@ -286,5 +283,5 @@ onMounted(() => {
 }
 
 .empty-state { text-align: center; color: #64748B; padding-top: 60px; }
-.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
 </style>

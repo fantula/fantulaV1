@@ -119,15 +119,17 @@ defineExpose({ refresh: fetchHistory })
 
 <style scoped>
 .mobile-history-card {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px; overflow: hidden;
+  background: #1E293B; /* Slate 800 base */
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; 
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   margin-top: 12px;
 }
 
 .card-header {
   padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
-  background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
   cursor: pointer;
 }
 .header-main { display: flex; align-items: center; gap: 8px; }
@@ -137,11 +139,11 @@ defineExpose({ refresh: fetchHistory })
 .toggle-icon { color: #64748B; font-size: 12px; transition: transform 0.2s; }
 .rotate-180 { transform: rotate(180deg); }
 
-.history-list { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.history-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
 .record-item {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 8px; padding: 10px;
+  background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px; padding: 12px;
 }
 
 .record-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -155,10 +157,10 @@ defineExpose({ refresh: fetchHistory })
 .record-body { display: flex; flex-direction: column; gap: 4px; }
 .field-row { display: flex; justify-content: space-between; font-size: 12px; }
 .label { color: #64748B; }
-.val { color: #E2E8F0; font-family: monospace; }
+.val { color: #E2E8F0; font-family: 'Monaco', monospace; }
 
 .reject-box {
   margin-top: 8px; background: rgba(239, 68, 68, 0.1); color: #F87171;
-  padding: 6px 10px; border-radius: 6px; font-size: 11px; display: flex; gap: 6px; align-items: center;
+  padding: 8px 10px; border-radius: 8px; font-size: 11px; display: flex; gap: 6px; align-items: center;
 }
 </style>

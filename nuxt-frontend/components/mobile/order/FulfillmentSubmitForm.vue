@@ -2,15 +2,16 @@
   <div class="mobile-submit-form">
     <!-- Header Tip -->
     <div class="form-tip">
-       请填写以下信息以进行充值
+       <el-icon><InfoFilled /></el-icon>
+       <span>请填写以下信息以进行充值</span>
     </div>
 
     <!-- Form Fields -->
     <div class="fields-container">
        <div v-for="field in fields" :key="field.key" class="field-item">
           <label>{{ field.label }}</label>
-          <div class="input-box">
-             <input v-model="formData[field.key]" :placeholder="'请输入' + field.label" />
+          <div class="input-wrapper">
+             <input v-model="formData[field.key]" :placeholder="'请输入' + field.label" class="input-glass" />
           </div>
        </div>
     </div>
@@ -78,9 +79,9 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Loading, CircleCheck, CircleClose } from '@element-plus/icons-vue'
 import { getSupabaseClient } from '@/utils/supabase'
+import { useToast } from '@/composables/mobile/useToast'
+import { Loading, CircleCheck, CircleClose, InfoFilled } from '@element-plus/icons-vue'
 
 interface OrderFulfillment {
   id: string
@@ -101,144 +102,159 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['submit-success'])
+const { showToast } = useToast()
 
+const formData = reactive<Record<string, string>>({})
 const latestFulfillment = ref<OrderFulfillment | null>(null)
 const isSubmitting = ref(false)
-const formData = reactive<Record<string, string>>({})
 
 const fields = computed(() => props.cdkFields || [])
-const latestStatus = computed(() => latestFulfillment.value?.status)
-const latestRejectReason = computed(() => latestFulfillment.value?.reject_reason || '-')
-
-const initFormData = () => {
-    fields.value.forEach(f => formData[f.key] = '')
-    // Autofill if submitted/rejected
-    if (latestFulfillment.value?.payload && ['submitted', 'rejected'].includes(latestStatus.value || '')) {
-        Object.entries(latestFulfillment.value.payload).forEach(([k, v]) => {
-            if (k !== '_cdk_id') formData[k] = v as string
-        })
-    }
-}
+const latestStatus = computed(() => latestFulfillment.value?.status || '')
+const latestRejectReason = computed(() => latestFulfillment.value?.reject_reason || '')
 
 const fetchLatestFulfillment = async () => {
     if (!props.orderId) return
-    try {
-        const client = getSupabaseClient()
-        let query = client.from('order_fulfillments').select('*').eq('order_id', props.orderId).order('submitted_at', { ascending: false })
-        if (props.cdkId) query = query.contains('payload', { _cdk_id: props.cdkId })
-        const { data, error } = await query.limit(1).maybeSingle()
-        if (!error) {
-            latestFulfillment.value = data as OrderFulfillment
-            initFormData()
+    const client = getSupabaseClient()
+    let query = client.from('order_fulfillments').select('*').eq('order_id', props.orderId).order('submitted_at', { ascending: false })
+    if (props.cdkId) query = query.contains('payload', { _cdk_id: props.cdkId })
+    const { data, error } = await query.limit(1).single()
+    
+    if (data && !error) {
+        latestFulfillment.value = data as OrderFulfillment
+        if (data.payload) {
+             Object.assign(formData, data.payload)
         }
-    } catch(e) { console.error(e) }
+    }
 }
 
-const getPayload = () => {
-    const p: Record<string, string> = {}
-    fields.value.forEach(f => p[f.key] = formData[f.key] || '')
-    if (props.cdkId) p['_cdk_id'] = props.cdkId
-    return p
+const validate = () => {
+    for (const f of fields.value) {
+        if (!formData[f.key]) {
+            showToast(`请输入${f.label}`, 'warning')
+            return false
+        }
+    }
+    return true
 }
 
 const handleInsert = async () => {
+    if (!validate()) return
     isSubmitting.value = true
     try {
         const client = getSupabaseClient()
-        const { data, error } = await client.from('order_fulfillments').insert({
+        const payload = { ...formData, _cdk_id: props.cdkId }
+        
+        const { error } = await client.from('order_fulfillments').insert({
             order_id: props.orderId,
             status: 'submitted',
-            payload: getPayload(),
-            submitted_at: new Date().toISOString()
-        }).select().single()
-        
+            payload
+        })
+
         if (error) throw error
-        latestFulfillment.value = data as OrderFulfillment
-        ElMessage.success('提交成功')
+        showToast('提交成功', 'success')
+        await fetchLatestFulfillment()
         emit('submit-success')
-    } catch(e: any) { ElMessage.error(e.message) }
-    finally { isSubmitting.value = false }
+    } catch (e: any) {
+        showToast(e.message || '提交失败', 'error')
+    } finally {
+        isSubmitting.value = false
+    }
 }
 
 const handleUpdate = async () => {
     if (!latestFulfillment.value) return
+    if (!validate()) return
     isSubmitting.value = true
     try {
         const client = getSupabaseClient()
-        const { error } = await client.from('order_fulfillments').update({
-            payload: getPayload(),
-            submitted_at: new Date().toISOString()
-        }).eq('id', latestFulfillment.value.id)
+        const payload = { ...formData, _cdk_id: props.cdkId }
+        
+        const { error } = await client
+           .from('order_fulfillments')
+           .update({ payload, status: 'submitted' }) // Reset to submitted if updated? Or keep as is?
+           .eq('id', latestFulfillment.value.id)
 
         if (error) throw error
-        ElMessage.success('更新成功')
-        fetchLatestFulfillment()
-        emit('submit-success')
-    } catch(e: any) { ElMessage.error(e.message) }
-    finally { isSubmitting.value = false }
+        showToast('更新成功', 'success')
+        await fetchLatestFulfillment()
+    } catch (e: any) {
+        showToast(e.message || '更新失败', 'error')
+    } finally {
+        isSubmitting.value = false
+    }
 }
 
-watch(() => props.cdkFields, initFormData, { immediate: true })
 onMounted(fetchLatestFulfillment)
-defineExpose({ refresh: fetchLatestFulfillment })
 </script>
 
 <style scoped>
 .mobile-submit-form {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; overflow: hidden;
-    margin-top: 12px;
+    display: flex; flex-direction: column; gap: 16px;
+    background: #1E293B; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
 .form-tip {
-    padding: 12px 16px; font-size: 12px; color: #94A3B8;
-    background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px; color: #94A3B8; display: flex; align-items: center; gap: 6px;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.fields-container {
-    padding: 16px; display: flex; flex-direction: column; gap: 16px;
+.fields-container { display: flex; flex-direction: column; gap: 16px; margin-top: 4px; }
+.field-item label { 
+    display: block; font-size: 12px; color: #CBD5E1; margin-bottom: 6px; font-weight: 500;
+}
+.input-glass {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px;
+    color: #fff; font-size: 14px;
+    transition: all 0.2s;
+}
+.input-glass:focus {
+    outline: none; border-color: #3B82F6; background: rgba(59, 130, 246, 0.1);
 }
 
-.field-item label {
-    display: block; font-size: 12px; color: #E2E8F0; margin-bottom: 6px;
-}
-.input-box input {
-    width: 100%; box-sizing: border-box;
-    background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; padding: 10px 12px;
-    color: #fff; font-size: 14px; outline: none;
-}
-.input-box input:focus { border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
-
+/* Status Banner */
 .status-banner {
-    margin: 0 16px 16px; padding: 12px; border-radius: 8px;
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
 }
-.status-content { display: flex; gap: 10px; align-items: flex-start; }
+.status-content { display: flex; gap: 12px; align-items: flex-start; }
+.icon, .icon-spin { font-size: 20px; margin-top: 2px; }
+.icon-spin { animation: spin 1s linear infinite; color: #3B82F6; }
 
-.status-banner.submitted { background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); color: #FACC15; }
-.status-banner.approved { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: #4ADE80; }
-.status-banner.rejected { background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.2); color: #F87171; }
+.status-banner.approved { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); }
+.status-banner.approved .icon { color: #10B981; }
+.status-banner.approved .t-title { color: #10B981; }
 
-.icon-spin { animation: spin 2s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.status-banner.rejected { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+.status-banner.rejected .icon { color: #EF4444; }
+.status-banner.rejected .t-title { color: #EF4444; }
 
-.t-title { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
-.t-desc { font-size: 11px; opacity: 0.8; }
+.text { flex: 1; }
+.t-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; color: #E2E8F0; }
+.t-desc { font-size: 12px; color: #94A3B8; line-height: 1.4; }
 
-.form-actions {
-    padding: 16px; border-top: 1px solid rgba(255,255,255,0.05);
-    display: flex; justify-content: center; gap: 12px;
-}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Actions */
+.form-actions { display: flex; gap: 12px; margin-top: 4px; }
 .action-btn {
-    flex: 1; max-width: 160px; padding: 10px; border-radius: 20px;
-    font-size: 13px; font-weight: 600; border: none;
-    display: flex; align-items: center; justify-content: center;
+    flex: 1; padding: 12px; border-radius: 12px; font-weight: 600; font-size: 14px;
+    border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;
 }
-.action-btn:disabled { opacity: 0.6; }
-
-.action-btn.primary { background: #3B82F6; color: #fff; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
-.action-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
-.action-btn.outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #E2E8F0; }
+.action-btn.primary {
+    background: linear-gradient(90deg, #3B82F6, #2563EB); color: #fff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+.action-btn.secondary {
+    background: rgba(255,255,255,0.1); color: #E2E8F0;
+}
+.action-btn.outline {
+    background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #CBD5E1;
+}
+.action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>

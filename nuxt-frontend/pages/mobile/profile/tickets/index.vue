@@ -1,15 +1,9 @@
 <template>
   <div class="mobile-page">
-    <div class="page-header">
-      <div class="back-btn" @click="router.back()">
-        <el-icon><ArrowLeft /></el-icon>
-      </div>
-      <h1 class="page-title">我的工单</h1>
-      <div class="header-right"></div>
-    </div>
+    <MobileSubPageHeader title="我的工单" />
 
     <!-- Tabs -->
-    <div class="tabs-header">
+    <div class="tabs-header glass-tabs">
       <div 
         v-for="tab in tabs" 
         :key="tab.key"
@@ -37,7 +31,7 @@
             <div 
               v-for="ticket in displayList" 
               :key="ticket.id" 
-              class="ticket-card"
+              class="info-card-glass ticket-card"
               @click="goToDetail(ticket.id)"
             >
                <div class="ticket-header">
@@ -59,13 +53,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, Headset } from '@element-plus/icons-vue'
+import { Headset } from '@element-plus/icons-vue'
 import { ticketApi } from '@/api/client/ticket'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 definePageMeta({
   layout: 'mobile',
@@ -121,11 +116,6 @@ const goToDetail = (id: string) => {
     router.push(`/mobile/profile/tickets/${id}`)
 }
 
-// Initial fetch handled by loadMore? No, verify usage.
-// In favorites/index.vue I did fetchFavorites() onMounted.
-// In redemption I used fetchData.
-// Here I am using `data` source (client side paging). So I need to fetch data.
-import { onMounted } from 'vue'
 onMounted(fetchTickets)
 
 </script>
@@ -139,46 +129,44 @@ onMounted(fetchTickets)
   display: flex; flex-direction: column;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.95);
-  position: sticky; top: 0; z-index: 20;
-}
-.back-btn {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-}
-.page-title {
-  flex: 1; text-align: center; font-size: 18px; font-weight: 600; margin: 0; padding-right: 32px;
+/* Glass Tabs */
+.glass-tabs {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .tabs-header {
     display: flex;
-    background: #0F172A;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    position: sticky; top: 72px; z-index: 10;
+    position: sticky; top: 70px; z-index: 10;
 }
 .tab-item {
     flex: 1; text-align: center;
     padding: 14px 0;
     font-size: 14px; color: #94A3B8;
-    border-bottom: 2px solid transparent;
+    position: relative;
     transition: all 0.3s;
 }
-.tab-item.active { color: #fff; font-weight: 600; border-bottom-color: #3B82F6; }
+.tab-item.active { color: #fff; font-weight: 600; }
+.tab-item.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 3px; background: #3B82F6; border-radius: 2px;
+}
 
 .content-body { padding: 20px; flex: 1; }
 
 .ticket-list { display: flex; flex-direction: column; gap: 12px; }
 
+/* Glass Card */
+.info-card-glass {
+    background: #1E293B; /* Slate 800 base */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; 
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
 .ticket-card {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 12px;
     padding: 16px;
 }
 
@@ -187,21 +175,22 @@ onMounted(fetchTickets)
     margin-bottom: 8px;
 }
 .ticket-id { font-family: monospace; font-size: 13px; color: #94A3B8; }
-.ticket-status { font-size: 12px; padding: 2px 6px; border-radius: 4px; }
-.ticket-status.processing { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
-.ticket-status.resolved { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+.ticket-status { font-size: 12px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+.ticket-status.processing { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+.ticket-status.resolved { background: rgba(16, 185, 129, 0.15); color: #10B981; }
 
 .ticket-title {
     font-size: 15px; color: #E2E8F0; margin-bottom: 12px;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    line-height: 1.5;
 }
 
 .ticket-footer {
     display: flex; justify-content: space-between; align-items: flex-end;
 }
-.ticket-meta { font-size: 12px; color: #64748B; max-width: 60%; }
+.ticket-meta { font-size: 12px; color: #64748B; max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ticket-time { font-size: 12px; color: #64748B; }
 
 .empty-state { text-align: center; color: #64748B; padding-top: 60px; }
-.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
 </style>

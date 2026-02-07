@@ -1,15 +1,9 @@
 <template>
   <div class="mobile-page">
-    <div class="page-header">
-      <div class="back-btn" @click="router.back()">
-        <el-icon><ArrowLeft /></el-icon>
-      </div>
-      <h1 class="page-title">我的收藏</h1>
-      <div class="header-right"></div>
-    </div>
+    <MobileSubPageHeader title="我的收藏" />
 
     <!-- Categories Tabs -->
-    <div class="categories-tabs" v-if="categories.length > 0">
+    <div class="categories-tabs glass-tabs" v-if="categories.length > 0">
       <div 
         v-for="cat in categories" 
         :key="cat.id"
@@ -37,7 +31,7 @@
             <div 
               v-for="item in displayList" 
               :key="item.id" 
-              class="fav-card"
+              class="info-card-glass fav-card"
               @click="goToProduct(item.productId)"
             >
                <div class="card-img">
@@ -63,11 +57,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, Star, Delete } from '@element-plus/icons-vue'
+import { Star, Delete } from '@element-plus/icons-vue'
 import { favoriteApi } from '@/api/client/common'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
-import { ElMessage } from 'element-plus'
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
+import { useToast } from '@/composables/mobile/useToast'
 
 definePageMeta({
   layout: 'mobile',
@@ -75,6 +70,7 @@ definePageMeta({
 })
 
 const router = useRouter()
+const { showToast } = useToast()
 const categories = ref<any[]>([])
 const allFavorites = ref<any[]>([])
 const activeTab = ref('all')
@@ -110,26 +106,18 @@ const handleRemove = async (id: string) => {
    try {
       const res = await favoriteApi.removeFavorite(id)
       if(res.success) {
-         ElMessage.success({ message: '已取消收藏', offset: 100, customClass: 'mobile-message' })
+         showToast('已取消收藏', 'success')
          // Remove locally
          allFavorites.value = allFavorites.value.filter(item => item.id !== id)
       } else {
-         ElMessage.error({ message: res.msg || '操作失败', offset: 100, customClass: 'mobile-message' })
+         showToast(res.msg || '操作失败', 'error')
       }
    } catch(e) {
-      ElMessage.error('网络错误')
+      showToast('网络错误', 'error')
    }
 }
 
 const goToProduct = (id: string) => {
-    // Mobile product detail page route? 
-    // Usually /mobile/goods/[id] or similar. Checking PC: /goods/[id].
-    // Assuming /mobile/goods/[id] exists or needs to be created. 
-    // Task rule: "Mobile Pages: /pages/mobile". 
-    // Existing files in list_dir: mobile/product probably? 
-    // If not sure, just push to likely route. I'll guess /mobile/goods/[id] based on PC /goods/[id].
-    // Re-checking list_dir output from step 8 -> mobile has 10 children.
-    // I haven't listed mobile children.
     router.push(`/mobile/goods/${id}`)
 }
 
@@ -153,41 +141,35 @@ watch(activeTab, () => {
   display: flex; flex-direction: column;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.95);
-  position: sticky; top: 0; z-index: 20;
-}
-.back-btn {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-}
-.page-title {
-  flex: 1; text-align: center; font-size: 18px; font-weight: 600; margin: 0; padding-right: 32px;
+/* Glass Tabs */
+.glass-tabs {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .categories-tabs {
     display: flex; gap: 20px;
     overflow-x: auto;
-    padding: 10px 20px;
-    background: #0F172A;
-    position: sticky; top: 72px; z-index: 10;
+    padding: 0 20px;
+    position: sticky; top: 70px; z-index: 40; /* top: 70px to sit below header */
     scrollbar-width: none;
+    height: 48px; align-items: center;
 }
 .categories-tabs::-webkit-scrollbar { display: none; }
 
 .tab-item {
     font-size: 14px; color: #94A3B8; white-space: nowrap;
-    padding-bottom: 6px;
-    border-bottom: 2px solid transparent;
+    padding: 6px 0;
+    position: relative;
     transition: all 0.3s;
 }
 .tab-item.active {
-    color: #fff; font-weight: 600; border-bottom-color: #3B82F6;
+    color: #fff; font-weight: 600; 
+}
+.tab-item.active::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 3px; background: #3B82F6; border-radius: 2px;
 }
 
 .content-body {
@@ -200,46 +182,56 @@ watch(activeTab, () => {
     gap: 12px;
 }
 
-.fav-card {
-    background: rgba(30, 41, 59, 0.4);
-    border-radius: 12px;
+/* Glass Card */
+.info-card-glass {
+    background: #1E293B; /* Slate 800 base */
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; 
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.fav-card {
+    display: flex; flex-direction: column;
 }
 
 .card-img {
     position: relative;
     padding-top: 100%;
-    background: #1E293B;
+    background: #0F172A;
 }
 .card-img img {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
 }
 .remove-btn {
     position: absolute; top: 8px; right: 8px;
-    width: 24px; height: 24px;
-    background: rgba(0,0,0,0.5);
+    width: 28px; height: 28px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
 }
+.remove-btn:active { background: rgba(239, 68, 68, 0.8); }
 
 .card-info {
-    padding: 10px;
+    padding: 12px;
 }
 .product-title {
     font-size: 13px; color: #E2E8F0;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    margin-bottom: 4px;
+    margin-bottom: 4px; line-height: 1.4;
 }
 .product-spec {
-    font-size: 10px; color: #64748B; margin-bottom: 6px;
+    font-size: 11px; color: #64748B; margin-bottom: 8px;
 }
 .product-price {
     font-size: 16px; font-weight: bold; color: #F97316; font-family: 'DIN Alternate', sans-serif;
+    display: flex; align-items: baseline;
 }
-.symbol { font-size: 10px; margin-right: 1px; }
+.symbol { font-size: 11px; margin-right: 2px; }
 
 .empty-state { text-align: center; color: #64748B; padding-top: 60px; }
-.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
 </style>

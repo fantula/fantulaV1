@@ -1,13 +1,7 @@
 <template>
-  <div class="checkout-page">
+  <div class="checkout-page-glass">
     <!-- Header -->
-    <div class="header">
-       <div class="btn-back" @click="router.back()">
-         <el-icon><ArrowLeft /></el-icon>
-       </div>
-       <div class="header-title">确认订单</div>
-       <div class="header-placeholder"></div>
-    </div>
+    <MobileSubPageHeader title="确认订单" :back="() => router.back()" />
 
     <!-- Loading / Error -->
     <div v-if="loading" class="state-box">
@@ -16,7 +10,7 @@
     </div>
     
     <div v-else-if="error" class="state-box error">
-       <el-icon><CircleCloseFilled /></el-icon>
+       <div class="error-icon"><el-icon><CircleCloseFilled /></el-icon></div>
        <span>{{ error }}</span>
        <button class="btn-retry" @click="router.replace('/')">返回首页</button>
     </div>
@@ -25,28 +19,28 @@
     <div v-else-if="preOrders.length > 0" class="content">
        
        <!-- Countdown Timer -->
-       <div class="countdown-bar" v-if="remainingSeconds > 0">
+       <div class="countdown-bar-glass" v-if="remainingSeconds > 0">
           <el-icon><Timer /></el-icon>
           <span>请在 <span class="time-val">{{ formatCountdown }}</span> 内支付</span>
        </div>
 
        <!-- Product List -->
-       <div class="card product-card" v-for="order in preOrders" :key="order.id">
-          <div class="pc-head">
-             <span class="pc-tag">商品信息</span>
-             <span class="pc-order-no">{{ order.order_no }}</span>
+       <div class="info-card-glass" v-for="order in preOrders" :key="order.id">
+          <div class="card-head">
+             <span class="card-title-sm">商品信息</span>
+             <span class="order-no">{{ order.order_no }}</span>
           </div>
-          <div class="pc-body">
-             <div class="thumb">
+          <div class="product-body">
+             <div class="thumb-glow">
                 <el-image :src="order.product_snapshot?.image" fit="cover" />
              </div>
-             <div class="info">
+             <div class="product-info">
                 <div class="p-name">{{ order.product_snapshot?.product_name }}</div>
                 <div class="p-sku">
-                   <div class="sku-pill">{{ formatSpec(order.sku_snapshot?.spec_combination) }}</div>
+                   <div class="sku-pill-glass">{{ formatSpec(order.sku_snapshot?.spec_combination) }}</div>
                 </div>
                 <div class="p-price-row">
-                    <div class="p-price">{{ order.unit_price.toFixed(2) }} 点</div>
+                    <div class="p-price">{{ order.unit_price.toFixed(2) }} <span class="unit">点</span></div>
                     <div class="p-qty">x {{ order.quantity }}</div>
                 </div>
              </div>
@@ -54,24 +48,26 @@
        </div>
 
        <!-- Coupon Card -->
-       <div class="card coupon-card" @click="showCouponModal = true">
-           <div class="cc-left">
-              <el-icon><Ticket /></el-icon>
-              <span>优惠券</span>
-           </div>
-           <div class="cc-right">
-              <span v-if="selectedCoupon" class="coupon-val">- {{ couponDiscount.toFixed(2) }} 点</span>
-              <span v-else class="coupon-ph">选择优惠券</span>
-              <el-icon><ArrowRight /></el-icon>
+       <div class="info-card-glass clickable" @click="showCouponModal = true">
+           <div class="row-between">
+               <div class="row-left">
+                  <div class="icon-box-glass"><el-icon><Ticket /></el-icon></div>
+                  <span class="label">优惠券</span>
+               </div>
+               <div class="row-right">
+                  <span v-if="selectedCoupon" class="coupon-val">- {{ couponDiscount.toFixed(2) }} 点</span>
+                  <span v-else class="coupon-ph">选择优惠券</span>
+                  <el-icon><ArrowRight /></el-icon>
+               </div>
            </div>
        </div>
 
        <!-- FAQ Section (Accordion) -->
        <div class="faq-section" v-if="checkoutFaqs.length > 0">
-           <div class="faq-header">
+           <div class="section-title">
                <el-icon><QuestionFilled /></el-icon> 常见问题
            </div>
-           <div class="faq-list">
+           <div class="faq-list-glass">
                <div 
                    v-for="(faq, index) in checkoutFaqs" 
                    :key="faq.id" 
@@ -91,10 +87,10 @@
        </div>
 
        <!-- Payment Method -->
-       <div class="card pay-card">
+       <div class="info-card-glass">
           <div class="card-title">支付方式</div>
           <div class="pay-methods">
-             <div class="pm-item active">
+             <div class="pm-item-glass active">
                 <div class="pm-icon balance">
                    <el-icon><WalletFilled /></el-icon>
                 </div>
@@ -115,20 +111,20 @@
        </div>
 
        <!-- Tips -->
-       <div class="tips-box">
+       <div class="tips-box-glass">
           <el-icon><WarningFilled /></el-icon>
           <span>虚拟商品自动发货，售出后概不退换。超时未支付将自动释放库存。</span>
        </div>
     </div>
 
     <!-- Footer Bar -->
-    <div class="footer-bar" v-if="!loading && !error && preOrders.length > 0">
+    <div class="footer-bar-glass" v-if="!loading && !error && preOrders.length > 0">
        <div class="fb-left">
           <span class="fb-label">应付:</span>
           <span class="fb-price"><span class="fb-big">{{ finalPayAmount.toFixed(2) }}</span> 点</span>
        </div>
        <button 
-         class="btn-pay" 
+         class="btn-pay-glow" 
          :class="{ 'insufficient': isBalanceInsufficient }"
          @click="handlePayAction" 
          :disabled="paying || remainingSeconds <= 0"
@@ -140,7 +136,7 @@
     </div>
 
     <!-- Modals -->
-    <CouponSelectorModal
+    <MobileCouponSelectorSheet
         v-model="showCouponModal"
         :orderAmount="totalProductAmount"
         :skuIds="orderSkuIds"
@@ -154,6 +150,17 @@
         @close="handleRechargeClose"
         @success="handleRechargeClose"
     />
+    
+    <!-- Success Modal -->
+    <MobilePaySuccessModal
+        v-if="showPaySuccess"
+        :visible="showPaySuccess"
+        :orderNo="lastOrderId"
+        :amount="lastOrderAmount.toFixed(2)"
+        @viewOrder="goToOrder"
+        @goHome="goToHome"
+        @close="goToOrder"
+    />
 
   </div>
 </template>
@@ -162,23 +169,21 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
-  ArrowLeft, ArrowRight, CircleCloseFilled, WalletFilled, Select, WarningFilled,
+  ArrowRight, CircleCloseFilled, WalletFilled, Select, WarningFilled,
   Ticket, Timer, QuestionFilled, ArrowDown, Refresh
 } from '@element-plus/icons-vue'
-// Use Shared Composable
 import { useCheckout } from '@/composables/client/useCheckout'
 import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
-import CouponSelectorModal from '@/components/pc/modal/business/CouponSelectorModal.vue' // Reuse PC component logic logic (it's modal based, might need adapting if it's not responsive, but usually ElementPlus dialogs work ok, or we can use mobile sheet if needed. PC CouponSelector is a Dialog. For mobile we previously used a sheet. Let's stick to PC component if it works, OR re-implement sheet wrapper if PC component is too desktop-centric. Given constraints, using PC component might be risky if it's not responsive. But let's check. Actually, let's keep the logic but maybe wrap it? For now, let's assume reuse is preferred for logic consistency, but UI might suffer. Wait, the user said "Logic consistent", not "Reuse PC Component specifically". Mobile usually needs a Bottom Sheet. 
-// However, to strictly follow "Data and logic consistent", using the composable is key. For UI, I should probably stick to a mobile-friendly sheet.
-// But time is tight. Let's use the PC component for now as it handles the logic perfectly. If it looks bad, we can quickly swap.
-// Actually, looking at previous code, there was a local sheet logic.
-// Ideally usage of `CouponSelectorModal` is fine if `el-dialog` is responsive. 
-// Let's use the layout from PC but styled for mobile? No. 
-// Let's use the `CouponSelectorModal` but keep in mind it opens a Dialog.
-// Better approach: Use the `useCheckout` composable, but keep the `CouponSelectorModal` which abstracts the selection logic.
+import { ElMessage } from 'element-plus'
+import MobileCouponSelectorSheet from '@/components/mobile/checkout/MobileCouponSelectorSheet.vue'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
+import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
+import MobilePaySuccessModal from '@/components/mobile/checkout/MobilePaySuccessModal.vue'
 
-definePageMeta({ layout: 'mobile' })
+definePageMeta({ 
+  layout: 'mobile',
+  hideTabBar: true
+})
 
 const route = useRoute()
 const router = useRouter()
@@ -203,6 +208,8 @@ const {
   totalProductAmount,
   finalPayAmount,
   userBalance,
+  lastOrderId,      // Get Last Order ID
+  lastOrderAmount,  // Get Last Payment Amount
   orderSkuIds,
   orderProductIds,
   
@@ -248,16 +255,13 @@ const fetchFaqs = async () => {
     }
 }
 
-// Watch pay success to redirect
-watch(showPaySuccess, (val) => {
-    if (val) {
-        // Mobile redirect logic
-        ElMessage.success('支付成功')
-        setTimeout(() => {
-            router.replace('/mobile/profile')
-        }, 1000)
-    }
-})
+const goToOrder = () => {
+    router.replace('/mobile/profile/order')
+}
+
+const goToHome = () => {
+    router.replace('/mobile')
+}
 
 onMounted(() => {
    loadPreOrders(preOrderIds.value)
@@ -266,136 +270,153 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.checkout-page {
+.checkout-page-glass {
   min-height: 100vh;
   background: #0F172A;
   color: #fff;
-  padding-bottom: 90px;
+  padding-bottom: 100px; /* Space for footer */
 }
-
-/* Header */
-.header {
-  height: 56px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
-  position: sticky; top: 0; z-index: 100;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.btn-back {
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; background: rgba(255,255,255,0.05); cursor: pointer;
-}
-.header-title { font-size: 16px; font-weight: 600; }
-.header-placeholder { width: 32px; }
 
 /* States */
 .state-box {
-   padding: 60px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; color: #94A3B8;
+   padding: 100px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; color: #94A3B8;
 }
-.state-box.error { color: #EF4444; }
+.error-icon { font-size: 48px; color: #EF4444; margin-bottom: 10px; }
 .spinner {
-   width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #38BDF8;
+   width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #38BDF8;
    border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 .btn-retry {
-   padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); 
-   background: transparent; color: #fff; font-size: 13px;
+   padding: 10px 24px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); 
+   background: rgba(255,255,255,0.05); color: #fff; font-size: 14px; margin-top: 10px;
 }
 
 /* Content */
 .content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
 
-.countdown-bar {
+.countdown-bar-glass {
    background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2);
-   border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; justify-content: center;
-   gap: 8px; color: #F97316; font-size: 13px;
+   border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: center;
+   gap: 8px; color: #F97316; font-size: 14px;
+   backdrop-filter: blur(5px);
 }
-.time-val { font-weight: 700; font-family: monospace; font-size: 15px; }
+.time-val { font-weight: 700; font-family: monospace; font-size: 16px; }
 
-.card {
-  background: rgba(30, 41, 59, 0.5); border-radius: 16px; padding: 16px;
+/* Info Card Glass */
+.info-card-glass {
+  background: rgba(30, 41, 59, 0.6); 
+  backdrop-filter: blur(10px);
+  border-radius: 16px; padding: 16px;
   border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
+.info-card-glass.clickable:active { background: rgba(30, 41, 59, 0.8); }
 
-/* Product */
-.pc-head { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; }
-.pc-tag { color: #94A3B8; }
-.pc-order-no { color: #64748B; font-family: monospace; }
-.pc-body { display: flex; gap: 12px; }
-.thumb {
+/* Product Info */
+.card-head { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; }
+.card-title-sm { color: #94A3B8; }
+.order-no { color: #64748B; font-family: monospace; }
+.product-body { display: flex; gap: 12px; }
+.thumb-glow {
    width: 72px; height: 72px; border-radius: 10px; background: #0F172A; overflow: hidden;
+   box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); border: 1px solid rgba(255,255,255,0.05);
 }
-.thumb .el-image { width: 100%; height: 100%; }
-.info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.thumb-glow .el-image { width: 100%; height: 100%; }
+.product-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .p-name { font-size: 14px; font-weight: 500; color: #F1F5F9; line-height: 1.4; }
-.sku-pill { font-size: 10px; padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 4px; color: #94A3B8; display: inline-block; }
+.sku-pill-glass { 
+   font-size: 10px; padding: 2px 8px; background: rgba(255,255,255,0.05); 
+   border-radius: 4px; color: #94A3B8; display: inline-block; 
+   border: 1px solid rgba(255,255,255,0.05);
+}
 .p-price-row { display: flex; justify-content: space-between; align-items: flex-end; }
-.p-price { color: #F97316; font-weight: 700; font-family: 'DIN Alternate'; font-size: 16px; }
+.p-price { color: #38BDF8; font-weight: 700; font-family: 'DIN Alternate'; font-size: 18px; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+.p-price .unit { font-size: 12px; font-weight: normal; margin-left: 2px; }
 .p-qty { color: #64748B; font-size: 12px; }
 
-/* Coupon */
-.coupon-card { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-.cc-left { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
-.cc-right { display: flex; align-items: center; gap: 4px; font-size: 13px; }
+/* Coupon Row */
+.row-between { display: flex; justify-content: space-between; align-items: center; }
+.row-left { display: flex; align-items: center; gap: 8px; }
+.icon-box-glass {
+   width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05);
+   display: flex; align-items: center; justify-content: center; color: #F472B6; /* Pink tint for coupon */
+}
+.label { font-size: 14px; font-weight: 500; color: #E2E8F0; }
+.row-right { display: flex; align-items: center; gap: 4px; font-size: 13px; }
 .coupon-ph { color: #94A3B8; }
-.coupon-val { color: #EF4444; font-weight: 600; }
+.coupon-val { color: #F472B6; font-weight: 600; }
 
 /* FAQ */
 .faq-section { margin-top: 8px; }
-.faq-header { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #E2E8F0; margin-bottom: 12px; padding-left: 4px; }
-.faq-list { background: rgba(30, 41, 59, 0.3); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+.section-title { 
+    display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; 
+    color: #E2E8F0; margin-bottom: 12px; padding-left: 4px; 
+}
+.faq-list-glass { 
+    background: rgba(30, 41, 59, 0.3); border-radius: 16px; overflow: hidden; 
+    border: 1px solid rgba(255,255,255,0.05); 
+}
 .faq-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
 .faq-item:last-child { border-bottom: none; }
 .faq-q { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #94A3B8; cursor: pointer; }
 .faq-q .arrow { transition: transform 0.3s; }
-.faq-q .arrow.rotate { transform: rotate(180deg); color: #F97316; }
+.faq-q .arrow.rotate { transform: rotate(180deg); color: #38BDF8; }
 .active .faq-q { color: #E2E8F0; }
 .faq-a { padding: 0 16px 14px; font-size: 12px; color: #64748B; line-height: 1.6; }
 
 /* Pay Method */
 .card-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #E2E8F0; }
-.pm-item {
+.pm-item-glass {
   display: flex; align-items: center; gap: 12px; padding: 12px;
-  background: rgba(23, 143, 198, 0.1); border-radius: 12px; border: 1px solid rgba(23, 143, 198, 0.3);
+  background: rgba(56, 189, 248, 0.1); border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.1) inset;
 }
-.pm-item.active { border-color: #38BDF8; background: rgba(56, 189, 248, 0.1); }
 .pm-icon {
-   width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-   background: rgba(56, 189, 248, 0.2); color: #38BDF8;
+   width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+   background: rgba(56, 189, 248, 0.2); color: #38BDF8; font-size: 20px;
 }
 .pm-info { flex: 1; }
-.pm-name { font-size: 14px; font-weight: 500; color: #fff; }
+.pm-name { font-size: 14px; font-weight: 600; color: #fff; }
 .pm-desc { font-size: 11px; color: #94A3B8; margin-top: 2px; display: flex; align-items: center; gap: 6px; }
-.refresh-btn { display: inline-flex; padding: 2px; cursor: pointer; }
+.refresh-btn { display: inline-flex; padding: 4px; cursor: pointer; color: #38BDF8; }
 .spinning { animation: spin 1s linear infinite; }
-.pm-check { color: #38BDF8; font-size: 18px; }
+.pm-check { color: #38BDF8; font-size: 20px; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
 
 /* Tips */
-.tips-box {
-   padding: 12px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; 
+.tips-box-glass {
+   padding: 12px; background: rgba(245, 158, 11, 0.1); border-radius: 12px; 
    display: flex; gap: 8px; align-items: flex-start; 
    color: #F59E0B; font-size: 12px; line-height: 1.5;
+   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 /* Footer */
-.footer-bar {
+.footer-bar-glass {
    position: fixed; bottom: 0; left: 0; right: 0;
-   height: 80px; background: #1E293B; border-top: 1px solid rgba(255,255,255,0.05);
+   height: 80px; 
+   background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px);
+   border-top: 1px solid rgba(255,255,255,0.05);
    padding: 10px 16px 30px; display: flex; align-items: center; justify-content: space-between;
    z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
 }
-.fb-left { font-size: 13px; color: #E2E8F0; }
-.fb-price { color: #F97316; font-weight: 600; margin-left: 4px; }
-.fb-big { font-size: 20px; font-family: 'DIN Alternate'; }
+.fb-left { font-size: 13px; color: #94A3B8; }
+.fb-price { color: #38BDF8; font-weight: 600; margin-left: 6px; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+.fb-big { font-size: 22px; font-family: 'DIN Alternate'; }
 
-.btn-pay {
-   background: linear-gradient(135deg, #F97316, #EA580C);
+.btn-pay-glow {
+   background: linear-gradient(135deg, #3B82F6, #2563EB);
    border: none; color: #fff; font-weight: 600; font-size: 15px;
    padding: 0 32px; height: 44px; border-radius: 22px;
-   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); cursor: pointer;
+   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); cursor: pointer;
    display: flex; align-items: center; justify-content: center; gap: 8px;
+   transition: all 0.2s;
 }
-.btn-pay.insufficient { background: #334155; color: #94A3B8; box-shadow: none; }
-.btn-pay:disabled:not(.insufficient) { opacity: 0.7; filter: grayscale(0.5); }
+.btn-pay-glow:active { transform: scale(0.98); }
+.btn-pay-glow.insufficient { 
+    background: rgba(255,255,255,0.1); color: #94A3B8; 
+    box-shadow: none; border: 1px solid rgba(255,255,255,0.1); 
+}
+.btn-pay-glow:disabled:not(.insufficient) { opacity: 0.7; filter: grayscale(0.5); }
 .spinner-sm {
     width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
     border-radius: 50%; animation: spin 0.8s linear infinite;
