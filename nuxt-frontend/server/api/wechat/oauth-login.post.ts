@@ -87,14 +87,23 @@ export default defineEventHandler(async (event) => {
             let actionLink = null
             if (profile.email) {
                 const config = useRuntimeConfig()
-                const redirectTo = config.public.siteUrl ? `${config.public.siteUrl}/mobile` : 'https://www.fantula.com/mobile'
-                console.log('[OAuthLogin] Magic Link RedirectTo:', redirectTo)
+                // 优先使用客户端传入的重定向地址，否则默认跳首页
+                let userRedirectTo = body.redirectTo
+                if (!userRedirectTo) {
+                    userRedirectTo = config.public.siteUrl ? `${config.public.siteUrl}/mobile` : 'https://www.fantula.com/mobile'
+                } else if (userRedirectTo.startsWith('/')) {
+                    // 处理相对路径
+                    const baseUrl = config.public.siteUrl || 'https://www.fantula.com'
+                    userRedirectTo = `${baseUrl}${userRedirectTo}`
+                }
+
+                console.log('[OAuthLogin] Magic Link RedirectTo:', userRedirectTo)
 
                 const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
                     type: 'magiclink',
                     email: profile.email,
                     options: {
-                        redirectTo
+                        redirectTo: userRedirectTo
                     }
                 })
 

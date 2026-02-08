@@ -50,6 +50,11 @@ const updateMenu_get = defineEventHandler(async (event) => {
               url: "https://www.fantula.com/mobile/help"
             }
           ]
+        },
+        {
+          type: "view",
+          name: "\u767B\u5F55\u65E7\u7248",
+          url: "https://en.jjhezu.com/pages/login/login"
         }
       ]
     };

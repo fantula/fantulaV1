@@ -88,13 +88,13 @@ export const wechatLoginApi = {
     /**
      * 移动端微信 OAuth 登录
      */
-    async oauthLogin(code: string): Promise<ApiResponse<OAuthResult>> {
+    async oauthLogin(code: string, options?: { indent?: string; redirectTo?: string }): Promise<ApiResponse<OAuthResult>> {
         try {
             const response = await $fetch<{ success: boolean; data: OAuthResult }>(
                 `${BASE_URL}/oauth-login`,
                 {
                     method: 'POST',
-                    body: { code },
+                    body: { code, ...options },
                 }
             )
             return {

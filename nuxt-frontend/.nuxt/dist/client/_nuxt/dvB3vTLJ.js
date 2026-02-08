@@ -1,0 +1,1 @@
+const l=()=>({getCache:e=>{if(typeof window>"u")return null;try{const t=localStorage.getItem(e);if(!t)return null;const{data:n,expiry:r}=JSON.parse(t);return Date.now()>r?(localStorage.removeItem(e),null):n}catch{return null}},setCache:(e,t)=>{if(!(typeof window>"u"))try{localStorage.setItem(e,JSON.stringify({data:t,expiry:Date.now()+3e5}))}catch{}}});export{l as u};

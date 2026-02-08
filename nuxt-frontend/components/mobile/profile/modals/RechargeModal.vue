@@ -204,7 +204,10 @@ async function getOpenId(): Promise<string | null> {
 function redirectToWechatAuth() {
   // 公众号 AppID
   const appId = 'wxc2042fae927b28b8'
-  const redirectUri = encodeURIComponent(window.location.href)
+  // 统一回调处理页面，完成后跳回当前页
+  const callbackUrl = window.location.origin + '/mobile/wechat-callback'
+  const currentPath = window.location.pathname + window.location.search
+  const redirectUri = encodeURIComponent(`${callbackUrl}?return_to=${encodeURIComponent(currentPath)}`)
   const scope = 'snsapi_base'  // 静默授权
   const state = 'recharge'
   

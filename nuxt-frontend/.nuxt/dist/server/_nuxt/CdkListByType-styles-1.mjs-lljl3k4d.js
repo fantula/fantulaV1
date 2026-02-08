@@ -1,0 +1,5 @@
+const CdkListByType_vue_vue_type_style_index_0_scoped_e34a8f9e_lang = ".cdk-list-view[data-v-e34a8f9e]{display:flex;flex-direction:column;height:100%}.filter-group[data-v-e34a8f9e]{gap:10px}.filter-group[data-v-e34a8f9e],.product-cell[data-v-e34a8f9e]{align-items:center;display:flex}.product-name[data-v-e34a8f9e]{font-size:14px;font-weight:500}.code-display[data-v-e34a8f9e]{align-items:center;display:flex;gap:8px}.code-text[data-v-e34a8f9e]{color:#333;font-size:13px;word-break:break-all}.sku-mappings-cell[data-v-e34a8f9e]{align-items:center;display:flex;flex-wrap:wrap;gap:4px}.more-tag[data-v-e34a8f9e]{color:#909399;font-size:12px}.stock-info[data-v-e34a8f9e]{align-items:center;display:flex;font-size:14px;justify-content:center}.stock-divider[data-v-e34a8f9e]{color:#dcdfe6;margin:0 4px}.remaining[data-v-e34a8f9e]{color:#67c23a;font-weight:500}";
+export {
+  CdkListByType_vue_vue_type_style_index_0_scoped_e34a8f9e_lang as default
+};
+//# sourceMappingURL=CdkListByType-styles-1.mjs-lljl3k4d.js.map

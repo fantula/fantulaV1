@@ -2,8 +2,9 @@
   <!-- 顶部进度条 (导航时唯一的加载指示) -->
   <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="200" />
   
-  <!-- 全屏 Loader 只在首次加载时显示，导航时不显示 -->
+  <!-- 全屏 Loader 只在首次加载且非移动端时显示 -->
   <GlobalLoader 
+    v-if="!isMobile"
     :loading="isLoading && loadingVariant === 'initial'" 
     variant="initial" 
   />
@@ -21,6 +22,10 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 // 使用全局 Loading 状态管理
 const { isLoading, loadingVariant, startLoading, stopLoading } = usePageLoading()
 const nuxtApp = useNuxtApp()
+const route = useRoute()
+
+// 检测是否为移动端路由
+const isMobile = computed(() => route.path.startsWith('/mobile'))
 
 onMounted(() => {
   // 1. 设置初始 loading 状态

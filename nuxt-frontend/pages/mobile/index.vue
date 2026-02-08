@@ -77,6 +77,7 @@ import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { commonApi } from '@/api/client/common'
 import { goodsApi } from '@/api/client/goods'
+import { wechatLoginApi } from '@/api/client/wechat-login'
 import { useSimpleCache } from '@/composables/shared/useSimpleCache'
 import { usePageLoading } from '@/composables/usePageLoading'
 import { useUserStore } from '@/stores/client/user'
@@ -254,6 +255,33 @@ const handleScroll = (e: Event) => {
 onMounted(async () => {
     startLoading('initial')
     try {
+        // 【关键】处理微信授权回调的 code 参数
+        const code = route.query.code as string
+        const state = route.query.state as string
+        
+        if (code && !userStore.isLoggedIn) {
+            console.log('[MobileHome] Processing WeChat OAuth callback...')
+            try {
+                const res = await wechatLoginApi.oauthLogin(code)
+                if (res.success && res.data) {
+                    if (res.data.status === 'logged_in' && res.data.actionLink) {
+                        // 有 Magic Link，跳转完成登录
+                        console.log('[MobileHome] Redirecting to Magic Link...')
+                        window.location.href = res.data.actionLink
+                        return // 停止后续执行
+                    } else if (res.data.status === 'need_bind') {
+                        // 需要绑定邮箱，跳转到 wechat-callback 页面
+                        router.replace(`/mobile/wechat-callback?code=${code}`)
+                        return
+                    }
+                }
+            } catch (e) {
+                console.error('[MobileHome] OAuth login failed:', e)
+            }
+            // 清除 URL 中的 code 参数
+            router.replace({ path: '/mobile', query: {} })
+        }
+        
         await Promise.all([
            fetchBanners(),
            fetchCategories().then(id => {

@@ -1,1 +1,0 @@
-import{bP as n,K as a,bQ as o,q as r}from"./Cw8CLAr8.js";const l=n(async e=>{let i,s;if(e.path.includes("/login")||e.path.includes("/register"))return;const t=a();if(t.isLoggedIn||([i,s]=o(()=>t.init()),await i,s()),!t.isLoggedIn)return e.path.startsWith("/mobile/")?r("/mobile?login=1"):r("/?login=1")});export{l as default};

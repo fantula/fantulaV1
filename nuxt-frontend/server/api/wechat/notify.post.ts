@@ -145,9 +145,11 @@ export default defineEventHandler(async (event) => {
             .single()
 
         if (profile) {
-            const currentBalance = profile.balance || 0
-            const bonus = order.bonus || attach.bonus || 0
-            const totalAmount = order.amount + bonus
+            // 注意：数据库返回的金额可能是字符串，需要转换为数字
+            const currentBalance = parseFloat(profile.balance) || 0
+            const orderAmount = parseFloat(order.amount) || 0
+            const bonus = parseFloat(order.bonus) || parseFloat(String(attach.bonus || 0)) || 0
+            const totalAmount = orderAmount + bonus
             const newBalance = currentBalance + totalAmount
 
             await supabase

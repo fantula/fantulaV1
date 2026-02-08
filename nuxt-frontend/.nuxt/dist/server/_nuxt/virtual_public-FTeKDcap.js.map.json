@@ -1,0 +1,1 @@
+{"file":"virtual_public-FTeKDcap.js","mappings":";AAAuD,MAAA,aAAe,gBAAgB,8BAA8B;","names":[],"sources":["../../../../virtual:public?%2Fimages%2Fclient%2Fpc%2Fweixin.png"],"sourcesContent":["import { publicAssetsURL } from '#internal/nuxt/paths';export default publicAssetsURL(\"/images/client/pc/weixin.png\")"],"version":3}

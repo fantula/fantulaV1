@@ -105,7 +105,7 @@ export default defineEventHandler(async (event) => {
         // 使用标准 Supabase 客户端进行 OTP 验证
         const anonClient = createClient(
             config.public.supabaseUrl as string,
-            config.public.supabaseKey as string
+            config.public.supabaseAnonKey as string
         )
 
         const { data: authData, error: verifyError } = await anonClient.auth.verifyOtp({

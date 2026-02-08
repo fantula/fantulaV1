@@ -79,6 +79,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
+import { getSupabaseClient } from '~/utils/supabase'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
@@ -103,6 +104,52 @@ const codeTimer = ref(0)
 let codeInterval: any = null
 
 onMounted(async () => {
+  // 0. 特殊处理：如果是 Magic Link 回调（Hash 中包含 access_token）
+  if (route.hash && route.hash.includes('access_token')) {
+    console.log('[WechatCallback] Magic Link hash detected')
+    state.value = 'loading'
+    
+    // 监听 Auth 状态变化 (Supabase 客户端会自动处理 Hash 并恢复 Session)
+    const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        console.log('[WechatCallback] Session restored from hash')
+        
+        // 确保 userStore 同步
+        await userStore.setUser(session.user, session.access_token)
+        
+        state.value = 'success'
+        setTimeout(() => {
+            const returnTo = route.query.return_to as string
+            if (returnTo) {
+                window.location.href = decodeURIComponent(returnTo)
+            } else {
+                router.replace('/mobile/profile/account')
+            }
+        }, 800)
+        subscription.unsubscribe()
+      }
+    })
+    
+    // 同时也尝试直接获取 session (如果已经处理完)
+    const { data: { session } } = await getSupabaseClient().auth.getSession()
+    if (session) {
+         await userStore.setUser(session.user, session.access_token)
+         state.value = 'success'
+         setTimeout(() => {
+            const returnTo = route.query.return_to as string
+            if (returnTo) {
+                window.location.href = decodeURIComponent(returnTo)
+            } else {
+                router.replace('/mobile/profile/account')
+            }
+         }, 800)
+         subscription.unsubscribe() // clean up
+         return
+    }
+    
+    return // 等待 AuthStateChange
+  }
+
   // 从 URL 获取微信授权 code
   const code = route.query.code as string
 
@@ -120,8 +167,15 @@ onMounted(async () => {
         if (res.success) {
             state.value = 'success'
             setTimeout(() => {
-                router.replace('/mobile/profile/account')
-            }, 1500)
+                const returnTo = route.query.return_to as string
+                if (returnTo) {
+                    // 解码 return_to 避免多次编码问题
+                    const target = decodeURIComponent(returnTo)
+                    window.location.href = target // 使用 href 确保全量加载
+                } else {
+                    router.replace('/mobile/profile/account')
+                }
+            }, 1000)
         } else {
             state.value = 'error'
             errorMsg.value = res.msg || '绑定失败'
@@ -134,8 +188,13 @@ onMounted(async () => {
   }
 
   try {
+    // 获取 return_to 参数
+    const returnTo = route.query.return_to as string
+    
     // 用 code 换取 openid 并检查绑定状态
-    const res = await wechatLoginApi.oauthLogin(code)
+    const res = await wechatLoginApi.oauthLogin(code, { 
+        redirectTo: returnTo ? decodeURIComponent(returnTo) : undefined 
+    })
 
     if (!res.success || !res.data) {
       state.value = 'error'
@@ -171,13 +230,25 @@ onMounted(async () => {
       
       // 如果后端返回了 Magic Link，使用它进行自动登录跳转
       if (res.data.actionLink) {
-          console.log('Redirecting to Magic Link...')
-          window.location.href = res.data.actionLink
+         // 处理 Magic Link 的重定向目标
+         let link = res.data.actionLink
+         const returnTo = route.query.return_to as string
+         // 如果有 return_to，我们需要告诉 Magic Link 登录后跳转到哪里
+         // 但 Supabase Magic Link 的重定向是在生成时决定的 (redirectTo)
+         // 我们可以在客户端处理：先跳 Magic Link，Magic Link 验证后会跳回配置的页面
+         // 这里的策略是：信任后端生成的 Link
+         
+         console.log('Redirecting to Magic Link...', link)
+         window.location.href = link
       } else {
-          // 降级：如果没有 Link (罕见)，尝试直接跳回首页 (依赖 Session/Cookie?)
-          // 但通常不会成功，除非 OAuthLogin API 设置了 Cookie
+          // 降级：如果没有 Link
            setTimeout(() => {
-            router.replace('/mobile')
+            const returnTo = route.query.return_to as string
+            if (returnTo) {
+                window.location.href = decodeURIComponent(returnTo)
+            } else {
+                router.replace('/mobile')
+            }
           }, 1500)
       }
     } else if (res.data.status === 'need_bind') {
@@ -285,8 +356,13 @@ const onBind = async () => {
       userStore.setUser(res.data.user, res.data.session?.access_token)
       state.value = 'success'
       setTimeout(() => {
-        router.replace('/mobile')
-      }, 1500)
+        const returnTo = route.query.return_to as string
+        if (returnTo) {
+            window.location.href = decodeURIComponent(returnTo)
+        } else {
+            router.replace('/mobile')
+        }
+      }, 1000)
     } else {
       errorMsg.value = res.msg || '绑定失败'
     }

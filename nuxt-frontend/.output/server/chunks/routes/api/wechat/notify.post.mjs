@@ -69,9 +69,10 @@ const notify_post = defineEventHandler(async (event) => {
     }).eq("out_trade_no", payment.out_trade_no);
     const { data: profile } = await supabase.from("profiles").select("balance").eq("id", attach.userId).single();
     if (profile) {
-      const currentBalance = profile.balance || 0;
-      const bonus = order.bonus || attach.bonus || 0;
-      const totalAmount = order.amount + bonus;
+      const currentBalance = parseFloat(profile.balance) || 0;
+      const orderAmount = parseFloat(order.amount) || 0;
+      const bonus = parseFloat(order.bonus) || parseFloat(String(attach.bonus || 0)) || 0;
+      const totalAmount = orderAmount + bonus;
       const newBalance = currentBalance + totalAmount;
       await supabase.from("profiles").update({
         balance: newBalance,
