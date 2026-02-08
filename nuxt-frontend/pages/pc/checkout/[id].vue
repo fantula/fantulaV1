@@ -120,14 +120,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Timer, InfoFilled, QuestionFilled, ArrowDown } from '@element-plus/icons-vue'
 import { useCheckout } from '@/composables/client/useCheckout'
 // BalanceNotEnoughModal import removed
-import PaySuccessModal from '@/components/pc/modal/PaySuccessModal.vue'
-import CouponSelectorModal from '@/components/pc/modal/business/CouponSelectorModal.vue'
-import WalletRechargeModal from '@/components/pc/modal/business/WalletRechargeModal.vue'
+const PaySuccessModal = defineAsyncComponent(() => import('@/components/pc/modal/PaySuccessModal.vue'))
+const CouponSelectorModal = defineAsyncComponent(() => import('@/components/pc/modal/business/CouponSelectorModal.vue'))
+const WalletRechargeModal = defineAsyncComponent(() => import('@/components/pc/modal/business/WalletRechargeModal.vue'))
 import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
 import CheckoutOrderList from '@/components/pc/checkout/CheckoutOrderList.vue'
 import CheckoutSummary from '@/components/pc/checkout/CheckoutSummary.vue'

@@ -37,7 +37,7 @@
             >
                <!-- Image Section -->
                <div class="card-img">
-                  <img :src="item.productImage" :alt="item.productName" loading="lazy" />
+                  <img :src="item.productImage" :alt="item.productName" loading="lazy" decoding="async" />
                   <!-- Status Overlay (e.g. No Stock) -->
                   <div class="stock-overlay" v-if="item.stock === 0">
                       <span>缺货</span>
@@ -82,7 +82,7 @@ import { favoriteApi } from '@/api/client/common'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
-import ProductDetailSheet from '@/components/mobile/goods/ProductDetailSheet.vue'
+const ProductDetailSheet = defineAsyncComponent(() => import('@/components/mobile/goods/ProductDetailSheet.vue'))
 import { useToast } from '@/composables/mobile/useToast'
 
 definePageMeta({
@@ -256,7 +256,7 @@ watch(activeTab, () => {
 }
 .product-title {
     font-size: 13px; color: #E2E8F0;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     margin-bottom: 8px; line-height: 1.4; height: 36px;
 }
 

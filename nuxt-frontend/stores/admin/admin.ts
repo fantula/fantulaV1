@@ -150,16 +150,17 @@ export const useAdminStore = defineStore('admin', () => {
 
     /**
      * 发送验证码（OTP）
+     * 对于 admin_users 表中的管理员，如果尚未创建 auth.users 账号，会自动创建
      */
     const sendOtp = async (email: string): Promise<{ success: boolean; error?: string }> => {
         try {
             const authClient = getSupabaseClient()
             const adminClient = getAdminSupabaseClient()
 
-            // 先检查该邮箱是否是管理员
+            // 先检查该邮箱是否是管理员，并获取 auth_user_id
             const { data: adminData } = await adminClient
                 .from('admin_users')
-                .select('id, status')
+                .select('id, status, auth_user_id')
                 .eq('email', email)
                 .single()
 
@@ -171,15 +172,24 @@ export const useAdminStore = defineStore('admin', () => {
                 return { success: false, error: '该账号已被禁用' }
             }
 
+            // 检查是否已有 auth_user_id
+            // 如果没有，说明需要为该管理员创建 auth.users 账号
+            const shouldCreateUser = !adminData.auth_user_id
+
             // 发送 OTP
             const { error } = await authClient.auth.signInWithOtp({
                 email,
                 options: {
-                    shouldCreateUser: false  // 不自动创建用户
+                    // 只有管理员表中没有 auth_user_id 时才允许创建用户
+                    shouldCreateUser: shouldCreateUser
                 }
             })
 
             if (error) {
+                // 特殊处理：如果用户不存在且我们不允许创建，给出更友好的提示
+                if (error.message.includes('Signups not allowed')) {
+                    return { success: false, error: '账号未初始化，请联系超级管理员' }
+                }
                 return { success: false, error: error.message }
             }
 
@@ -191,6 +201,7 @@ export const useAdminStore = defineStore('admin', () => {
 
     /**
      * 验证码登录（OTP）
+     * 如果是首次登录，会自动关联 admin_users 表的 auth_user_id
      */
     const loginWithOtp = async (email: string, code: string): Promise<{ success: boolean; error?: string }> => {
         try {
@@ -216,20 +227,47 @@ export const useAdminStore = defineStore('admin', () => {
                 return { success: false, error: '登录失败，无法获取 Session' }
             }
 
-            // 验证是否在 admin_users 表中，并获取部门权限
-            const { data: adminData, error: adminError } = await adminClient
+            const authUserId = data.session.user.id
+
+            // 先尝试通过 auth_user_id 查找管理员
+            let { data: adminData, error: adminError } = await adminClient
                 .from('admin_users')
                 .select(`
                     *,
                     department:admin_departments(id, name, permissions)
                 `)
-                .eq('auth_user_id', data.session.user.id)
+                .eq('auth_user_id', authUserId)
                 .single()
 
+            // 如果通过 auth_user_id 找不到，尝试通过邮箱查找并更新关联
             if (adminError || !adminData) {
-                // 不是管理员，登出
-                await authClient.auth.signOut()
-                return { success: false, error: '该账号不是管理员' }
+                const { data: adminByEmail, error: emailError } = await adminClient
+                    .from('admin_users')
+                    .select(`
+                        *,
+                        department:admin_departments(id, name, permissions)
+                    `)
+                    .eq('email', email)
+                    .single()
+
+                if (emailError || !adminByEmail) {
+                    // 确实不是管理员，登出
+                    await authClient.auth.signOut()
+                    return { success: false, error: '该账号不是管理员' }
+                }
+
+                // 找到了，更新 auth_user_id 关联
+                const { error: updateError } = await adminClient
+                    .from('admin_users')
+                    .update({ auth_user_id: authUserId })
+                    .eq('id', adminByEmail.id)
+
+                if (updateError) {
+                    console.error('更新 auth_user_id 失败:', updateError)
+                    // 不阻止登录，只是记录错误
+                }
+
+                adminData = adminByEmail
             }
 
             if (adminData.status !== 'enabled') {
@@ -238,7 +276,7 @@ export const useAdminStore = defineStore('admin', () => {
             }
 
             adminUser.value = {
-                id: data.session.user.id,
+                id: authUserId,
                 email: data.session.user.email || '',
                 role: adminData.role || 'admin'
             }

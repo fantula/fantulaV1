@@ -11,6 +11,12 @@
     </div>
     
     <div class="goods-content">
+      <!-- 骨架屏 -->
+      <ProductDetailSkeleton v-if="pending" />
+
+      <!-- 主内容 -->
+      <template v-else>
+      <div class="goods-content-inner">
       <!-- 返回按钮 -->
       <div class="back-btn-row">
         <BaseButton themeId="secondary" @click="goBack">
@@ -163,11 +169,14 @@
               <div class="detail-text-box">{{ mod.content }}</div>
             </template>
             <template v-else-if="mod.type === 'image'">
-              <img :src="mod.content" class="detail-full-img" loading="lazy" />
+              <img :src="mod.content" class="detail-full-img" loading="lazy" decoding="async" />
             </template>
           </div>
         </div>
       </div>
+
+      </div>
+      </template>
 
     </div>
     
@@ -188,12 +197,16 @@ import {
   InfoFilled,
   ArrowLeft
 } from '@element-plus/icons-vue'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductDetail } from '@/composables/client/useProductDetail'
 import ProductGallery from '@/components/pc/goods/ProductGallery.vue'
-import FaqTicker from '@/components/pc/goods/FaqTicker.vue'
+// FaqTicker is below fold mostly, can be async
+const FaqTicker = defineAsyncComponent(() => import('@/components/pc/goods/FaqTicker.vue'))
 import BaseButton from '@/components/shared/BaseButton.vue'
+import ProductDetailSkeleton from '@/components/pc/goods/ProductDetailSkeleton.vue'
+
+const LoginRegisterModal = defineAsyncComponent(() => import('@/components/pc/modal/LoginRegisterModal.vue'))
 
 const router = useRouter()
 const {
@@ -216,6 +229,7 @@ const {
   detailModules,
   allowAddon,
   faqs,
+  pending, // Use pending
   formatPrice,
   handleSpecSelect,
   buyNow,

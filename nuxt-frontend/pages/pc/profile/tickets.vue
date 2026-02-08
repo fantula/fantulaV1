@@ -132,12 +132,12 @@ definePageMeta({
   layout: 'pc'
 })
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { ticketApi } from '@/api/client/ticket'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
-import { Service, Right, Delete } from '@element-plus/icons-vue'
-import TicketDetailModal from '@/components/pc/modal/business/TicketDetailModal.vue'
+import { Service, Delete } from '@element-plus/icons-vue'
+const TicketDetailModal = defineAsyncComponent(() => import('@/components/pc/modal/business/TicketDetailModal.vue'))
 import BaseConfirmModal from '@/components/pc/modal/base/BaseConfirmModal.vue'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { ElMessage } from 'element-plus'

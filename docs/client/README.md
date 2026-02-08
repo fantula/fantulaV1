@@ -1,7 +1,7 @@
 # PC 客户端文档索引
 
 > **Fantula PC Client**
-> **版本**: V1.1 | **更新时间**: 2026-02-04
+> **版本**: V1.2 | **更新时间**: 2026-02-08
 
 ---
 
@@ -20,7 +20,8 @@
 | 文档 | 说明 | 优先级 |
 |------|------|--------|
 | [CLIENT_TEST_OPTIMIZATION_GUIDE.md](./CLIENT_TEST_OPTIMIZATION_GUIDE.md) | 测试与优化规范 | 必读 |
-| [CLIENT_COMPONENT_ROADMAP.md](./CLIENT_COMPONENT_ROADMAP.md) | 🆕 组件标准化路线图 | 必读 |
+| [CLIENT_COMPONENT_ROADMAP.md](./CLIENT_COMPONENT_ROADMAP.md) | 组件标准化路线图 | 必读 |
+| [STYLE_MAPPING.md](./STYLE_MAPPING.md) | 🆕 **全局样式映射** | 必读 |
 
 ### 重点页面文档 (⭐ 关键)
 
@@ -32,7 +33,7 @@
 
 | 文档 | 说明 |
 |------|------|
-| [EXAMPLE_TEST_HOMEPAGE.md](./EXAMPLE_TEST_HOMEPAGE.md) | 🆕 示例：测试首页完整流程 |
+| [EXAMPLE_TEST_HOMEPAGE.md](./EXAMPLE_TEST_HOMEPAGE.md) | 示例：测试首页完整流程 |
 
 ### 相关业务规则
 

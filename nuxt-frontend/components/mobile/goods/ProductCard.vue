@@ -2,7 +2,7 @@
   <div class="goods-card-row card-glass" @click="$emit('click')">
     <!-- Left: Image -->
     <div class="goods-thumb">
-      <img :src="goods.image || goods.coverImage" loading="lazy" />
+      <img :src="goods.image || goods.coverImage" loading="lazy" decoding="async" />
       <!-- Tag Overlay -->
       <div v-if="goods.badge_label && goods.badge_label !== '不展示'" 
            class="card-badge" 
@@ -145,7 +145,7 @@ const getBadgeClass = (label: string) => {
   font-weight: 600;
   line-height: 1.4;
   margin-bottom: 4px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
 .goods-tags-row {

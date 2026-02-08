@@ -63,7 +63,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { Bell, ShoppingCart, Warning, ChatDotRound } from '@element-plus/icons-vue'
 import { messageApi, type UserMessage } from '@/api/client/message'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
@@ -77,7 +76,6 @@ definePageMeta({
   middleware: 'client-auth'
 })
 
-const router = useRouter()
 const userStore = useUserStore()
 const { showToast } = useToast()
 const activeTab = ref('all')
@@ -274,7 +272,7 @@ onMounted(() => {
 
 .msg-body {
     font-size: 13px; color: #94A3B8;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     line-height: 1.4;
 }
 

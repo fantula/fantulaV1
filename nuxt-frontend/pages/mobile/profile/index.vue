@@ -127,8 +127,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
-  Setting, ArrowRight, Wallet, Box, CircleCheck, Service,
-  Ticket, Star, Headset, Bell, List, Monitor, RefreshRight, ShoppingCart // Import ShoppingCart Icon
+  ArrowRight, Wallet, Box,
+  Ticket, Star, Headset, Bell, Monitor, RefreshRight, ShoppingCart // Import ShoppingCart Icon
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart' // Import Cart Store
@@ -300,9 +300,7 @@ onMounted(() => {
     transition: all 0.2s;
 }
 
-.order-card {
-    /* min-height: 140px; REMOVE fixed height to allow compact */
-}
+
 .compact-header {
     padding-bottom: 8px !important;
     border-bottom: 1px solid rgba(255,255,255,0.05); /* Separator for clarity */

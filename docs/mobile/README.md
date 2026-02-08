@@ -1,13 +1,15 @@
 # 移动端文档索引
 
 > **Fantula Mobile**
-> **版本**: V1.0 | **更新时间**: 2026-02-04
+> **版本**: V1.1 | **更新时间**: 2026-02-08
 
 ---
 
 ## 🎯 快速入口
 
-**AI 工程师请先阅读**: [`../AI_WORKFLOW.md`](../AI_WORKFLOW.md) - 工作流程主框架
+**AI 助手执行任务前必读**:
+1. [`../AI_SOP.md`](../AI_SOP.md) - 标准操作流程 (强制)
+2. [`../AI_WORKFLOW.md`](../AI_WORKFLOW.md) - 工作流程主框架
 
 ---
 
@@ -41,10 +43,11 @@
 
 ### 核心规范
 
-| 文档 | 说明 |
-|------|------|
-| [MOBILE_TEST_OPTIMIZATION_GUIDE.md](./MOBILE_TEST_OPTIMIZATION_GUIDE.md) | 测试与优化规范 |
-| [MOBILE_COMPONENT_STANDARD.md](./MOBILE_COMPONENT_STANDARD.md) | 组件使用标准 |
+| 文档 | 说明 | 优先级 |
+|------|------|--------|
+| [MOBILE_TEST_OPTIMIZATION_GUIDE.md](./MOBILE_TEST_OPTIMIZATION_GUIDE.md) | 测试与优化规范 | 必读 |
+| [STYLE_MAPPING.md](./STYLE_MAPPING.md) | 🆕 **全局样式映射** | 必读 |
+| [STANDARDIZATION_WORKFLOW.md](./STANDARDIZATION_WORKFLOW.md) | 🆕 **组件标准化工作流程** | 必读 |
 
 ### 重点页面
 

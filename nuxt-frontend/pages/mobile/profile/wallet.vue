@@ -81,14 +81,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, InfoFilled, Lightning } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import { useBizFormat } from '@/composables/common/useBizFormat'
-import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
+const RechargeModal = defineAsyncComponent(() => import('@/components/mobile/profile/modals/RechargeModal.vue'))
 import MobileInfiniteList from '@/components/mobile/list/MobileInfiniteList.vue'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 

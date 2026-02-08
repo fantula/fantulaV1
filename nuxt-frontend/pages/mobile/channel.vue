@@ -1,89 +1,115 @@
 <template>
-  <div class="mobile-channel-page">
-    <!-- Header -->
-    <div class="channel-header">
-       <div class="header-icon">
-          <el-icon :size="32" color="#fff"><Search /></el-icon>
-       </div>
-       <h1>频道识别</h1>
-       <p>请输入频道标识以连接专属商品</p>
-    </div>
+  <div class="mobile-page">
+    <!-- Main Header -->
+    <header class="hub-header">
+       <h1 class="hub-title">探索功能 <span class="dot">.</span></h1>
+       <p class="hub-subtitle">Discovery Tools</p>
+    </header>
 
-    <!-- Content Body -->
-    <div class="channel-body">
-       
-       <!-- Input State -->
-       <div v-if="state === 'input'" class="input-section">
-          <div class="input-wrapper">
-             <input 
-                ref="inputRef"
-                v-model="channelInput"
-                type="text"
-                class="channel-input"
-                placeholder="@channel_name"
-                @input="handleInput"
-                @keyup.enter="handleRecognize"
-                spellcheck="false"
-             />
-             <div v-if="loading" class="input-loader">
-                <div class="spinner-sm"></div>
+    <div class="hub-body">
+       <!-- Tool: Channel Identifier -->
+       <div class="tool-card expanded">
+          <div class="tool-header">
+             <div class="th-icon">
+                <el-icon><Search /></el-icon>
+             </div>
+             <div class="th-info">
+                <h3>频道识别</h3>
+                <p>链接专属商品渠道</p>
              </div>
           </div>
-          
-          <button 
-             class="action-btn" 
-             @click="handleRecognize"
-             :disabled="loading || !isValidInput"
-          >
-             {{ loading ? '识别中...' : '立即识别' }}
-          </button>
+
+          <!-- Input Area -->
+          <div class="tool-content">
+             <div class="input-row">
+                <input 
+                   ref="inputRef"
+                   v-model="channelInput"
+                   type="text"
+                   class="glass-input"
+                   placeholder="@channel_key"
+                   @input="handleInput"
+                   @keyup.enter="handleRecognize"
+                   spellcheck="false"
+                />
+                <button 
+                   class="btn-icon-action" 
+                   @click="handleRecognize"
+                   :disabled="loading || !isValidInput"
+                >
+                   <div v-if="loading" class="spinner-xs"></div>
+                   <el-icon v-else><Right /></el-icon>
+                </button>
+             </div>
+
+             <!-- Result Area (Inline) -->
+             <div v-if="state !== 'input'" class="result-area">
+                
+                <!-- Success: Product Preview -->
+                <div v-if="state === 'bound' && product" class="result-success animate-fade-in">
+                   <div class="success-tag">
+                      <el-icon><CircleCheckFilled /></el-icon> 识别成功
+                   </div>
+                   
+                   <!-- Product Card Preview -->
+                   <div class="preview-card" @click="openProductSheet">
+                      <img :src="product.image || product.coverImage" class="pc-thumb" decoding="async" loading="lazy" />
+                      <div class="pc-info">
+                         <div class="pc-name">{{ product.name || product.title }}</div>
+                         <div class="pc-price">
+                            ¥<span class="val">{{ product.price }}</span>
+                         </div>
+                      </div>
+                      <button class="pc-btn">购买</button>
+                   </div>
+                </div>
+
+                <!-- Pending / Error -->
+                <div v-else-if="state === 'pending'" class="result-warning animate-fade-in">
+                   <div class="warning-icon"><el-icon><WarningFilled /></el-icon></div>
+                   <div class="warning-text">
+                      <p>频道 <span>{{ resultKey }}</span> 暂未绑定商品</p>
+                      <button class="btn-text-reset" @click="reset">重试</button>
+                   </div>
+                </div>
+
+             </div>
+          </div>
        </div>
 
-       <!-- Bound State (Success) -->
-       <div v-else-if="state === 'bound'" class="result-section">
-          <div class="status-icon success">
-             <el-icon><CircleCheckFilled /></el-icon>
+       <!-- Placeholder for Future Tools -->
+       <div class="tools-grid">
+          <div class="tool-card mini disabled">
+             <el-icon><Compass /></el-icon>
+             <span>更多功能</span>
+             <div class="badge-soon">Coming Soon</div>
           </div>
-          <h3 class="result-key">{{ resultKey }}</h3>
-          <p class="result-msg">已成功识别频道</p>
-          
-          <button class="action-btn success-btn" @click="goToProduct">
-             前往购买 <el-icon class="ml-1"><Right /></el-icon>
-          </button>
-          <button class="text-btn" @click="reset">重新输入</button>
-       </div>
-
-       <!-- Pending State (Warning) -->
-       <div v-else-if="state === 'pending'" class="result-section">
-          <div class="status-icon warning">
-             <el-icon><WarningFilled /></el-icon>
-          </div>
-          <h3 class="result-key">{{ resultKey }}</h3>
-          <p class="result-msg">频道尚未绑定商品</p>
-          <p class="result-sub-msg">已记录请求，请稍后重试或联系客服</p>
-          
-          <button class="text-btn" @click="reset">返回</button>
        </div>
 
     </div>
+
+    <!-- Product Detail Sheet -->
+    <ProductDetailSheet 
+      v-model:visible="showDetailSheet" 
+      :goods-id="boundProductId || ''" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { Search, CircleCheckFilled, WarningFilled, Right } from '@element-plus/icons-vue'
+import { ref, computed, nextTick, defineAsyncComponent } from 'vue'
+import { Search, Right, CircleCheckFilled, WarningFilled, Compass } from '@element-plus/icons-vue'
 import { getSupabaseClient } from '@/utils/supabase'
 import { useToast } from '@/composables/mobile/useToast'
+import { goodsApi } from '@/api/client/goods'
 
-definePageMeta({
-  layout: 'mobile'
-})
+const ProductDetailSheet = defineAsyncComponent(() => import('@/components/mobile/goods/ProductDetailSheet.vue'))
+
+definePageMeta({ layout: 'mobile' })
 
 const client = getSupabaseClient()
-const router = useRouter()
-const inputRef = ref<HTMLInputElement | null>(null)
 const { showToast } = useToast()
+const inputRef = ref<HTMLInputElement | null>(null)
 
 // State
 type PageState = 'input' | 'bound' | 'pending'
@@ -92,20 +118,16 @@ const loading = ref(false)
 const channelInput = ref('@')
 const resultKey = ref('')
 const boundProductId = ref<string | null>(null)
+const product = ref<any>(null)
+const showDetailSheet = ref(false)
 
-const isValidInput = computed(() => {
-  return /^@[a-z0-9_]+$/.test(channelInput.value)
-})
+const isValidInput = computed(() => /^@[a-z0-9_]+$/.test(channelInput.value))
 
 const handleInput = (e: Event) => {
   let val = (e.target as HTMLInputElement).value
   val = val.toLowerCase().replace(/\s+/g, '')
-  
-  if (!val) {
-    val = '@'
-  } else if (!val.startsWith('@')) {
-    val = '@' + val
-  }
+  if (!val) val = '@'
+  else if (!val.startsWith('@')) val = '@' + val
   
   channelInput.value = val
   if (inputRef.value && inputRef.value.value !== val) {
@@ -114,142 +136,188 @@ const handleInput = (e: Event) => {
 }
 
 const handleRecognize = async () => {
-  if (!isValidInput.value) {
-    showToast('请输入有效的频道标识', 'warning')
-    return
-  }
+  if (!isValidInput.value) return showToast('请输入有效的频道标识', 'warning')
 
   try {
     loading.value = true
-    const { data, error } = await client.rpc('resolve_channel_key', {
+    state.value = 'input' // Reset view while loading
+    product.value = null
+
+    const { data: channelData, error } = await client.rpc('resolve_channel_key', {
       p_channel_key: channelInput.value
     })
-
     if (error) throw error
 
-    resultKey.value = data.channel_key
-    boundProductId.value = data.product_id
+    resultKey.value = channelData.channel_key
+    boundProductId.value = channelData.product_id
 
-    if (data.bound && data.product_id) {
-      state.value = 'bound'
+    if (channelData.bound && channelData.product_id) {
+       // Fetch Product Detail
+       const res = await goodsApi.getGoodsDetail(channelData.product_id)
+       if (res.success && res.data) {
+          product.value = res.data
+          state.value = 'bound'
+       } else {
+          // Product might be off-shelf or invalid
+          state.value = 'pending' 
+          showToast('商品已下架或不存在', 'warning')
+       }
     } else {
       state.value = 'pending'
     }
-  } catch (err: any) {
-    console.error('Channel recognition error:', err)
-    showToast('识别失败，请重试', 'error')
+  } catch (err) {
+    console.error(err)
+    showToast('识别失败', 'error')
   } finally {
     loading.value = false
   }
 }
 
-const goToProduct = () => {
-  if (boundProductId.value) {
-    router.push(`/goods/${boundProductId.value}`)
-  }
+const openProductSheet = () => {
+    if (boundProductId.value) {
+        showDetailSheet.value = true
+    }
 }
 
 const reset = () => {
   state.value = 'input'
   channelInput.value = '@'
-  resultKey.value = ''
-  boundProductId.value = null
   nextTick(() => inputRef.value?.focus())
 }
-
-onMounted(() => {
-  nextTick(() => inputRef.value?.focus())
-})
 </script>
 
 <style scoped>
-.mobile-channel-page {
+.mobile-page {
   min-height: 100vh;
-  /* background: #0F172A; REMOVED to show global background */
+  /* background: transparent; handled by layout */
   color: #fff;
+  padding: 20px;
   display: flex; flex-direction: column;
-  padding: 40px 24px;
 }
 
-.channel-header {
-  display: flex; flex-direction: column; align-items: center; margin-bottom: 60px;
+/* Header */
+.hub-header { margin-bottom: 24px; padding-left: 4px; }
+.hub-title { 
+    font-size: 28px; font-weight: 800; margin: 0; line-height: 1.2;
+    background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
-.header-icon {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.6));
-  border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
-  margin-bottom: 24px;
-  backdrop-filter: blur(12px);
+.hub-title .dot { color: var(--cyber-primary); -webkit-text-fill-color: var(--cyber-primary); }
+.hub-subtitle { font-size: 14px; color: #64748B; margin: 4px 0 0; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+
+/* Grid */
+.hub-body { display: flex; flex-direction: column; gap: 20px; }
+
+/* Tool Card */
+.tool-card {
+   background: var(--glass-bg);
+   border: 1px solid var(--glass-border);
+   border-radius: 20px;
+   padding: 20px;
+   transition: all 0.3s;
+   overflow: hidden;
 }
-.channel-header h1 { 
-    font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;
-    background: linear-gradient(135deg, #00FFFF 0%, #06B6D4 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+.tool-card.expanded {
+   border-color: rgba(56, 189, 248, 0.3);
+   box-shadow: 0 0 30px rgba(56, 189, 248, 0.1);
 }
-.channel-header p { color: #94A3B8; font-size: 15px; text-align: center; }
 
-.channel-body { width: 100%; max-width: 400px; margin: 0 auto; }
-
-/* Input Section */
-.input-wrapper { position: relative; margin-bottom: 24px; }
-.channel-input {
-  width: 100%; height: 64px; 
-  background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.6));
-  border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-  border-radius: 20px;
-  padding: 0 24px; color: #fff; font-size: 20px; font-family: monospace;
-  text-align: center; outline: none; transition: all 0.3s;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+.tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.th-icon {
+   width: 48px; height: 48px; border-radius: 14px;
+   background: rgba(56, 189, 248, 0.1);
+   color: var(--cyber-primary);
+   display: flex; align-items: center; justify-content: center; font-size: 24px;
+   border: 1px solid rgba(56, 189, 248, 0.2);
 }
-.channel-input:focus {
-  border-color: #00FFFF;
-  background: rgba(15, 23, 42, 0.8);
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+.th-info h3 { font-size: 16px; font-weight: 700; margin: 0 0 4px; color: #E2E8F0; }
+.th-info p { font-size: 13px; color: #94A3B8; margin: 0; }
+
+/* Input Row */
+.input-row { display: flex; gap: 12px; height: 50px; }
+.glass-input {
+   flex: 1; height: 100%;
+   background: rgba(15, 23, 42, 0.6);
+   border: 1px solid rgba(255,255,255,0.1);
+   border-radius: 12px;
+   padding: 0 16px; color: #fff; font-size: 16px; font-family: monospace;
+   outline: none; transition: all 0.2s;
 }
-.input-loader { position: absolute; right: 20px; top: 22px; color: #06B6D4; }
+.glass-input:focus { border-color: var(--cyber-primary); background: rgba(15, 23, 42, 0.8); }
 
-.action-btn {
-  width: 100%; height: 56px; border-radius: 28px; border: none;
-  background: var(--cyber-gradient-btn, linear-gradient(135deg, #F97316 0%, #EA580C 100%));
-  color: #fff; font-size: 18px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--cyber-glow-orange, 0 8px 20px rgba(249, 115, 22, 0.4));
-  transition: all 0.2s;
-  cursor: pointer;
+.btn-icon-action {
+   width: 50px; height: 50px; border-radius: 12px; border: none;
+   background: var(--cyber-primary); color: #fff; font-size: 20px;
+   display: flex; align-items: center; justify-content: center;
+   cursor: pointer; transition: all 0.2s;
 }
-.action-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3); }
-.action-btn:disabled { opacity: 0.6; filter: grayscale(0.5); cursor: not-allowed; }
+.btn-icon-action:active { transform: scale(0.95); }
+.btn-icon-action:disabled { opacity: 0.5; filter: grayscale(1); }
 
-/* Result Section */
-.result-section { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.status-icon { font-size: 64px; margin-bottom: 24px; }
-.status-icon.success { color: #00FFFF; filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.5)); }
-.status-icon.warning { color: #F59E0B; filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5)); }
+/* Result Area */
+.result-area { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
 
-.result-key { font-size: 24px; font-family: monospace; margin-bottom: 8px; word-break: break-all; color: #E0F2FE; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-.result-msg { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px; }
-.result-sub-msg { font-size: 14px; color: #94A3B8; margin-bottom: 32px; }
-
-.success-btn {
-  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
-  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
-  margin-bottom: 16px;
+.success-tag { 
+    display: flex; align-items: center; gap: 6px; color: var(--cyber-primary); 
+    font-size: 13px; font-weight: 600; margin-bottom: 12px; 
 }
-.ml-1 { margin-left: 4px; }
 
-.text-btn {
-  background: none; border: none; color: #94A3B8; font-size: 15px; padding: 12px; cursor: pointer;
+.preview-card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 16px;
+    padding: 12px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
-.text-btn:hover { color: #fff; }
+.preview-card:active { transform: scale(0.98); background: rgba(30, 41, 59, 0.8); }
 
-/* Simple Spinner */
-.spinner-sm {
-  width: 20px; height: 20px;
-  border: 2px solid rgba(255,255,255,0.1); border-top-color: #00FFFF;
+.pc-thumb { 
+    width: 60px; height: 60px; border-radius: 8px; background: #000; object-fit: cover; 
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.pc-info { flex: 1; overflow: hidden; }
+.pc-name { font-size: 14px; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-price { color: #F97316; font-size: 12px; font-weight: 700; font-family: 'DIN Alternates'; }
+.pc-price .val { font-size: 16px; }
+
+.pc-btn {
+    padding: 6px 16px; background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+    border: none; border-radius: 100px; color: #fff; font-size: 12px; font-weight: 600;
+}
+
+/* Warning */
+.result-warning {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 10px;
+}
+.warning-icon { font-size: 32px; color: #F59E0B; }
+.warning-text p { font-size: 14px; color: #94A3B8; margin: 0 0 8px; }
+.warning-text span { color: #E2E8F0; font-family: monospace; }
+.btn-text-reset { background: none; border: none; color: var(--cyber-primary); font-size: 14px; text-decoration: underline; }
+
+/* Mini Tools */
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; opacity: 0.5; }
+.tool-card.mini {
+   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+   height: 100px; padding: 0;
+   position: relative;
+}
+.tool-card.mini .el-icon { font-size: 24px; color: #94A3B8; }
+.tool-card.mini span { font-size: 12px; color: #64748B; }
+.badge-soon { 
+    position: absolute; top: 8px; right: 8px; 
+    font-size: 9px; background: rgba(255,255,255,0.05); 
+    padding: 2px 6px; border-radius: 4px; color: #64748B; 
+}
+
+/* Animation */
+.animate-fade-in { animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.spinner-xs {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

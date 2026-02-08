@@ -1,11 +1,16 @@
 <template>
-  <div class="mobile-sub-page-header">
-    <div class="back-btn" @click="handleBack">
-      <el-icon><ArrowLeft /></el-icon>
-    </div>
-    <h1 class="page-title">{{ title }}</h1>
-    <div class="header-right">
-       <slot name="right"></slot>
+  <div class="mobile-sub-page-header-wrapper">
+    <!-- Spacer to prevent content overlap -->
+    <div class="header-spacer"></div>
+    
+    <div class="mobile-sub-page-header">
+      <div class="back-btn" @click="handleBack">
+        <el-icon><ArrowLeft /></el-icon>
+      </div>
+      <h1 class="page-title">{{ title }}</h1>
+      <div class="header-right">
+         <slot name="right"></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -36,9 +41,10 @@ const handleBack = () => {
   /* Glass Header */
   background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.8));
   backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 50;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
   border-bottom: 1px solid var(--cyber-border, rgba(56, 189, 248, 0.3));
-  height: 70px; /* Fixed height for consistency */
+  height: 60px; /* Reduced height for better mobile feel */
+  padding-top: env(safe-area-inset-top); /* Handle safe area */
 }
 
 .back-btn {
@@ -58,5 +64,11 @@ const handleBack = () => {
 
 .header-right {
     width: 36px; display: flex; justify-content: flex-end;
+}
+
+.header-spacer {
+  height: 60px; /* Match header height */
+  width: 100%;
+  padding-top: env(safe-area-inset-top); /* Match header padding */
 }
 </style>

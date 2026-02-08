@@ -2,8 +2,9 @@
   <header class="mobile-header" :class="{ 'is-scrolled': isScrolled }">
     <!-- Top Row: Logo & Actions -->
     <div class="header-top">
-      <div class="logo-area">
+<div class="logo-area">
          <img src="/images/shared/logo_v3.png" class="logo-img" alt="FANTULA" />
+         <span class="site-name">凡图拉</span>
       </div>
       
       <div class="header-actions">
@@ -125,8 +126,16 @@ onUnmounted(() => {
   display: flex; align-items: center; padding-left: 8px; /* More breathing room */
 }
 .logo-img {
-  height: 40px; /* Increased size to match icons */
+  height: 40px; 
   width: auto; object-fit: contain;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 2px;
+  background: rgba(255,255,255,0.05); /* Slight backing */
+}
+.site-name {
+  font-size: 18px; font-weight: 700; margin-left: 10px;
+  color: #F1F5F9; letter-spacing: 1px;
 }
 
 /* Actions */

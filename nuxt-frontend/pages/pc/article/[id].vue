@@ -15,14 +15,15 @@
             border="0" 
             frameborder="no" 
             framespacing="0" 
-            allowfullscreen="true">
+            allowfullscreen="true"
+            loading="lazy">
           </iframe>
         </div>
       </div>
 
       <!-- 封面图 (如果没有视频) -->
       <div v-else-if="article.cover_image" class="cover-section">
-        <img :src="article.cover_image" :alt="article.title" />
+        <img :src="article.cover_image" :alt="article.title" decoding="async" />
       </div>
 
       <!-- 文章内容区 -->
@@ -33,7 +34,7 @@
           
           <div class="meta-info">
             <div class="author">
-              <img :src="article.author?.avatar || '/images/client/pc/service-avatar.png'" class="avatar" />
+              <img :src="article.author?.avatar || '/images/client/pc/service-avatar.png'" class="avatar" loading="lazy" />
               <span class="name">{{ article.author?.name || '官方客服' }}</span>
             </div>
             <span class="divider">|</span>

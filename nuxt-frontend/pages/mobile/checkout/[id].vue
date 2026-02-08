@@ -32,7 +32,7 @@
           </div>
           <div class="product-body">
              <div class="thumb-glow">
-                <el-image :src="order.product_snapshot?.image" fit="cover" />
+                <el-image :src="order.product_snapshot?.image" fit="cover" loading="lazy" />
              </div>
              <div class="product-info">
                 <div class="p-name">{{ order.product_snapshot?.product_name }}</div>
@@ -166,7 +166,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
   ArrowRight, CircleCloseFilled, WalletFilled, Select, WarningFilled,
@@ -175,10 +175,12 @@ import {
 import { useCheckout } from '@/composables/client/useCheckout'
 import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
 import { ElMessage } from 'element-plus'
-import MobileCouponSelectorSheet from '@/components/mobile/checkout/MobileCouponSelectorSheet.vue'
-import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
-import MobilePaySuccessModal from '@/components/mobile/checkout/MobilePaySuccessModal.vue'
+
+// Lazy Load Heavy Components
+const MobileCouponSelectorSheet = defineAsyncComponent(() => import('@/components/mobile/checkout/MobileCouponSelectorSheet.vue'))
+const RechargeModal = defineAsyncComponent(() => import('@/components/mobile/profile/modals/RechargeModal.vue'))
+const MobilePaySuccessModal = defineAsyncComponent(() => import('@/components/mobile/checkout/MobilePaySuccessModal.vue'))
 
 definePageMeta({ 
   layout: 'mobile',

@@ -32,14 +32,38 @@
         @load="loadMore"
         :offset="150"
       >
-        <!-- Empty State -->
-        <div v-if="displayList.length === 0 && !loading" class="empty-state">
+        <!-- 1. Skeleton Loading State -->
+        <div v-if="loading && displayList.length === 0" class="coupon-list">
+          <div v-for="i in 3" :key="i" style="padding: 24px; background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; display: flex; gap: 24px;">
+             <el-skeleton animated style="width: 100%">
+               <template #template>
+                 <div style="display: flex; gap: 24px; align-items: center;">
+                    <!-- Left: Ticket Stub -->
+                    <el-skeleton-item variant="rect" style="width: 140px; height: 100px; border-radius: 12px;" />
+                    <!-- Right: Info -->
+                    <div style="flex: 1">
+                       <el-skeleton-item variant="h3" style="width: 40%; margin-bottom: 16px;" />
+                       <el-skeleton-item variant="text" style="width: 70%; margin-bottom: 12px;" />
+                       <el-skeleton-item variant="text" style="width: 30%;" />
+                    </div>
+                    <!-- Action -->
+                    <div style="width: 100px; display: flex; justify-content: flex-end;">
+                       <el-skeleton-item variant="button" style="width: 88px; height: 40px; border-radius: 20px;" />
+                    </div>
+                 </div>
+               </template>
+             </el-skeleton>
+          </div>
+        </div>
+
+        <!-- 2. Empty State -->
+        <div v-else-if="displayList.length === 0" class="empty-state">
           <el-icon class="empty-icon"><Ticket /></el-icon>
           <div class="empty-text">暂无优惠券</div>
           <div class="empty-desc">快去兑换或参与活动获取吧~</div>
         </div>
 
-        <!-- Coupon Cards -->
+        <!-- 3. Coupon Cards -->
         <div v-else class="coupon-list">
           <component
             v-for="coupon in displayList"
@@ -117,12 +141,17 @@ import { Ticket } from '@element-plus/icons-vue'
 // Import Base Modals
 import BaseConfirmModal from '@/components/pc/modal/base/BaseConfirmModal.vue'
 import BaseResultModal from '@/components/pc/modal/base/BaseResultModal.vue'
-import RedemptionCard from '@/components/pc/exchange/RedemptionCard.vue'
+// Lazy load Redemption Widget
+const RedemptionCard = defineAsyncComponent(() => import('@/components/pc/exchange/RedemptionCard.vue'))
 
-// Import Coupon Components
-import CouponBalance from '@/components/pc/exchange/coupon/CouponBalance.vue'
-import CouponFlat from '@/components/pc/exchange/coupon/CouponFlat.vue'
-import CouponProduct from '@/components/pc/exchange/coupon/CouponProduct.vue'
+// Import Coupon Components (Lazy load if list is long, but these are small functional components)
+// For list items, async component might cause flicker on scroll if not preloaded. 
+// Given the use in v-for with dynamic :is, let's keep them imported or use Async with loading stub if heavy.
+// Since they are small, standard import might be better for list smoothness, BUT we can async them to reduce initial bundle.
+// Let's safe optimization: Async.
+const CouponBalance = defineAsyncComponent(() => import('@/components/pc/exchange/coupon/CouponBalance.vue'))
+const CouponFlat = defineAsyncComponent(() => import('@/components/pc/exchange/coupon/CouponFlat.vue'))
+const CouponProduct = defineAsyncComponent(() => import('@/components/pc/exchange/coupon/CouponProduct.vue'))
 
 const userStore = useUserStore()
 const router = useRouter()

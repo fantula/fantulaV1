@@ -8,10 +8,10 @@ export const usePageLoading = () => {
     }
 
     const stopLoading = () => {
-        // 稍微延迟关闭，保证动画流畅
+        // 快速关闭，保证流畅体验
         setTimeout(() => {
             isLoading.value = false
-        }, 500) // 500ms 缓冲
+        }, 100) // 100ms 缓冲 (原 500ms)
     }
 
     return {

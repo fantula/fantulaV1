@@ -31,9 +31,9 @@ definePageMeta({
   layout: 'pc'
 })
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import WalletRechargeModal from '@/components/pc/modal/business/WalletRechargeModal.vue'
+const WalletRechargeModal = defineAsyncComponent(() => import('@/components/pc/modal/business/WalletRechargeModal.vue'))
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'

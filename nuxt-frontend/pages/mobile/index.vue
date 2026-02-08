@@ -21,9 +21,8 @@
       <!-- 3. Goods List -->
       <div class="goods-list-section">
         
-        <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state bg-glass-card">
-          <div class="spinner-premium"></div>
-          <span class="text-muted text-sm">正在加载好物...</span>
+        <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
+           <ProductCardSkeleton v-for="i in 6" :key="i" />
         </div>
         
         <div v-else-if="currentGoods.length === 0" class="empty-state bg-glass-card">
@@ -74,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { commonApi } from '@/api/client/common'
 import { goodsApi } from '@/api/client/goods'
@@ -88,8 +87,9 @@ import HomeHeader from '@/components/mobile/home/HomeHeader.vue'
 import HomeBanner from '@/components/mobile/home/HomeBanner.vue'
 import HomeCategoryNav from '@/components/mobile/home/HomeCategoryNav.vue'
 import ProductCard from '@/components/mobile/goods/ProductCard.vue'
-import ProductDetailSheet from '@/components/mobile/goods/ProductDetailSheet.vue'
-import MobileLoginSheet from '@/components/mobile/auth/MobileLoginSheet.vue'
+import ProductCardSkeleton from '@/components/mobile/goods/ProductCardSkeleton.vue'
+const ProductDetailSheet = defineAsyncComponent(() => import('@/components/mobile/goods/ProductDetailSheet.vue'))
+const MobileLoginSheet = defineAsyncComponent(() => import('@/components/mobile/auth/MobileLoginSheet.vue'))
 
 definePageMeta({
   layout: 'mobile'

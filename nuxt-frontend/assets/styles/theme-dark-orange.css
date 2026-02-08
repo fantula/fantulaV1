@@ -979,3 +979,112 @@ p,
     display: none !important;
     /* 定稿样式隐藏调试条 */
 }
+
+
+/* =========================================
+   骨架屏深色主题样式 (防止闪白)
+   ========================================= */
+
+/* 
+ * 🔧 问题：Element Plus 骨架屏默认是浅灰色，在深色背景下切换会"闪白"
+ * ✅ 解决：覆盖默认颜色，使用深色半透明背景 + 微光动画
+ */
+
+/* 骨架屏背景色 - 深色半透明 */
+.el-skeleton {
+    --el-skeleton-color: rgba(255, 255, 255, 0.03) !important;
+    --el-skeleton-to-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 骨架屏项目 - 统一深色风格 */
+.el-skeleton__item {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 骨架屏动画渐变 - 微光效果 */
+.el-skeleton.is-animated .el-skeleton__item {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(255, 255, 255, 0.08) 37%,
+        rgba(255, 255, 255, 0.03) 63%
+    ) !important;
+    background-size: 400% 100% !important;
+    animation: el-skeleton-loading 1.4s ease infinite !important;
+}
+
+/* 骨架屏按钮特殊处理 */
+.el-skeleton__button {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+}
+
+/* 骨架屏图片占位 */
+.el-skeleton__image {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* 骨架屏 SVG 图标 (图片占位中的图标) */
+.el-skeleton__image svg {
+    fill: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 骨架屏段落 */
+.el-skeleton__p {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 骨架屏标题行 */
+.el-skeleton__h1,
+.el-skeleton__h3,
+.el-skeleton__h5 {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 骨架屏文本行 */
+.el-skeleton__text {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 骨架屏圆形 (头像等) */
+.el-skeleton__circle {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 骨架屏矩形 */
+.el-skeleton__rect {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 骨架屏段落整体容器 */
+.el-skeleton__paragraph {
+    background: transparent !important;
+}
+
+/* 骨架屏行容器 */
+.el-skeleton__item--text,
+.el-skeleton__item--h1,
+.el-skeleton__item--h3,
+.el-skeleton__item--rect,
+.el-skeleton__item--circle,
+.el-skeleton__item--image,
+.el-skeleton__item--button {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 确保动画状态下也使用深色 */
+.el-skeleton.is-animated .el-skeleton__item--text,
+.el-skeleton.is-animated .el-skeleton__item--h1,
+.el-skeleton.is-animated .el-skeleton__item--h3,
+.el-skeleton.is-animated .el-skeleton__item--rect,
+.el-skeleton.is-animated .el-skeleton__item--circle,
+.el-skeleton.is-animated .el-skeleton__item--image,
+.el-skeleton.is-animated .el-skeleton__item--button {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(255, 255, 255, 0.08) 37%,
+        rgba(255, 255, 255, 0.03) 63%
+    ) !important;
+    background-size: 400% 100% !important;
+}

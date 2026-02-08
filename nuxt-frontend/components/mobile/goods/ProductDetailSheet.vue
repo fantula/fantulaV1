@@ -25,9 +25,18 @@
 
           <!-- Header -->
           <div class="sheet-header">
-             <div class="header-left">
+             <!-- Skeleton Loading -->
+             <div v-if="loading" style="width: 100%; display: flex; gap: 12px;">
+                <el-skeleton-item variant="image" style="width: 88px; height: 88px; border-radius: 12px;" />
+                <div style="flex: 1; padding-top: 4px;">
+                   <el-skeleton-item variant="h3" style="width: 80%; margin-bottom: 8px;" />
+                   <el-skeleton-item variant="h3" style="width: 40%;" />
+                </div>
+             </div>
+
+             <div v-else class="header-left">
                 <div class="thumb-box">
-                  <img :src="selectedSkuImage || goodsInfo.image" class="sheet-thumb-img" loading="lazy" />
+                  <img :src="selectedSkuImage || goodsInfo.image" class="sheet-thumb-img" loading="lazy" decoding="async" />
                 </div>
                 <div class="info-box">
                    <div class="h-title">{{ goodsInfo.name || '加载中...' }}</div>
@@ -43,10 +52,9 @@
                 </div>
              </div>
              
-
              <!-- Detail Button (Top Right) -->
              <!-- Help Button (Top Right, Refined) -->
-             <button class="help-btn" @click="showDetailViewer = true">
+             <button class="help-btn" @click="showDetailViewer = true" v-if="!loading">
                 <el-icon class="h-icon"><QuestionFilled /></el-icon>
                 <span>显示帮助</span>
              </button>
@@ -54,6 +62,19 @@
 
           <!-- Scrollable Body -->
           <div class="sheet-body">
+              <!-- Skeleton Body -->
+              <div v-if="loading">
+                  <el-skeleton-item variant="rect" style="width: 100%; height: 40px; border-radius: 20px; margin-bottom: 20px;" />
+                  <div style="margin-bottom: 20px;">
+                      <el-skeleton-item variant="text" style="width: 40px; margin-bottom: 10px;" />
+                      <div style="display: flex; gap: 10px;">
+                          <el-skeleton-item variant="button" style="width: 60px; height: 32px; border-radius: 8px;" />
+                          <el-skeleton-item variant="button" style="width: 60px; height: 32px; border-radius: 8px;" />
+                      </div>
+                  </div>
+              </div>
+
+              <template v-else>
               <!-- FAQ Ticker -->
               <!-- FAQ Ticker (Re-inserted) -->
               <!-- FAQ Ticker (Vertical Pill) -->
@@ -100,6 +121,7 @@
                     <div class="q-btn" @click="qty = qty+1" :class="{ disabled: qty >= stock }">+</div>
                  </div>
               </div>
+              </template>
           </div>
 
           <!-- Footer Actions -->
@@ -149,7 +171,7 @@
                      <span>暂无详情</span>
                   </div>
                   <div v-else v-for="(mod, idx) in detailModules" :key="idx" class="dm-mod">
-                     <img v-if="mod.type === 'image'" :src="mod.content" loading="lazy" />
+                     <img v-if="mod.type === 'image'" :src="mod.content" loading="lazy" decoding="async" />
                      <div v-else-if="mod.type === 'text'" class="dm-text">{{ mod.content }}</div>
                   </div>
                </div>
@@ -439,7 +461,7 @@ watch(() => props.visible, (val) => {
 .info-box { display: flex; flex-direction: column; justify-content: center; padding-top: 4px; }
 .h-title { 
    color: #fff; font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; 
-   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .h-price-row { display: flex; align-items: center; gap: 8px; }
 .price-wrap { color: var(--accent); display: flex; align-items: baseline; }

@@ -137,7 +137,7 @@ const otpRules = reactive<FormRules>({
   ],
   code: [
     { required: true, message: '请输入验证码', trigger: 'blur' },
-    { min: 6, max: 6, message: '验证码为6位数字', trigger: 'blur' }
+    { pattern: /^\d{6,8}$/, message: '请输入验证码', trigger: 'blur' }
   ]
 })
 

@@ -85,7 +85,7 @@ const props = defineProps<{
   displayList: any[]
   loading: boolean
   finished: boolean
-  error: string | null
+  error: boolean
   activeTab: 'all' | 'income' | 'expense'
 }>()
 

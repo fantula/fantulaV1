@@ -25,9 +25,10 @@ export const useProductDetail = async () => {
   // 所以这里我们仅返回 fetch 函数，让组件自己去处理 useAsyncData，或者我们将 useAsyncData 封装在这里
 
   // 封装 useAsyncData
-  const { data: goodsResponse, error: fetchError } = await useAsyncData(
+  const { data: goodsResponse, error: fetchError, pending } = await useAsyncData(
     `goods-detail-${goodsId.value}`,
-    () => goodsApi.getGoodsDetail(goodsId.value)
+    () => goodsApi.getGoodsDetail(goodsId.value),
+    { lazy: true }
   )
 
   const goodsData = computed(() => goodsResponse.value || null)
@@ -380,6 +381,20 @@ export const useProductDetail = async () => {
 
   // 客户端初始化 (在 onMounted 调用)
   const initClientState = async () => {
+    // 如果数据正在加载，等待数据返回
+    if (pending.value) {
+      const unwatch = watch(pending, (val) => {
+        if (!val) {
+          _initConfig()
+          unwatch()
+        }
+      })
+      return
+    }
+    _initConfig()
+  }
+
+  const _initConfig = async () => {
     if (!goodsData.value?.success) return
 
     // 默认选中第一个规格
@@ -391,7 +406,7 @@ export const useProductDetail = async () => {
       })
     }
 
-    // 设置默认 SKU 的图片
+    // Initial Check
     if (matchedSku.value) {
       if (matchedSku.value.image) {
         selectedSkuImage.value = matchedSku.value.image
@@ -401,8 +416,11 @@ export const useProductDetail = async () => {
       await checkSkuAvailability(skus.value[0].id)
     }
 
-    fetchBoundFaqs()
-    checkFavoriteStatus()
+    // Parallel fetch secondary data
+    await Promise.all([
+      fetchBoundFaqs(),
+      checkFavoriteStatus()
+    ])
   }
 
   return {
@@ -418,6 +436,7 @@ export const useProductDetail = async () => {
     selectedSkuImage,
     skuAvailable,
     stockLoading,
+    pending, // Export pending status
     hasStock,
     hasSkus,
     skus,

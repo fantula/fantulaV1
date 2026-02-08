@@ -1,6 +1,13 @@
 <template>
-  <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="0" />
-  <GlobalLoader :loading="isLoading && loadingVariant !== 'section'" :variant="loadingVariant" />
+  <!-- 顶部进度条 (导航时唯一的加载指示) -->
+  <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="200" />
+  
+  <!-- 全屏 Loader 只在首次加载时显示，导航时不显示 -->
+  <GlobalLoader 
+    :loading="isLoading && loadingVariant === 'initial'" 
+    variant="initial" 
+  />
+  
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
@@ -19,8 +26,8 @@ onMounted(() => {
   // 1. 设置初始 loading 状态
   startLoading('initial')
 
-  // 2. 最小展示时间 (防止加载太快导致闪烁)
-  const minTimePromise = new Promise(resolve => setTimeout(resolve, 800))
+  // 2. 最小展示时间 (缩短，让用户更快看到内容)
+  const minTimePromise = new Promise(resolve => setTimeout(resolve, 400))
   
   // 3. 实际资源加载完成
   const loadPromise = new Promise((resolve) => {

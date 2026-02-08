@@ -51,7 +51,7 @@
     <!-- 页脚 -->
 
     <!-- 登录注册弹窗 -->
-    <LoginRegisterModal :visible="modal.showLogin" @close="modal.closeLogin()" />
+    <LoginRegisterModal v-if="modal.showLogin" :visible="modal.showLogin" @close="modal.closeLogin()" />
   </div>
 </template>
 
@@ -60,12 +60,17 @@ definePageMeta({
   layout: 'pc'
 })
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useModalStore } from '@/stores/client/modal'
 import { commonApi } from '@/api/client/common'
 import { goodsApi } from '@/api/client/goods'
 import { preloadModalAssets } from '@/utils/modalAssetPreloader'
 import type { Banner, Goods, GoodsCategory } from '@/types/api'
+
+// Components
+const AboutSection = defineAsyncComponent(() => import('@/components/pc/AboutSection.vue'))
+const LoginRegisterModal = defineAsyncComponent(() => import('@/components/pc/modal/LoginRegisterModal.vue'))
+
 
 // 1. 顶层定义路由实例 & 配置
 const route = useRoute()
@@ -237,9 +242,7 @@ const modal = useModalStore()
 </script>
 
 <style scoped>
-.home-page {
-  /* background: #f8f9fa; */
-}
+
 
 .empty-state {
   padding: 60px 0;

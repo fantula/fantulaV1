@@ -19,8 +19,8 @@
               </div>
             </template>
             <div class="metric-content">
-              <el-statistic :value="128" />
-              <div class="metric-sub">昨日: 105</div>
+              <el-statistic :value="stats.today_orders" />
+              <div class="metric-sub">昨日: {{ stats.yesterday_orders }}</div>
             </div>
           </el-card>
         </el-col>
@@ -33,8 +33,8 @@
               </div>
             </template>
             <div class="metric-content">
-              <el-statistic :value="12880" prefix="¥" :precision="2" />
-               <div class="metric-sub">昨日: ¥11,200.00</div>
+              <el-statistic :value="stats.today_sales" prefix="¥" :precision="2" />
+               <div class="metric-sub">昨日: ¥{{ Number(stats.yesterday_sales).toFixed(2) }}</div>
             </div>
           </el-card>
         </el-col>
@@ -47,8 +47,8 @@
               </div>
             </template>
              <div class="metric-content">
-              <el-statistic :value="356" />
-              <div class="metric-sub">上架中: 350</div>
+              <el-statistic :value="stats.total_products" />
+              <div class="metric-sub">上架中: {{ stats.active_products }}</div>
             </div>
           </el-card>
         </el-col>
@@ -61,8 +61,8 @@
               </div>
             </template>
             <div class="metric-content">
-              <el-statistic :value="42" />
-              <div class="metric-sub">本月: 1,204</div>
+              <el-statistic :value="stats.today_new_users" />
+              <div class="metric-sub">本月: {{ stats.month_new_users }}</div>
             </div>
           </el-card>
         </el-col>
@@ -79,28 +79,17 @@
             </template>
             <div class="chart-container">
               <!-- 简单SVG折线图: 订单 -->
-              <svg viewBox="0 0 500 200" class="line-chart">
-                <!-- Grid lines -->
-                <line x1="50" y1="150" x2="450" y2="150" stroke="#eee" />
-                <line x1="50" y1="100" x2="450" y2="100" stroke="#eee" />
-                <line x1="50" y1="50" x2="450" y2="50" stroke="#eee" />
-                
-                <!-- Data path -->
-                <path d="M50,140 L116,120 L182,145 L248,80 L314,90 L380,40 L446,60" 
-                      fill="none" 
-                      stroke="#409EFF" 
-                      stroke-width="3" />
-                <!-- Points -->
-                <circle cx="50" cy="140" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-                <circle cx="116" cy="120" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-                <circle cx="182" cy="145" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-                <circle cx="248" cy="80" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-                <circle cx="314" cy="90" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-                <circle cx="380" cy="40" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-                <circle cx="446" cy="60" r="4" fill="#fff" stroke="#409EFF" stroke-width="2"/>
-              </svg>
-              <div class="chart-labels">
-                <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+              <div class="chart-wrapper">
+                 <!-- 这里使用简单的 CSS 柱状图代替复杂 SVG，因为 SVG 需要计算路径 -->
+                 <div class="simple-bar-chart">
+                    <div v-for="(item, index) in stats.order_trend" :key="index" class="bar-group">
+                       <div class="bar-col">
+                           <div class="bar-val">{{ item.count }}</div>
+                           <div class="bar-fill" :style="{ height: `${calculatePercent(item.count, maxOrderCount)}%` }"></div>
+                       </div>
+                       <div class="bar-label">{{ formatDate(item.date) }}</div>
+                    </div>
+                 </div>
               </div>
             </div>
           </el-card>
@@ -113,29 +102,16 @@
               </div>
             </template>
             <div class="chart-container">
-              <!-- 简单SVG折线图: 销售额 -->
-              <svg viewBox="0 0 500 200" class="line-chart">
-                 <!-- Grid lines -->
-                <line x1="50" y1="150" x2="450" y2="150" stroke="#eee" />
-                <line x1="50" y1="100" x2="450" y2="100" stroke="#eee" />
-                <line x1="50" y1="50" x2="450" y2="50" stroke="#eee" />
-
-                <!-- Data path -->
-                <path d="M50,130 L116,140 L182,110 L248,100 L314,60 L380,50 L446,30" 
-                      fill="none" 
-                      stroke="#67C23A" 
-                      stroke-width="3" />
-                 <!-- Points -->
-                 <circle cx="50" cy="130" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-                 <circle cx="116" cy="140" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-                 <circle cx="182" cy="110" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-                 <circle cx="248" cy="100" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-                 <circle cx="314" cy="60" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-                 <circle cx="380" cy="50" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-                 <circle cx="446" cy="30" r="4" fill="#fff" stroke="#67C23A" stroke-width="2"/>
-              </svg>
-               <div class="chart-labels">
-                <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+               <div class="chart-wrapper">
+                 <div class="simple-bar-chart sales">
+                    <div v-for="(item, index) in stats.sales_trend" :key="index" class="bar-group">
+                       <div class="bar-col">
+                           <div class="bar-val">¥{{ item.amount }}</div>
+                           <div class="bar-fill" :style="{ height: `${calculatePercent(item.amount, maxSalesAmount)}%` }"></div>
+                       </div>
+                       <div class="bar-label">{{ formatDate(item.date) }}</div>
+                    </div>
+                 </div>
               </div>
             </div>
           </el-card>
@@ -144,7 +120,8 @@
 
       <div class="secondary-metrics" style="margin-top: 20px;">
          <el-alert
-            title="CDK 库存预警：部分热销商品 CDK 库存不足 10 个，请及时补货。"
+            v-if="stats.cdk_warning_count > 0"
+            :title="`CDK 库存预警：有 ${stats.cdk_warning_count} 个热销商品 CDK 库存不足 10 个，请及时补货。`"
             type="warning"
             show-icon
             :closable="false"
@@ -155,9 +132,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Top, Money, Goods, User } from '@element-plus/icons-vue'
 import AdminPageSkeleton from '@/components/admin/base/AdminPageSkeleton.vue'
+import { adminDashboardApi, type DashboardStats } from '@/api/admin/dashboard'
 
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"],
@@ -165,12 +143,52 @@ definePageMeta({
 })
 
 const loading = ref(true)
+const stats = ref<DashboardStats>({
+  today_orders: 0, yesterday_orders: 0,
+  today_sales: 0, yesterday_sales: 0,
+  total_products: 0, active_products: 0,
+  today_new_users: 0, month_new_users: 0,
+  cdk_warning_count: 0,
+  order_trend: [], sales_trend: []
+})
 
-onMounted(async () => {
-  // Simulate data fetch
-  setTimeout(() => {
-    loading.value = false
-  }, 1000)
+const loadStats = async () => {
+    loading.value = true
+    try {
+        const res = await adminDashboardApi.getStats()
+        if (res.success && res.data) {
+            stats.value = res.data
+        }
+    } catch (e) {
+        console.error(e)
+    } finally {
+        loading.value = false
+    }
+}
+
+// Helpers for Chart
+const maxOrderCount = computed(() => {
+    if (!stats.value.order_trend.length) return 10
+    return Math.max(...stats.value.order_trend.map(i => i.count)) || 10
+})
+
+const maxSalesAmount = computed(() => {
+    if (!stats.value.sales_trend.length) return 100
+    return Math.max(...stats.value.sales_trend.map(i => i.amount)) || 100
+})
+
+const calculatePercent = (val: number, max: number) => {
+    if (max === 0) return 0
+    return Math.min(100, (val / max) * 100)
+}
+
+const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr)
+    return `${d.getMonth() + 1}-${d.getDate()}`
+}
+
+onMounted(() => {
+  loadStats()
 })
 </script>
 
@@ -242,10 +260,33 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
 }
-.line-chart {
-  width: 100%;
-  height: 100%;
+
+/* Simple Bar Chart Styles */
+.chart-wrapper { width: 100%; height: 100%; padding-top: 20px; }
+.simple-bar-chart {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  height: 100%; width: 100%; padding-bottom: 20px;
 }
+.bar-group {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; height: 100%; justify-content: flex-end; gap: 8px;
+}
+.bar-col {
+    width: 20px; background: rgba(64, 158, 255, 0.1);
+    border-radius: 4px; position: relative;
+    display: flex; align-items: flex-end;
+    height: 80%; /* leave space for label */
+}
+.bar-fill {
+    width: 100%; background: #409EFF; border-radius: 4px;
+    min-height: 4px; transition: height 0.5s ease;
+}
+.sales .bar-fill { background: #67C23A; }
+.sales .bar-col { background: rgba(103, 194, 58, 0.1); }
+
+.bar-val { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.bar-label { font-size: 12px; color: var(--text-secondary); }
+
 .chart-labels {
   display: flex;
   justify-content: space-between;

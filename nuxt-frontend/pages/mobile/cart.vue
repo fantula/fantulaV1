@@ -39,7 +39,7 @@
 
              <!-- Thumb -->
              <div class="card-thumb">
-                <img :src="item.productImage" loading="lazy" />
+                <img :src="item.productImage" loading="lazy" decoding="async" />
              </div>
 
              <!-- Info -->
@@ -175,24 +175,13 @@ const updateQty = async (item: any, delta: number) => {
 const handleDelete = async () => {
     if (selectedIds.value.size === 0) return
     
-    try {
-        await ElMessageBox.confirm('确定要删除选中的商品吗？', '提示', {
-            confirmButtonText: '删除',
-            cancelButtonText: '取消',
-            type: 'warning',
-            customClass: 'mobile-msg-box'
-        })
-        
-        const ids = Array.from(selectedIds.value)
-        for (const id of ids) {
-            await cartStore.removeFromCart(id)
-            selectedIds.value.delete(id)
-        }
-        showToast('删除成功', 'success')
-        if (cartStore.items.length === 0) isEditMode.value = false
-    } catch (e) {
-        // Cancelled
+    const ids = Array.from(selectedIds.value)
+    for (const id of ids) {
+        await cartStore.removeFromCart(id)
+        selectedIds.value.delete(id)
     }
+    showToast('删除成功', 'success')
+    if (cartStore.items.length === 0) isEditMode.value = false
 }
 
 const handleCheckout = async () => {
@@ -220,7 +209,7 @@ const handleCheckout = async () => {
 <style scoped>
 .mobile-page {
   min-height: 100vh;
-  background: #0F172A; color: #fff;
+  background: transparent; /* Allow global background */
   display: flex; flex-direction: column;
 }
 
@@ -229,7 +218,7 @@ const handleCheckout = async () => {
 .cart-body {
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 120px; /* Ensure space for footer */
+    padding-bottom: 180px; /* Clearance for Footer + TabBar */
 }
 
 /* Loading */
@@ -265,10 +254,10 @@ const handleCheckout = async () => {
 /* List */
 .cart-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-/* Card */
+/* Card - Using Global Glass & Border */
 .cart-card {
-   background: rgba(30, 41, 59, 0.4);
-   border: 1px solid rgba(255,255,255,0.05);
+   background: var(--glass-bg);
+   border: 1px solid var(--glass-border);
    border-radius: 16px;
    padding: 12px;
    display: flex; align-items: center; gap: 12px;
@@ -277,8 +266,8 @@ const handleCheckout = async () => {
    overflow: hidden;
 }
 .cart-card.active {
-   background: rgba(30, 41, 59, 0.6);
-   border-color: rgba(56, 189, 248, 0.3);
+   background: rgba(15, 23, 42, 0.8);
+   border-color: var(--cyber-primary); /* Highlight border */
    box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.05);
 }
 
@@ -303,7 +292,7 @@ const handleCheckout = async () => {
 .card-thumb {
    width: 88px; height: 88px; border-radius: 10px; overflow: hidden;
    background: #0F172A; flex-shrink: 0;
-   border: 1px solid rgba(255,255,255,0.05);
+   border: 1px solid var(--glass-border);
 }
 .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -311,18 +300,28 @@ const handleCheckout = async () => {
 .card-info { flex: 1; height: 88px; display: flex; flex-direction: column; justify-content: space-between; padding-right: 4px; }
 
 .ci-title { 
-   font-size: 15px; font-weight: 500; color: #F1F5F9; line-height: 1.4; margin-bottom: 4px;
+   font-size: 15px; font-weight: 500; color: var(--text-primary); line-height: 1.4; margin-bottom: 4px;
    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
+
+/* Specs - Matching Tag Style */
 .ci-sku { 
-    font-size: 12px; color: #94A3B8; 
-    background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; 
+    font-size: 11px; 
+    color: var(--text-secondary);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    background: rgba(6, 182, 212, 0.05);
+    padding: 2px 8px; border-radius: 4px; 
     display: inline-block;
 }
 
 .ci-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-.ci-price { font-size: 13px; color: #F97316; font-weight: 700; font-family: 'DIN Alternates'; }
-.price-val { font-size: 18px; }
+
+/* Price - Global Style */
+.ci-price { 
+    font-size: 13px; color: var(--accent); font-weight: 700; font-family: 'DIN Alternates'; 
+    display: flex; align-items: baseline;
+}
+.price-val { font-size: 18px; letter-spacing: -0.5px; }
 
 /* Stepper (Premium Glass) */
 .stepper {
@@ -343,16 +342,21 @@ const handleCheckout = async () => {
 .step-num { min-width: 32px; text-align: center; font-size: 14px; font-weight: 600; color: #E2E8F0; font-variant-numeric: tabular-nums; }
 .step-btn.plus { color: var(--cyber-primary); }
 
-/* Footer */
+/* Footer - Floating Above TabBar */
 .cart-footer {
-   position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; /* Slightly taller */
+   position: fixed; 
+   bottom: 100px; /* Above TabBar (~84px) */
+   left: 16px; right: 16px; /* Floating Card Style */
+   width: auto;
+   height: 60px;
    background: rgba(15, 23, 42, 0.95);
    backdrop-filter: blur(20px);
-   border-top: 1px solid rgba(255,255,255,0.1);
+   border: 1px solid var(--glass-border);
+   border-radius: 30px; /* Pill Shape */
    display: flex; align-items: center; justify-content: space-between;
-   padding: 0 16px; padding-bottom: env(safe-area-inset-bottom);
-   z-index: 100;
-   box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+   padding: 0 20px;
+   z-index: 900; /* Below TabBar (1000) but above content */
+   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
 .footer-left { display: flex; align-items: center; gap: 8px; cursor: pointer; }
@@ -362,12 +366,12 @@ const handleCheckout = async () => {
 
 .total-box { display: flex; align-items: baseline; gap: 4px; flex-direction: column; align-items: flex-end; }
 .t-label { font-size: 11px; color: #94A3B8; }
-.t-price { color: #F97316; font-size: 20px; font-weight: 700; line-height: 1; font-family: 'DIN Alternates'; }
+.t-price { color: var(--accent); font-size: 18px; font-weight: 700; line-height: 1; font-family: 'DIN Alternates'; }
 
 .btn-checkout {
    background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
-   color: #fff; border: none; padding: 0 28px; height: 42px;
-   border-radius: 100px; font-weight: 600; font-size: 15px;
+   color: #fff; border: none; padding: 0 24px; height: 38px;
+   border-radius: 100px; font-weight: 600; font-size: 14px;
    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
    transition: all 0.2s;
 }
@@ -380,6 +384,6 @@ const handleCheckout = async () => {
 
 .btn-delete {
    background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);
-   padding: 0 24px; height: 36px; border-radius: 100px; font-size: 14px; font-weight: 500;
+   padding: 0 20px; height: 34px; border-radius: 100px; font-size: 13px; font-weight: 500;
 }
 </style>

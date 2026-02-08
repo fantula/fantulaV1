@@ -270,6 +270,8 @@
 ```
 docs/
 ├── AI_WORKFLOW.md              # 📋 本文档 (主框架入口)
+├── AI_SOP.md                   # 📋 标准操作流程 (必读)
+├── PERFORMANCE_OPTIMIZATION.md # 🚀 性能优化方案 (新增)
 │
 ├── admin/                      # 🔧 后台管理
 │   ├── README.md               # 索引
@@ -281,11 +283,14 @@ docs/
 ├── client/                     # 🖥️ PC客户端
 │   ├── README.md               # 索引
 │   ├── CLIENT_TEST_OPTIMIZATION_GUIDE.md # 测试优化规范
+│   ├── STYLE_MAPPING.md        # 🆕 全局样式映射
 │   └── ORDER_DETAIL.md         # ⭐ 订单详情规范 (重点)
 │
 ├── mobile/                     # 📱 移动端
 │   ├── README.md               # 索引 (核心原则)
-│   └── MOBILE_TEST_OPTIMIZATION_GUIDE.md # 测试优化规范
+│   ├── MOBILE_TEST_OPTIMIZATION_GUIDE.md # 测试优化规范
+│   ├── STYLE_MAPPING.md        # 🆕 全局样式映射
+│   └── STANDARDIZATION_WORKFLOW.md # 🆕 组件标准化流程
 │
 ├── backend/                    # 🔙 后端
 │   ├── README.md

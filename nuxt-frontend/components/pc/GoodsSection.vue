@@ -2,22 +2,7 @@
   <section class="goods-section">
     <div class="container">
       <div class="goods-grid" v-if="loading">
-        <div v-for="i in 8" :key="i" class="goods-card-skeleton">
-          <div style="padding: 24px;">
-            <el-skeleton animated>
-              <template #template>
-                <el-skeleton-item variant="image" style="width: 100%; height: 160px; border-radius: 12px; margin-bottom: 20px;" />
-                <el-skeleton-item variant="h3" style="width: 80%; margin: 0 auto 10px;" />
-                <el-skeleton-item variant="text" style="width: 50%; margin: 0 auto 20px;" />
-                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                  <el-skeleton-item variant="text" style="width: 30%;" />
-                  <el-skeleton-item variant="text" style="width: 30%;" />
-                </div>
-                <el-skeleton-item variant="button" style="width: 100%; height: 40px; border-radius: 20px;" />
-              </template>
-            </el-skeleton>
-          </div>
-        </div>
+        <ProductCardSkeleton v-for="i in 8" :key="i" />
       </div>
 
       <div class="goods-grid" v-else-if="goodsList && goodsList.length > 0">
@@ -48,6 +33,7 @@
 
 <script setup lang="ts">
 import ProductCard from '@/components/pc/ProductCard.vue'
+import ProductCardSkeleton from '@/components/pc/base/ProductCardSkeleton.vue'
 
 // Prop type matches the fields defined in AdminProduct for high fidelity
 interface GoodsDisplayItem {

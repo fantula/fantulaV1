@@ -87,7 +87,6 @@ definePageMeta({
 })
 
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { messageApi, type UserMessage } from '@/api/client/message'
 import { useUserStore } from '@/stores/client/user' 
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
@@ -95,7 +94,6 @@ import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { Bell, ChatDotRound, ShoppingCart, Warning, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
-const router = useRouter()
 const userStore = useUserStore()
 
 // State

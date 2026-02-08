@@ -80,7 +80,7 @@
                   <!-- Main Row: Image & Info -->
                   <div class="card-body">
                     <div class="product-thumb">
-                      <img v-if="item.product_image" :src="item.product_image" class="thumb-img" />
+                      <img v-if="item.product_image" :src="item.product_image" class="thumb-img" loading="lazy" />
                       <div v-else class="placeholder-img"><el-icon><Picture /></el-icon></div>
                     </div>
 

@@ -99,6 +99,7 @@ export interface Goods {
   skus?: SkuInfo[]
   faqs?: string[]        // 或者 FaqItem[]
   detail_modules?: DetailModule[]
+  allow_addon?: boolean  // 新增：是否允许加购数量
 }
 
 export interface SkuInfo {

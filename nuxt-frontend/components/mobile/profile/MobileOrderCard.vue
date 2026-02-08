@@ -20,7 +20,7 @@
     <!-- Card Body -->
     <div class="card-body">
        <div class="thumb">
-          <img :src="order.product_image || '/images/placeholder.png'" class="product-img" loading="lazy" />
+          <img :src="order.product_image || '/images/placeholder.png'" class="product-img" loading="lazy" decoding="async" />
        </div>
        <div class="info">
           <!-- Name & Spec Inline -->
@@ -111,7 +111,7 @@ const { formatDate } = useBizFormat()
 
 .name-row { 
     font-size: 13px; color: #E2E8F0; line-height: 1.4; 
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .name-text { font-weight: 500; margin-right: 6px; }
 .spec-inline {

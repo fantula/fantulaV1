@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Headset } from '@element-plus/icons-vue'
 import { ticketApi } from '@/api/client/ticket'
@@ -181,7 +181,7 @@ onMounted(fetchTickets)
 
 .ticket-title {
     font-size: 15px; color: #E2E8F0; margin-bottom: 12px;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     line-height: 1.5;
 }
 

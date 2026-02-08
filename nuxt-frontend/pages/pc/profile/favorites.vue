@@ -68,7 +68,7 @@
             >
               <!-- Image Area (Homepage Style) -->
               <div class="card-image-container">
-                <img :src="item.productImage" :alt="item.productName" class="product-img" />
+                <img :src="item.productImage" :alt="item.productName" class="product-img" loading="lazy" decoding="async" />
               </div>
 
               <!-- Content Area -->

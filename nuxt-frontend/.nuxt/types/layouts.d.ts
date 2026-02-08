@@ -1,12 +1,14 @@
-import mgmt from "/Users/dalin/fantula/nuxt-frontend/layouts/mgmt.vue";
-import mobile from "/Users/dalin/fantula/nuxt-frontend/layouts/mobile.vue";
-import pc from "/Users/dalin/fantula/nuxt-frontend/layouts/pc.vue";
 import type { ComputedRef, MaybeRef } from 'vue'
+
+type ComponentProps<T> = T extends new(...args: any) => { $props: infer P } ? NonNullable<P>
+  : T extends (props: infer P, ...args: any) => any ? P
+  : {}
+
 declare module 'nuxt/app' {
   interface NuxtLayouts {
-    'mgmt': InstanceType<typeof mgmt>['$props'],
-    'mobile': InstanceType<typeof mobile>['$props'],
-    'pc': InstanceType<typeof pc>['$props'],
+    mgmt: ComponentProps<typeof import("/Users/dalin/fantula/nuxt-frontend/layouts/mgmt.vue").default>,
+    mobile: ComponentProps<typeof import("/Users/dalin/fantula/nuxt-frontend/layouts/mobile.vue").default>,
+    pc: ComponentProps<typeof import("/Users/dalin/fantula/nuxt-frontend/layouts/pc.vue").default>,
 }
   export type LayoutKey = keyof NuxtLayouts extends never ? string : keyof NuxtLayouts
   interface PageMeta {

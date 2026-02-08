@@ -46,7 +46,37 @@
             :error="error"
             @load="loadMore"
          >
-            <div v-if="displayList.length === 0 && !loading" class="empty-state">
+            <!-- 1. Skeleton Loading -->
+            <div v-if="loading && displayList.length === 0" class="list-items">
+               <div v-for="i in 4" :key="i" class="info-card-glass skeleton-card" style="padding: 0; min-height: 90px; height: 90px; border-radius: 12px; display: flex; overflow: hidden; margin-bottom: 12px;">
+                    <div style="width: 100%; height: 100%; background: rgba(30,41,59,0.5);">
+                        <el-skeleton animated style="width: 100%; height: 100%;">
+                           <template #template>
+                              <div style="display: flex; height: 100%;">
+                                 <!-- Left Stub -->
+                                 <div style="width: 90px; display: flex; align-items: center; justify-content: center; border-right: 1px dashed rgba(255,255,255,0.1);">
+                                     <el-skeleton-item variant="circle" style="width: 40px; height: 40px;" />
+                                 </div>
+                                 <!-- Right Info -->
+                                 <div style="flex: 1; padding: 12px 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                                     <div style="width: 100%;">
+                                         <el-skeleton-item variant="h3" style="width: 50%; margin-bottom: 8px;" />
+                                         <el-skeleton-item variant="text" style="width: 30%;" />
+                                     </div>
+                                     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                         <el-skeleton-item variant="text" style="width: 40%;" />
+                                         <el-skeleton-item variant="button" style="width: 48px; height: 20px; border-radius: 10px;" />
+                                     </div>
+                                 </div>
+                              </div>
+                           </template>
+                        </el-skeleton>
+                    </div>
+               </div>
+            </div>
+
+            <!-- 2. Empty State -->
+            <div v-else-if="displayList.length === 0" class="empty-state">
                <div class="empty-icon-box"><el-icon><Ticket /></el-icon></div>
                <p>暂无优惠券记录</p>
             </div>
@@ -85,7 +115,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Ticket, List, Loading } from '@element-plus/icons-vue'
+import { Ticket, List } from '@element-plus/icons-vue'
 import { couponApi, type UserCoupon } from '@/api/client/coupon'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
