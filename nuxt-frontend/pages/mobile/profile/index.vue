@@ -87,6 +87,13 @@
         />
 
         <MobileMenuLink 
+            label="我的购物车" 
+            :icon="ShoppingCart" 
+            :badge="cartStore.totalCount > 0"
+            @click="router.push('/mobile/cart')" 
+        />
+
+        <MobileMenuLink 
             label="我的消息" 
             :icon="Bell" 
             :badge="userStore.unreadMessageCount > 0"
@@ -121,9 +128,10 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   Setting, ArrowRight, Wallet, Box, CircleCheck, Service,
-  Ticket, Star, Headset, Bell, List, Monitor, RefreshRight
+  Ticket, Star, Headset, Bell, List, Monitor, RefreshRight, ShoppingCart // Import ShoppingCart Icon
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
+import { useCartStore } from '@/stores/client/cart' // Import Cart Store
 import MobileSettingsSheet from '@/components/mobile/profile/MobileSettingsSheet.vue'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
@@ -137,6 +145,7 @@ definePageMeta({
 
 const router = useRouter()
 const userStore = useUserStore()
+const cartStore = useCartStore()
 const showSettings = ref(false)
 const showRecharge = ref(false)
 const showContactModal = ref(false)
@@ -155,7 +164,8 @@ const orderCounts = computed(() => {
     // Note: Adjust status strings to match backend ENUMs if needed
     const pending = userStore.getOrdersByStatus('pending_payment').length
     const paid = userStore.getOrdersByStatus('pending_delivery').length 
-    return { pending, paid }
+    const refunding = userStore.getOrdersByStatus('refunding').length 
+    return { pending, paid, refunding }
 })
 
 const navigateToOrder = (tab: string) => {
@@ -182,6 +192,7 @@ onMounted(() => {
     } else {
         userStore.fetchUserInfo()
         userStore.loadOrders() 
+        cartStore.loadCart()
     }
 })
 </script>

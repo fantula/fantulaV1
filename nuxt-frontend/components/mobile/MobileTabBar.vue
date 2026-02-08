@@ -120,7 +120,7 @@ const handleTabClick = (tab: any) => {
 
 .badge {
   position: absolute; top: -2px; right: -6px;
-  background: #EF4444; color: #fff;
+  background: var(--cyber-primary); color: #fff;
   font-size: 9px; font-weight: 700;
   padding: 1px 4px; border-radius: 10px;
   min-width: 14px; text-align: center;

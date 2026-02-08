@@ -179,8 +179,8 @@ onUnmounted(() => {
 .badge-dot-header {
     position: absolute; top: 8px; right: 8px;
     width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 4px var(--accent);
+    background: var(--cyber-primary);
+    box-shadow: 0 0 4px var(--cyber-primary);
 }
 
 .header-avatar {

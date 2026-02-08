@@ -51,9 +51,9 @@ defineEmits(['click'])
 
 .list-dot {
   width: 6px; height: 6px; 
-  background: var(--cyber-primary, #06B6D4); 
+  background: var(--cyber-primary); 
   border-radius: 50%; margin-left: 8px;
-  box-shadow: 0 0 5px var(--cyber-primary, #06B6D4);
+  box-shadow: 0 0 5px var(--cyber-primary);
   animation: breathe 2s infinite ease-in-out;
 }
 

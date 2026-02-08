@@ -225,7 +225,8 @@ onMounted(() => {
 }
 .dot {
     position: absolute; top: 10px; right: 25%;
-    width: 6px; height: 6px; background: #EF4444; border-radius: 50%;
+    width: 6px; height: 6px; background: var(--cyber-primary); border-radius: 50%;
+    box-shadow: 0 0 5px var(--cyber-primary);
 }
 
 .content-body { padding: 20px; flex: 1; }
@@ -279,7 +280,8 @@ onMounted(() => {
 
 .unread-dot {
     position: absolute; top: 16px; right: 16px;
-    width: 8px; height: 8px; background: #EF4444; border-radius: 50%;
+    width: 8px; height: 8px; background: var(--cyber-primary); border-radius: 50%;
+    box-shadow: 0 0 5px var(--cyber-primary);
 }
 
 .empty-state { text-align: center; color: #64748B; padding-top: 60px; }

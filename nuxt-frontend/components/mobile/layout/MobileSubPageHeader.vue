@@ -37,7 +37,7 @@ const handleBack = () => {
   background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.8));
   backdrop-filter: blur(12px);
   position: sticky; top: 0; z-index: 50;
-  border-bottom: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
+  border-bottom: 1px solid var(--cyber-border, rgba(56, 189, 248, 0.3));
   height: 70px; /* Fixed height for consistency */
 }
 
@@ -53,7 +53,7 @@ const handleBack = () => {
 
 .page-title { 
     flex: 1; text-align: center; font-size: 18px; font-weight: 700; margin: 0; 
-    color: #fff; text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+    color: #fff; text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 
 .header-right {
