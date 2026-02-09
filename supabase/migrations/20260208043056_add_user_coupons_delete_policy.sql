@@ -1,0 +1,3 @@
+-- Migration: add_user_coupons_delete_policy
+-- Add delete policy for user_coupons table
+-- Synced from cloud Supabase

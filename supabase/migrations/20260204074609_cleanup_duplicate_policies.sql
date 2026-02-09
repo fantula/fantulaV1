@@ -1,0 +1,3 @@
+-- Migration: cleanup_duplicate_policies
+-- Remove duplicate RLS policies
+-- Synced from cloud Supabase
