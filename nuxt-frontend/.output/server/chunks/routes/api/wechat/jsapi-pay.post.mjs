@@ -21,7 +21,7 @@ const jsapiPay_post = defineEventHandler(async (event) => {
       });
     }
     const body = await readBody(event);
-    const { amount, openid, description } = body;
+    const { amount, openid, description, bonus = 0 } = body;
     if (!amount || amount <= 0) {
       throw createError({
         statusCode: 400,
@@ -49,6 +49,7 @@ const jsapiPay_post = defineEventHandler(async (event) => {
       user_id: user.id,
       amount,
       amount_cents: amountInCents,
+      bonus,
       status: "pending",
       pay_type: "wechat_jsapi",
       description: description || `\u5145\u503C${amount}\u70B9`,
@@ -68,7 +69,7 @@ const jsapiPay_post = defineEventHandler(async (event) => {
       payer: {
         openid
       },
-      attach: JSON.stringify({ userId: user.id, type: "recharge" })
+      attach: JSON.stringify({ userId: user.id, type: "recharge", bonus })
     };
     console.log("[JsapiPay] Request:", JSON.stringify(requestBody, null, 2));
     const result = await wechatPayRequest(

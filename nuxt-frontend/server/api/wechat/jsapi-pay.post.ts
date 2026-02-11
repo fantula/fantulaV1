@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
         // 解析请求参数
         const body = await readBody(event)
-        const { amount, openid, description } = body
+        const { amount, openid, description, bonus = 0 } = body
 
         if (!amount || amount <= 0) {
             throw createError({
@@ -71,6 +71,7 @@ export default defineEventHandler(async (event) => {
                 user_id: user.id,
                 amount: amount,
                 amount_cents: amountInCents,
+                bonus: bonus,
                 status: 'pending',
                 pay_type: 'wechat_jsapi',
                 description: description || `充值${amount}点`,
@@ -92,7 +93,7 @@ export default defineEventHandler(async (event) => {
             payer: {
                 openid: openid,
             },
-            attach: JSON.stringify({ userId: user.id, type: 'recharge' }),
+            attach: JSON.stringify({ userId: user.id, type: 'recharge', bonus: bonus }),
         }
 
         console.log('[JsapiPay] Request:', JSON.stringify(requestBody, null, 2))

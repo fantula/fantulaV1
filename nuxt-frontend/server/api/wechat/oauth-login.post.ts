@@ -83,27 +83,26 @@ export default defineEventHandler(async (event) => {
             }
 
             // 生成 Magic Link 以便通过 Token 登录
-            // 注意：这需要 Supabase 项目启用了 Magic Link 并且 redirect URL 配置正确
+            // 注意：Magic Link 验证后必须跳转到 wechat-callback 页面，
+            // 因为只有该页面有从 URL hash 中提取 access_token 并建立 session 的逻辑。
+            // 用户最终的目标页面通过 return_to 参数传递。
             let actionLink = null
             if (profile.email) {
                 const config = useRuntimeConfig()
-                // 优先使用客户端传入的重定向地址，否则默认跳首页
-                let userRedirectTo = body.redirectTo
-                if (!userRedirectTo) {
-                    userRedirectTo = config.public.siteUrl ? `${config.public.siteUrl}/mobile` : 'https://www.fantula.com/mobile'
-                } else if (userRedirectTo.startsWith('/')) {
-                    // 处理相对路径
-                    const baseUrl = config.public.siteUrl || 'https://www.fantula.com'
-                    userRedirectTo = `${baseUrl}${userRedirectTo}`
-                }
+                const baseUrl = config.public.siteUrl || 'https://www.fantula.com'
 
-                console.log('[OAuthLogin] Magic Link RedirectTo:', userRedirectTo)
+                // 构建 wechat-callback URL 作为 Magic Link 的 redirectTo
+                // 用户实际想去的页面通过 return_to query 参数传递
+                const finalDestination = body.redirectTo || '/mobile'
+                const callbackUrl = `${baseUrl}/mobile/wechat-callback?return_to=${encodeURIComponent(finalDestination)}`
+
+                console.log('[OAuthLogin] Magic Link RedirectTo:', callbackUrl)
 
                 const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
                     type: 'magiclink',
                     email: profile.email,
                     options: {
-                        redirectTo: userRedirectTo
+                        redirectTo: callbackUrl
                     }
                 })
 

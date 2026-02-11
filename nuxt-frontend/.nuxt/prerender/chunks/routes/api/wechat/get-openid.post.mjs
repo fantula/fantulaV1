@@ -58,10 +58,12 @@ const getOpenid_post = defineEventHandler(async (event) => {
     }
     console.log("[GetOpenId] Got openid:", result.openid);
     const supabase = getSupabaseServiceClient();
-    await supabase.from("profiles").update({
-      wechat_openid: result.openid,
-      updated_at: (/* @__PURE__ */ new Date()).toISOString()
+    const { error: updateError } = await supabase.from("profiles").update({
+      wechat_openid: result.openid
     }).eq("id", user.id);
+    if (updateError) {
+      console.error("[GetOpenId] Failed to update profile openid:", updateError);
+    }
     return {
       success: true,
       data: {

@@ -70,7 +70,7 @@ const bindWechat_post = defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const anonClient = createClient(
       config.public.supabaseUrl,
-      config.public.supabaseKey
+      config.public.supabaseAnonKey
     );
     const { data: authData, error: verifyError } = await anonClient.auth.verifyOtp({
       email: body.email,

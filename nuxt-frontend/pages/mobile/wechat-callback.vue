@@ -159,6 +159,33 @@ onMounted(async () => {
     return
   }
 
+  // 场景: 充值获取 OpenID（state=recharge），不是绑定微信
+  const urlState = route.query.state as string
+  if (urlState === 'recharge') {
+    state.value = 'loading'
+    try {
+      // 通过 code 换取 openid 用于支付
+      const { wechatPayApi } = await import('@/api/client/wechat-payment')
+      const res = await wechatPayApi.getOpenId(code)
+      if (res.success && res.data?.openid) {
+        localStorage.setItem('wechat_openid', res.data.openid)
+        console.log('[WechatCallback] Got openid for recharge:', res.data.openid)
+      }
+      // 跳回充值页面
+      const returnTo = route.query.return_to as string
+      if (returnTo) {
+        window.location.href = decodeURIComponent(returnTo)
+      } else {
+        router.replace('/mobile')
+      }
+    } catch (e: any) {
+      console.error('[WechatCallback] Get openid for recharge failed:', e)
+      state.value = 'error'
+      errorMsg.value = '获取支付信息失败: ' + (e.message || '')
+    }
+    return
+  }
+
   // 场景: 已登录用户绑定微信
   if (userStore.isLoggedIn) {
      state.value = 'loading'
@@ -166,6 +193,8 @@ onMounted(async () => {
         const res = await wechatLoginApi.bindWechatToAccount({ wechatCode: code })
         if (res.success) {
             state.value = 'success'
+            // 绑定成功后刷新用户信息以获取最新的 openId
+            await userStore.fetchUserInfo()
             setTimeout(() => {
                 const returnTo = route.query.return_to as string
                 if (returnTo) {
@@ -203,53 +232,19 @@ onMounted(async () => {
     }
 
     if (res.data.status === 'logged_in') {
-      // 已有绑定账号，直接登录
-      state.value = 'success'
-      // TODO: 完成登录流程（后端需返回 session）
-      // oauthLogin actually returns session if logged_in?
-      // Check wechat-login.ts oauthLogin return type?
-      // It returns OAuthResult { status, ... }
-      // To actually login, we might need to set token?
-      // But let's assume oauthLogin logic on server sets cookie or returns token?
-      // Wait, oauthLogin on server: returns `token`.
-      // Client `oauthLogin` api wrapper: returns `response.data`.
-      // Check server code?
-      // If server returns token, we need to use it.
-      // But here we are focusing on Binding.
+      // 已有绑定账号，通过 Magic Link 完成自动登录
+      // 流程: 跳转 Magic Link → GoTrue 验证 → 重定向回 wechat-callback#access_token=xxx
+      //       → onMounted 的 hash 分支处理 → 建立 session → 登录成功
       
-      // For existing logic (not my task but worth noting): 
-      // If status is logged_in, we probably need to fetch user info or token is already set?
-      // Let's leave existing logic logic alone aside from what I see.
-      
-      // But looking at existing code:
-      // setTimeout(() => { router.replace('/mobile') }, 1500)
-      // It doesn't seem to set userStore?
-      // Maybe oauthLogin endpoint sets HttpOnly cookie?
-      
-      state.value = 'success'
-      
-      // 如果后端返回了 Magic Link，使用它进行自动登录跳转
       if (res.data.actionLink) {
-         // 处理 Magic Link 的重定向目标
-         let link = res.data.actionLink
-         const returnTo = route.query.return_to as string
-         // 如果有 return_to，我们需要告诉 Magic Link 登录后跳转到哪里
-         // 但 Supabase Magic Link 的重定向是在生成时决定的 (redirectTo)
-         // 我们可以在客户端处理：先跳 Magic Link，Magic Link 验证后会跳回配置的页面
-         // 这里的策略是：信任后端生成的 Link
-         
-         console.log('Redirecting to Magic Link...', link)
-         window.location.href = link
+         state.value = 'success'
+         console.log('[WechatCallback] Redirecting to Magic Link for auto-login...')
+         window.location.href = res.data.actionLink
       } else {
-          // 降级：如果没有 Link
-           setTimeout(() => {
-            const returnTo = route.query.return_to as string
-            if (returnTo) {
-                window.location.href = decodeURIComponent(returnTo)
-            } else {
-                router.replace('/mobile')
-            }
-          }, 1500)
+          // 降级：Magic Link 生成失败，提示用户
+          state.value = 'error'
+          errorMsg.value = '自动登录失败，请使用邮箱验证码登录'
+          console.error('[WechatCallback] No actionLink returned from server')
       }
     } else if (res.data.status === 'need_bind') {
       // 需要绑定邮箱
@@ -353,7 +348,19 @@ const onBind = async () => {
     })
 
     if (res.success && res.data) {
+      // 🔑 关键：在 Supabase JS Client 上建立 session
+      // 否则后续的 auth.getUser() 会返回 null（未登录）
+      const client = getSupabaseClient()
+      if (res.data.session?.access_token && res.data.session?.refresh_token) {
+        await client.auth.setSession({
+          access_token: res.data.session.access_token,
+          refresh_token: res.data.session.refresh_token,
+        })
+      }
+      
+      // 设置 userStore 并刷新完整用户信息（含 openId）
       userStore.setUser(res.data.user, res.data.session?.access_token)
+      await userStore.fetchUserInfo()
       state.value = 'success'
       setTimeout(() => {
         const returnTo = route.query.return_to as string

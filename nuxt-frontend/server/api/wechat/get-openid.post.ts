@@ -64,13 +64,16 @@ export default defineEventHandler(async (event) => {
 
         // 保存 openid 到用户 profile
         const supabase = getSupabaseServiceClient()
-        await supabase
+        const { error: updateError } = await supabase
             .from('profiles')
             .update({
                 wechat_openid: result.openid,
-                updated_at: new Date().toISOString(),
             })
             .eq('id', user.id)
+
+        if (updateError) {
+            console.error('[GetOpenId] Failed to update profile openid:', updateError)
+        }
 
         return {
             success: true,

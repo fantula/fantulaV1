@@ -648,7 +648,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "eb4ebe36-a479-4754-b54a-250cd30aa729",
+    "buildId": "4a07843f-c48d-458b-a035-91fd427a5faa",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -679,18 +679,18 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
-    "apiBase": "https://vjvmzcodbeijnembjiig.supabase.co",
+    "apiBase": "https://www.fantula.com",
     "appName": "凡图拉",
     "siteUrl": "https://www.fantula.com",
     "wechatAppid": "wxc2042fae927b28b8",
-    "supabaseUrl": "https://vjvmzcodbeijnembjiig.supabase.co",
-    "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MzE3NTgsImV4cCI6MjA4NTQwNzc1OH0.WU0WCXiOh2Orinc8BSXOg50mFKKp7Ru0tFNxj7YAgFc",
-    "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTgzMTc1OCwiZXhwIjoyMDg1NDA3NzU4fQ.5jpTpQ6OLjXiqWxGYN51E_Q5YKEbaKzq3ksbQJ9ouJY",
+    "supabaseUrl": "https://www.fantula.com",
+    "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNjEwNzUzLCJleHAiOjMzMzA2NjEwNzUzfQ.OVRG41EylWMyAEJQSel5TqDg3D5oygrCtxyAT27kH9I",
+    "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg",
     "schedulerUrl": "http://localhost:3001"
   },
   "apiSecret": "",
-  "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MzE3NTgsImV4cCI6MjA4NTQwNzc1OH0.WU0WCXiOh2Orinc8BSXOg50mFKKp7Ru0tFNxj7YAgFc",
-  "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqdm16Y29kYmVpam5lbWJqaWlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTgzMTc1OCwiZXhwIjoyMDg1NDA3NzU4fQ.5jpTpQ6OLjXiqWxGYN51E_Q5YKEbaKzq3ksbQJ9ouJY",
+  "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNjEwNzUzLCJleHAiOjMzMzA2NjEwNzUzfQ.OVRG41EylWMyAEJQSel5TqDg3D5oygrCtxyAT27kH9I",
+  "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg",
   "wechatPayMchid": "1716074381",
   "wechatPayAppid": "wxc2042fae927b28b8",
   "wechatPayApiV3Key": "lWm9tNYwCIDsnzhedfqz1QVvK4pmAoBb",

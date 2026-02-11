@@ -1,1 +1,0 @@
-import{aj as a,ak as s,al as r,am as u,an as o}from"./C2ppgzLl.js";function i(e){const t=e||s();return t?.ssrContext?.head||t?.runWithContext(()=>{if(r())return u(o)})}function x(e,t={}){const n=i(t.nuxt);if(n)return a(e,{head:n,...t})}export{x as u};

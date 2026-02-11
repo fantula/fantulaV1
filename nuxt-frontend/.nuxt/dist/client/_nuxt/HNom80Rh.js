@@ -1,1 +1,0 @@
-import{f as i,S as u,R as c,k as r}from"./C2ppgzLl.js";const b=()=>{const n=r(null),a=async()=>{const s=c(),{data:e}=await s.auth.getSession();return n.value=e.session,s};let t=null;return i(async()=>{{const s=await a(),{data:e}=s.auth.onAuthStateChange((l,o)=>{n.value=o});t=e.subscription}}),u(()=>{t&&t.unsubscribe()}),n};export{b as u};

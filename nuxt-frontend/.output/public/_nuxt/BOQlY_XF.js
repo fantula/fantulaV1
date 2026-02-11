@@ -1,1 +1,0 @@
-import{e,c as t,o as c,_ as o}from"./C2ppgzLl.js";const a={class:"page-placeholder"},s=e({__name:"contact",setup(_){return(n,p)=>(c(),t("div",a,"联系我们页面建设中…"))}}),d=o(s,[["__scopeId","data-v-60edfbe1"]]);export{d as default};

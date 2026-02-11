@@ -85,10 +85,12 @@ const notify_post = defineEventHandler(async (event) => {
       const bonus = parseFloat(order.bonus) || parseFloat(String(attach.bonus || 0)) || 0;
       const totalAmount = orderAmount + bonus;
       const newBalance = currentBalance + totalAmount;
-      await supabase.from("profiles").update({
-        balance: newBalance,
-        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      const { error: updateError } = await supabase.from("profiles").update({
+        balance: newBalance
       }).eq("id", attach.userId);
+      if (updateError) {
+        console.error("[Notify] Failed to update balance:", updateError);
+      }
       await supabase.from("wallet_transactions").insert({
         user_id: attach.userId,
         type: "\u5FAE\u4FE1\u5145\u503C",

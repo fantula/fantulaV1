@@ -53,7 +53,7 @@ export default defineNuxtConfig({
         { property: 'og:image', content: '/images/og-image.jpg' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
-        { property: 'og:url', content: 'http://localhost:3000' },
+        { property: 'og:url', content: 'https://www.fantula.com' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: '凡图拉｜智能海外代充代付平台' },
@@ -62,10 +62,10 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-        { rel: 'canonical', href: 'http://localhost:3000' },
-        { rel: 'alternate', hreflang: 'zh-CN', href: 'http://localhost:3000' },
+        { rel: 'canonical', href: 'https://www.fantula.com' },
+        { rel: 'alternate', hreflang: 'zh-CN', href: 'https://www.fantula.com' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'dns-prefetch', href: 'http://127.0.0.1:54321' }
+        { rel: 'dns-prefetch', href: 'https://www.fantula.com' }
       ]
     }
   },

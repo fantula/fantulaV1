@@ -110,13 +110,14 @@ export const wechatPayApi = {
      * @param amount 充值金额（元）
      * @param openid 用户 OpenID
      * @param description 商品描述
+     * @param bonus 赠送额度
      */
-    async jsapiPayRecharge(amount: number, openid: string, description?: string): Promise<WechatJsapiPayResponse> {
+    async jsapiPayRecharge(amount: number, openid: string, description?: string, bonus: number = 0): Promise<WechatJsapiPayResponse> {
         try {
             const headers = await getAuthHeaders()
             const data = await $fetch<WechatJsapiPayResponse>('/api/wechat/jsapi-pay', {
                 method: 'POST',
-                body: { amount, openid, description },
+                body: { amount, openid, description, bonus },
                 headers,
             })
             return data

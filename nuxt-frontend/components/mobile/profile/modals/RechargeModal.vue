@@ -163,10 +163,33 @@ function checkWechatBrowser() {
   isWechatBrowser.value = ua.includes('micromessenger')
 }
 
-// 获取用户 OpenID（从 URL 参数或缓存）
+// 获取用户 OpenID（优先从已登录用户 profile 获取，再尝试 URL 参数或缓存）
 async function getOpenId(): Promise<string | null> {
-  // 检查是否已有 OpenID
+  // 检查是否已有 OpenID (本地变量)
   if (userOpenId.value) return userOpenId.value
+  
+  // 优先从 userStore 获取已绑定的 wechat_openid
+  const storeOpenId = userStore.user?.openId
+  if (storeOpenId) {
+    userOpenId.value = storeOpenId
+    localStorage.setItem('wechat_openid', storeOpenId)
+    return storeOpenId
+  }
+  
+  // userStore 中没有 openId，尝试从 API 刷新（可能 init 时还没加载完）
+  if (userStore.isLoggedIn) {
+    try {
+      await userStore.fetchUserInfo()
+      const refreshedOpenId = userStore.user?.openId
+      if (refreshedOpenId) {
+        userOpenId.value = refreshedOpenId
+        localStorage.setItem('wechat_openid', refreshedOpenId)
+        return refreshedOpenId
+      }
+    } catch (e) {
+      console.error('[RechargeModal] fetchUserInfo failed:', e)
+    }
+  }
   
   // 从 localStorage 获取缓存的 OpenID
   const cached = localStorage.getItem('wechat_openid')
@@ -279,11 +302,12 @@ const handleRecharge = async () => {
           return
         }
         
-        // 调用 JSAPI 下单
+        // 调用 JSAPI 下单（传入 bonus 赠送额度）
         const res = await wechatPayApi.jsapiPayRecharge(
           payAmount.value,
           openid,
-          `凡图拉-充值${payAmount.value}点`
+          `凡图拉-充值${payAmount.value}点`,
+          currentBonus.value
         )
         
         if (!res.success || !res.data) {

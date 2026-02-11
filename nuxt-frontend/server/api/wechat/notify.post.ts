@@ -152,13 +152,16 @@ export default defineEventHandler(async (event) => {
             const totalAmount = orderAmount + bonus
             const newBalance = currentBalance + totalAmount
 
-            await supabase
+            const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
                     balance: newBalance,
-                    updated_at: new Date().toISOString(),
                 })
                 .eq('id', attach.userId)
+
+            if (updateError) {
+                console.error('[Notify] Failed to update balance:', updateError)
+            }
 
             // 记录余额变动
             await supabase

@@ -64,13 +64,15 @@ const oauthLogin_post = defineEventHandler(async (event) => {
       let actionLink = null;
       if (profile.email) {
         const config2 = useRuntimeConfig();
-        const redirectTo = config2.public.siteUrl ? `${config2.public.siteUrl}/mobile` : "https://www.fantula.com/mobile";
-        console.log("[OAuthLogin] Magic Link RedirectTo:", redirectTo);
+        const baseUrl = config2.public.siteUrl || "https://www.fantula.com";
+        const finalDestination = body.redirectTo || "/mobile";
+        const callbackUrl = `${baseUrl}/mobile/wechat-callback?return_to=${encodeURIComponent(finalDestination)}`;
+        console.log("[OAuthLogin] Magic Link RedirectTo:", callbackUrl);
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
           type: "magiclink",
           email: profile.email,
           options: {
-            redirectTo
+            redirectTo: callbackUrl
           }
         });
         if (!linkError && ((_a = linkData == null ? void 0 : linkData.properties) == null ? void 0 : _a.action_link)) {

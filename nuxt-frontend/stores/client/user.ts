@@ -516,6 +516,7 @@ export const useUserStore = defineStore('user', () => {
       user.value = null
       if (process.client) {
         localStorage.removeItem('user_info')
+        localStorage.removeItem('wechat_openid') // 清除微信 OpenID 缓存
       }
       favorites.value = []
       orders.value = [...defaultOrders]
