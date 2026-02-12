@@ -1,9 +1,11 @@
 <template>
   <div class="admin-page-post">
-    <div class="page-header">
-      <h2 class="page-title">{{ isEdit ? '编辑文章' : '发布文章' }}</h2>
-      <el-button @click="router.back()">返回列表</el-button>
-    </div>
+    <StickyFormHeader
+      :title="isEdit ? '编辑文章' : '发布文章'"
+      back-path="/admin/help-center/articles"
+      :loading="loading"
+      @save="submitForm"
+    />
 
     <div class="form-container">
       <el-form :model="form" label-width="120px" ref="formRef" :rules="rules" v-loading="loading">
@@ -92,10 +94,7 @@
           <el-switch v-model="form.is_published" active-text="立即发布" inactive-text="存为草稿" />
         </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="submitForm">保存提交</el-button>
-          <el-button @click="router.back()">取消</el-button>
-        </el-form-item>
+          <!-- Buttons moved to StickyFormHeader -->
       </el-form>
     </div>
 
@@ -117,6 +116,7 @@ import { ElMessage } from 'element-plus'
 import { adminCommunityApi, communityApi, type Category } from '@/api/client/community'
 // Explicitly import AdminImagePicker
 import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
+import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -246,14 +246,6 @@ onMounted(() => {
   min-height: calc(100vh - 100px);
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-}
 
 .form-container {
   max-width: 800px;

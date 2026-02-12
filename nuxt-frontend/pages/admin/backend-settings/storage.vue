@@ -97,7 +97,7 @@ const testConnection = async () => {
     }
 
   } catch (e: any) {
-    console.error('Test connection exception:', e)
+    // console.error('Test connection exception:', e)
     testResult.value = {
       success: false,
       message: '前端异常: ' + (e.message || '未知错误')

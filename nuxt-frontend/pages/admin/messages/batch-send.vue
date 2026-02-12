@@ -1,6 +1,6 @@
 <template>
-  <div class="message-page">
-    <!-- Header handled by parent layout -->
+  <div class="page-container">
+    <PageTipHeader title="消息发送" description="批量向用户发送站内信通知，并查看发送记录。" />
 
     <!-- Layout: Left (Recipients) / Right (Content) -->
     <div class="content-layout">
@@ -97,15 +97,18 @@
     </div>
 
     <!-- Recent Messages -->
-    <el-card shadow="never" class="history-card" style="margin-top: 24px;">
-      <template #header>
-        <div class="card-header">
+    <div class="history-section mt-6">
+       <div class="section-title mb-4">
           <span>最近发送记录</span>
-          <el-button text @click="loadMessages">刷新</el-button>
-        </div>
-      </template>
-      
-      <el-table :data="messageList" style="width: 100%" v-loading="loadingMessages">
+          <el-button size="small" :icon="Refresh" circle @click="loadMessages" />
+       </div>
+
+       <AdminDataTable 
+          :data="messageList" 
+          :loading="loadingMessages"
+          :total="0" 
+          :show-pagination="false"
+       >
         <el-table-column prop="user_uid" label="用户UID" width="120" />
         <el-table-column prop="title" label="标题" min-width="200" />
         <el-table-column prop="content" label="内容" min-width="300" show-overflow-tooltip />
@@ -121,16 +124,19 @@
             {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
-      </el-table>
-    </el-card>
+      </AdminDataTable>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { Close } from '@element-plus/icons-vue'
+import { Close, Refresh } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { adminUserApi, adminMessageApi, type AdminUser, type AdminMessage } from '@/api/admin'
+import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import { useBizFormat } from '@/composables/admin/useBizFormat'
 
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"],
@@ -159,16 +165,13 @@ const form = reactive({
   link: ''
 })
 
+const { formatDate } = useBizFormat()
+
 // --- Rules ---
 const rules = reactive<FormRules>({
   title: [{ required: true, message: '请输入消息标题', trigger: 'blur' }],
   content: [{ required: true, message: '请输入消息正文', trigger: 'blur' }]
 })
-
-// --- Helpers ---
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleString('zh-CN')
-}
 
 // --- Load Messages History ---
 const loadMessages = async () => {
@@ -179,7 +182,7 @@ const loadMessages = async () => {
       messageList.value = result.messages
     }
   } catch (e: any) {
-    console.error('加载消息失败:', e)
+    // Silent fail safely
   } finally {
     loadingMessages.value = false
   }
@@ -206,6 +209,7 @@ const addUser = async () => {
       recipients.value.unshift({
         uid: result.user.uid,
         email: result.user.email,
+        avatar: result.user.avatar // Ensure avatar is passed if available
       })
       ElMessage.success(`添加用户 ${result.user.email} 成功`)
       uidInput.value = ''
@@ -255,7 +259,7 @@ const handleSend = async () => {
             successCount++
           } else {
             failCount++
-            console.error(`发送给 ${user.uid} 失败:`, result.error)
+            // Removed console.error
           }
         }
         
@@ -292,9 +296,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.message-page { /* Padding handled jointly by Layout */ }
-.page-header { margin-bottom: 24px; }
-.page-header h2 { margin: 0; font-size: 28px; color: var(--el-text-color-primary); font-weight: 600; }
+.page-container {
+    padding-bottom: 20px;
+}
 
 .content-layout {
   display: flex;
@@ -368,6 +372,22 @@ onMounted(() => {
   padding: 40px 0;
   display: flex;
   justify-content: center;
+}
+
+/* History Section */
+.history-section {
+    margin-top: 24px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--el-border-color-lighter);
+}
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* Transitions */

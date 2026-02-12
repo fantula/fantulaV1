@@ -1,5 +1,6 @@
 <template>
   <div class="admin-page">
+    <PageTipHeader title="文章分类" description="管理帮助中心文章的分类结构。" />
     
     <AdminActionCard>
       <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">新增分类</el-button>
@@ -90,6 +91,7 @@ import { ref, onMounted } from 'vue'
 import { adminArticleApi } from '@/api/admin/help-center'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'

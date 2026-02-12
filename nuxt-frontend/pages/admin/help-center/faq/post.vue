@@ -1,13 +1,15 @@
 <template>
   <div class="faq-post-page">
-    <div class="page-header">
-      <div class="header-left">
-        <el-button link @click="$router.back()">
-          <el-icon><ArrowLeft /></el-icon> 返回列表
-        </el-button>
-        <h2 class="page-title">{{ isEdit ? '编辑问题' : '创建问题' }}</h2>
-      </div>
-    </div>
+    <StickyFormHeader
+      :title="isEdit ? '编辑问题' : '创建问题'"
+      back-path="/admin/help-center/faq"
+      :loading="submitting"
+      @save="submitForm"
+    >
+      <template #extra>
+         <!-- Extra buttons if needed -->
+      </template>
+    </StickyFormHeader>
 
     <div class="form-card" v-loading="loading">
       <el-form :model="form" label-width="120px" class="faq-form">
@@ -78,12 +80,7 @@
           <el-switch v-model="form.isActive" />
         </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="submitForm" :loading="submitting" size="large">
-            {{ isEdit ? '保存修改' : '立即发布' }}
-          </el-button>
-          <el-button @click="$router.back()" size="large">取消</el-button>
-        </el-form-item>
+          <!-- Buttons moved to StickyFormHeader -->
 
       </el-form>
     </div>
@@ -102,6 +99,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminFaqApi, type AdminFaqCategory } from '@/api/admin/help-center'
 import { adminProductApi } from '@/api/admin/product'
+import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -226,14 +224,6 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.page-header {
-  margin-bottom: 24px;
-}
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 .page-title {
   margin: 0;
   font-size: 24px;

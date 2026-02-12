@@ -116,6 +116,7 @@ export interface AdminUser {
     uid: string
     email: string
     status: 'active' | 'disabled'
+    avatar?: string
     created_at: string
 }
 

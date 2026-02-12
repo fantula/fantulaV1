@@ -1,5 +1,7 @@
 <template>
   <div class="admin-page">
+    <PageTipHeader title="常见问题" description="管理系统常见问题列表。" />
+
     <AdminActionCard>
       <el-button type="primary" :icon="Plus" @click="$router.push('/admin/help-center/faq/post')">添加问题</el-button>
     </AdminActionCard>
@@ -93,6 +95,7 @@ import { ref, onMounted } from 'vue'
 import { Plus, Search, Goods } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminFaqApi } from '@/api/admin/help-center'
+import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { confirmDelete } from '@/composables/admin/useAdminDialog'

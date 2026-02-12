@@ -1,10 +1,11 @@
 <template>
-  <el-dialog 
-    v-model="visible" 
-    title="分类管理" 
-    width="500px" 
-    append-to-body 
+  <AdminDataDialog
+    v-model="visible"
+    title="分类管理"
+    width="500px"
+    append-to-body
     :z-index="2000"
+    :show-footer="false"
     @open="fetchCategories"
   >
      <div class="cat-manager">
@@ -20,7 +21,7 @@
          </div>
        </div>
      </div>
-  </el-dialog>
+  </AdminDataDialog>
 </template>
 
 <script setup lang="ts">
@@ -28,6 +29,7 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { adminImageCategoryApi, type AdminImageCategory } from '@/api/admin/media'
 import { confirmDelete } from '@/composables/admin/useAdminDialog'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 
 const props = defineProps<{
   modelValue: boolean

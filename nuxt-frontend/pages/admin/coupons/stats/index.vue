@@ -49,6 +49,10 @@
     <AdminDataTable
       v-loading="loading"
       :data="dataList"
+      :total="pagination.total"
+      v-model:current-page="pagination.page"
+      v-model:page-size="pagination.pageSize"
+      @page-change="loadData"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
@@ -111,19 +115,6 @@
         </template>
       </el-table-column>
     </AdminDataTable>
-
-    <!-- Pagination -->
-    <div class="pagination-wrapper">
-      <el-pagination
-        v-model:current-page="pagination.page"
-        v-model:page-size="pagination.pageSize"
-        :total="pagination.total"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </div>
   </div>
 </template>
 

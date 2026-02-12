@@ -1,5 +1,7 @@
 <template>
   <div class="admin-page">
+    <PageTipHeader title="问题分类" description="管理常见问题（FAQ）的分类结构。" />
+
     <AdminActionCard>
       <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">新增分类</el-button>
     </AdminActionCard>
@@ -27,7 +29,7 @@
         </el-table-column>
         <el-table-column prop="created_at" label="创建时间" width="200">
           <template #default="{ row }">
-            {{ new Date(row.created_at).toLocaleString() }}
+            {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center" fixed="right">
@@ -69,10 +71,12 @@ import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminFaqApi } from '@/api/admin/help-center'
+import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
+import { useBizFormat } from '@/composables/admin/useBizFormat'
 
 definePageMeta({
   layout: 'mgmt',
@@ -90,6 +94,7 @@ interface AdminFaqCategory {
 
 const loading = ref(false)
 const categories = ref<AdminFaqCategory[]>([])
+const { formatDate } = useBizFormat()
 
 const fetchCategories = async () => {
   loading.value = true

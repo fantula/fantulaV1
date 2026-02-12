@@ -47,7 +47,7 @@
                      <label class="checkbox-label">
                         <input type="checkbox" v-model="loginForm.remember" /> 记住我
                      </label>
-                     <span class="forgot-btn" @click="ElMessage.info('请联系客服重置')">忘记密码?</span>
+                     <span class="forgot-btn" @click="showForgotDialog = true">忘记密码?</span>
                   </div>
                   <div class="form-agreement">
                       <label>
@@ -133,16 +133,19 @@
       </div>
     </transition>
     </div>
+
+    <ForgotPasswordModal :visible="showForgotDialog" @close="showForgotDialog = false" @success="showForgotDialog = false" />
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { getSupabaseClient } from '@/utils/supabase'
 import EmailInput from '@/components/shared/EmailInput.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
+import ForgotPasswordModal from '@/components/mobile/auth/ForgotPasswordModal.vue'
 import { ElMessage } from 'element-plus'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 
@@ -155,6 +158,7 @@ const loginType = ref<'password' | 'code'>('code')
 const loginForm = ref({ email: '', password: '', remember: false, agree: false })
 const loginCodeForm = ref({ email: '', code: '', remember: false, agree: false })
 const registerForm = ref({ email: '', code: '', password: '', inviteId: '', agree: false })
+const showForgotDialog = ref(false)
 
 // Initialize shared composables
 import { useSendCode } from '@/composables/client/useSendCode'
@@ -183,9 +187,7 @@ const loading = computed(() =>
 
 const close = () => emit('close')
 
-const restoreTimer = () => {
-    // Timers are restored automatically by useSendCode
-}
+
 
 // Actions
 const sendCode = async (type: 'login' | 'register') => {

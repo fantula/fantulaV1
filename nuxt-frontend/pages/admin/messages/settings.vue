@@ -1,13 +1,18 @@
 <template>
   <div class="settings-page">
-    <el-card shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>客户消息通知配置</span>
-          <el-button type="primary" @click="saveSettings" :loading="saving">保存配置</el-button>
-        </div>
-      </template>
+    <PageTipHeader 
+      title="通知配置" 
+      description="配置各类业务场景下的自动消息通知模板。" 
+    />
+    
+    <StickyFormHeader 
+        title="通知配置" 
+        :loading="saving" 
+        @save="saveSettings" 
+        :show-back="false" 
+    />
 
+    <el-card shadow="never" class="mt-4">
       <div class="settings-list" v-loading="loading">
         <el-form label-position="top">
           
@@ -146,6 +151,8 @@ definePageMeta({
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { adminMessageApi } from '@/api/admin/message'
+import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
+import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
 
 const loading = ref(false)
 const saving = ref(false)

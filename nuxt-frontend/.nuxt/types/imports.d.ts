@@ -448,6 +448,7 @@ declare global {
   const useAdminScheduler: typeof import('../../composables/admin/useAdminScheduler').useAdminScheduler
   const useAdminSkuEditor: typeof import('../../composables/admin/useAdminSkuEditor').useAdminSkuEditor
   const useAdminStore: typeof import('../../stores/admin/admin').useAdminStore
+  const useAdminSystemStatus: typeof import('../../composables/admin/useAdminSystemStatus').useAdminSystemStatus
   const useAdminTicketList: typeof import('../../composables/admin/useAdminTicketList').useAdminTicketList
   const useAppConfig: typeof import('../../node_modules/nuxt/dist/app/config').useAppConfig
   const useAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useAsyncData
@@ -579,6 +580,9 @@ declare global {
   // @ts-ignore
   export type { DetailModule } from '../../composables/admin/useAdminProductForm'
   import('../../composables/admin/useAdminProductForm')
+  // @ts-ignore
+  export type { SystemStatus } from '../../composables/admin/useAdminSystemStatus'
+  import('../../composables/admin/useAdminSystemStatus')
   // @ts-ignore
   export type { GoodsData } from '../../composables/client/useGoodsDetail'
   import('../../composables/client/useGoodsDetail')
@@ -1049,6 +1053,7 @@ declare module 'vue' {
     readonly useAdminScheduler: UnwrapRef<typeof import('../../composables/admin/useAdminScheduler')['useAdminScheduler']>
     readonly useAdminSkuEditor: UnwrapRef<typeof import('../../composables/admin/useAdminSkuEditor')['useAdminSkuEditor']>
     readonly useAdminStore: UnwrapRef<typeof import('../../stores/admin/admin')['useAdminStore']>
+    readonly useAdminSystemStatus: UnwrapRef<typeof import('../../composables/admin/useAdminSystemStatus')['useAdminSystemStatus']>
     readonly useAdminTicketList: UnwrapRef<typeof import('../../composables/admin/useAdminTicketList')['useAdminTicketList']>
     readonly useAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['useAppConfig']>
     readonly useAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']>

@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onUnmounted } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
@@ -131,8 +131,7 @@ watch(() => props.visible, (val) => {
     oldCode.value = ''
     form.email = ''
     form.code = ''
-    // countdown.value = 0 // handled by composable
-    // if(timerInterval) clearInterval(timerInterval)
+
   }
 })
 
@@ -161,11 +160,6 @@ watch(() => props.visible, (val) => {
 const baseLoading = ref(false)
 const loading = computed(() => baseLoading.value || oldLoading.value || newLoading.value)
 const countdown = computed(() => step.value === 1 ? oldCountdown.value : newCountdown.value)
-
-// Remove old timer logic variables
-// const loading = ref(false) // Removed
-// const countdown = ref(0) // Removed (replaced by computed)
-// let timerInterval: any = null // Removed
 
 // Handlers
 const handleClose = () => {

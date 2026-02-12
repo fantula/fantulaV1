@@ -111,7 +111,13 @@
     </AdminDataTable>
 
     <!-- 回执审核弹窗 -->
-    <el-dialog v-model="receiptDialogVisible" title="虚拟充值 - 回执审核" width="600px" destroy-on-close>
+    <AdminDataDialog 
+       v-model="receiptDialogVisible" 
+       title="虚拟充值 - 回执审核" 
+       width="600px" 
+       destroy-on-close
+       :show-footer="false"
+    >
       <div v-if="receiptLoading" class="loading-state">
         <el-icon class="is-loading"><Loading /></el-icon> 正在加载回执记录...
       </div>
@@ -193,7 +199,7 @@
           <el-button @click="receiptDialogVisible = false">关闭</el-button>
         </template>
       </template>
-    </el-dialog>
+    </AdminDataDialog>
   </div>
 </template>
 
@@ -204,6 +210,7 @@ import { ElMessage } from 'element-plus'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import { useAdminOrderList } from '@/composables/admin/useAdminOrderList'
 import { adminFulfillmentApi } from '@/api/admin/fulfillment'
 import type { OrderFulfillment } from '@/types/order'

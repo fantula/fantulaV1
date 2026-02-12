@@ -1,5 +1,7 @@
 <template>
   <div class="admin-page">
+    <PageTipHeader title="文章管理" description="发布和管理帮助中心的内容文章。" />
+
     <AdminActionCard>
       <el-button type="primary" :icon="Plus" @click="router.push('/admin/help-center/articles/post')">发布文章</el-button>
     </AdminActionCard>
@@ -67,9 +69,11 @@ import { useRouter } from 'vue-router'
 import { adminArticleApi } from '@/api/admin/help-center'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { confirmDelete } from '@/composables/admin/useAdminDialog'
+import { useBizFormat } from '@/composables/admin/useBizFormat'
 
 definePageMeta({
   layout: 'mgmt',
@@ -90,9 +94,7 @@ const currentPage = ref(1)
 const pageSize = ref(20)
 const categories = ref<Category[]>([])
 
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleString()
-}
+const { formatDate } = useBizFormat()
 
 const getCategoryLabel = (id: string) => {
   const cat = categories.value.find((c: Category) => c.id === id)

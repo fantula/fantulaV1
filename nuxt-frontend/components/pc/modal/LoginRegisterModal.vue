@@ -318,9 +318,11 @@ const showPrivacyDialog = ref(false)
 const showPolicyDialog = ref(false)
 const showForgotDialog = ref(false)
 const forgotForm = ref({ email: '', code: '', password: '' })
-// timers managed by composables now
+
 
 // Auto-focus logic
+
+
 const focusInput = () => {
   nextTick(() => {
     if (mode.value === 'login') {
@@ -336,7 +338,8 @@ watch([mode, loginType, () => props.visible], () => {
   if (props.visible) focusInput()
 })
 
-// Timer logic removed (handled by composables)
+// Timer logic handles by composables
+
 
 // Helpers
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -642,6 +645,8 @@ watch(() => props.visible, (val) => {
     wechatQrcodeUrl.value = ''
     wechatSceneStr.value = ''
     wechatBindToken.value = ''
+  } else {
+    // Reset forms or specific states on open if needed
   }
 })
 </script>

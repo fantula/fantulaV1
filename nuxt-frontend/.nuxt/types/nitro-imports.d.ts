@@ -116,6 +116,7 @@ declare global {
   const sendError: typeof import('../../node_modules/h3').sendError
   const sendIterable: typeof import('../../node_modules/h3').sendIterable
   const sendNoContent: typeof import('../../node_modules/h3').sendNoContent
+  const sendNotification: typeof import('../../server/utils/email').sendNotification
   const sendProxy: typeof import('../../node_modules/h3').sendProxy
   const sendRedirect: typeof import('../../node_modules/h3').sendRedirect
   const sendStream: typeof import('../../node_modules/h3').sendStream
@@ -170,6 +171,7 @@ export { defineTask, runTask } from 'nitropack/runtime/internal/task';
 export { defineNitroErrorHandler } from 'nitropack/runtime/internal/error/utils';
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from '/Users/dalin/fantula/nuxt-frontend/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from '/Users/dalin/fantula/nuxt-frontend/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
+export { sendNotification } from '/Users/dalin/fantula/nuxt-frontend/server/utils/email';
 export { getSupabaseClient, getSupabaseServiceClient, getCurrentUser } from '/Users/dalin/fantula/nuxt-frontend/server/utils/supabase';
 export { getWechatAccessToken, createParametricQrCode, getQrCodeImageUrl, generateLoginScene, parseWechatEventXml, generateBindToken, verifyBindToken, getWechatUserInfo } from '/Users/dalin/fantula/nuxt-frontend/server/utils/wechat-login';
 export { getWechatPayConfig, generateNonceStr, getTimestamp, buildAuthHeader, decryptCallback, verifyCallbackSignature, wechatPayRequest, generateOutTradeNo, generateJsapiPaySign } from '/Users/dalin/fantula/nuxt-frontend/server/utils/wechat-pay';

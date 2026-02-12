@@ -1,13 +1,14 @@
 <template>
-  <el-dialog
+  <AdminDataDialog
     v-model="visible"
     title="工单详情与处理"
     width="900px"
     class="ticket-chat-modal"
-    @close="handleClose"
+    @closed="handleClose"
     :close-on-click-modal="false"
     destroy-on-close
     append-to-body
+    :show-footer="false"
   >
     <div class="modal-layout" v-loading="loading">
        <!-- Error State -->
@@ -197,7 +198,7 @@
            </div>
        </template>
     </div>
-  </el-dialog>
+  </AdminDataDialog>
 </template>
 
 <script setup lang="ts">
@@ -213,6 +214,7 @@ import { confirmAction } from '@/composables/admin/useAdminDialog'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, CircleCheckFilled, RefreshRight, Picture, Close } from '@element-plus/icons-vue'
 import { uploadImageToStorage } from '@/utils/uploadImage'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -319,7 +321,7 @@ const loadData = async () => {
    error.value = null
    
    try {
-      console.log('[TicketChatModal] Loading data for:', props.ticketId)
+
       
       const [resDetail, resMsgs] = await Promise.all([
          adminTicketApi.getDetail(props.ticketId),
@@ -336,11 +338,10 @@ const loadData = async () => {
       if (resMsgs.success) {
          messages.value = resMsgs.data
          scrollToBottom()
-      } else {
-         console.warn('[TicketChatModal] Messages load warning:', resMsgs.error)
+
       }
    } catch(e: any) {
-      console.error('[TicketChatModal] Load Failed:', e)
+
       error.value = e.message || '加载失败，请重试'
       loaded.value = false
    } finally {

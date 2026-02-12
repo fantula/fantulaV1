@@ -2157,7 +2157,22 @@ const plugins = [
 _fy54yt5h8gnrY5ksk0ToqrUYohroiU1U2cOhUCV49Mc
 ];
 
-const assets = {};
+const assets = {
+  "/index.mjs": {
+    "type": "text/javascript; charset=utf-8",
+    "etag": "\"29548-lW648PxgOJjYx1A1kK2QkTefqPA\"",
+    "mtime": "2026-02-12T13:48:50.464Z",
+    "size": 169288,
+    "path": "index.mjs"
+  },
+  "/index.mjs.map": {
+    "type": "application/json",
+    "etag": "\"a0b95-ta/0xqo5w7G20c2kuFuMIzhnJHs\"",
+    "mtime": "2026-02-12T13:48:50.464Z",
+    "size": 658325,
+    "path": "index.mjs.map"
+  }
+};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -2606,6 +2621,9 @@ async function getIslandContext(event) {
 	return ctx;
 }
 
+const _lazy_k_WUKv = () => Promise.resolve().then(function () { return templates_get$1; });
+const _lazy_2ED9bq = () => Promise.resolve().then(function () { return templates_post$1; });
+const _lazy_wKDF6C = () => Promise.resolve().then(function () { return test_post$1; });
 const _lazy_dcHuVB = () => Promise.resolve().then(function () { return bindWechat_post$1; });
 const _lazy_hMjmce = () => Promise.resolve().then(function () { return contact_get$1; });
 const _lazy_rPysyX = () => Promise.resolve().then(function () { return test$1; });
@@ -2623,6 +2641,9 @@ const _lazy_8EFkQE = () => Promise.resolve().then(function () { return renderer$
 
 const handlers = [
   { route: '', handler: _2qpWSd, lazy: false, middleware: true, method: undefined },
+  { route: '/api/admin/system/notifications/templates', handler: _lazy_k_WUKv, lazy: true, middleware: false, method: "get" },
+  { route: '/api/admin/system/notifications/templates', handler: _lazy_2ED9bq, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/system/notifications/test', handler: _lazy_wKDF6C, lazy: true, middleware: false, method: "post" },
   { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },
   { route: '/api/client/config/contact', handler: _lazy_hMjmce, lazy: true, middleware: false, method: "get" },
   { route: '/api/test', handler: _lazy_rPysyX, lazy: true, middleware: false, method: undefined },
@@ -3003,6 +3024,131 @@ async function getCurrentUser(event) {
   }
   return user;
 }
+
+const templates_get = defineEventHandler(async (event) => {
+  const client = getSupabaseServiceClient();
+  const { data, error } = await client.from("notification_templates").select("*").order("event_type");
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: error.message
+    });
+  }
+  return {
+    success: true,
+    data
+  };
+});
+
+const templates_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: templates_get
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const templates_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const client = getSupabaseServiceClient();
+  if (!body.id || !body.event_type) {
+    throw createError({ statusCode: 400, statusMessage: "Missing ID or Event Type" });
+  }
+  const updates = {};
+  if (body.subject_template !== void 0) updates.subject_template = body.subject_template;
+  if (body.body_template !== void 0) updates.body_template = body.body_template;
+  if (body.is_enabled !== void 0) updates.is_enabled = body.is_enabled;
+  updates.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  const { data, error } = await client.from("notification_templates").update(updates).eq("id", body.id).select().single();
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: error.message
+    });
+  }
+  return {
+    success: true,
+    data
+  };
+});
+
+const templates_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: templates_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+async function sendNotification(eventType, to, data) {
+  try {
+    const config = useRuntimeConfig();
+    const client = getSupabaseServiceClient();
+    const { data: template, error } = await client.from("notification_templates").select("*").eq("event_type", eventType).single();
+    if (error || !template) {
+      console.error(`[Email] Template not found: ${eventType}`);
+      return { success: false, message: "\u6A21\u677F\u4E0D\u5B58\u5728" };
+    }
+    if (!template.is_enabled) {
+      console.log(`[Email] Notification disabled: ${eventType}`);
+      return { success: true, message: "\u901A\u77E5\u5DF2\u7981\u7528" };
+    }
+    const subject = renderTemplate(template.subject_template, data);
+    const html = renderTemplate(template.body_template, data);
+    const resendApiKey = process.env.SUPABASE_AUTH_SMTP_PASS;
+    if (!resendApiKey) {
+      console.error("[Email] Missing SUPABASE_AUTH_SMTP_PASS");
+      return { success: false, message: "\u90AE\u4EF6\u670D\u52A1\u672A\u914D\u7F6E" };
+    }
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${resendApiKey}`
+      },
+      body: JSON.stringify({
+        from: "Fantula <noreply@fantula.com>",
+        to: [to],
+        subject,
+        html
+      })
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("[Email] Resend API Error:", errorData);
+      return { success: false, message: `\u53D1\u9001\u5931\u8D25: ${errorData.message}` };
+    }
+    const result = await response.json();
+    console.log(`[Email] Sent ${eventType} to ${to}: ${result.id}`);
+    return { success: true };
+  } catch (err) {
+    console.error("[Email] Send Error:", err);
+    return { success: false, message: err.message };
+  }
+}
+function renderTemplate(template, data) {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+    return data[key] !== void 0 ? String(data[key]) : match;
+  });
+}
+
+const test_post = defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  if (!body.event_type || !body.to) {
+    throw createError({ statusCode: 400, statusMessage: "Missing event_type or to address" });
+  }
+  const templateData = body.data || {};
+  const result = await sendNotification(body.event_type, body.to, templateData);
+  if (!result.success) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: result.message || "Send failed"
+    });
+  }
+  return {
+    success: true,
+    message: "Test email sent successfully"
+  };
+});
+
+const test_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: test_post
+}, Symbol.toStringTag, { value: 'Module' }));
 
 function getWechatPayConfig() {
   const config = useRuntimeConfig();

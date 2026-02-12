@@ -1,11 +1,14 @@
 <template>
-  <el-dialog 
-    v-model="visible" 
-    title="上传图片" 
-    width="500px" 
-    @closed="resetForm" 
-    append-to-body 
+  <AdminDataDialog
+    v-model="visible"
+    title="上传图片"
+    width="500px"
+    @closed="resetForm"
+    append-to-body
     :z-index="2000"
+    confirm-text="开始上传"
+    :loading="uploading"
+    @confirm="submitUpload"
   >
     <el-form :model="form" label-width="80px">
       <el-form-item label="所属分类" required>
@@ -33,19 +36,14 @@
          </el-upload>
       </el-form-item>
     </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="visible = false">取消</el-button>
-        <el-button type="primary" @click="submitUpload" :loading="uploading">开始上传</el-button>
-      </span>
-    </template>
-  </el-dialog>
+  </AdminDataDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { adminImageApi, type AdminImageCategory } from '@/api/admin/media'
+import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -122,7 +120,6 @@ const submitUpload = async () => {
       ElMessage.error('保存图片记录失败: ' + res.error)
     }
   } catch (error: any) {
-    console.error('Upload error:', error)
     ElMessage.error('上传失败: ' + (error.message || '未知错误'))
   } finally {
     uploading.value = false

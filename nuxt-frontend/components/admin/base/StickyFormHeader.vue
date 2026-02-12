@@ -1,7 +1,7 @@
 <template>
   <div class="sticky-form-header">
     <div class="header-left">
-      <el-button link @click="$emit('back')" class="back-btn">
+      <el-button link @click="handleBack" class="back-btn">
         <el-icon class="back-icon"><ArrowLeft /></el-icon>
         <div class="header-titles">
           <div class="main-title">{{ title }}</div>
@@ -20,24 +20,36 @@
 
 <script setup lang="ts">
 import { ArrowLeft } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
-withDefaults(defineProps<{
+const router = useRouter()
+
+const props = withDefaults(defineProps<{
   title: string
   subtitle?: string
   cancelText?: string
   submitText?: string
   loading?: boolean
+  backPath?: string
 }>(), {
   cancelText: '取消',
   submitText: '保存',
   loading: false
 })
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'back'): void
   (e: 'cancel'): void
   (e: 'submit'): void
 }>()
+
+const handleBack = () => {
+  if (props.backPath) {
+    router.push(props.backPath)
+  } else {
+    emit('back')
+  }
+}
 </script>
 
 <style scoped>
