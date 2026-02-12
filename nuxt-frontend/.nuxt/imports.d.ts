@@ -87,3 +87,4 @@ export { useModalStore } from '../stores/client/modal';
 export { useUserStore } from '../stores/client/user';
 export { useSupabaseUserStore } from '../stores/shared/supabase-user';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
+export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';
