@@ -75,13 +75,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { commonApi } from '@/api/client/common'
-import { goodsApi } from '@/api/client/goods'
+// import { commonApi } from '@/api/client/common' // Removed
+// import { goodsApi } from '@/api/client/goods' // Removed
 import { wechatLoginApi } from '@/api/client/wechat-login'
-import { useSimpleCache } from '@/composables/shared/useSimpleCache'
+// import { useSimpleCache } from '@/composables/shared/useSimpleCache' // Removed
 import { usePageLoading } from '@/composables/usePageLoading'
 import { useUserStore } from '@/stores/client/user'
-import type { Banner, Goods, GoodsCategory } from '@/types/api'
+// import type { Banner, Goods, GoodsCategory } from '@/types/api' // Removed
+import { useHomeData } from '@/composables/client/useHomeData'
 
 // Components
 import HomeHeader from '@/components/mobile/home/HomeHeader.vue'
@@ -99,23 +100,25 @@ definePageMeta({
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
-const { getCache, setCache } = useSimpleCache()
+// const { getCache, setCache } = useSimpleCache() // Removed
 const { startLoading, stopLoading } = usePageLoading()
 
-// State
-const banners = ref<Banner[]>([])
-const categories = ref<GoodsCategory[]>([])
-const currentGoods = ref<Goods[]>([])
-const activeCategoryId = ref<string | number>('')
-const goodsLoading = ref(false)
+// Shared Logic from Composable
+const { 
+  banners, 
+  categories, 
+  currentGoods, 
+  activeCategoryId,
+  goodsLoading, 
+  hasMore, 
+  isLoadingMore,
+  initData,
+  handleCategoryChange: _handleCategoryChange, // Rename to avoid conflict if we need wrapper
+  loadMore
+} = useHomeData()
 
-// Pagination State (与 PC 端一致)
-const currentPage = ref(1)
-const hasMore = ref(true)
-const isLoadingMore = ref(false)
-const PAGE_SIZE = 10
 
-// UI State
+// UI State (Mobile Specific)
 const isScrolled = ref(false)
 const scrollThreshold = 20
 const showDetailSheet = ref(false)
@@ -133,92 +136,9 @@ const openDetail = (id: string | number) => {
     showDetailSheet.value = true
 }
 
-// Data Fetching logic
-const fetchBanners = async () => {
-  const cached = getCache<Banner[]>('home_banners')
-  if (cached) { banners.value = cached; return }
-  
-  try {
-    const res = await commonApi.getBannerList()
-    if (res?.success && res.data) {
-      banners.value = res.data
-      setCache('home_banners', res.data)
-    }
-  } catch (e) { console.error(e) }
-}
-
-const fetchCategories = async () => {
-  const cached = getCache<GoodsCategory[]>('home_categories')
-  if (cached && cached.length > 0) {
-    categories.value = cached
-    return cached[0].id
-  }
-  
-  try {
-    const res = await goodsApi.getCategories()
-    if (res?.success && res.data && res.data.length > 0) {
-      categories.value = res.data
-      setCache('home_categories', res.data)
-      return res.data[0].id
-    }
-  } catch (e) { console.error(e) }
-  return null
-}
-
-// 核心：获取商品列表 (支持分页，与 PC 端逻辑一致)
-const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
-  if (!categoryId) return
-  
-  if (isLoadMore) {
-    if (!hasMore.value || isLoadingMore.value) return
-    isLoadingMore.value = true
-  } else {
-    // 重置列表
-    goodsLoading.value = true
-    currentPage.value = 1
-    hasMore.value = true
-    currentGoods.value = []
-  }
-
-  try {
-    const res = await goodsApi.getGoodsList({ 
-        categoryId: categoryId,
-        page: currentPage.value, 
-        limit: PAGE_SIZE,
-    })
-    
-    const newList = res?.success && res.data?.list ? res.data.list : []
-    
-    if (isLoadMore) {
-      currentGoods.value = [...currentGoods.value, ...newList]
-    } else {
-      currentGoods.value = newList
-    }
-
-    if (newList.length < PAGE_SIZE) {
-      hasMore.value = false
-    } else {
-      currentPage.value++
-      hasMore.value = true
-    }
-  } catch (e) {
-    console.error(e)
-    if (!isLoadMore) currentGoods.value = []
-  } finally {
-    goodsLoading.value = false
-    isLoadingMore.value = false
-  }
-}
-
-// 滚动加载触发器
-const loadMore = () => {
-  fetchGoods(activeCategoryId.value, true)
-}
-
-// 分类切换处理
+// 分类切换处理 wrapper
 const handleCategoryChange = async (categoryId: string | number) => {
-  activeCategoryId.value = categoryId
-  await fetchGoods(categoryId)
+  await _handleCategoryChange(categoryId)
   // 切换分类后重新设置 Observer
   setupObserver()
 }
@@ -257,7 +177,7 @@ onMounted(async () => {
     try {
         // 【关键】处理微信授权回调的 code 参数
         const code = route.query.code as string
-        const state = route.query.state as string
+        // const state = route.query.state as string
         
         if (code && !userStore.isLoggedIn) {
             console.log('[MobileHome] Processing WeChat OAuth callback...')
@@ -282,15 +202,8 @@ onMounted(async () => {
             router.replace({ path: '/mobile', query: {} })
         }
         
-        await Promise.all([
-           fetchBanners(),
-           fetchCategories().then(id => {
-               if (id) {
-                   activeCategoryId.value = id
-                   return fetchGoods(id)
-               }
-           })
-        ])
+        // Use shared init logic
+        await initData()
         
         // 设置滚动加载监听
         setupObserver()

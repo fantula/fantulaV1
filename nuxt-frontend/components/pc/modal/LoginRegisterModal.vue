@@ -253,8 +253,47 @@ const route = useRoute()
 
 const mode = ref<'login'|'register'>('login')
 const loginType = ref<'password'|'code'|'wechat'>('code')
-const codeTimer = ref(0)
-let codeInterval: any = null
+
+// Initialize shared composables for code sending
+import { useSendCode } from '@/composables/client/useSendCode'
+
+// 1. Login with Code Timer
+const { 
+  loading: loginCodeLoading, 
+  countdown: codeTimer, 
+  sendCode: sendLoginCode 
+} = useSendCode({ timerKey: 'otp_timer_end' })
+
+// 2. Register Code Timer
+const { 
+  loading: registerCodeLoading, 
+  countdown: registerCodeTimer, 
+  sendCode: sendRegisterCode 
+} = useSendCode({ timerKey: 'otp_register_timer_end' }) // Use different key if needed, or same if shared cooldown
+
+// 3. Forgot Password Timer
+const { 
+  loading: forgotCodeLoading, 
+  countdown: forgotCodeTimer, 
+  sendCode: sendForgotPasswordCode 
+} = useSendCode({ timerKey: 'otp_forgot_timer_end' })
+
+// 4. WeChat Bind Timer
+const { 
+  loading: wechatBindLoading, 
+  countdown: wechatBindCodeTimer, 
+  sendCode: sendWechatBindVerificationCode 
+} = useSendCode({ timerKey: 'wechat_bind_timer' })
+
+// Unified loading state (computed)
+const loading = computed(() => 
+  baseLoading.value || 
+  loginCodeLoading.value || 
+  registerCodeLoading.value || 
+  forgotCodeLoading.value || 
+  wechatBindLoading.value
+)
+const baseLoading = ref(false)
 
 // WeChat Login States
 const wechatState = ref<'loading'|'qrcode'|'bind'|'logged_in'|'error'>('loading')
@@ -266,8 +305,6 @@ const wechatErrorMsg = ref('')
 let wechatPollTimer: any = null
 
 const wechatBindForm = ref({ email: '', code: '', password: '', agree: false })
-const wechatBindCodeTimer = ref(0)
-let wechatBindCodeInterval: any = null
 
 const loginForm = ref({ email: '', password: '', remember: false, agree: false })
 const loginCodeForm = ref({ email: '', code: '', password: '', remember: false, agree: false })
@@ -281,9 +318,7 @@ const showPrivacyDialog = ref(false)
 const showPolicyDialog = ref(false)
 const showForgotDialog = ref(false)
 const forgotForm = ref({ email: '', code: '', password: '' })
-const forgotCodeTimer = ref(0)
-let forgotCodeInterval: any = null
-const loading = ref(false)
+// timers managed by composables now
 
 // Auto-focus logic
 const focusInput = () => {
@@ -301,47 +336,7 @@ watch([mode, loginType, () => props.visible], () => {
   if (props.visible) focusInput()
 })
 
-// Timer Persistence Keys
-const TIMER_KEY_CODE = 'otp_timer_end'
-const TIMER_KEY_FORGOT = 'otp_forgot_timer_end'
-const COOLDOWN_SECONDS = 300 // 5 minutes
-
-// Restore timers on mount
-onMounted(() => {
-  restoreTimer(TIMER_KEY_CODE, codeTimer, codeInterval)
-  restoreTimer(TIMER_KEY_FORGOT, forgotCodeTimer, forgotCodeInterval)
-})
-
-const restoreTimer = (key: string, timerRef: any, intervalRef: any) => {
-  const endTimeStr = localStorage.getItem(key)
-  if (endTimeStr) {
-    const endTime = parseInt(endTimeStr, 10)
-    const now = Date.now()
-    if (endTime > now) {
-      const remaining = Math.ceil((endTime - now) / 1000)
-      startTimer(timerRef, intervalRef, remaining, key, false) // false means don't set new end time, just resume
-    } else {
-      localStorage.removeItem(key)
-    }
-  }
-}
-
-const startTimer = (timerRef: any, intervalRef: any, seconds: number, storageKey: string, isNew = true) => {
-  timerRef.value = seconds
-  if (isNew) {
-    const endTime = Date.now() + seconds * 1000
-    localStorage.setItem(storageKey, endTime.toString())
-  }
-  
-  if (intervalRef) clearInterval(intervalRef)
-  return setInterval(() => {
-    timerRef.value--
-    if (timerRef.value <= 0) {
-      clearInterval(intervalRef)
-      localStorage.removeItem(storageKey)
-    }
-  }, 1000)
-}
+// Timer logic removed (handled by composables)
 
 // Helpers
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -360,47 +355,16 @@ function onForgot() {
   showForgotDialog.value = true
 }
 
-function sendCode(type: 'login'|'register') {
-  if (codeTimer.value > 0) return
-  
-  const email = type==='register' ? registerForm.value.email : loginCodeForm.value.email
-  if (!email) { ElMessage.warning('请输入邮箱'); return }
-  if (!isValidEmail(email)) { ElMessage.warning('邮箱格式不正确'); return }
-  
-  // 统一使用 getEmailCode，允许验证码登录时自动注册新用户
-  loading.value = true
-  const apiCall = authApi.getEmailCode(email)
-  
-  apiCall
-    .then((res) => {
-      if (res.success) {
-        ElMessage.success('验证码已发送，请注意查收')
-        codeInterval = startTimer(codeTimer, codeInterval, COOLDOWN_SECONDS, TIMER_KEY_CODE)
-      } else {
-        ElMessage.error(res.msg || '验证码发送失败')
-      }
-    })
-    .catch(err => { ElMessage.error(err.message || '验证码发送失败') })
-    .finally(() => { loading.value = false })
+async function sendCode(type: 'login'|'register') {
+  if (type === 'login') {
+      await sendLoginCode(loginCodeForm.value.email)
+  } else {
+      await sendRegisterCode(registerForm.value.email)
+  }
 }
 
-function sendForgotCode() {
-  if (forgotCodeTimer.value > 0) return
-  if (!forgotForm.value.email) { ElMessage.warning('请输入邮箱'); return }
-  if (!isValidEmail(forgotForm.value.email)) { ElMessage.warning('邮箱格式不正确'); return }
-  
-  loading.value = true
-  authApi.sendOtp(forgotForm.value.email)
-    .then((res) => {
-      if (res.success) {
-         ElMessage.success('验证码已发送')
-         forgotCodeInterval = startTimer(forgotCodeTimer, forgotCodeInterval, COOLDOWN_SECONDS, TIMER_KEY_FORGOT)
-      } else {
-        ElMessage.error(res.msg || '发送失败')
-      }
-    })
-    .catch(err => { ElMessage.error(err.message || '验证码发送失败') })
-    .finally(() => { loading.value = false })
+async function sendForgotCode() {
+  await sendForgotPasswordCode(forgotForm.value.email)
 }
 
 async function onLogin() {
@@ -408,7 +372,9 @@ async function onLogin() {
   if (!isValidEmail(loginForm.value.email)) { ElMessage.warning('邮箱格式不正确'); return }
   if (!loginForm.value.agree) { ElMessage.warning('请勾选协议'); return }
   
-  loading.value = true
+  if (!loginForm.value.agree) { ElMessage.warning('请勾选协议'); return }
+  
+  baseLoading.value = true
   try {
     const res = await authApi.login(loginForm.value)
     if (res.success && res.data) {
@@ -419,7 +385,7 @@ async function onLogin() {
   } catch (e: any) {
     ElMessage.error(e.message || '登录失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 
@@ -428,7 +394,9 @@ async function onLoginCode() {
   if (!isValidEmail(loginCodeForm.value.email)) { ElMessage.warning('邮箱格式不正确'); return }
   if (!loginCodeForm.value.agree) { ElMessage.warning('请勾选协议'); return }
   
-  loading.value = true
+  if (!loginCodeForm.value.agree) { ElMessage.warning('请勾选协议'); return }
+  
+  baseLoading.value = true
   try {
     const res = await authApi.loginWithCode({
       email: loginCodeForm.value.email,
@@ -442,7 +410,7 @@ async function onLoginCode() {
   } catch (e: any) {
     ElMessage.error(e.message || '验证码登录失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 
@@ -452,7 +420,9 @@ async function onRegister() {
   if (!isValidPassword(registerForm.value.password)) { ElMessage.warning('密码至少需要6位'); return }
   if (!registerForm.value.agree) { ElMessage.warning('请勾选协议'); return }
   
-  loading.value = true
+  if (!registerForm.value.agree) { ElMessage.warning('请勾选协议'); return }
+  
+  baseLoading.value = true
   try {
     const res = await authApi.registerWithCodeAndPassword({
       email: registerForm.value.email,
@@ -469,7 +439,7 @@ async function onRegister() {
   } catch (e: any) {
     ElMessage.error(e.message || '注册失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 
@@ -477,7 +447,9 @@ async function onForgotSubmit() {
   if (!forgotForm.value.email || !forgotForm.value.code || !forgotForm.value.password) { ElMessage.warning('请填写完整'); return }
   if (!isValidPassword(forgotForm.value.password)) { ElMessage.warning('新密码至少需要6位'); return }
   
-  loading.value = true
+  if (!isValidPassword(forgotForm.value.password)) { ElMessage.warning('新密码至少需要6位'); return }
+  
+  baseLoading.value = true
   try {
     const res = await authApi.resetPasswordWithOtp({
       email: forgotForm.value.email,
@@ -502,7 +474,7 @@ async function onForgotSubmit() {
   } catch (e: any) {
     ElMessage.error(e.message || '重置失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 
@@ -629,22 +601,7 @@ async function pollWechatStatus() {
 }
 
 function sendWechatBindCode() {
-  if (wechatBindCodeTimer.value > 0) return
-  if (!wechatBindForm.value.email) { ElMessage.warning('请输入邮箱'); return }
-  if (!isValidEmail(wechatBindForm.value.email)) { ElMessage.warning('邮箱格式不正确'); return }
-  
-  loading.value = true
-  authApi.getEmailCode(wechatBindForm.value.email)
-    .then((res) => {
-      if (res.success) {
-        ElMessage.success('验证码已发送')
-        wechatBindCodeInterval = startTimer(wechatBindCodeTimer, wechatBindCodeInterval, COOLDOWN_SECONDS, 'wechat_bind_timer')
-      } else {
-        ElMessage.error(res.msg || '发送失败')
-      }
-    })
-    .catch(err => { ElMessage.error(err.message || '发送失败') })
-    .finally(() => { loading.value = false })
+  sendWechatBindVerificationCode(wechatBindForm.value.email)
 }
 
 async function onWechatBind() {
@@ -653,7 +610,9 @@ async function onWechatBind() {
   if (!wechatBindForm.value.agree) { ElMessage.warning('请勾选协议'); return }
   if (!wechatBindToken.value) { ElMessage.error('绑定凭证无效，请重新扫码'); startWechatLogin(); return }
   
-  loading.value = true
+  if (!wechatBindToken.value) { ElMessage.error('绑定凭证无效，请重新扫码'); startWechatLogin(); return }
+  
+  baseLoading.value = true
   try {
     const res = await wechatLoginApi.bindWechatToEmail({
       bindToken: wechatBindToken.value,
@@ -670,7 +629,7 @@ async function onWechatBind() {
   } catch (err: any) {
     ElMessage.error(err.message || '绑定失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 

@@ -109,11 +109,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import BaseBusinessModal from '@/components/pc/modal/base/BaseBusinessModal.vue'
 import BaseCouponTicket from '@/components/pc/exchange/coupon/BaseCouponTicket.vue'
-import { couponApi, type UserCoupon, type Coupon } from '@/api/client/coupon'
+import { type UserCoupon, type Coupon } from '@/api/client/coupon'
 import { Refresh, InfoFilled, CircleClose } from '@element-plus/icons-vue'
+import { useCouponList } from '@/composables/client/useCouponList'
 
 const props = defineProps<{
   modelValue: boolean
@@ -131,11 +132,24 @@ const visible = computed({
   set: (val) => emit('update:modelValue', val)
 })
 
-const listLoading = ref(false)
-const loading = ref(false) // 确认按钮 loading
-const coupons = ref<UserCoupon[]>([])
 const tempSelected = ref<UserCoupon | null>(null)
 const allowEmpty = true // 允许传 null
+
+// --- Use Shared Composable ---
+const { 
+    loading: listLoading, 
+    coupons, // Used for empty check
+    sortedCoupons, // Used for v-for
+    loadCoupons,
+    isApplicable,
+    getInapplicableReason
+} = useCouponList(
+    toRef(props, 'orderAmount'),
+    toRef(props, 'skuIds'),
+    toRef(props, 'productIds')
+)
+
+const loading = ref(false) // 确认按钮 loading (Separate from list loading)
 
 // 初始化逻辑
 watch(() => props.modelValue, (val) => {
@@ -144,84 +158,19 @@ watch(() => props.modelValue, (val) => {
   }
 })
 
-const sortedCoupons = computed(() => {
-  return [...coupons.value].sort((a, b) => {
-    const aValid = isApplicable(a)
-    const bValid = isApplicable(b)
-    if (aValid && !bValid) return -1
-    if (!aValid && bValid) return 1
-    return b.coupon.value - a.coupon.value
-  })
-})
-
-const loadCoupons = async () => {
-  listLoading.value = true
-  try {
-    const res = await couponApi.getUserCoupons()
-    if (res.success && res.data) {
-      const now = new Date()
-      coupons.value = res.data.filter(c => 
-        c.status === 'unused' && 
-        c.coupon.type !== 'balance' &&
-        (!c.coupon.end_date || new Date(c.coupon.end_date) >= now)
-      )
-      
-      // 初始化选中状态
-      if (props.currentCouponId) {
-        tempSelected.value = coupons.value.find(c => c.id === props.currentCouponId) || null
-      } else {
-        tempSelected.value = null
-      }
+// Sync tempSelected when list loads or prop changes
+watch(sortedCoupons, (list) => {
+    if (visible.value && list.length > 0) {
+         if (props.currentCouponId) {
+            tempSelected.value = list.find(c => c.id === props.currentCouponId) || null
+         } else {
+            tempSelected.value = null
+         }
     }
-  } catch (e) {
-    console.error('Failed to load coupons', e)
-  } finally {
-    listLoading.value = false
-  }
-}
-
-// 检查可用性
-const isApplicable = (coupon: UserCoupon) => {
-  const c = coupon.coupon
-  if (props.orderAmount < c.min_usage) return false
-  
-  if (c.type === 'product') {
-     // Assuming c.extra holds sku_ids or product_ids as per previous logic, 
-     // but type definition might vary. Using 'any' safety or strict type if known.
-     const extra = (c as any).extra || {}
-     // Some coupons might use direct fields if refined, but sticking to previous logic structure:
-     // If the previous code used c.sku_ids directly, I will assume it exists on the type or I cast it.
-     // Re-checking previous file content: it used `c.sku_ids` and `c.product_ids`.
-     const cAny = c as any
-     
-     if (cAny.sku_ids && cAny.sku_ids.length > 0) {
-        const hasCommonSku = props.skuIds.some(sid => 
-          cAny.sku_ids.includes(sid)
-        )
-        if (!hasCommonSku) return false
-     } else if (cAny.product_ids && cAny.product_ids.length > 0) {
-        const hasCommonProduct = props.productIds.some(pid => 
-          cAny.product_ids?.includes(pid)
-        )
-        if (!hasCommonProduct) return false
-     }
-  }
-  return true
-}
-
-const getInapplicableReason = (coupon: UserCoupon) => {
-  if (props.orderAmount < coupon.coupon.min_usage) {
-    return `还差 ¥${(coupon.coupon.min_usage - props.orderAmount).toFixed(2)}`
-  }
-  if (coupon.coupon.type === 'product') {
-    return '该商品不可用'
-  }
-  return '不可用'
-}
+})
 
 const handleItemClick = (coupon: UserCoupon) => {
   if (!isApplicable(coupon)) return
-  // Toggle off if clicking selected? Or just select. Standard is just select.
   tempSelected.value = coupon
 }
 
@@ -235,7 +184,7 @@ const handleConfirm = () => {
   visible.value = false
 }
 
-// 转换函数 for BaseCouponTicket
+// 转换函数 for BaseCouponTicket (Pure UI formatters, keep local or extract later? Keep local for now as report said UI logic ok)
 const getTicketColor = (c: Coupon) => {
   if (c.type === 'flat') return 'purple'
   if (c.type === 'product') return 'cyan'
@@ -279,7 +228,6 @@ const formatDate = (dateStr: string | null) => {
   const date = new Date(dateStr)
   return `有效期至 ${date.getFullYear()}.${String(date.getMonth()+1).padStart(2,'0')}.${String(date.getDate()).padStart(2,'0')}`
 }
-
 </script>
 
 <style scoped>

@@ -21,6 +21,7 @@ export interface ScanStatus {
     userId?: string
     email?: string
     nickname?: string
+    action_link?: string
 }
 
 export interface OAuthResult {

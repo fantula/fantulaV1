@@ -26,7 +26,7 @@
           <!-- Header -->
           <div class="sheet-header">
              <!-- Skeleton Loading -->
-             <div v-if="loading" style="width: 100%; display: flex; gap: 12px;">
+             <div v-if="pending" style="width: 100%; display: flex; gap: 12px;">
                 <el-skeleton-item variant="image" style="width: 88px; height: 88px; border-radius: 12px;" />
                 <div style="flex: 1; padding-top: 4px;">
                    <el-skeleton-item variant="h3" style="width: 80%; margin-bottom: 8px;" />
@@ -54,7 +54,7 @@
              
              <!-- Detail Button (Top Right) -->
              <!-- Help Button (Top Right, Refined) -->
-             <button class="help-btn" @click="showDetailViewer = true" v-if="!loading">
+             <button class="help-btn" @click="showDetailViewer = true" v-if="!pending">
                 <el-icon class="h-icon"><QuestionFilled /></el-icon>
                 <span>显示帮助</span>
              </button>
@@ -63,7 +63,7 @@
           <!-- Scrollable Body -->
           <div class="sheet-body">
               <!-- Skeleton Body -->
-              <div v-if="loading">
+              <div v-if="pending">
                   <el-skeleton-item variant="rect" style="width: 100%; height: 40px; border-radius: 20px; margin-bottom: 20px;" />
                   <div style="margin-bottom: 20px;">
                       <el-skeleton-item variant="text" style="width: 40px; margin-bottom: 10px;" />
@@ -139,14 +139,14 @@
                   <button 
                     class="btn-mobile-base btn-mobile-ghost btn-cart" 
                     @click="addToCart" 
-                    :disabled="!hasStock || loading"
+                    :disabled="!hasStock || pending"
                   >
                      加入购物车
                   </button>
                   <button 
                     class="btn-mobile-base btn-mobile-accent btn-buy-now" 
                     @click="buyNow" 
-                    :disabled="!hasStock || loading"
+                    :disabled="!hasStock || pending"
                   >
                      立即购买
                   </button>
@@ -183,17 +183,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   Picture, CircleCheckFilled, Star, StarFilled, Service, Close, 
   Lightning, Umbrella, Document, InfoFilled, ArrowRight, QuestionFilled
 } from '@element-plus/icons-vue'
-import { goodsApi } from '@/api/client/goods'
-import { supabaseFaqApi, supabaseProductApi } from '@/api/client/supabase'
 import { useCartStore } from '@/stores/client/cart'
 import { useUserStore } from '@/stores/client/user'
 import { useToast } from '@/composables/mobile/useToast'
+import { useProductDetail } from '@/composables/client/useProductDetail'
+import { favoriteApi } from '@/api/client/common' // Direct API use for custom UI feedback
 
 const props = defineProps<{
   visible: boolean
@@ -206,34 +206,49 @@ const cartStore = useCartStore()
 const userStore = useUserStore()
 const { showToast } = useToast()
 
-// --- State ---
-const loading = ref(false)
-const goodsInfo = ref<any>({})
-const skus = ref<any[]>([])
-const specGroups = ref<any[]>([])
-const faqs = ref<any[]>([
-  { id: '1', question: '下单后多久发货？一般为秒级自动发货。' },
-  { id: '2', question: '账号无法登录怎么办？请联系在线人工客服处理。' },
-  { id: '3', question: '支持退款吗？虚拟商品发货后非质量问题不支持退款。' },
-  { id: '4', question: '可以长期续费吗？支持同号续费，请关注订阅到期提醒。' }
-])
-const detailModules = ref<any[]>([])
+// --- Shared Logic ---
+// We pass the goodsId prop as a Ref to the composable
+const {
+  // State
+  pending, // Replaces loading
+  goodsInfo,
+  skus,
+  specGroups,
+  faqs,      // Computed from fallback + fetch
+  detailModules,
+  allowAddon,
+  
+  // Interactive State
+  qty,
+  stock,
+  selectedSpecs,
+  selectedSkuImage,
+  isFavorited,
+  
+  // Computed
+  currentPrice,
+  hasStock,
+  matchedSku,
+  skuAvailable, // used for stock check
+  
+  // Methods
+  formatPrice,
+  handleSpecSelect,
+  initClientState,
+  modal
+} = useProductDetail(toRef(props, 'goodsId'))
 
-const selectedSpecs = ref<Record<string, string>>({})
-const qty = ref(1)
-const stock = ref(0)
-const isFavorited = ref(false)
+// --- Mobile Specific UI State ---
 const showDetailViewer = ref(false)
-const allowAddon = ref(true) // Default true, fetch to confirm
 
-// FAQ Ticker Logic (Seamless Loop)
+// --- FAQ Ticker Logic (UI Only) ---
 const activeFaqIndex = ref(0)
 const isTransitioning = ref(true)
 let faqTimer: any = null
 
 const displayFaqs = computed(() => {
     if (faqs.value.length === 0) return []
-    return [...faqs.value, faqs.value[0]] // Add clone at end
+    return [...faqs.value, faqs.value[0]] 
 })
 
 const trackStyle = computed(() => ({
@@ -244,17 +259,13 @@ const trackStyle = computed(() => ({
 const startFaqTicker = () => {
     if (faqTimer) clearInterval(faqTimer)
     faqTimer = setInterval(() => {
-        // Normal Move
         isTransitioning.value = true
         activeFaqIndex.value += 1
-        
-        // If moved to the Clone (last item)
         if (activeFaqIndex.value === faqs.value.length) {
-            // Wait for transition to finish, then snap back
             setTimeout(() => {
                 isTransitioning.value = false
                 activeFaqIndex.value = 0
-            }, 500) // Match transition duration
+            }, 500)
         }
     }, 3000)
 }
@@ -269,112 +280,20 @@ onUnmounted(() => {
 
 watch(() => faqs.value, () => startFaqTicker())
 
-// --- Computed ---
-const matchedSku = computed(() => {
-  if (skus.value.length === 0) return null
-  return skus.value.find((sku: any) => {
-    const combination = sku.spec_combination || {}
-    return Object.entries(selectedSpecs.value).every(([k, v]) => combination[k] === v)
-  })
-})
-
-const currentPrice = computed(() => matchedSku.value?.price || goodsInfo.value.price || 0)
-const hasStock = computed(() => stock.value > 0)
-const selectedSkuImage = computed(() => matchedSku.value?.image)
-
-// --- Methods ---
-const formatPrice = (p: any) => Number(p).toFixed(2)
+// --- Methods (Mobile Specific Action Wrappers) ---
 const handleClose = () => emit('update:visible', false)
 
-const checkSkuAvailability = async (skuId: string) => {
-    try {
-       const res = await supabaseProductApi.checkSkuAvailability(skuId)
-       stock.value = res.available ? res.availableCount : 0
-    } catch(e) { stock.value = 0 }
-}
-
-const handleSpecSelect = async (group: string, val: string) => {
-   selectedSpecs.value[group] = val
-   if (matchedSku.value) {
-       await checkSkuAvailability(matchedSku.value.id)
-   }
-}
-
-const fetchData = async (id: string) => {
-   loading.value = true
-   try {
-      const res = await goodsApi.getGoodsDetail(id)
-      if (res.success && res.data) {
-          const d = res.data
-          goodsInfo.value = {
-             name: d.product_name || d.title,
-             image: d.coverImage || d.image,
-             price: d.price
-          }
-          skus.value = d.skus || []
-          detailModules.value = d.detail_modules || []
-          allowAddon.value = d.allow_addon === true // Consistency Check
-          
-          if (skus.value.length > 0) {
-             const groups: Record<string, Set<string>> = {}
-             skus.value.forEach((s: any) => {
-                const comb = s.spec_combination || {}
-                Object.entries(comb).forEach(([k,v]) => {
-                   if (!groups[k]) groups[k] = new Set()
-                   groups[k].add(v as string)
-                })
-             })
-             specGroups.value = Object.keys(groups).map(k => ({ name: k, values: Array.from(groups[k]) }))
-             
-             // Default Select (Match PC Logic: First SKU)
-             if (skus.value[0] && skus.value[0].spec_combination) {
-                 selectedSpecs.value = { ...skus.value[0].spec_combination }
-             } else {
-                 // Fallback (shouldn't happen if data integrity is good)
-                 specGroups.value.forEach(g => {
-                    if (!selectedSpecs.value[g.name]) selectedSpecs.value[g.name] = g.values[0]
-                 })
-             }
-             
-             // Initial Check
-             if (matchedSku.value) await checkSkuAvailability(matchedSku.value.id)
-             else if (skus.value[0]) await checkSkuAvailability(skus.value[0].id)
-          } else {
-             // No SKU product (rare but possible)
-             stock.value = Number(d.stock || 0)
-          }
-      }
-      
-       // FAQ Logic: Specific -> General -> Fallback
-       let finalFaqs: any[] = []
-       const fRes = await supabaseFaqApi.getFaqsByProduct(id)
-       if (fRes.success && fRes.faqs.length > 0) finalFaqs = [...fRes.faqs]
-       
-       // Backfill if needed
-       if (finalFaqs.length < 5) {
-          const fGen = await supabaseFaqApi.getFaqs()
-          if (fGen.success && fGen.faqs.length > 0) {
-             const existingIds = new Set(finalFaqs.map(f => f.id))
-             const add = fGen.faqs.filter((f: any) => !existingIds.has(f.id))
-             finalFaqs = [...finalFaqs, ...add]
-          }
-       }
-       
-       // Only override if we actually found something. 
-       // If finalFaqs is empty, we keep the static fallback initialized in ref.
-       if (finalFaqs.length > 0) {
-           faqs.value = finalFaqs.slice(0, 5)
-       }
-       
-    } catch(e) { console.error(e) }
-    finally { loading.value = false }
-}
-
+// Override default interaction methods to use ShowToast instead of ElMessage
 const addToCart = async () => {
     if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
+    // Safe check if SKUs exist but none matched
     if (!matchedSku.value && skus.value.length > 0) return showToast('请选择规格', 'warning')
-    const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id // Fallback if no sku
     
+    // Fallback ID if no SKUs (some products might not have SKUs)
+    const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id 
+    if (!skuId) return showToast('商品信息异常', 'error')
+    
+    // Direct call to cart store (same as composable but handling UI here)
     const res = await cartStore.addToCart(skuId, qty.value)
     if (res.success) {
         showToast('已加入购物车', 'success')
@@ -387,7 +306,9 @@ const addToCart = async () => {
 const buyNow = async () => {
      if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
      if (!matchedSku.value && skus.value.length > 0) return showToast('请选择规格', 'warning')
+     
      const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
+     if (!skuId) return showToast('商品信息异常', 'error')
 
      const { supabasePreOrderApi } = await import('@/api/client/supabase')
      const res = await supabasePreOrderApi.createPreOrder(skuId, qty.value, 'buy_now')
@@ -399,11 +320,32 @@ const buyNow = async () => {
      }
 }
 
-const handleToggleFavorite = () => { isFavorited.value = !isFavorited.value; showToast(isFavorited.value ? '已收藏' : '已取消', 'success') }
-const contactService = () => showToast('客服连接中...', 'info')
+const handleToggleFavorite = async () => {
+    if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
+    
+    // Optimistic UI or wait? Better wait.
+    // Logic from favoriteApi
+    if (isFavorited.value) {
+         showToast('取消收藏请前往"我的收藏"页面', 'info')
+         return
+    }
+    
+    const skuId = matchedSku.value?.id ? String(matchedSku.value.id) : undefined
+    const res = await favoriteApi.addFavorite(String(goodsInfo.value.id), skuId)
+    if (res.success) {
+        isFavorited.value = true
+        showToast('收藏成功', 'success')
+    } else {
+        showToast(res.msg || '收藏失败', 'error')
+    }
+}
 
-watch(() => props.visible, (val) => {
-   if (val && props.goodsId) fetchData(String(props.goodsId))
+// Lifecycle Init
+watch(() => props.visible, async (val) => {
+   if (val && props.goodsId) {
+       // Trigger the composable's fetch logic logic
+       await initClientState()
+   }
 })
 </script>
 

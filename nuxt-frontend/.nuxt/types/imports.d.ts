@@ -452,12 +452,14 @@ declare global {
   const useAppConfig: typeof import('../../node_modules/nuxt/dist/app/config').useAppConfig
   const useAsyncData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useAsyncData
   const useAttrs: typeof import('vue').useAttrs
+  const useAuthTimer: typeof import('../../composables/client/useAuthTimer').useAuthTimer
   const useBizConfig: typeof import('../../composables/common/useBizConfig').useBizConfig
   const useBizFormat: typeof import('../../composables/common/useBizFormat').useBizFormat
   const useCartAnimation: typeof import('../../composables/client/useCartAnimation').useCartAnimation
   const useCartStore: typeof import('../../stores/client/cart').useCartStore
   const useCheckout: typeof import('../../composables/client/useCheckout').useCheckout
   const useCookie: typeof import('../../node_modules/nuxt/dist/app/composables/cookie').useCookie
+  const useCouponList: typeof import('../../composables/client/useCouponList').useCouponList
   const useCssModule: typeof import('vue').useCssModule
   const useCssVars: typeof import('vue').useCssVars
   const useError: typeof import('../../node_modules/nuxt/dist/app/composables/error').useError
@@ -468,6 +470,7 @@ declare global {
   const useGoodsDetail: typeof import('../../composables/client/useGoodsDetail').useGoodsDetail
   const useHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHead
   const useHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHeadSafe
+  const useHomeData: typeof import('../../composables/client/useHomeData').useHomeData
   const useHttp: typeof import('../../composables/shared/useHttp').useHttp
   const useHydration: typeof import('../../node_modules/nuxt/dist/app/composables/hydrate').useHydration
   const useId: typeof import('vue').useId
@@ -529,6 +532,7 @@ declare global {
   const useScriptVimeoPlayer: typeof import('../../node_modules/nuxt/dist/app/composables/script-stubs').useScriptVimeoPlayer
   const useScriptXPixel: typeof import('../../node_modules/nuxt/dist/app/composables/script-stubs').useScriptXPixel
   const useScriptYouTubePlayer: typeof import('../../node_modules/nuxt/dist/app/composables/script-stubs').useScriptYouTubePlayer
+  const useSendCode: typeof import('../../composables/client/useSendCode').useSendCode
   const useSeoMeta: typeof import('../../node_modules/nuxt/dist/app/composables/head').useSeoMeta
   const useServerHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').useServerHead
   const useServerHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useServerHeadSafe
@@ -1049,12 +1053,14 @@ declare module 'vue' {
     readonly useAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['useAppConfig']>
     readonly useAsyncData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useAsyncData']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
+    readonly useAuthTimer: UnwrapRef<typeof import('../../composables/client/useAuthTimer')['useAuthTimer']>
     readonly useBizConfig: UnwrapRef<typeof import('../../composables/common/useBizConfig')['useBizConfig']>
     readonly useBizFormat: UnwrapRef<typeof import('../../composables/common/useBizFormat')['useBizFormat']>
     readonly useCartAnimation: UnwrapRef<typeof import('../../composables/client/useCartAnimation')['useCartAnimation']>
     readonly useCartStore: UnwrapRef<typeof import('../../stores/client/cart')['useCartStore']>
     readonly useCheckout: UnwrapRef<typeof import('../../composables/client/useCheckout')['useCheckout']>
     readonly useCookie: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/cookie')['useCookie']>
+    readonly useCouponList: UnwrapRef<typeof import('../../composables/client/useCouponList')['useCouponList']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['useError']>
@@ -1065,6 +1071,7 @@ declare module 'vue' {
     readonly useGoodsDetail: UnwrapRef<typeof import('../../composables/client/useGoodsDetail')['useGoodsDetail']>
     readonly useHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHead']>
     readonly useHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHeadSafe']>
+    readonly useHomeData: UnwrapRef<typeof import('../../composables/client/useHomeData')['useHomeData']>
     readonly useHttp: UnwrapRef<typeof import('../../composables/shared/useHttp')['useHttp']>
     readonly useHydration: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/hydrate')['useHydration']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
@@ -1126,6 +1133,7 @@ declare module 'vue' {
     readonly useScriptVimeoPlayer: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/script-stubs')['useScriptVimeoPlayer']>
     readonly useScriptXPixel: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/script-stubs')['useScriptXPixel']>
     readonly useScriptYouTubePlayer: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/script-stubs')['useScriptYouTubePlayer']>
+    readonly useSendCode: UnwrapRef<typeof import('../../composables/client/useSendCode')['useSendCode']>
     readonly useSeoMeta: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useSeoMeta']>
     readonly useServerHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useServerHead']>
     readonly useServerHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useServerHeadSafe']>

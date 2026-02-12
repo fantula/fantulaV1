@@ -89,7 +89,7 @@ const userStore = useUserStore()
 const state = ref<'loading' | 'bind' | 'success' | 'error'>('loading')
 const errorMsg = ref('')
 const bindToken = ref('')
-const loading = ref(false)
+
 
 const bindForm = ref({
   email: '',
@@ -100,8 +100,18 @@ const bindForm = ref({
   avatar: undefined as string | undefined,
 })
 
-const codeTimer = ref(0)
-let codeInterval: any = null
+import { useSendCode } from '@/composables/client/useSendCode'
+
+const { 
+  loading: codeLoading, 
+  countdown: codeTimer, 
+  sendCode: sendBindCode 
+} = useSendCode({ timerKey: 'wechat_bind_timer' })
+
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || codeLoading.value)
+// const codeTimer = ref(0) // Replaced
+let codeInterval: any = null // clear on unmount if any? useSendCode handles it.
 
 onMounted(async () => {
   // 0. 特殊处理：如果是 Magic Link 回调（Hash 中包含 access_token）
@@ -269,7 +279,7 @@ const sendCode = async () => {
     return
   }
 
-  loading.value = true
+  baseLoading.value = true
   try {
     // 1. Check if email exists (Pre-flight check)
     const checkRes = await authApi.checkEmailAvailable(bindForm.value.email)
@@ -300,31 +310,16 @@ const sendCode = async () => {
     }
 
     // 2. Send Code
-    const res = await authApi.getEmailCode(bindForm.value.email)
-    if (res.success) {
-      startTimer(60)
-      ElMessage.success('验证码已发送')
-      errorMsg.value = '' // Clear error if any
-    } else {
-      errorMsg.value = res.msg || '发送失败'
-    }
+    await sendBindCode(bindForm.value.email)
   } catch (err: any) {
     console.error(err)
     errorMsg.value = '发送失败: ' + (err.message || '网络错误')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 
-const startTimer = (seconds: number) => {
-  codeTimer.value = seconds
-  codeInterval = setInterval(() => {
-    codeTimer.value--
-    if (codeTimer.value <= 0) {
-      clearInterval(codeInterval)
-    }
-  }, 1000)
-}
+// const startTimer = (seconds: number) => { ... } // Removed
 
 const onBind = async () => {
   if (!bindForm.value.agree) {
@@ -336,7 +331,7 @@ const onBind = async () => {
     return
   }
 
-  loading.value = true
+  baseLoading.value = true
   try {
     const res = await wechatLoginApi.bindWechatToEmail({
       bindToken: bindToken.value,
@@ -376,7 +371,7 @@ const onBind = async () => {
   } catch (err: any) {
     errorMsg.value = err.message || '绑定失败'
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 

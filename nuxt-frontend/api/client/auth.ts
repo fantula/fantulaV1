@@ -26,6 +26,9 @@ function localizeAuthError(originalMsg: string): string {
   if (msg.includes('too many requests') || msg.includes('rate limit')) {
     return '操作太频繁了，请稍后再试'
   }
+  if (msg.includes('security purposes') && msg.includes('seconds')) {
+    return '发送频率过高，请稍后再试'
+  }
 
   return originalMsg // 默认返回原文 (或者可以统一返回 '出错了，请稍后再试')
 }

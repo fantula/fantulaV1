@@ -61,6 +61,7 @@ import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useSendCode } from '@/composables/client/useSendCode'
 
 const props = defineProps<{
   visible: boolean
@@ -72,9 +73,15 @@ const router = useRouter()
 
 const isConfirmed = ref(false)
 const otpCode = ref('')
-const loading = ref(false)
-const countdown = ref(0)
-let timerInterval: any = null
+  loading: codeLoading, 
+  countdown, 
+  sendCode: sendOtp,
+  checkTimer 
+} = useSendCode({ timerKey: 'otp_security_timer' })
+
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || codeLoading.value)
+// let timerInterval: any = null // Removed
 
 const canSubmit = computed(() => {
     return isConfirmed.value && otpCode.value.length >= 4
@@ -85,67 +92,40 @@ watch(() => props.visible, (val) => {
         isConfirmed.value = false
         otpCode.value = ''
         countdown.value = 0
-        if(timerInterval) clearInterval(timerInterval)
+        // if(timerInterval) clearInterval(timerInterval) // Removed
+        checkTimer() // Sync timer
     }
 })
 
 onUnmounted(() => {
-    if (timerInterval) clearInterval(timerInterval)
+    // if (timerInterval) clearInterval(timerInterval) // Removed
 })
 
 const handleClose = () => {
     emit('close')
 }
 
-const startTimer = (seconds: number) => {
-    countdown.value = seconds
-    if (timerInterval) clearInterval(timerInterval)
-    timerInterval = setInterval(() => {
-        countdown.value--
-        if (countdown.value <= 0) {
-            clearInterval(timerInterval)
-        }
-    }, 1000)
-}
+// import { useSendCode } from '@/composables/client/useSendCode' // Moved to top
+
+// ... existing code ...
 
 const sendCode = async () => {
-    if (!userStore.user?.email) return
-    if (countdown.value > 0) return
-
-    loading.value = true
-    try {
-        const res = await authApi.sendOtp(userStore.user.email)
-        if (res.success) {
-            ElMessage.success({ message: '验证码已发送', offset: 100, customClass: 'mobile-message' })
-            startTimer(300)
-        } else {
-            ElMessage.error(res.msg || '发送失败')
-        }
-    } catch (e: any) {
-        ElMessage.error('发送异常')
-    } finally {
-        loading.value = false
-    }
+    await sendOtp(userStore.user?.email || '')
 }
 
 const handleDelete = async () => {
     if (!canSubmit.value || !userStore.user?.email) return
     
-    loading.value = true
+    baseLoading.value = true
     try {
         // 1. Verify OTP
         const verifyRes = await authApi.verifyOtp(userStore.user.email, otpCode.value)
         if (!verifyRes.success) {
             ElMessage.error(verifyRes.msg || '验证码错误')
-            loading.value = false
             return
         }
 
-        // 2. Execute Delete (Should ideally be atomic with verification on backend, but following PC flow)
-        // Actually PC flow isVerifyOtp -> emit confirm -> parent calls deleteAccount.
-        // Wait, DeleteAccountModal PC calls emit('confirm'), parent ProfilePersonalInfo calls deleteAccount(). 
-        // Here we can call it directly or emit. Direct call is simpler for mobile page structure.
-        
+        // 2. Execute Delete
         const res = await authApi.deleteAccount()
         if (res.success) {
             ElMessage.success({ message: '账号已注销', offset: 100, customClass: 'mobile-message' })
@@ -157,7 +137,7 @@ const handleDelete = async () => {
     } catch (e: any) {
         ElMessage.error('注销失败')
     } finally {
-        loading.value = false
+        baseLoading.value = false
     }
 }
 </script>

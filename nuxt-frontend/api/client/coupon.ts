@@ -1,6 +1,18 @@
 import { getSupabaseClient } from '@/utils/supabase'
 import type { ApiResponse } from '@/types/api'
 
+export interface Coupon {
+    id: string
+    name: string
+    type: 'flat' | 'balance' | 'product'
+    value: number
+    min_usage: number
+    end_date: string | null
+    sku_ids?: string[]
+    product_ids?: string[]
+    extra?: any
+}
+
 export interface UserCoupon {
     id: string
     user_id: string
@@ -8,14 +20,7 @@ export interface UserCoupon {
     status: 'unused' | 'used' | 'expired'
     redeemed_at: string
     used_at: string | null
-    coupon: {
-        id: string
-        name: string
-        type: 'flat' | 'balance' | 'product'
-        value: number
-        min_usage: number
-        end_date: string | null
-    }
+    coupon: Coupon
 }
 
 /**
@@ -28,7 +33,7 @@ export const couponApi = {
     async getUserCoupons(): Promise<ApiResponse<UserCoupon[]>> {
         const client = getSupabaseClient()
         const { data: { user } } = await client.auth.getUser()
-        if (!user) return { code: 401, msg: '未登录', success: false }
+        if (!user) return { code: 401, msg: '未登录', success: false, data: [] }
 
         const { data, error } = await client
             .from('user_coupons')
@@ -39,7 +44,7 @@ export const couponApi = {
             .eq('user_id', user.id)
             .order('redeemed_at', { ascending: false })
 
-        if (error) return { code: 500, msg: error.message, success: false }
+        if (error) return { code: 500, msg: error.message, success: false, data: [] }
         return { code: 0, msg: 'success', data: data as any[], success: true }
     },
 
@@ -55,7 +60,7 @@ export const couponApi = {
         })
 
         if (error) {
-            return { code: 500, msg: error.message, success: false }
+            return { code: 500, msg: error.message, success: false, data: null }
         }
 
         // RPC 返回 jsonb 对象
@@ -70,7 +75,8 @@ export const couponApi = {
             return {
                 code: 400,
                 msg: data?.error || '兑换失败',
-                success: false
+                success: false,
+                data: null
             }
         }
     },
@@ -81,7 +87,7 @@ export const couponApi = {
     async useBalanceCoupon(userCouponId: string): Promise<ApiResponse<any>> {
         const client = getSupabaseClient()
         const { data: { user } } = await client.auth.getUser()
-        if (!user) return { code: 401, msg: '未登录', success: false }
+        if (!user) return { code: 401, msg: '未登录', success: false, data: null }
 
         // 1. 获取用户持有的记录并校验类型
         const { data: userCoupon, error: fetchUserCouponError } = await client
@@ -95,15 +101,15 @@ export const couponApi = {
             .single()
 
         if (fetchUserCouponError || !userCoupon) {
-            return { code: 400, msg: '优惠券不存在', success: false }
+            return { code: 400, msg: '优惠券不存在', success: false, data: null }
         }
 
         if (userCoupon.status !== 'unused') {
-            return { code: 400, msg: '优惠券已使用或已过期', success: false }
+            return { code: 400, msg: '优惠券已使用或已过期', success: false, data: null }
         }
 
         if (userCoupon.coupon.type !== 'balance') {
-            return { code: 400, msg: '该优惠券不是余额券', success: false }
+            return { code: 400, msg: '该优惠券不是余额券', success: false, data: null }
         }
 
         // 2. 更新逻辑 (生产环境必须使用数据库函数/事务)
@@ -123,7 +129,7 @@ export const couponApi = {
         })
 
         if (error) {
-            return { code: 500, msg: error.message, success: false }
+            return { code: 500, msg: error.message, success: false, data: null }
         }
 
         // RPC 返回 jsonb 对象，需要检查 data.success 字段
@@ -141,7 +147,8 @@ export const couponApi = {
             return {
                 code: 400,
                 msg: data?.error || '使用失败',
-                success: false
+                success: false,
+                data: null
             }
         }
     },
@@ -152,7 +159,7 @@ export const couponApi = {
     async deleteUserCoupon(userCouponId: string): Promise<ApiResponse<any>> {
         const client = getSupabaseClient()
         const { data: { user } } = await client.auth.getUser()
-        if (!user) return { code: 401, msg: '未登录', success: false }
+        if (!user) return { code: 401, msg: '未登录', success: false, data: null }
 
         // 仅允许删除属于该用户的记录
         const { error } = await client
@@ -162,9 +169,9 @@ export const couponApi = {
             .eq('user_id', user.id)
 
         if (error) {
-            return { code: 500, msg: error.message, success: false }
+            return { code: 500, msg: error.message, success: false, data: null }
         }
-        return { code: 0, msg: '删除成功', success: true }
+        return { code: 0, msg: '删除成功', success: true, data: null }
     },
 
     /**

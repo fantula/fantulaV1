@@ -47,7 +47,8 @@ export interface User {
 
 // 登录请求参数
 export interface LoginParams {
-  username: string
+  username?: string
+  email?: string
   password: string
   captcha?: string
   captchaKey?: string

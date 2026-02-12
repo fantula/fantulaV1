@@ -62,10 +62,8 @@ definePageMeta({
 
 import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useModalStore } from '@/stores/client/modal'
-import { commonApi } from '@/api/client/common'
-import { goodsApi } from '@/api/client/goods'
 import { preloadModalAssets } from '@/utils/modalAssetPreloader'
-import type { Banner, Goods, GoodsCategory } from '@/types/api'
+import { useHomeData } from '@/composables/client/useHomeData'
 
 // Components
 const AboutSection = defineAsyncComponent(() => import('@/components/pc/AboutSection.vue'))
@@ -76,7 +74,6 @@ const LoginRegisterModal = defineAsyncComponent(() => import('@/components/pc/mo
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
-const { getCache, setCache } = useSimpleCache()
 
 // 2. SEO配置 - 使用环境变量
 useHead({
@@ -91,152 +88,33 @@ useHead({
   ]
 })
 
-// 状态管理
-const banners = ref<Banner[]>([])
-const categories = ref<GoodsCategory[]>([])
-const currentGoods = ref<Goods[]>([])
-const activeCategoryId = ref<string | number>('')
-const goodsLoading = ref(false)
+// 3. 核心业务逻辑 (使用共享 Composable)
+const {
+  banners,
+  categories,
+  currentGoods,
+  activeCategoryId,
+  goodsLoading,
+  isLoadingMore,
+  hasMore,
+  initData,
+  handleCategoryChange: _handleCategoryChange,
+  loadMore
+} = useHomeData()
 
-
-// 分页状态
-const currentPage = ref(1)
-const hasMore = ref(true)
-const isLoadingMore = ref(false)
-const PAGE_SIZE = 10 
-
-// ========================================
-// 数据获取函数（带缓存）
-// ========================================
-
-// 获取轮播图数据 (保持不变)
-const fetchBanners = async () => {
-  const cached = getCache<Banner[]>('home_banners')
-  if (cached) banners.value = cached
-  try {
-    const res = await commonApi.getBannerList()
-    if (res?.success && res.data) {
-      banners.value = res.data
-      setCache('home_banners', res.data)
-    }
-  } catch (error) { /* handle error */ }
-}
-
-// 获取分类数据 (保持不变)
-const fetchCategories = async (): Promise<string | number | null> => {
-  const cached = getCache<GoodsCategory[]>('home_categories')
-  if (cached && cached.length > 0) {
-    categories.value = cached
-    return cached[0].id
-  }
-  try {
-    const res = await goodsApi.getCategories()
-    if (res?.success && res.data && res.data.length > 0) {
-      categories.value = res.data
-      setCache('home_categories', res.data)
-      return res.data[0].id
-    }
-  } catch (error) { /* handle error */ }
-  return null
-}
-
-// 核心：获取商品列表 (支持分页)
-// isLoadMore: true 表示追加数据，false 表示重置列表
-const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
-  if (!categoryId) return
-  
-  if (isLoadMore) {
-    if (!hasMore.value || isLoadingMore.value) return
-    isLoadingMore.value = true
-  } else {
-    // Mature Logic: Do NOT clear currentGoods immediately if we want to support smooth transition,
-    // OR clear it to show Skeleton. 
-    // New Strategy: "Skeleton Switch"
-    // We clear currentGoods so the UI switches to the Skeleton State immediately.
-    goodsLoading.value = true
-    currentPage.value = 1
-    hasMore.value = true
-    currentGoods.value = [] 
-  }
-
-  try {
-    const res = await goodsApi.getGoodsList({ 
-      categoryId: categoryId,
-      page: currentPage.value, 
-      limit: PAGE_SIZE 
-    })
-    
-
-
-    const newList = res?.success && res.data?.list ? res.data.list : []
-    
-    if (isLoadMore) {
-      currentGoods.value = [...currentGoods.value, ...newList]
-    } else {
-      currentGoods.value = newList
-    }
-
-    if (newList.length < PAGE_SIZE) {
-      hasMore.value = false
-    } else {
-      currentPage.value++ 
-      hasMore.value = true
-    }
-
-  } catch (error) {
-    if (!isLoadMore) currentGoods.value = []
-  } finally {
-    goodsLoading.value = false
-    isLoadingMore.value = false
-  }
-}
-
-// 滚动加载触发器
-const loadMore = () => {
-  fetchGoods(activeCategoryId.value, true)
-}
-
-// 初始化数据 - 优化版：缓存优先 + 并行获取 + 后台刷新
-const initData = async () => {
-  // 第一批：并行获取轮播图和分类（有缓存则立即显示）
-  const [_, firstCategoryId] = await Promise.all([
-    fetchBanners(),
-    fetchCategories()
-  ])
-  
-  // 优先从 URL 获取分类 ID
-  const queryCategoryId = route.query.category_id
-  let targetId = queryCategoryId ? String(queryCategoryId) : firstCategoryId
-
-  // 如果 URL 有参数但不在分类列表中（或者列表为空），回退到第一个
-  if (queryCategoryId && categories.value.length > 0) {
-    const exists = categories.value.find(c => String(c.id) === String(queryCategoryId))
-    if (!exists && firstCategoryId) targetId = firstCategoryId
-  }
-
-  if (targetId) {
-    activeCategoryId.value = targetId
-    await fetchGoods(targetId)
-  }
-}
-
-// 分类切换处理
+// 包装 CategoryChange 以同步 URL
 const handleCategoryChange = async (categoryId: string | number) => {
-  activeCategoryId.value = categoryId
-  
-  // Sync URL
+  await _handleCategoryChange(categoryId)
   router.replace({ query: { ...route.query, category_id: categoryId } })
-  await fetchGoods(categoryId)
 }
 
 onMounted(() => {
   // 预加载弹窗素材（消除闪烁）
   preloadModalAssets()
-  // 初始化页面数据
-  initData()
+  // 初始化页面数据 (传入 URL 中的 classify_id)
+  const queryCategoryId = route.query.category_id ? String(route.query.category_id) : undefined
+  initData(queryCategoryId)
 })
-
-
 
 const modal = useModalStore()
 </script>

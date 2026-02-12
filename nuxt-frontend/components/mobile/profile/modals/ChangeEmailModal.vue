@@ -103,9 +103,7 @@ const userStore = useUserStore()
 
 // State
 const step = ref(1)
-const loading = ref(false)
-const countdown = ref(0)
-let timerInterval: any = null
+import { useSendCode } from '@/composables/client/useSendCode'
 
 const currentEmail = computed(() => userStore.user?.email)
 
@@ -133,26 +131,41 @@ watch(() => props.visible, (val) => {
     oldCode.value = ''
     form.email = ''
     form.code = ''
-    countdown.value = 0
-    if(timerInterval) clearInterval(timerInterval)
+    // countdown.value = 0 // handled by composable
+    // if(timerInterval) clearInterval(timerInterval)
   }
 })
 
-onUnmounted(() => {
-    if (timerInterval) clearInterval(timerInterval)
+const { 
+  loading: oldLoading, 
+  countdown: oldCountdown, 
+  sendCode: sendOldOtp,
+  checkTimer: checkOldTimer 
+} = useSendCode({ timerKey: 'otp_security_timer' })
+
+const { 
+  loading: newLoading, 
+  countdown: newCountdown, 
+  sendCode: sendNewOtp,
+  checkTimer: checkNewTimer 
+} = useSendCode({ timerKey: 'otp_bind_new_timer_end' })
+
+// Move Watcher Logic here to ensure variables are defined
+watch(() => props.visible, (val) => {
+  if (val) {
+     checkOldTimer()
+     checkNewTimer()
+  }
 })
 
-// Timer Logic
-const startTimer = (seconds: number) => {
-    countdown.value = seconds
-    if (timerInterval) clearInterval(timerInterval)
-    timerInterval = setInterval(() => {
-        countdown.value--
-        if (countdown.value <= 0) {
-            clearInterval(timerInterval)
-        }
-    }, 1000)
-}
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || oldLoading.value || newLoading.value)
+const countdown = computed(() => step.value === 1 ? oldCountdown.value : newCountdown.value)
+
+// Remove old timer logic variables
+// const loading = ref(false) // Removed
+// const countdown = ref(0) // Removed (replaced by computed)
+// let timerInterval: any = null // Removed
 
 // Handlers
 const handleClose = () => {
@@ -161,83 +174,58 @@ const handleClose = () => {
 
 // 1. Send Old Code
 const sendOldCode = async () => {
-    if (!currentEmail.value) return
-    if (countdown.value > 0) return
-
-    loading.value = true
-    try {
-        const res = await authApi.sendOtp(currentEmail.value)
-        if (res.success) {
-            ElMessage.success({ message: '验证码已发送', offset: 100, customClass: 'mobile-message' })
-            startTimer(300)
-        } else {
-            ElMessage.error(res.msg || '发送失败')
-        }
-    } catch (e: any) {
-        ElMessage.error('发送异常')
-    } finally {
-        loading.value = false
-    }
+    await sendOldOtp(currentEmail.value || '')
 }
 
 // 2. Verify Old Email
 const verifyOldEmail = async () => {
     if (!currentEmail.value || !oldCode.value) return
     
-    loading.value = true
+    baseLoading.value = true
     try {
         const res = await authApi.verifyOtp(currentEmail.value, oldCode.value)
         if (res.success) {
             ElMessage.success({ message: '验证通过', offset: 100, customClass: 'mobile-message' })
             step.value = 2
-            // Reset timer for step 2? Usually separate. Let's clear logic to allow new send.
-            if(timerInterval) clearInterval(timerInterval)
-            countdown.value = 0
+            // No need to manually reset timer, they are independent
         } else {
             ElMessage.error(res.msg || '验证码错误')
         }
     } catch (e: any) {
         ElMessage.error('验证失败')
     } finally {
-        loading.value = false
+        baseLoading.value = false
     }
 }
 
 // 3. Send New Code
 const sendNewCode = async () => {
+    // Check availability logic can remain or move inside sendOtp if supported. 
+    // For now, keep pre-check here as it's specific business logic before sending code.
     if (!isEmailValid.value) return
-    if (countdown.value > 0) return
+    // if (countdown.value > 0) return // Handled by useSendCode
 
-    // Check availability
+    baseLoading.value = true
     try {
         const checkRes = await authApi.checkEmailAvailable(form.email)
         if (!checkRes.success) {
              ElMessage.error({ message: '该邮箱已被注册', offset: 100, customClass: 'mobile-message' })
              return
         }
-    } catch (e) {}
-
-    loading.value = true
-    try {
-        const res = await authApi.sendOtp(form.email)
-        if (res.success) {
-            ElMessage.success({ message: '验证码已发至新邮箱', offset: 100, customClass: 'mobile-message' })
-            startTimer(300)
-        } else {
-            ElMessage.error(res.msg || '发送失败')
-        }
-    } catch (e: any) {
-        ElMessage.error('发送异常')
+    } catch (e) {
+        return // Stop if check failed
     } finally {
-        loading.value = false
+        baseLoading.value = false
     }
+
+    await sendNewOtp(form.email)
 }
 
 // 4. Confirm Binding
 const handleConfirm = async () => {
     if (!canSubmit.value) return
 
-    loading.value = true
+    baseLoading.value = true
     try {
         // Verify New Email Logic First? Or direct update with verify?
         // PC logic: verifyOtp(newEmail, code) THEN updateEmail(newEmail)
@@ -245,7 +233,6 @@ const handleConfirm = async () => {
         const verifyRes = await authApi.verifyOtp(form.email, form.code)
         if (!verifyRes.success) {
             ElMessage.error(verifyRes.msg || '验证码错误')
-            loading.value = false
             return
         }
 
@@ -260,7 +247,7 @@ const handleConfirm = async () => {
     } catch (e: any) {
         ElMessage.error(e.message || '操作失败')
     } finally {
-        loading.value = false
+        baseLoading.value = false
     }
 }
 </script>

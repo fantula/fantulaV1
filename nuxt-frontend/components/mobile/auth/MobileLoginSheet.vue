@@ -94,7 +94,7 @@
                      <input type="text" v-model="registerForm.code" placeholder="验证码" required />
                      <SendCodeButton 
                         :loading="loading" 
-                        :countdown="codeTimer" 
+                        :countdown="registerCodeTimer" 
                         @click="sendCode('register')" 
                      />
                   </div>
@@ -151,60 +151,49 @@ const emit = defineEmits(['close'])
 
 const mode = ref<'login' | 'register'>('login')
 const loginType = ref<'password' | 'code'>('code')
-const loading = ref(false)
-
 // Forms
 const loginForm = ref({ email: '', password: '', remember: false, agree: false })
 const loginCodeForm = ref({ email: '', code: '', remember: false, agree: false })
 const registerForm = ref({ email: '', code: '', password: '', inviteId: '', agree: false })
 
-// Timer Logic
-const codeTimer = ref(0)
-let codeInterval: any = null
-const COOLDOWN = 60
-const TIMER_KEY = 'mobile_auth_timer'
+// Initialize shared composables
+import { useSendCode } from '@/composables/client/useSendCode'
+
+// 1. Login with Code Timer
+const { 
+  loading: loginCodeLoading, 
+  countdown: codeTimer, 
+  sendCode: sendLoginCode 
+} = useSendCode({ timerKey: 'otp_timer_end' }) // Shared with PC
+
+// 2. Register Code Timer
+const { 
+  loading: registerCodeLoading, 
+  countdown: registerCodeTimer, 
+  sendCode: sendRegisterCode 
+} = useSendCode({ timerKey: 'otp_register_timer_end' }) // Shared with PC
+
+// Unified loading state
+const baseLoading = ref(false)
+const loading = computed(() => 
+  baseLoading.value || 
+  loginCodeLoading.value || 
+  registerCodeLoading.value
+)
 
 const close = () => emit('close')
 
 const restoreTimer = () => {
-    const end = localStorage.getItem(TIMER_KEY)
-    if (end) {
-        const left = Math.ceil((parseInt(end) - Date.now()) / 1000)
-        if (left > 0) startTimer(left, false)
-        else localStorage.removeItem(TIMER_KEY)
-    }
+    // Timers are restored automatically by useSendCode
 }
-
-const startTimer = (seconds: number, fresh = true) => {
-    codeTimer.value = seconds
-    if (fresh) localStorage.setItem(TIMER_KEY, (Date.now() + seconds * 1000).toString())
-    if (codeInterval) clearInterval(codeInterval)
-    codeInterval = setInterval(() => {
-        codeTimer.value--
-        if (codeTimer.value <= 0) {
-            clearInterval(codeInterval)
-            localStorage.removeItem(TIMER_KEY)
-        }
-    }, 1000)
-}
-
-onMounted(() => restoreTimer())
 
 // Actions
 const sendCode = async (type: 'login' | 'register') => {
-    if (codeTimer.value > 0) return
-    const email = type === 'register' ? registerForm.value.email : loginCodeForm.value.email
-    if (!email) return ElMessage.warning('请输入邮箱')
-    
-    loading.value = true
-    try {
-        const res = await authApi.getEmailCode(email)
-        if (res.success) {
-            ElMessage.success('发送成功')
-            startTimer(COOLDOWN)
-        } else ElMessage.error(res.msg || '发送失败')
-    } catch(e) { ElMessage.error('网络错误') }
-    finally { loading.value = false }
+    if (type === 'login') {
+        await sendLoginCode(loginCodeForm.value.email)
+    } else {
+        await sendRegisterCode(registerForm.value.email)
+    }
 }
 
 const handleSuccess = async (data: any) => {
@@ -217,38 +206,35 @@ const handleSuccess = async (data: any) => {
 
 const onLogin = async () => {
     if (!loginForm.value.agree) return ElMessage.warning('请同意协议')
-    loading.value = true
+    baseLoading.value = true
     try {
-        const res = await authApi.login({
-           username: loginForm.value.email,
-           password: loginForm.value.password
-        })
+        const res = await authApi.login(loginForm.value)
         if (res.success) await handleSuccess(res.data)
         else ElMessage.error(res.msg || '登录失败')
-    } catch(e) { ElMessage.error('登录异常') }
-    finally { loading.value = false }
+    } catch(e: any) { ElMessage.error(e.message || '登录异常') }
+    finally { baseLoading.value = false }
 }
 
 const onLoginCode = async () => {
     if (!loginCodeForm.value.agree) return ElMessage.warning('请同意协议')
-    loading.value = true
+    baseLoading.value = true
     try {
         const res = await authApi.loginWithCode(loginCodeForm.value)
         if (res.success) await handleSuccess(res.data)
         else ElMessage.error(res.msg || '登录失败')
-    } catch(e) { ElMessage.error('登录异常') }
-    finally { loading.value = false }
+    } catch(e: any) { ElMessage.error(e.message || '登录异常') }
+    finally { baseLoading.value = false }
 }
 
 const onRegister = async () => {
     if (!registerForm.value.agree) return ElMessage.warning('请同意协议')
-    loading.value = true
+    baseLoading.value = true
     try {
         const res = await authApi.registerWithCodeAndPassword(registerForm.value)
         if (res.success) await handleSuccess(res.data)
         else ElMessage.error(res.msg || '注册失败')
-    } catch(e) { ElMessage.error('注册异常') }
-    finally { loading.value = false }
+    } catch(e: any) { ElMessage.error(e.message || '注册异常') }
+    finally { baseLoading.value = false }
 }
 
 const oauth = (provider: string) => {

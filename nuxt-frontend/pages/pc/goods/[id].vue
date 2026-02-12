@@ -229,7 +229,7 @@ const {
   detailModules,
   allowAddon,
   faqs,
-  pending, // Use pending
+  pending,
   formatPrice,
   handleSpecSelect,
   buyNow,
@@ -238,7 +238,7 @@ const {
   toggleFavorite,
   initClientState,
   modal
-} = await useProductDetail()
+} = useProductDetail()
 
 // 动画 composable
 import { useCartAnimation } from '@/composables/client/useCartAnimation'

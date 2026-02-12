@@ -81,10 +81,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import { Close, InfoFilled, Refresh, Loading } from '@element-plus/icons-vue'
-import { couponApi, type UserCoupon } from '@/api/client/coupon'
+import { type UserCoupon } from '@/api/client/coupon'
 import MobileCouponTicket from '@/components/mobile/redemption/MobileCouponTicket.vue'
+import { useCouponList } from '@/composables/client/useCouponList'
 
 const props = defineProps<{
   modelValue: boolean
@@ -101,9 +102,21 @@ const visible = computed({
   set: (val) => emit('update:modelValue', val)
 })
 
-const listLoading = ref(false)
-const coupons = ref<UserCoupon[]>([])
 const tempSelected = ref<UserCoupon | null>(null)
+
+// --- Shared Logic ---
+const { 
+    loading: listLoading, 
+    coupons,
+    sortedCoupons,
+    loadCoupons,
+    isApplicable,
+    getInapplicableReason
+} = useCouponList(
+    toRef(props, 'orderAmount'),
+    toRef(props, 'skuIds'),
+    toRef(props, 'productIds')
+)
 
 watch(() => props.modelValue, (val) => {
   if (val) {
@@ -111,67 +124,16 @@ watch(() => props.modelValue, (val) => {
   }
 })
 
-const sortedCoupons = computed(() => {
-  return [...coupons.value].sort((a, b) => {
-    const aValid = isApplicable(a)
-    const bValid = isApplicable(b)
-    if (aValid && !bValid) return -1
-    if (!aValid && bValid) return 1
-    return b.coupon.value - a.coupon.value
-  })
-})
-
-const loadCoupons = async () => {
-  listLoading.value = true
-  try {
-    const res = await couponApi.getUserCoupons()
-    if (res.success && res.data) {
-      const now = new Date()
-      coupons.value = res.data.filter(c => 
-        c.status === 'unused' && 
-        c.coupon.type !== 'balance' &&
-        (!c.coupon.end_date || new Date(c.coupon.end_date) >= now)
-      )
-      
-      if (props.currentCouponId) {
-        tempSelected.value = coupons.value.find(c => c.id === props.currentCouponId) || null
-      } else {
-        tempSelected.value = null
-      }
+// Sync tempSelected logic
+watch(sortedCoupons, (list) => {
+    if (visible.value && list.length > 0) {
+         if (props.currentCouponId) {
+            tempSelected.value = list.find(c => c.id === props.currentCouponId) || null
+         } else {
+            tempSelected.value = null
+         }
     }
-  } catch (e) {
-    // console.error('Failed to load coupons', e)
-  } finally {
-    listLoading.value = false
-  }
-}
-
-const isApplicable = (coupon: UserCoupon) => {
-  const c = coupon.coupon
-  if (props.orderAmount < c.min_usage) return false
-  
-  if (c.type === 'product') {
-     const cAny = c as any
-     if (cAny.sku_ids && cAny.sku_ids.length > 0) {
-        const hasCommonSku = props.skuIds.some(sid => cAny.sku_ids.includes(sid))
-        if (!hasCommonSku) return false
-     } else if (cAny.product_ids && cAny.product_ids.length > 0) {
-        const hasCommonProduct = props.productIds.some(pid => cAny.product_ids?.includes(pid))
-        if (!hasCommonProduct) return false
-     }
-  }
-  return true
-}
-
-const getInapplicableReason = (coupon: UserCoupon) => {
-  if (props.orderAmount < coupon.coupon.min_usage) {
-    return `还差 ¥${(coupon.coupon.min_usage - props.orderAmount).toFixed(2)}`
-  }
-  if (coupon.coupon.type === 'product') {
-    return '该商品不可用'
-  }
-  return '不可用'
-}
+})
 
 const handleItemClick = (coupon: UserCoupon) => {
   if (!isApplicable(coupon)) return

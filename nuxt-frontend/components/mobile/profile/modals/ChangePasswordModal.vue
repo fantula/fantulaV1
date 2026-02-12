@@ -84,9 +84,10 @@ const props = defineProps<{
 const emit = defineEmits(['close', 'success'])
 const userStore = useUserStore()
 
-const loading = ref(false)
-const countdown = ref(0)
-let timerInterval: any = null
+import { useSendCode } from '@/composables/client/useSendCode'
+
+
+
 
 const form = reactive({
   code: '',
@@ -105,54 +106,35 @@ watch(() => props.visible, (val) => {
         form.code = ''
         form.newPassword = ''
         form.confirmPassword = ''
+        checkTimer() // Sync timer
     }
 })
 
-const startTimer = (seconds: number) => {
-    countdown.value = seconds
-    if (timerInterval) clearInterval(timerInterval)
-    timerInterval = setInterval(() => {
-        countdown.value--
-        if (countdown.value <= 0) {
-            clearInterval(timerInterval)
-        }
-    }, 1000)
-}
+const { 
+  loading: codeLoading, 
+  countdown, 
+  sendCode: sendOtp,
+  checkTimer 
+} = useSendCode({ timerKey: 'otp_security_timer' })
 
-onUnmounted(() => {
-    if (timerInterval) clearInterval(timerInterval)
-})
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || codeLoading.value)
 
 const sendCode = async () => {
-    if (!userStore.user?.email) return
-    if (countdown.value > 0) return
-
-    loading.value = true
-    try {
-        const res = await authApi.sendOtp(userStore.user.email)
-        if (res.success) {
-            ElMessage.success({ message: '验证码已发送', offset: 100, customClass: 'mobile-message' })
-            startTimer(300) 
-        } else {
-            ElMessage.error(res.msg || '发送失败')
-        }
-    } catch (e: any) {
-        ElMessage.error('发送验证码异常')
-    } finally {
-        loading.value = false
-    }
+  await sendOtp(userStore.user?.email || '')
 }
 
 const handleConfirm = async () => {
     if (!canSubmit.value || !userStore.user?.email) return
 
-    loading.value = true
+    // loading.value = true // Removed deprecated
+    
+    baseLoading.value = true
     try {
         // 1. Verify OTP
         const verifyRes = await authApi.verifyOtp(userStore.user.email, form.code)
         if (!verifyRes.success) {
             ElMessage.error(verifyRes.msg || '验证码错误')
-            loading.value = false
             return
         }
 
@@ -167,7 +149,7 @@ const handleConfirm = async () => {
     } catch (e: any) {
         ElMessage.error(e.message || '操作失败')
     } finally {
-        loading.value = false
+        baseLoading.value = false
     }
 }
 </script>

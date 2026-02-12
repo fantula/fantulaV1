@@ -80,12 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { authApi } from '@/api/client/auth'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 import BaseButton from '@/components/shared/BaseButton.vue'
+import { useSendCode } from '@/composables/client/useSendCode'
 
 const props = defineProps<{
   visible: boolean
@@ -98,13 +99,29 @@ const emit = defineEmits<{
   (e: 'success', email: string): void
 }>()
 
-const step = ref(1)
-const loading = ref(false)
-const countdown = ref(0)
-let timerInterval: any = null
 
-const TIMER_KEY = 'otp_bind_email_timer_end'
-const COOLDOWN_SECONDS = 300
+
+
+const step = ref(1)
+
+// 1. Old Email Timer
+const { 
+  loading: oldLoading, 
+  countdown: oldCountdown, 
+  sendCode: sendOldOtp,
+  checkTimer 
+} = useSendCode({ timerKey: 'otp_security_timer' })
+
+// 2. New Email Timer
+const { 
+  loading: newLoading, 
+  countdown: newCountdown, 
+  sendCode: sendNewOtp 
+} = useSendCode({ timerKey: 'otp_bind_new_timer_end' })
+
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || oldLoading.value || newLoading.value)
+const countdown = computed(() => step.value === 1 ? oldCountdown.value : newCountdown.value)
 
 // 旧邮箱验证码
 const oldCode = ref('')
@@ -124,54 +141,15 @@ const canSubmit = computed(() => {
   return isEmailValid.value && form.code.length >= 4
 })
 
-const startTimer = (seconds: number, isNew = true) => {
-  countdown.value = seconds
-  if (isNew) {
-    const endTime = Date.now() + seconds * 1000
-    localStorage.setItem(TIMER_KEY, endTime.toString())
-  }
-
-  if (timerInterval) clearInterval(timerInterval)
-  timerInterval = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      clearInterval(timerInterval)
-      localStorage.removeItem(TIMER_KEY)
-    }
-  }, 1000)
-}
-
-const restoreTimer = () => {
-  const endTimeStr = localStorage.getItem(TIMER_KEY)
-  if (endTimeStr) {
-    const endTime = parseInt(endTimeStr, 10)
-    const now = Date.now()
-    if (endTime > now) {
-      const remaining = Math.ceil((endTime - now) / 1000)
-      startTimer(remaining, false)
-    } else {
-      localStorage.removeItem(TIMER_KEY)
-    }
-  }
-}
-
 watch(() => props.visible, (val) => {
   if (val) {
     step.value = props.currentEmail ? 1 : 2
     oldCode.value = ''
     form.email = ''
     form.code = ''
-    restoreTimer()
-  } else {
-    // Clear timer on close if desired, BUT user asked for standard logic like DeleteAccount
-    // DeleteAccount maintains timer even if closed? 
-    // Usually persistence means it survives close/refresh.
-    // So we DON'T clear it here.
+    checkTimer() // Sync timer
   }
 })
-
-onMounted(() => { restoreTimer() })
-onUnmounted(() => { if (timerInterval) clearInterval(timerInterval) })
 
 const handleClose = () => {
   emit('update:visible', false)
@@ -181,61 +159,31 @@ const handleClose = () => {
 // 发送旧邮箱验证码
 const sendOldCode = async () => {
   if (!props.currentEmail) return
-  if (countdown.value > 0) return
-
-  loading.value = true
-  try {
-    const res = await authApi.sendOtp(props.currentEmail)
-    if (res.success) {
-      ElMessage.success('验证码已发送到当前邮箱')
-      startTimer(COOLDOWN_SECONDS)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e: any) {
-    ElMessage.error(e.message || '发送失败')
-  } finally {
-    loading.value = false
-  }
+  await sendOldOtp(props.currentEmail)
 }
 
 // 验证旧邮箱
 const verifyOldEmail = async () => {
   if (!props.currentEmail || !oldCode.value) return
-  loading.value = true
+  baseLoading.value = true
   try {
     const res = await authApi.verifyOtp(props.currentEmail, oldCode.value)
     if (res.success) {
       ElMessage.success('当前邮箱验证通过')
       step.value = 2
-      // Reset logic for step 2? 
-      // Usually verification codes are separate. 
-      // If we use the SAME timer for both steps, it's confusing.
-      // But typically "Send Code" is one global throttling action.
-      // Let's assume the timer applies to ANY code sending action for this modal context.
-      // Or we should clear it? 
-      // If step 2 requires sending a NEW code to NEW email, we should probably allow it?
-      // Logic: Changing target email usually resets throttle or has separate throttle.
-      // For simplicity and user request "like DeleteAccount", let's keep it shared or reset if logical.
-      // Step 2 needs code for NEW email. 
-      // Let's reset timer for Step 2 so user can send code to new email immediately.
-      clearInterval(timerInterval)
-      localStorage.removeItem(TIMER_KEY)
-      countdown.value = 0
     } else {
       ElMessage.error(res.msg || '验证码错误')
     }
   } catch (e: any) {
     ElMessage.error(e.message || '验证失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 
 // 发送新邮箱验证码
 const sendNewCode = async () => {
   if (!isEmailValid.value) return
-  if (countdown.value > 0) return
   
   // 检查邮箱是否已被占用
   try {
@@ -248,33 +196,19 @@ const sendNewCode = async () => {
     // ignore
   }
 
-  loading.value = true
-  try {
-    const res = await authApi.sendOtp(form.email)
-    if (res.success) {
-      ElMessage.success('验证码已发送到新邮箱')
-      startTimer(COOLDOWN_SECONDS)
-    } else {
-      ElMessage.error(res.msg || '发送失败')
-    }
-  } catch (e: any) {
-    ElMessage.error(e.message || '发送失败')
-  } finally {
-    loading.value = false
-  }
+  await sendNewOtp(form.email)
 }
 
 // 最终提交：验证新邮箱并换绑
 const handleConfirm = async () => {
   if (!canSubmit.value) return
   
-  loading.value = true
+  baseLoading.value = true
   try {
     // 1. Verify new email OTP
     const verifyRes = await authApi.verifyOtp(form.email, form.code)
     if (!verifyRes.success) {
       ElMessage.error(verifyRes.msg || '验证码错误')
-      loading.value = false
       return
     }
 
@@ -290,7 +224,7 @@ const handleConfirm = async () => {
   } catch (e: any) {
     ElMessage.error(e.message || '操作失败')
   } finally {
-    loading.value = false
+    baseLoading.value = false
   }
 }
 </script>
