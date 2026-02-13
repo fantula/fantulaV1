@@ -31,8 +31,8 @@ onMounted(() => {
   // 1. 设置初始 loading 状态
   startLoading('initial')
 
-  // 2. 最小展示时间 (缩短，让用户更快看到内容)
-  const minTimePromise = new Promise(resolve => setTimeout(resolve, 400))
+  // 2. 最小展示时间 (等待滚动动画完整播放 3.5s + 停留 0.5s)
+  const minTimePromise = new Promise(resolve => setTimeout(resolve, 4000))
   
   // 3. 实际资源加载完成
   const loadPromise = new Promise((resolve) => {
