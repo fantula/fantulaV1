@@ -103,12 +103,8 @@ export default defineNuxtConfig({
       // Supabase 公共配置
       supabaseUrl: process.env.SUPABASE_URL || '',
       supabaseAnonKey: process.env.SUPABASE_KEY || '',
-      // 🔒 安全修复：生产环境不暴露 Service Key
-      // 开发环境：Admin 面板可用（仅内部团队访问）
-      // 生产环境：完全不暴露（使用服务端 API）
-      supabaseServiceKey: process.env.NODE_ENV === 'production'
-        ? undefined
-        : (process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'),
+      // ⚠️ Admin 专用 (暴露 Service Role Key 给前端 Admin 面板，仅内部使用)
+      supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU',
       // 定时任务服务地址（通过服务端代理访问）
       schedulerUrl: '/api/admin/scheduler'
     }
