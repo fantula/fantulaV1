@@ -1,7 +1,8 @@
 import { defineEventHandler, readBody, createError } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
 import { u as useRuntimeConfig } from '../../../nitro/nitro.mjs';
-import { b as getWechatPayConfig, g as getSupabaseServiceClient } from '../../../_/wechat-pay.mjs';
+import { g as getSupabaseServiceClient } from '../../../_/supabase.mjs';
 import { a as generateBindToken } from '../../../_/wechat-login.mjs';
+import { getWechatPayConfig } from '../../../_/wechat-pay.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/destr/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/hookable/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ofetch/dist/node.mjs';

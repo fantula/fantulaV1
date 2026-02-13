@@ -146,7 +146,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 import EmailInput from '@/components/shared/EmailInput.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 import ForgotPasswordModal from '@/components/mobile/auth/ForgotPasswordModal.vue'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 
 const props = defineProps<{ visible: boolean }>()
@@ -159,6 +159,7 @@ const loginForm = ref({ email: '', password: '', remember: false, agree: false }
 const loginCodeForm = ref({ email: '', code: '', remember: false, agree: false })
 const registerForm = ref({ email: '', code: '', password: '', inviteId: '', agree: false })
 const showForgotDialog = ref(false)
+const { success, warning, error } = useNotify()
 
 // Initialize shared composables
 import { useSendCode } from '@/composables/client/useSendCode'
@@ -202,40 +203,40 @@ const handleSuccess = async (data: any) => {
     const store = useUserStore()
     store.setUser(data.user, data.session?.access_token)
     await Promise.all([store.loadFavorites(), store.loadOrders()])
-    ElMessage.success('欢迎回来')
+    success('欢迎回来')
     close()
 }
 
 const onLogin = async () => {
-    if (!loginForm.value.agree) return ElMessage.warning('请同意协议')
+    if (!loginForm.value.agree) return warning('请同意协议')
     baseLoading.value = true
     try {
         const res = await authApi.login(loginForm.value)
         if (res.success) await handleSuccess(res.data)
-        else ElMessage.error(res.msg || '登录失败')
-    } catch(e: any) { ElMessage.error(e.message || '登录异常') }
+        else error(res.msg || '登录失败')
+    } catch(e: any) { error(e.message || '登录异常') }
     finally { baseLoading.value = false }
 }
 
 const onLoginCode = async () => {
-    if (!loginCodeForm.value.agree) return ElMessage.warning('请同意协议')
+    if (!loginCodeForm.value.agree) return warning('请同意协议')
     baseLoading.value = true
     try {
         const res = await authApi.loginWithCode(loginCodeForm.value)
         if (res.success) await handleSuccess(res.data)
-        else ElMessage.error(res.msg || '登录失败')
-    } catch(e: any) { ElMessage.error(e.message || '登录异常') }
+        else error(res.msg || '登录失败')
+    } catch(e: any) { error(e.message || '登录异常') }
     finally { baseLoading.value = false }
 }
 
 const onRegister = async () => {
-    if (!registerForm.value.agree) return ElMessage.warning('请同意协议')
+    if (!registerForm.value.agree) return warning('请同意协议')
     baseLoading.value = true
     try {
         const res = await authApi.registerWithCodeAndPassword(registerForm.value)
         if (res.success) await handleSuccess(res.data)
-        else ElMessage.error(res.msg || '注册失败')
-    } catch(e: any) { ElMessage.error(e.message || '注册异常') }
+        else error(res.msg || '注册失败')
+    } catch(e: any) { error(e.message || '注册异常') }
     finally { baseLoading.value = false }
 }
 
@@ -250,7 +251,7 @@ const onWechatLogin = () => {
     const isWechat = /MicroMessenger/i.test(navigator.userAgent)
     
     if (!isWechat) {
-        ElMessage.warning('请在微信内打开此页面使用微信登录')
+        warning('请在微信内打开此页面使用微信登录')
         return
     }
     

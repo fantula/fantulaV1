@@ -174,7 +174,6 @@ import {
 } from '@element-plus/icons-vue'
 import { useCheckout } from '@/composables/client/useCheckout'
 import { clientFaqApi, type ClientFaq } from '@/api/client/help-center'
-import { ElMessage } from 'element-plus'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 // Lazy Load Heavy Components

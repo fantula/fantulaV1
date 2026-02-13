@@ -103,7 +103,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { wechatPayApi } from '@/api/client/wechat-payment'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import { useUserStore } from '@/stores/client/user'
 
 const props = defineProps<{
@@ -112,6 +112,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'success'])
 const userStore = useUserStore()
+const { success, warning, error, info } = useNotify()
 
 interface RechargeOption {
   value: number
@@ -251,7 +252,7 @@ function invokeWechatPay(params: {
   return new Promise<boolean>((resolve) => {
     // 检查 WeixinJSBridge 是否可用
     if (typeof WeixinJSBridge === 'undefined') {
-      ElMessage.error('请在微信浏览器中使用')
+      error('请在微信浏览器中使用')
       resolve(false)
       return
     }
@@ -270,10 +271,10 @@ function invokeWechatPay(params: {
         if (res.err_msg === 'get_brand_wcpay_request:ok') {
           resolve(true)
         } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
-          ElMessage.warning('已取消支付')
+          warning('已取消支付')
           resolve(false)
         } else {
-          ElMessage.error('支付失败')
+          error('支付失败')
           resolve(false)
         }
       }
@@ -285,7 +286,7 @@ const handleRecharge = async () => {
     if (!isValidAmount.value || loading.value) return 
     
     if (!isWechatBrowser.value) {
-      ElMessage.warning('请在微信中打开本页面')
+      warning('请在微信中打开本页面')
       return
     }
     
@@ -297,7 +298,7 @@ const handleRecharge = async () => {
         
         if (!openid) {
           // 需要授权获取 OpenID
-          ElMessage.info('正在跳转微信授权...')
+          info('正在跳转微信授权...')
           redirectToWechatAuth()
           return
         }
@@ -311,7 +312,7 @@ const handleRecharge = async () => {
         )
         
         if (!res.success || !res.data) {
-          ElMessage.error(res.error || '支付发起失败')
+          error(res.error || '支付发起失败')
           return
         }
         
@@ -326,7 +327,7 @@ const handleRecharge = async () => {
         })
         
         if (paySuccess) {
-          ElMessage.success('充值成功！')
+          success('充值成功！')
           
           // 刷新用户余额
           await userStore.fetchUserInfo()
@@ -336,7 +337,7 @@ const handleRecharge = async () => {
         }
         
     } catch (e: any) {
-        ElMessage.error(e.message || '支付失败')
+        error(e.message || '支付失败')
     } finally {
         loading.value = false
     }

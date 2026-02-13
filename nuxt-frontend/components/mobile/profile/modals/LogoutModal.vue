@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="handleClose">
-    <div class="modal-content">
+    <div class="modal-content aurora-modal-panel">
       <div class="modal-header">
         <h3 class="modal-title text-danger">退出登录</h3>
         <button class="close-btn" @click="handleClose">
@@ -52,20 +52,12 @@ const handleConfirm = () => {
     padding: 20px;
 }
 
+/* Global Aurora Modal */
 .modal-content {
-    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.85));
-    width: 100%; max-width: 320px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.15), 0 10px 40px rgba(0,0,0,0.5);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(20px);
+    /* Styles handled by .aurora-modal-panel */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 

@@ -1,18 +1,26 @@
 <template>
   <div class="category-scroll-wrapper">
     <div class="category-scroll no-scrollbar" ref="scrollContainer">
-      <div 
-        v-for="cat in categories" 
-        :key="cat.id" 
-        class="category-pill"
-        :class="{ 
-          active: modelValue === cat.id,
-          'active-glow-border': modelValue === cat.id
-        }"
-        @click="handleCategoryClick(cat.id)"
-      >
-        <span class="pill-text">{{ cat.name }}</span>
-      </div>
+      <!-- Loading Skeleton -->
+      <template v-if="loading">
+        <div class="category-pill skeleton-pill" v-for="i in 5" :key="`skel-${i}`"></div>
+      </template>
+
+      <!-- Real Content -->
+      <template v-else>
+        <div 
+            v-for="cat in categories" 
+            :key="cat.id" 
+            class="category-pill"
+            :class="{ 
+            active: modelValue === cat.id,
+            'active-glow-border': modelValue === cat.id
+            }"
+            @click="handleCategoryClick(cat.id)"
+        >
+            <span class="pill-text">{{ cat.name }}</span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -24,6 +32,7 @@ import type { GoodsCategory } from '@/types/api'
 const props = defineProps<{
   categories: GoodsCategory[]
   modelValue: string | number
+  loading?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -105,5 +114,25 @@ watch(() => props.modelValue, () => {
 .pill-text {
   position: relative;
   z-index: 2;
+}
+
+.skeleton-pill {
+    width: 60px;
+    height: 36px; /* Matches padding + font size approx */
+    background: rgba(255, 255, 255, 0.05);
+    border-color: transparent;
+    animation: shimmer 1.5s infinite;
+    padding: 0; /* Reset padding for skeleton */
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.02) 25%, 
+        rgba(255,255,255,0.08) 50%, 
+        rgba(255,255,255,0.02) 75%
+    );
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

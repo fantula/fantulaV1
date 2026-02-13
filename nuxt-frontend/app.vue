@@ -2,12 +2,12 @@
   <!-- 顶部进度条 (导航时唯一的加载指示) -->
   <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="200" />
   
-  <!-- 全屏 Loader 只在首次加载且非移动端时显示 -->
+  <!-- 全屏 Loader (所有设备首次加载显示) -->
   <GlobalLoader 
-    v-if="!isMobile"
     :loading="isLoading && loadingVariant === 'initial'" 
     variant="initial" 
   />
+  <GlobalLoading />
   
   <NuxtLayout>
     <NuxtPage />

@@ -1,5 +1,5 @@
 import { d as defineEventHandler, c as createError } from '../../../nitro/nitro.mjs';
-import { g as getSupabaseServiceClient } from '../../../_/wechat-pay.mjs';
+import { g as getSupabaseServiceClient } from '../../../_/supabase.mjs';
 import { b as generateLoginScene, c as createParametricQrCode, d as getQrCodeImageUrl } from '../../../_/wechat-login.mjs';
 import 'node:http';
 import 'node:https';
@@ -11,6 +11,7 @@ import 'node:crypto';
 import 'node:url';
 import '@supabase/supabase-js';
 import 'crypto';
+import '../../../_/wechat-pay.mjs';
 
 const loginQrcode_get = defineEventHandler(async (event) => {
   try {

@@ -1,5 +1,5 @@
 import { defineEventHandler, getMethod, getQuery, readRawBody } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
-import { g as getSupabaseServiceClient } from '../../../_/wechat-pay.mjs';
+import { g as getSupabaseServiceClient } from '../../../_/supabase.mjs';
 import { p as parseWechatEventXml } from '../../../_/wechat-login.mjs';
 import '../../../nitro/nitro.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/destr/dist/index.mjs';
@@ -22,6 +22,7 @@ import 'node:fs';
 import 'node:url';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/pathe/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
+import '../../../_/wechat-pay.mjs';
 
 const eventCallback = defineEventHandler(async (event) => {
   const method = getMethod(event);

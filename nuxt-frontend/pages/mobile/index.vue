@@ -9,12 +9,17 @@
     <div class="content-scroll no-scrollbar" ref="scrollContainer" @scroll="handleScroll">
       
       <!-- 1. Banners -->
-      <HomeBanner :banners="banners" />
+      <!-- 1. Banners -->
+      <HomeBanner 
+        :banners="banners" 
+        :loading="bannerLoading"
+      />
 
     <!-- 2. Categories -->
       <HomeCategoryNav 
         :categories="categories"
         :model-value="activeCategoryId"
+        :loading="categoryLoading"
         @change="handleCategoryChange"
       />
 
@@ -135,6 +140,8 @@ const {
   categories, 
   currentGoods, 
   activeCategoryId,
+  bannerLoading,
+  categoryLoading,
   goodsLoading, 
   hasMore, 
   isLoadingMore,

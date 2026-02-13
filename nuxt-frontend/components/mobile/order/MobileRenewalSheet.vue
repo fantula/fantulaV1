@@ -2,7 +2,7 @@
   <Teleport to="body">
   <Transition name="fade">
   <div v-if="visible" class="sheet-mask" @click="handleClose">
-    <div class="sheet-panel-glass" @click.stop>
+    <div class="sheet-panel-glass aurora-sheet-panel" @click.stop>
        <div class="sheet-header">
           <div class="title">续费订单</div>
           <div class="close-btn" @click="handleClose"><el-icon><Close /></el-icon></div>
@@ -25,8 +25,8 @@
                 <div class="g-name">{{ group.name }}</div>
                 <div class="g-vals">
                    <div v-for="val in group.values" :key="val.value" 
-                        class="val-chip-glass"
-                        :class="{ active: selectedSpecs[group.name] === val.value }"
+                        class="val-chip-glass aurora-option-card"
+                        :class="{ 'active-blue': selectedSpecs[group.name] === val.value, active: selectedSpecs[group.name] === val.value }"
                         @click="handleSpec(group.name, val.value)"
                    >
                       {{ val.value }}
@@ -39,8 +39,8 @@
                  <div class="g-name">选择时长</div>
                  <div class="g-vals">
                      <div v-for="sku in skuList" :key="sku.sku_id"
-                          class="val-chip-glass"
-                          :class="{ active: selectedSkuId === sku.sku_id }"
+                          class="val-chip-glass aurora-option-card"
+                          :class="{ 'active': selectedSkuId === sku.sku_id, 'active-blue': selectedSkuId === sku.sku_id }"
                           @click="handleSku(sku.sku_id)"
                      >
                         {{ sku.duration }}天
@@ -55,7 +55,7 @@
              <div class="coupon-list">
                  <!-- No Coupon Option -->
                  <div 
-                    class="coupon-item-glass" 
+                    class="coupon-item-glass aurora-option-card" 
                     :class="{ active: !selectedCoupon }"
                     @click="handleCouponSelect(null)"
                  >
@@ -67,7 +67,7 @@
                  <div 
                    v-for="coupon in availableCoupons" 
                    :key="coupon.id" 
-                   class="coupon-item-glass"
+                   class="coupon-item-glass aurora-option-card"
                    :class="{ active: selectedCoupon?.id === coupon.id }"
                    @click="handleCouponSelect(coupon)"
                  >
@@ -93,7 +93,7 @@
                 <div v-if="discountAmount > 0" class="discount-tag">已省 ¥{{ discountAmount }}</div>
              </div>
           </div>
-          <button class="pay-btn-glow" :disabled="!selectedSkuId || paying" @click="handlePay">
+          <button class="aurora-btn-accent" :disabled="!selectedSkuId || paying" @click="handlePay">
              {{ paying ? '支付中...' : '立即续费' }}
           </button>
        </div>
@@ -109,7 +109,7 @@ import { Close, Clock, Select } from '@element-plus/icons-vue'
 import { clientOrderApi } from '@/api/client'
 import { couponApi } from '@/api/client/coupon'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
 const props = defineProps<{
@@ -119,6 +119,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(['update:modelValue', 'success'])
 const userStore = useUserStore()
+const { success, error } = useNotify()
 
 const visible = computed({
   get: () => props.modelValue,
@@ -256,7 +257,7 @@ const calculateDiscount = () => {
 const handlePay = async () => {
     if (!selectedSkuId.value) return
     if ((userStore.user?.balance || 0) < Number(finalAmount.value)) {
-        ElMessage.error('余额不足')
+        error('余额不足')
         return
     }
     paying.value = true
@@ -274,11 +275,11 @@ const handlePay = async () => {
         const confirm = await clientOrderApi.confirmPreOrder(preOrderId, 'balance')
         if (!confirm.success) throw new Error(confirm.error)
         
-        ElMessage.success('续费成功')
+        success('续费成功')
         emit('success', confirm.orderId)
         handleClose()
         window.location.reload()
-    } catch(e: any) { ElMessage.error(e.message) }
+    } catch(e: any) { error(e.message) }
     finally { paying.value = false }
 }
 
@@ -295,12 +296,9 @@ watch(originalAmount, () => fetchCoupons()) // Refresh coupons if price changes 
     display: flex; flex-direction: column; justify-content: flex-end;
 }
 .sheet-panel-glass {
-    background: rgba(15, 23, 42, 0.95);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-top-left-radius: 24px; border-top-right-radius: 24px;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 60px); /* Add extra padding for Nav bar */
+    /* Global Aurora */
+    padding-bottom: 0;
     max-height: 85vh; display: flex; flex-direction: column;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 .sheet-header { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
 .title { color: #fff; font-weight: 700; font-size: 16px; }
@@ -326,34 +324,24 @@ watch(originalAmount, () => fetchCoupons()) // Refresh coupons if price changes 
 .g-name { color: #CBD5E1; font-size: 13px; margin-bottom: 10px; font-weight: 500; }
 .g-vals { display: flex; flex-wrap: wrap; gap: 10px; }
 
-.val-chip-glass {
-    padding: 10px 16px; 
-    background: rgba(255,255,255,0.03); 
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; color: #94A3B8; font-size: 13px; font-weight: 500;
-    transition: all 0.2s; min-width: 60px; text-align: center;
-}
-.val-chip-glass.active {
+/* .val-chip-glass handled by global .aurora-option-card */
+.val-chip-glass.active-blue {
+    /* Ensure blue override from global applies */
     background: rgba(59, 130, 246, 0.15); 
-    color: #60A5FA; 
     border-color: rgba(59, 130, 246, 0.4);
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1), inset 0 0 0 1px rgba(59, 130, 246, 0.2);
+    color: #60A5FA;
 }
 
 .coupon-section { margin-top: 0; }
 .coupon-list { display: flex; flex-direction: column; gap: 10px; }
+/* .coupon-item-glass handled by .aurora-option-card */
 .coupon-item-glass {
-    background: rgba(255,255,255,0.03); 
-    border: 1px solid rgba(255,255,255,0.05);
-    padding: 12px 16px; border-radius: 12px; 
     display: flex; justify-content: space-between; align-items: center;
-    color: #94A3B8; font-size: 13px; transition: all 0.2s;
+    padding: 12px 16px;
+    font-size: 13px; color: #94A3B8;
 }
-.coupon-item-glass.active {
-    background: rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.3);
-    color: #34D399;
-}
+
 .c-val { color: var(--color-accent); font-weight: 700; margin-right: 6px; }
 .chk { font-size: 16px; }
 
@@ -370,14 +358,7 @@ watch(originalAmount, () => fetchCoupons()) // Refresh coupons if price changes 
     font-size: 10px; color: #fff; background: #EF4444; 
     padding: 1px 6px; border-radius: 4px; transform: translateY(-3px);
 }
-
-.pay-btn-glow {
-    padding: 12px 40px; 
-    background: linear-gradient(90deg, #3B82F6, #2563EB);
-    color: #fff; font-weight: 600; border-radius: 30px; border: none; font-size: 15px;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-}
-.pay-btn-glow:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
+/* pay-btn handled globally */
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>

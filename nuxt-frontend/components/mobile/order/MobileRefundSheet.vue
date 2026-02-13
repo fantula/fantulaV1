@@ -2,7 +2,7 @@
   <Teleport to="body">
   <Transition name="fade">
   <div v-if="visible" class="sheet-mask" @click="handleClose">
-    <div class="sheet-panel-glass" @click.stop>
+    <div class="sheet-panel-glass aurora-sheet-panel" @click.stop>
        <div class="sheet-header">
           <div class="title">申请退款</div>
           <div class="close-btn" @click="handleClose"><el-icon><Close /></el-icon></div>
@@ -25,7 +25,7 @@
                 <div 
                    v-for="r in reasons" 
                    :key="r" 
-                   class="chip-glass"
+                   class="chip-glass aurora-option-card"
                    :class="{ active: form.reason === r }"
                    @click="form.reason = r"
                 >
@@ -40,7 +40,7 @@
              <div class="label">详细说明</div>
              <textarea 
                 v-model="form.detail" 
-                class="input-glass" 
+                class="aurora-textarea" 
                 placeholder="请填写详细说明（选填）"
                 rows="3"
              ></textarea>
@@ -49,7 +49,7 @@
 
        <div class="sheet-footer">
           <button 
-             class="submit-btn-danger" 
+             class="aurora-btn-danger" 
              :disabled="!form.reason || submitting"
              @click="handleSubmit"
           >
@@ -66,7 +66,7 @@
 import { ref, reactive, computed } from 'vue'
 import { Close, Warning, Select } from '@element-plus/icons-vue'
 import { clientOrderApi } from '@/api/client/order'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
 const props = defineProps<{
@@ -89,6 +89,8 @@ const form = reactive({
   detail: ''
 })
 
+const { success, error } = useNotify()
+
 const reasons = ['买错了/不需要了', '商品无法使用', '发货速度太慢', '商品描述不符', '其他原因']
 
 const handleClose = () => visible.value = false
@@ -99,16 +101,16 @@ const handleSubmit = async () => {
     try {
         const res = await clientOrderApi.createRefundRequest(props.orderId, form.reason, form.detail)
         if (res.success) {
-            ElMessage.success('已提交申请')
+            success('已提交申请')
             emit('success')
             handleClose()
             // Reset
             form.reason = ''
             form.detail = ''
         } else {
-            ElMessage.error(res.error || '提交失败')
+            error(res.error || '提交失败')
         }
-    } catch(e: any) { ElMessage.error(e.message) }
+    } catch(e: any) { error(e.message) }
     finally { submitting.value = false }
 }
 </script>
@@ -121,12 +123,9 @@ const handleSubmit = async () => {
 }
 
 .sheet-panel-glass {
-    background: rgba(15, 23, 42, 0.95);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-top-left-radius: 24px; border-top-right-radius: 24px;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 60px);
+    /* Global Aurora */
+    padding-bottom: 0;
     max-height: 85vh; display: flex; flex-direction: column;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 
 .sheet-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
@@ -161,16 +160,12 @@ const handleSubmit = async () => {
     background: rgba(239, 68, 68, 0.15); 
     color: #F87171; 
     border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
 }
 .chk { font-size: 14px; }
 
-.input-glass {
-    width: 100%; box-sizing: border-box;
-    background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; padding: 12px; color: #fff; font-size: 14px;
-    resize: none; transition: all 0.2s;
-}
-.input-glass:focus { border-color: #EF4444; outline: none; background: rgba(239, 68, 68, 0.05); }
+/* aurora-textarea global */
+/* .input-glass legacy */
 
 .sheet-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
 

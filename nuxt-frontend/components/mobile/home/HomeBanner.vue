@@ -8,10 +8,15 @@
       class="banner-container-premium" 
     >
       <!-- Premium Glow Background (Ported from PC) -->
-      <div class="glow-border-effect"></div>
+      <div class="glow-border-effect" v-if="!loading"></div>
+      
+      <!-- Skeleton State -->
+      <div v-if="loading" class="banner-skeleton">
+          <div class="skeleton-shimmer"></div>
+      </div>
       
        <!-- Content Area -->
-       <div class="banner-content-inner">
+       <div v-else class="banner-content-inner">
          <!-- 1. Expanded Content: Carousel -->
          <div class="expanded-view">
             <div class="banner-carousel" v-if="banners.length > 0">
@@ -35,6 +40,7 @@ import type { Banner } from '@/types/api'
 
 defineProps<{
   banners: Banner[]
+  loading?: boolean
 }>()
 </script>
 
@@ -143,6 +149,35 @@ defineProps<{
     background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
 }
 
+
+
+/* Skeleton Styles */
+.banner-skeleton {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: inherit;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.skeleton-shimmer {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.02) 25%, 
+        rgba(255,255,255,0.08) 50%, 
+        rgba(255,255,255,0.02) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 /* Cleaned up removed styles: .collapse-hint, .collapsed-view, etc. */
 </style>

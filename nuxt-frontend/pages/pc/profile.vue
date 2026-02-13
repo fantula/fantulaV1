@@ -5,8 +5,8 @@
     <!-- 个人中心主体内容 -->
     <div class="profile-container">
       
-      <!-- Simple Welcome Title -->
-      <h1 class="simple-welcome-text">欢迎回来</h1>
+      <!-- New Profile Header -->
+      <ProfileHeader />
 
       <div class="profile-layout">
         <!-- 左侧边栏 (Unified Deep Glass) -->
@@ -41,6 +41,7 @@ import { useUserStore } from '@/stores/client/user'
 import { onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
+import ProfileHeader from '@/components/pc/profile/ProfileHeader.vue'
 
 // SEO配置
 useHead({
@@ -74,7 +75,8 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
 
 <style scoped>
 .profile-page {
-  height: 100vh; /* Fixed height */
+  flex: 1; /* 填满 layout 剩余空间 */
+  height: 0; /* 配合 flex: 1 使用 min-height: 0 的效果 */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Disable window scroll */
@@ -158,86 +160,9 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
   margin-top: 0; 
 }
 
-/* --- Ambassador Header --- */
-.ambassador-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  flex-shrink: 0; /* Header doesn't shrink */
-  height: 180px;  /* Fixed header height */
-  margin-top: -10px; /* Slight pull up if needed, or adjust padding */
-  position: relative;
-  z-index: 5;
-}
 
-.ambassador-img-wrapper {
-  height: 130px; /* Adjust size to fit nicely */
-  width: auto;
-  display: flex;
-  justify-content: center;
-  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.4));
-  margin-bottom: -10px;
-  position: relative;
-  z-index: 2;
-  transition: transform 0.3s ease;
-}
 
-.ambassador-img-wrapper:hover {
-  transform: scale(1.05) translateY(-5px);
-}
 
-.ambassador-img {
-  height: 100%;
-  width: auto;
-  object-fit: contain;
-  /* Soft fade at bottom to blend */
-  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-}
-
-.welcome-text {
-  text-align: center;
-  position: relative;
-  z-index: 3;
-  margin-bottom: 20px;
-}
-
-.welcome-sub {
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: #60A5FA;
-  font-weight: 700;
-  margin-bottom: 2px;
-  text-transform: uppercase;
-  opacity: 0.8;
-  text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
-}
-
-.welcome-title {
-  font-size: 28px; /* Slightly smaller than banner version */
-  font-weight: 800;
-  color: #fff;
-  margin: 0;
-  letter-spacing: -0.5px;
-  text-shadow: 0 4px 15px rgba(0,0,0,0.6);
-}
-
-.highlight-name {
-  color: transparent;
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  font-family: 'Outfit', sans-serif;
-}
-
-/* Simple Welcome Text */
-.simple-welcome-text {
-  font-size: 20px; font-weight: 700; color: #fff;
-  margin: 0 0 20px 0; align-self: flex-start;
-  padding-left: 12px;
-  position: relative; z-index: 5;
-}
 
 /* --- Right Main Content --- */
 .profile-main {

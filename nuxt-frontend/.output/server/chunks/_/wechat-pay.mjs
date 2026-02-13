@@ -1,32 +1,13 @@
-import { u as useRuntimeConfig, e as getHeader } from '../nitro/nitro.mjs';
-import { createClient } from '@supabase/supabase-js';
+import { u as useRuntimeConfig } from '../nitro/nitro.mjs';
 import crypto from 'crypto';
-
-function getSupabaseClient(event) {
-  const config = useRuntimeConfig();
-  const supabaseUrl = config.public.apiBase || "http://127.0.0.1:54321";
-  const supabaseKey = String(config.supabaseKey || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0");
-  const authHeader = getHeader(event, "authorization");
-  return createClient(supabaseUrl, supabaseKey, {
-    global: {
-      headers: authHeader ? { Authorization: authHeader } : {}
-    }
-  });
-}
-function getSupabaseServiceClient() {
-  const config = useRuntimeConfig();
-  const supabaseUrl = config.public.apiBase || "http://127.0.0.1:54321";
-  const serviceKey = String(config.supabaseServiceKey || config.supabaseKey || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU");
-  return createClient(supabaseUrl, serviceKey);
-}
-async function getCurrentUser(event) {
-  const supabase = getSupabaseClient(event);
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) {
-    return null;
-  }
-  return user;
-}
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
 
 function getWechatPayConfig() {
   const config = useRuntimeConfig();
@@ -138,18 +119,5 @@ prepay_id=${prepayId}
   return signWithPrivateKey(signMessage, privateKey);
 }
 
-const wechatPay = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
-    __proto__: null,
-    buildAuthHeader: buildAuthHeader,
-    decryptCallback: decryptCallback,
-    generateJsapiPaySign: generateJsapiPaySign,
-    generateNonceStr: generateNonceStr,
-    generateOutTradeNo: generateOutTradeNo,
-    getTimestamp: getTimestamp,
-    getWechatPayConfig: getWechatPayConfig,
-    verifyCallbackSignature: verifyCallbackSignature,
-    wechatPayRequest: wechatPayRequest
-}, Symbol.toStringTag, { value: 'Module' }));
-
-export { getCurrentUser as a, getWechatPayConfig as b, generateOutTradeNo as c, getSupabaseClient as d, getTimestamp as e, generateNonceStr as f, getSupabaseServiceClient as g, generateJsapiPaySign as h, decryptCallback as i, wechatPay as j, verifyCallbackSignature as v, wechatPayRequest as w };
+export { buildAuthHeader, decryptCallback, generateJsapiPaySign, generateNonceStr, generateOutTradeNo, getTimestamp, getWechatPayConfig, verifyCallbackSignature, wechatPayRequest };
 //# sourceMappingURL=wechat-pay.mjs.map

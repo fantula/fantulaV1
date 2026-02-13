@@ -1,6 +1,6 @@
 # 服务器部署文档
 
-> 最后更新: 2026-02-11
+> 最后更新: 2026-02-13
 
 ---
 
@@ -11,6 +11,7 @@
 | 服务器 IP | `180.163.87.70` |
 | 操作系统 | Linux (Docker) |
 | 前端项目路径 | `/opt/fantula/nuxt-frontend/` |
+| 定时器项目路径 | `/opt/fantula/scripts/scheduler/` |
 | 数据库 | Supabase (自托管 Docker) |
 | 进程管理 | PM2 |
 | 域名 | `www.fantula.com` |
@@ -84,6 +85,30 @@ docker exec supabase-db psql -U supabase_admin -d postgres -c '
 # 3. 再部署前端代码（同 3.1）
 ```
 
+### 3.3 定时器部署（Scheduler）
+
+定时器是独立的 Node.js 进程，代码位于 `scripts/scheduler/`。
+
+```bash
+# === 本地执行 ===
+
+# 1. 上传定时器代码（不含 node_modules）
+rsync -az --exclude='node_modules' \
+  /Users/dalin/fantula/scripts/scheduler/ \
+  root@180.163.87.70:/opt/fantula/scripts/scheduler/
+
+# 2. 安装依赖（如 package.json 有变更）
+ssh root@180.163.87.70 "cd /opt/fantula/scripts/scheduler && npm install"
+
+# 3. 重启定时器
+ssh root@180.163.87.70 "pm2 restart fantula-scheduler --update-env"
+
+# 4. 验证
+ssh root@180.163.87.70 "curl -s http://127.0.0.1:3001/status"
+```
+
+> ⚠️ 定时器使用自己的 `.env`，不共用 Nuxt 的环境变量。
+
 ---
 
 ## 四、PM2 管理
@@ -115,9 +140,13 @@ pm2 show fantula
 PM2 进程由 `ecosystem.config.js` 配置（如存在），或通过命令行启动：
 
 ```bash
-# 启动方式
+# 前端启动方式
 cd /opt/fantula/nuxt-frontend
 pm2 start .output/server/index.mjs --name fantula
+
+# 定时器启动方式
+cd /opt/fantula/scripts/scheduler
+pm2 start index.js --name fantula-scheduler
 ```
 
 ---
@@ -176,7 +205,8 @@ docker exec supabase-db pg_dump -U supabase_admin -d postgres --schema-only > sc
 ### 6.1 服务器 `.env` 文件位置
 
 ```
-/opt/fantula/nuxt-frontend/.env
+/opt/fantula/nuxt-frontend/.env         # Nuxt 前端
+/opt/fantula/scripts/scheduler/.env     # 定时器
 ```
 
 ### 6.2 关键环境变量
@@ -197,9 +227,99 @@ docker exec supabase-db pg_dump -U supabase_admin -d postgres --schema-only > sc
 > 运行时只有 `NUXT_` 前缀的环境变量才能覆盖这些默认值。  
 > 修改 `.env` 后必须执行 `pm2 restart fantula --update-env` 才生效。
 
+### 6.3 Scheduler 环境变量
+
+| 变量名 | 说明 | 当前值 |
+|--------|------|--------|
+| `SUPABASE_URL` | Supabase API 地址 | `http://127.0.0.1:8000` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service Role Key | *(与 Nuxt 相同的 key)* |
+| `SCHEDULER_PORT` | Scheduler HTTP 端口 | `3001` |
+
+> ⚠️ **踩坑记录**：Supabase URL 必须是 `http://127.0.0.1:8000`（Kong 网关端口），  
+> 不是 `54321`（那是 Supabase CLI 本地开发的端口）。  
+> Service Role Key 必须是实际 JWT Secret 签发的，不是 demo key。
+
 ---
 
-## 七、Nginx 配置（如需修改）
+## 七、定时器 (Scheduler)
+
+### 7.1 架构
+
+```
+scripts/scheduler/
+├── index.js         # 入口（Express + node-cron）
+├── .env             # 环境变量（Supabase 连接信息）
+├── package.json     # 依赖（express, node-cron, @supabase/supabase-js, dotenv）
+└── node_modules/
+```
+
+### 7.2 任务清单
+
+| 任务名 | 分组 | 频率 | 说明 |
+|--------|------|------|------|
+| `cleanup_expired_preorders` | frequent | 每 5 分钟 | 清理过期预订单 (pending → deleted)，释放锁定资源 |
+| `expire_active_orders` | frequent | 每 5 分钟 | 将已过期的有效订单状态改为 expired |
+| `cleanup_unverified_users` | daily | 每日 03:00 | 统计超过24小时未验证邮箱的用户 |
+| `cleanup_expired_wechat_sessions` | daily | 每日 03:00 | 删除已过期的微信扫码登录会话 |
+| `cleanup_expired_order_fulfillments` | daily | 每日 04:00 | 删除过期超过7天的订单回执信息 |
+| `cleanup_old_expired_preorders` | weekly | 周日 05:00 | 将超过30天的 expired 预订单标记为 deleted |
+
+### 7.3 管理 API
+
+```bash
+# 查看状态
+curl http://127.0.0.1:3001/status
+
+# 查看任务列表
+curl http://127.0.0.1:3001/tasks
+
+# 手动执行某个任务
+curl -X POST http://127.0.0.1:3001/run/cleanup_expired_preorders
+
+# 启动/停止定时器
+curl -X POST http://127.0.0.1:3001/start
+curl -X POST http://127.0.0.1:3001/stop
+
+# 查看执行日志
+curl http://127.0.0.1:3001/logs
+```
+
+### 7.4 依赖的 RPC 函数
+
+以下 PostgreSQL 函数在数据库中，被定时器通过 `supabase.rpc()` 调用：
+
+- `cleanup_expired_preorders()`
+- `expire_active_orders()`
+- `cleanup_expired_order_fulfillments()`
+- `cleanup_unverified_users()`
+- `cleanup_old_expired_preorders()`
+
+> `cleanup_expired_wechat_sessions` 直接操作 `wechat_login_sessions` 表，不走 RPC。
+
+### 7.5 排查定时器问题
+
+```bash
+# 查看日志
+pm2 logs fantula-scheduler --lines 30
+
+# 如果全部报 fetch failed → 检查 .env 的 SUPABASE_URL 和 KEY
+cat /opt/fantula/scripts/scheduler/.env
+
+# 手动测试连接
+curl -s http://127.0.0.1:8000/rest/v1/profiles?select=email \
+  -H 'apikey: <SERVICE_KEY>' \
+  -H 'Authorization: Bearer <SERVICE_KEY>'
+
+# 检查执行记录
+docker exec supabase-db psql -U supabase_admin -d postgres -c "
+  SELECT task_name, status, affected_count, executed_at 
+  FROM scheduled_task_logs ORDER BY executed_at DESC LIMIT 10;
+"
+```
+
+---
+
+## 八、Nginx 配置（如需修改）
 
 ```bash
 # 查看配置
@@ -225,7 +345,7 @@ https://www.fantula.com/api/wechat/notify
 
 ---
 
-## 八、故障排查
+## 九、故障排查
 
 ### 8.1 前端白屏/502
 
@@ -260,7 +380,7 @@ docker logs supabase-db --tail 50
 
 ---
 
-## 九、安全注意事项
+## 十、安全注意事项
 
 1. **Service Role Key** 只能在服务端使用，绝不暴露给前端
 2. **微信 AppSecret** 和 **支付私钥** 属于最高敏感信息

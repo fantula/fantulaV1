@@ -1,5 +1,7 @@
 import { d as defineEventHandler, e as getHeader, b as readRawBody } from '../../../nitro/nitro.mjs';
-import { v as verifyCallbackSignature, b as getWechatPayConfig, i as decryptCallback, g as getSupabaseServiceClient } from '../../../_/wechat-pay.mjs';
+import { s as sendNotification } from '../../../_/email.mjs';
+import { g as getSupabaseServiceClient } from '../../../_/supabase.mjs';
+import { verifyCallbackSignature, getWechatPayConfig, decryptCallback } from '../../../_/wechat-pay.mjs';
 import 'node:http';
 import 'node:https';
 import 'node:events';
@@ -89,6 +91,14 @@ const notify_post = defineEventHandler(async (event) => {
         created_at: (/* @__PURE__ */ new Date()).toISOString()
       });
       console.log(`[Notify] Success: User ${attach.userId} recharged ${totalAmount} (amount: ${order.amount}, bonus: ${bonus})`);
+      const { data: userProfile } = await supabase.from("profiles").select("email").eq("id", attach.userId).single();
+      if (userProfile == null ? void 0 : userProfile.email) {
+        sendNotification("recharge_success", userProfile.email, {
+          amount: orderAmount.toFixed(2),
+          bonus: bonus.toFixed(2),
+          balance: newBalance.toFixed(2)
+        }).catch((e) => console.error("[Notify] Email send error:", e));
+      }
     }
     return { code: "SUCCESS", message: "\u6210\u529F" };
   } catch (err) {

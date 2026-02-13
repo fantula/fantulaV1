@@ -4,6 +4,7 @@ import { authApi } from '@/api/client/auth'
 import { clientOrderApi as orderApi } from '@/api/client/order' // Use modern API
 import { favoriteApi } from '@/api/client/common'
 import { messageApi } from '@/api/client/message'
+import { useGlobalLoading } from '@/composables/useGlobalLoading'
 
 // ... (keep interface definitions) ...
 
@@ -40,6 +41,9 @@ interface OrderItem {
  * 用户状态管理
  */
 export const useUserStore = defineStore('user', () => {
+  // Global Loading
+  const { show: showLoading, hide: hideLoading, success: showSuccess } = useGlobalLoading()
+
   // 状态
   const user = ref<User | null>(null)
   const token = useCookie('token')
@@ -507,11 +511,18 @@ export const useUserStore = defineStore('user', () => {
   const logout = async () => {
     try {
       if (token.value) {
+        // Show global loading for logout
+        showLoading('正在退出...')
         await authApi.logout()
       }
     } catch (error) {
       console.error('登出失败:', error)
     } finally {
+      // Ensure loading is hidden
+      setTimeout(() => {
+        hideLoading()
+      }, 500)
+
       token.value = null
       user.value = null
       if (process.client) {

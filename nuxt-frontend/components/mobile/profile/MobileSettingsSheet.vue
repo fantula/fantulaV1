@@ -2,7 +2,7 @@
   <div>
     <!-- Main Settings Sheet -->
     <div v-if="visible" class="sheet-overlay" @click="close">
-      <div class="sheet-content" @click.stop>
+      <div class="sheet-content aurora-sheet-panel" @click.stop>
         <!-- Grab Handle -->
         <div class="sheet-handle-bar">
             <div class="sheet-handle"></div>
@@ -148,14 +148,11 @@ const handleSuccess = (msg: string) => {
 }
 
 .sheet-content {
-    background: var(--cyber-bg-deep, #0F172A);
-    border-top-left-radius: 20px; border-top-right-radius: 20px;
+    /* Styles handled by .aurora-sheet-panel */
     padding: 10px 24px 40px 24px;
     max-height: 80vh; overflow-y: auto;
     display: flex; flex-direction: column;
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    border-top: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(6, 182, 212, 0.1);
 }
 
 .sheet-handle-bar {

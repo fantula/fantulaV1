@@ -1,5 +1,5 @@
 import { d as defineEventHandler, g as getQuery, c as createError, u as useRuntimeConfig } from '../../../nitro/nitro.mjs';
-import { g as getSupabaseServiceClient } from '../../../_/wechat-pay.mjs';
+import { g as getSupabaseServiceClient } from '../../../_/supabase.mjs';
 import { a as generateBindToken } from '../../../_/wechat-login.mjs';
 import 'node:http';
 import 'node:https';
@@ -11,6 +11,7 @@ import 'node:crypto';
 import 'node:url';
 import '@supabase/supabase-js';
 import 'crypto';
+import '../../../_/wechat-pay.mjs';
 
 const checkScan_get = defineEventHandler(async (event) => {
   var _a;

@@ -10,6 +10,9 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
     '@element-plus/nuxt',
+    '@nuxt/image',
+    '@nuxtjs/robots',
+    '@nuxtjs/sitemap',
   ],
 
   // 组件自动导入
@@ -87,6 +90,8 @@ export default defineNuxtConfig({
     wechatPayPrivateKey: process.env.WECHAT_PAY_PRIVATE_KEY || '',
     wechatPayNotifyUrl: process.env.WECHAT_PAY_NOTIFY_URL || '',
     wechatAppSecret: process.env.WECHAT_APP_SECRET || '',
+    // 定时任务服务内部地址（服务端代理用，浏览器不可访问）
+    schedulerInternalUrl: process.env.SCHEDULER_INTERNAL_URL || 'http://127.0.0.1:3001',
 
     // 公共配置（客户端和服务端都可用）
     public: {
@@ -100,16 +105,47 @@ export default defineNuxtConfig({
       supabaseAnonKey: process.env.SUPABASE_KEY || '',
       // ⚠️ Admin 专用 (暴露 Service Role Key 给前端 Admin 面板，仅内部使用)
       supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU',
-      // 定时任务服务地址
-      schedulerUrl: process.env.SCHEDULER_URL || 'http://localhost:3001'
+      // 定时任务服务地址（通过服务端代理访问）
+      schedulerUrl: '/api/admin/scheduler'
     }
+  },
+
+  // Image Optimization
+  image: {
+    provider: 'ipx',
+    ipx: {
+      modifiers: {
+        format: 'webp',
+        quality: 80
+      }
+    }
+  },
+
+  // Sitemap
+  site: {
+    url: process.env.SITE_URL || 'https://www.fantula.com',
   },
 
   // 代理配置
   nitro: {
     // 路由规则 - 为 admin 路由禁用 SSR
     routeRules: {
-      '/admin/**': { ssr: false }
+      '/admin/**': { ssr: false },
+      // API Routes (proxy or direct) - no cache usually
+      '/api/**': { cors: true },
+      // Caching Strategy
+      '/': { swr: 3600 }, // Home page cached for 1 hour
+      '/pc': { swr: 3600 },
+      '/mobile': { swr: 3600 },
+      '/pc/product/**': { swr: 600 }, // Product lists cached for 10 mins
+      '/mobile/product/**': { swr: 600 },
+      '/pc/article/**': { swr: 3600 }, // Articles cached longer
+      '/mobile/article/**': { swr: 3600 },
+      // User specific pages - No Cache
+      '/pc/profile/**': { ssr: false },
+      '/mobile/profile/**': { ssr: false },
+      '/pc/checkout/**': { ssr: false },
+      '/mobile/checkout/**': { ssr: false },
     },
     devProxy: {
       // 统一API代理地址为 Supabase 本地服务

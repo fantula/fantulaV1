@@ -1,1 +1,0 @@
-{"file":"virtual_public-CTq2VprR.js","mappings":";AAAuD,MAAA,aAAe,gBAAgB,8BAA8B;","names":[],"sources":["../../../../virtual:public?%2Fimages%2Fclient%2Fpc%2Fzhifu2.png"],"sourcesContent":["import { publicAssetsURL } from '#internal/nuxt/paths';export default publicAssetsURL(\"/images/client/pc/zhifu2.png\")"],"version":3}

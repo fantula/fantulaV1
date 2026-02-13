@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="fade">
       <div v-if="visible" class="sheet-mask" @click="handleClose">
-        <div class="sheet-panel-glass" @click.stop>
+        <div class="sheet-panel-glass aurora-sheet-panel" @click.stop>
           <div class="sheet-header">
             <div class="title">选择优惠券</div>
             <div class="close-btn" @click="handleClose"><el-icon><Close /></el-icon></div>
@@ -161,12 +161,9 @@ const formatDate = (dateStr: string | null) => {
     display: flex; flex-direction: column; justify-content: flex-end;
 }
 .sheet-panel-glass {
-    background: rgba(15, 23, 42, 0.95);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-top-left-radius: 24px; border-top-right-radius: 24px;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
-    max-height: 85vh; display: flex; flex-direction: column;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    /* Styles handled by .aurora-sheet-panel */
+    display: flex; flex-direction: column;
+    max-height: 85vh;
 }
 
 .sheet-header {

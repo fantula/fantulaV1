@@ -76,14 +76,7 @@
         </el-tab-pane>
       </el-tabs>
       
-      <div class="login-hint">
-        <el-alert 
-          title="测试账号：admin@fantula.com / admin123456" 
-          type="info" 
-          show-icon 
-          :closable="false"
-        />
-      </div>
+
     </el-card>
   </div>
 </template>
@@ -255,9 +248,7 @@ const formatCountdown = (seconds: number): string => {
   width: 100%;
 }
 
-.login-hint {
-  margin-top: 16px;
-}
+
 
 .code-input-group {
   display: flex;

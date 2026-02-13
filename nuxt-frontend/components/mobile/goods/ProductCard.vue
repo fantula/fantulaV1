@@ -9,27 +9,33 @@
            :class="getBadgeClass(goods.badge_label)">
          {{ goods.badge_label }}
       </div>
+
     </div>
 
     <!-- Right: Info -->
     <div class="goods-info">
       <h3 class="goods-title">{{ goods.product_name || goods.name || goods.title }}</h3>
-      
-      <!-- Tags (Limited to 2 to save space) -->
+
       <div class="goods-tags-row" v-if="tags.length">
-        <span class="tag-item" v-for="(tag, idx) in tags.slice(0, 2)" :key="idx">{{ tag }}</span>
+        <span
+          v-for="(tag, idx) in tags.slice(0, 2)"
+          :key="idx"
+          class="aurora-tag"
+        >
+          {{ tag }}
+        </span>
       </div>
 
       <!-- Stats -->
       <div class="goods-meta-row">
          <span class="stat-text">已售 {{ formatSales(goods.initial_sales || goods.sales || 0) }}</span>
       </div>
-      
+
       <div class="goods-bottom">
         <div class="goods-price-row">
           <span class="price-val text-price">{{ formatPrice(goods.display_price || goods.price) }}</span>
         </div>
-        
+
         <!-- Action Button -->
         <button class="buy-btn btn-marketing-buy">
           查看详情
@@ -149,16 +155,39 @@ const getBadgeClass = (label: string) => {
 }
 
 .goods-tags-row {
-    display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px;
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;
 }
-.tag-item {
-    font-size: 10px;
-    color: var(--secondary-color);
-    border: 1px solid rgba(6, 182, 212, 0.2);
-    background: rgba(6, 182, 212, 0.05);
-    padding: 1px 5px;
-    border-radius: 4px;
-    white-space: nowrap;
+/* .tag-item removed, replaced by global .aurora-tag */
+
+.aurora-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.aurora-tag-default {
+  background-color: var(--primary);
+}
+
+.aurora-tag-hot {
+  background: linear-gradient(90deg, #FF6B6B 0%, #EE4D2D 100%);
+}
+
+.aurora-tag-new {
+  background: linear-gradient(90deg, #6DD5ED 0%, #2193B0 100%);
+}
+
+.aurora-tag-recommend {
+  background: linear-gradient(90deg, #FDC830 0%, #F37335 100%);
+}
+
+.aurora-tag-benefit {
+  background: linear-gradient(90deg, #8360c3 0%, #2ebf91 100%);
 }
 
 .goods-meta-row {

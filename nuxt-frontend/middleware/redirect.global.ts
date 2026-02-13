@@ -4,8 +4,23 @@ export default defineNuxtRouteMiddleware((to, from) => {
         return navigateTo('/admin/orders/recharge')
     }
 
-    // 智能设备检测 - 仅在服务端执行（首次访问时）
-    // 如果用户访问 /pc 或 /mobile 开头的路径，检查设备是否匹配
+    // 智能设备检测与重定向
+    // 1. 根路径重定向 (服务端 + 客户端)
+    if (to.path === '/') {
+        let isMobile = false
+
+        if (import.meta.server) {
+            const event = useRequestEvent()
+            const userAgent = event?.node?.req?.headers?.['user-agent'] || ''
+            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
+        } else {
+            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        }
+
+        return navigateTo(isMobile ? '/mobile' : '/pc')
+    }
+
+    // 2. 这里的逻辑主要处理错误的设备路径访问 (仅服务端处理即可，客户端由 responsive layout 处理或保持现状)
     if (import.meta.server) {
         const event = useRequestEvent()
         const userAgent = event?.node?.req?.headers?.['user-agent'] || ''

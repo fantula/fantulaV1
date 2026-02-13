@@ -191,7 +191,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useCartStore } from '@/stores/client/cart'
 import { useUserStore } from '@/stores/client/user'
-import { useToast } from '@/composables/mobile/useToast'
+import { useNotify } from '@/composables/useNotify'
 import { useProductDetail } from '@/composables/client/useProductDetail'
 import { favoriteApi } from '@/api/client/common' // Direct API use for custom UI feedback
 
@@ -204,7 +204,7 @@ const emit = defineEmits(['update:visible'])
 const router = useRouter()
 const cartStore = useCartStore()
 const userStore = useUserStore()
-const { showToast } = useToast()
+const { success, warning, error, info } = useNotify()
 
 // --- Shared Logic ---
 // We pass the goodsId prop as a Ref to the composable
@@ -283,32 +283,32 @@ watch(() => faqs.value, () => startFaqTicker())
 // --- Methods (Mobile Specific Action Wrappers) ---
 const handleClose = () => emit('update:visible', false)
 
-// Override default interaction methods to use ShowToast instead of ElMessage
+// Methods
 const addToCart = async () => {
-    if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
+    if (!userStore.isLoggedIn) return warning('请登录')
     // Safe check if SKUs exist but none matched
-    if (!matchedSku.value && skus.value.length > 0) return showToast('请选择规格', 'warning')
+    if (!matchedSku.value && skus.value.length > 0) return warning('请选择规格')
     
     // Fallback ID if no SKUs (some products might not have SKUs)
     const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id 
-    if (!skuId) return showToast('商品信息异常', 'error')
+    if (!skuId) return error('商品信息异常')
     
     // Direct call to cart store (same as composable but handling UI here)
     const res = await cartStore.addToCart(skuId, qty.value)
     if (res.success) {
-        showToast('已加入购物车', 'success')
+        success('已加入购物车')
         handleClose()
     } else {
-        showToast(res.msg || '失败', 'error')
+        error(res.msg || '失败')
     }
 }
 
 const buyNow = async () => {
-     if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
-     if (!matchedSku.value && skus.value.length > 0) return showToast('请选择规格', 'warning')
+     if (!userStore.isLoggedIn) return warning('请登录')
+     if (!matchedSku.value && skus.value.length > 0) return warning('请选择规格')
      
      const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
-     if (!skuId) return showToast('商品信息异常', 'error')
+     if (!skuId) return error('商品信息异常')
 
      const { supabasePreOrderApi } = await import('@/api/client/supabase')
      const res = await supabasePreOrderApi.createPreOrder(skuId, qty.value, 'buy_now')
@@ -316,17 +316,17 @@ const buyNow = async () => {
          handleClose()
          router.push(`/mobile/checkout/${res.pre_order_id}`)
      } else {
-         showToast(res.error || '失败', 'error')
+         error(res.error || '失败')
      }
 }
 
 const handleToggleFavorite = async () => {
-    if (!userStore.isLoggedIn) return showToast('请登录', 'warning')
+    if (!userStore.isLoggedIn) return warning('请登录')
     
     // Optimistic UI or wait? Better wait.
     // Logic from favoriteApi
     if (isFavorited.value) {
-         showToast('取消收藏请前往"我的收藏"页面', 'info')
+         info('取消收藏请前往"我的收藏"页面')
          return
     }
     
@@ -334,9 +334,9 @@ const handleToggleFavorite = async () => {
     const res = await favoriteApi.addFavorite(String(goodsInfo.value.id), skuId)
     if (res.success) {
         isFavorited.value = true
-        showToast('收藏成功', 'success')
+        success('收藏成功')
     } else {
-        showToast(res.msg || '收藏失败', 'error')
+        error(res.msg || '收藏失败')
     }
 }
 

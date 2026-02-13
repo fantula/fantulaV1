@@ -648,7 +648,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "4a07843f-c48d-458b-a035-91fd427a5faa",
+    "buildId": "aa9da369-794e-4caf-b1bd-e7cf2307de50",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -686,7 +686,7 @@ const _inlineRuntimeConfig = {
     "supabaseUrl": "https://www.fantula.com",
     "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNjEwNzUzLCJleHAiOjMzMzA2NjEwNzUzfQ.OVRG41EylWMyAEJQSel5TqDg3D5oygrCtxyAT27kH9I",
     "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg",
-    "schedulerUrl": "http://localhost:3001"
+    "schedulerUrl": "/api/admin/scheduler"
   },
   "apiSecret": "",
   "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNjEwNzUzLCJleHAiOjMzMzA2NjEwNzUzfQ.OVRG41EylWMyAEJQSel5TqDg3D5oygrCtxyAT27kH9I",
@@ -697,7 +697,8 @@ const _inlineRuntimeConfig = {
   "wechatPaySerialNo": "53245181B4BB24F7AC58047FED958C04057735F9",
   "wechatPayPrivateKey": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMTogoAZexax27\\nMxWMyhMfFf6Vnc1kUJMHv0FTNDddobb7kVBgEMIDtsAB/zE9M8f5cWWKfrFR0dYr\\njaMyUCJE/PO9THno6/M9W2wesjDnezP3zCVqy0/dIFsvWK+811RbBNOndGxZ+9Eg\\nNGVdukHaorFNRWjuNz8WwvnyVYnVWgP8j6Q16b+KDI6+DGhObBLxWB8VikG5Nh7I\\n9GVz8QN7XfO2SDFcE9hakkLkf+olDI4hC7PpYpOy/w54tKeuKaGifKwwsEaB1By1\\nD31t/l2IS75831cuG2u9prz5knud86JuCSgb234jUoF5BPwc1GFJDMKaTXVsi+rY\\nHDYZLgaVAgMBAAECggEAMCk/DXc6pBclHhDvvo2QLl7H8csONNyNnGDobE2903Og\\np/LcaJjqs2dsIcxfdhbzyAiEMD6nXCtD+mZcFysuuOaMKo6RmmesokUf2qiUwKyZ\\nVouoMmGVBQJwnFuiqbh06TPdFPdr51ZmONpBHvQePAToGNgI4Ubit2Hk+8xQPpua\\nrNL8ivHL0k57y6acC1qN8+vW0K9Grd3ZQeVYUxu6s7frqhucBDrn2sE3rEIHCMZL\\nEXtU/auWGw/RLE6ZusErCZ+tqybXUIrtwzDyKMJZBTaBRG6eJbd/m0xa8L4+1SU0\\nXn6FIE1E29r6NGyQ5bUvGq/Sq8T/XW3kbF98yzeuwQKBgQDv4FpemUNdnV1W8FtA\\nX40e3YqkoC//ym5JuylQJ2Nj6hExX4cA4L6ixpRjEU7urh5LgfxKREG0xcc2gBZf\\nmLUpZh5bMjK+mhW4Ckr6ZpibuTF8oIly/6xSGZDRp/s9n9JiT4lBGy6jKiv0Doy1\\n2Wh2t8p7w3IAFmxoNkpg1bjEJQKBgQDaCh5ZP9DGLN/Er1gtOECdow8zsWtvbvIi\\nk1v9achvidUt0M89Pmugw0AALfhnvZDjIN45IEnajszCnAqz5zU9UGP2TkUEaSgP\\nKRctUFVF3igV91B/C48ChzyblEBeh+5JhQpn+ZfO12pbx7d4OCbzzKY5luqmwnUu\\n2LQAzKv1sQKBgQCZocF/UP3aWU1Mv0hSZGBH4nBHm+jiFM6qHlsJYRDBD0rPqnUW\\n1NqD+ldTU+SP7aith6UEE89Zbkp213Z855sv1p2envntJVa/tqfq1AbtxaCyR0eB\\nBctiEcm03beF8nSWToaD0lr+WaYo+6CXX5UOZAwlVDoRYEsyO4NLndZmmQKBgBPg\\n7klmxwr6VmBhOCHPShzVG/Kzjz72l37NfoqJFWwN3fCyY+KKiVd71Z7ukgIrR0Vd\\n3sTIi9MwR7zKazNhtfnkFWkEU8iGKc/QCDvqYgvfqDnwdVdP33b0i3MHviKgM/ph\\n9cPq/osuGpVJjRGZ1PtPQixn9PbFLdfai/aysk7RAoGAcg4IyQkEsMwBfstMoxHc\\nv9OEvpV8I3FxVZTmcSpud/Vsn8XFNCt5L0MuFV3EEKSgB2GKAzfCVcUNORWguxFg\\nOLxc12Rz6UncsrRyGCGhetxUJpKMi1ByBqR8A6G3y7JdKUGFNt72BTa6oOZbn8HS\\nqaapcC5n2bY7cKyXTpGKUlw=\\n-----END PRIVATE KEY-----",
   "wechatPayNotifyUrl": "https://www.fantula.com/api/wechat/notify",
-  "wechatAppSecret": "521970d6155d6f7ee3045f05b7cc3eb3"
+  "wechatAppSecret": "521970d6155d6f7ee3045f05b7cc3eb3",
+  "schedulerInternalUrl": "http://127.0.0.1:3001"
 };
 const envOptions = {
   prefix: "NITRO_",
@@ -1101,6 +1102,10 @@ const _2qpWSd = eventHandler((event) => {
 
 const _SxA8c9 = defineEventHandler(() => {});
 
+const _lazy_XeHggU = () => import('../routes/api/admin/scheduler/_...path_.mjs');
+const _lazy_k_WUKv = () => import('../routes/api/admin/system/notifications/templates.get.mjs');
+const _lazy_2ED9bq = () => import('../routes/api/admin/system/notifications/templates.post.mjs');
+const _lazy_wKDF6C = () => import('../routes/api/admin/system/notifications/test.post.mjs');
 const _lazy_dcHuVB = () => import('../routes/api/auth/bind-wechat.post.mjs');
 const _lazy_hMjmce = () => import('../routes/api/client/config/contact.get.mjs');
 const _lazy_rPysyX = () => import('../routes/api/test.mjs');
@@ -1118,6 +1123,10 @@ const _lazy_8EFkQE = () => import('../_/renderer.mjs').then(function (n) { retur
 
 const handlers = [
   { route: '', handler: _2qpWSd, lazy: false, middleware: true, method: undefined },
+  { route: '/api/admin/scheduler/**:path', handler: _lazy_XeHggU, lazy: true, middleware: false, method: undefined },
+  { route: '/api/admin/system/notifications/templates', handler: _lazy_k_WUKv, lazy: true, middleware: false, method: "get" },
+  { route: '/api/admin/system/notifications/templates', handler: _lazy_2ED9bq, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/system/notifications/test', handler: _lazy_wKDF6C, lazy: true, middleware: false, method: "post" },
   { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },
   { route: '/api/client/config/contact', handler: _lazy_hMjmce, lazy: true, middleware: false, method: "get" },
   { route: '/api/test', handler: _lazy_rPysyX, lazy: true, middleware: false, method: undefined },

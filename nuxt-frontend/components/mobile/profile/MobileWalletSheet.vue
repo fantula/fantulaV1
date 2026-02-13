@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="wallet-sheet-overlay" @click="close">
-    <div class="wallet-sheet-content" @click.stop>
+    <div class="wallet-sheet-content aurora-sheet-panel" @click.stop>
       <!-- Grab Handle -->
       <div class="sheet-handle-bar">
           <div class="sheet-handle"></div>
@@ -86,14 +86,11 @@ const parseDescription = (item: any) => {
 }
 
 .wallet-sheet-content {
-    background: #1E293B;
-    border-top-left-radius: 20px; border-top-right-radius: 20px;
-    padding: 10px 24px 40px 24px; /* Bottom padding for safe area */
-    height: 70vh; /* Taller */
+    /* Styles handled by .aurora-sheet-panel */
+    padding: 10px 24px 40px 24px;
+    height: 70vh;
     display: flex; flex-direction: column;
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 
 /* Grab Handle */

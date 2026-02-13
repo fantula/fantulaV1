@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="handleClose">
-    <div class="modal-content">
+    <div class="modal-content aurora-modal-panel">
       <div class="modal-header">
         <h3 class="modal-title text-danger">注销账号</h3>
         <button class="close-btn" @click="handleClose">
@@ -21,6 +21,7 @@
                 <input 
                     v-model="otpCode" 
                     type="text" 
+                    class="aurora-input"
                     placeholder="请输入验证码"
                     maxlength="6"
                 />
@@ -43,8 +44,7 @@
       </div>
 
       <div class="modal-footer">
-          <button class="cancel-btn" @click="handleClose">取消</button>
-          <button class="save-btn btn-danger" @click="handleDelete" :disabled="loading || !canSubmit">
+          <button class="aurora-btn-danger" @click="handleDelete" :disabled="loading || !canSubmit">
               <span v-if="loading" class="spinner"></span>
               <span v-else>确认注销</span>
           </button>
@@ -60,7 +60,7 @@ import { Close, Check } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import { useSendCode } from '@/composables/client/useSendCode'
 
 const props = defineProps<{
@@ -70,6 +70,7 @@ const props = defineProps<{
 const emit = defineEmits(['close'])
 const userStore = useUserStore()
 const router = useRouter()
+const { success, error } = useNotify()
 
 const isConfirmed = ref(false)
 const otpCode = ref('')
@@ -122,21 +123,21 @@ const handleDelete = async () => {
         // 1. Verify OTP
         const verifyRes = await authApi.verifyOtp(userStore.user.email, otpCode.value)
         if (!verifyRes.success) {
-            ElMessage.error(verifyRes.msg || '验证码错误')
+            error(verifyRes.msg || '验证码错误')
             return
         }
 
         // 2. Execute Delete
         const res = await authApi.deleteAccount()
         if (res.success) {
-            ElMessage.success({ message: '账号已注销', offset: 100, customClass: 'mobile-message' })
+            success('账号已注销')
             await userStore.logout()
             router.push('/mobile')
         } else {
-             ElMessage.error(res.msg || '注销失败')
+             error(res.msg || '注销失败')
         }
     } catch (e: any) {
-        ElMessage.error('注销失败')
+        error('注销失败')
     } finally {
         baseLoading.value = false
     }
@@ -150,20 +151,12 @@ const handleDelete = async () => {
     padding: 20px;
 }
 
+/* Global Aurora Modal */
 .modal-content {
-    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.85));
-    width: 100%; max-width: 340px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid rgba(239, 68, 68, 0.3); /* Red Border for Danger */
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.15), 0 10px 40px rgba(0,0,0,0.5);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(20px);
+    /* Styles handled by .aurora-modal-panel */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 
@@ -245,27 +238,16 @@ const handleDelete = async () => {
 .checkbox-row:hover span { color: #fff; }
 
 .modal-footer { display: flex; gap: 12px; }
-.cancel-btn, .save-btn {
-    flex: 1; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
-    transition: all 0.2s;
-}
-.cancel-btn { 
-    background: rgba(255,255,255,0.05); color: #94A3B8;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-.cancel-btn:active { background: rgba(255,255,255,0.1); }
-
-.btn-danger { 
-    background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%); 
-    color: white; 
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    display: flex; justify-content: center; align-items: center;
-}
-.btn-danger:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2); }
-.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
+/* Handled by global aurora classes */
 
 .spinner {
     width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Flex adjustments */
+.input-row .aurora-input { flex: 1; min-width: 0; }
+.code-btn { flex-shrink: 0; }
+
+/* Handled by global aurora classes */
 </style>

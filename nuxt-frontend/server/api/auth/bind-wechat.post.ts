@@ -191,6 +191,13 @@ export default defineEventHandler(async (event) => {
 
         console.log('[BindWechat] Successfully bound:', { userId: authData.user.id, openid })
 
+        // 异步发送欢迎邮件（不阻塞绑定流程）
+        if (authData.user.email) {
+            sendNotification('account_welcome', authData.user.email, {
+                nickname: body.nickname || authData.user.email.split('@')[0] || '新用户',
+            }).catch(e => console.error('[BindWechat] Welcome email error:', e))
+        }
+
         return {
             success: true,
             message: '绑定成功',

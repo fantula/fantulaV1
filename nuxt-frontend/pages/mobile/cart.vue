@@ -112,15 +112,14 @@ import {
 } from '@element-plus/icons-vue'
 import { useCartStore } from '@/stores/client/cart'
 import { supabasePreOrderApi } from '@/api/client/supabase'
-import { useToast } from '@/composables/mobile/useToast'
-import { ElMessageBox } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 definePageMeta({ layout: 'mobile' })
 
 const router = useRouter()
 const cartStore = useCartStore()
-const { showToast } = useToast()
+const { success, warning, error } = useNotify()
 
 const loading = ref(false)
 const isEditMode = ref(false)
@@ -177,22 +176,21 @@ const handleDelete = async () => {
     
     const ids = Array.from(selectedIds.value)
     for (const id of ids) {
-        await cartStore.removeFromCart(id)
         selectedIds.value.delete(id)
     }
-    showToast('删除成功', 'success')
+    success('删除成功')
     if (cartStore.items.length === 0) isEditMode.value = false
 }
 
 const handleCheckout = async () => {
-    if (selectedIds.value.size === 0) return showToast('请选择商品', 'warning')
+    if (selectedIds.value.size === 0) return warning('请选择商品')
     
     const items = selectedItems.value
     const firstSku = items[0].skuId
     const isConsistent = items.every(i => i.skuId === firstSku)
     
     if (!isConsistent) {
-        return showToast('暂不支持多规格同时结算', 'warning')
+        return warning('暂不支持多规格同时结算')
     }
     
     const totalQty = items.reduce((sum, i) => sum + i.quantity, 0)
@@ -201,7 +199,7 @@ const handleCheckout = async () => {
     if (res.success && res.pre_order_id) {
         router.push(`/mobile/checkout/${res.pre_order_id}`)
     } else {
-        showToast(res.error || '结算失败', 'error')
+        error(res.error || '结算失败')
     }
 }
 </script>

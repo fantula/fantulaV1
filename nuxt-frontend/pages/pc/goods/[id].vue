@@ -237,8 +237,23 @@ const {
   isFavorited,
   toggleFavorite,
   initClientState,
-  modal
+  goodsSeo
 } = useProductDetail()
+
+// SEO Configuration
+useHead({
+  title: computed(() => `${goodsSeo.value.title} - 凡图拉`),
+  meta: [
+    { name: 'description', content: computed(() => goodsSeo.value.desc) },
+    { name: 'keywords', content: computed(() => `${goodsSeo.value.title},数字产品,代充,凡图拉`) },
+    { property: 'og:title', content: computed(() => goodsSeo.value.title) },
+    { property: 'og:description', content: computed(() => goodsSeo.value.desc) },
+    { property: 'og:image', content: computed(() => goodsSeo.value.image) },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: computed(() => goodsSeo.value.title) },
+    { name: 'twitter:image', content: computed(() => goodsSeo.value.image) }
+  ]
+})
 
 // 动画 composable
 import { useCartAnimation } from '@/composables/client/useCartAnimation'

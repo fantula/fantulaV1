@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="handleClose">
-    <div class="modal-content">
+    <div class="modal-content aurora-modal-panel">
       <div class="modal-header">
         <h3 class="modal-title">{{ step === 1 && currentEmail ? '验证原邮箱' : '绑定新邮箱' }}</h3>
         <button class="close-btn" @click="handleClose">
@@ -18,7 +18,7 @@
             
             <div class="form-item">
                 <label>当前邮箱</label>
-                <input :value="currentEmail" disabled class="disabled-input" />
+                <input :value="currentEmail" disabled class="aurora-input disabled-input" style="color: #94A3B8;" />
             </div>
 
             <div class="form-item">
@@ -27,6 +27,7 @@
                     <input 
                         v-model="oldCode" 
                         type="text" 
+                        class="aurora-input"
                         placeholder="请输入验证码"
                         maxlength="6"
                     />
@@ -40,7 +41,7 @@
                 </div>
             </div>
 
-            <button class="submit-btn full-width" @click="verifyOldEmail" :disabled="loading || oldCode.length < 4">
+            <button class="aurora-btn-primary" @click="verifyOldEmail" :disabled="loading || oldCode.length < 4">
                 <div v-if="loading" class="spinner"></div>
                 <span v-else>下一步</span>
             </button>
@@ -53,6 +54,7 @@
                 <input 
                     v-model="form.email" 
                     type="email"
+                    class="aurora-input"
                     placeholder="请输入新邮箱"
                 />
             </div>
@@ -63,6 +65,7 @@
                     <input 
                         v-model="form.code" 
                         type="text" 
+                        class="aurora-input"
                         placeholder="新邮箱验证码"
                         maxlength="6"
                     />
@@ -76,7 +79,7 @@
                 </div>
             </div>
 
-            <button class="submit-btn full-width" @click="handleConfirm" :disabled="loading || !canSubmit">
+            <button class="aurora-btn-primary" @click="handleConfirm" :disabled="loading || !canSubmit">
                 <div v-if="loading" class="spinner"></div>
                 <span v-else>确认绑定</span>
             </button>
@@ -92,7 +95,7 @@ import { ref, reactive, computed, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 const props = defineProps<{
   visible: boolean
@@ -103,6 +106,7 @@ const userStore = useUserStore()
 
 // State
 const step = ref(1)
+const { success, error } = useNotify()
 import { useSendCode } from '@/composables/client/useSendCode'
 
 const currentEmail = computed(() => userStore.user?.email)
@@ -179,14 +183,14 @@ const verifyOldEmail = async () => {
     try {
         const res = await authApi.verifyOtp(currentEmail.value, oldCode.value)
         if (res.success) {
-            ElMessage.success({ message: '验证通过', offset: 100, customClass: 'mobile-message' })
+            success('验证通过')
             step.value = 2
             // No need to manually reset timer, they are independent
         } else {
-            ElMessage.error(res.msg || '验证码错误')
+            error(res.msg || '验证码错误')
         }
     } catch (e: any) {
-        ElMessage.error('验证失败')
+        error('验证失败')
     } finally {
         baseLoading.value = false
     }
@@ -203,7 +207,7 @@ const sendNewCode = async () => {
     try {
         const checkRes = await authApi.checkEmailAvailable(form.email)
         if (!checkRes.success) {
-             ElMessage.error({ message: '该邮箱已被注册', offset: 100, customClass: 'mobile-message' })
+             error('该邮箱已被注册')
              return
         }
     } catch (e) {
@@ -224,22 +228,23 @@ const handleConfirm = async () => {
         // Verify New Email Logic First? Or direct update with verify?
         // PC logic: verifyOtp(newEmail, code) THEN updateEmail(newEmail)
         
+        
         const verifyRes = await authApi.verifyOtp(form.email, form.code)
         if (!verifyRes.success) {
-            ElMessage.error(verifyRes.msg || '验证码错误')
+            error(verifyRes.msg || '验证码错误')
             return
         }
 
         const updateRes = await authApi.updateEmail(form.email)
         if (updateRes.success) {
             emit('success')
-            ElMessage.success({ message: '绑定成功，请查收确认邮件', offset: 100, customClass: 'mobile-message' })
+            success('绑定成功，请查收确认邮件')
             handleClose()
         } else {
-             ElMessage.error(updateRes.msg || '绑定失败')
+             error(updateRes.msg || '绑定失败')
         }
     } catch (e: any) {
-        ElMessage.error(e.message || '操作失败')
+        error(e.message || '操作失败')
     } finally {
         baseLoading.value = false
     }
@@ -253,20 +258,12 @@ const handleConfirm = async () => {
     padding: 20px;
 }
 
+/* Global Aurora Modal */
 .modal-content {
-    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.8));
-    width: 100%; max-width: 320px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), 0 10px 40px rgba(0,0,0,0.5);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(20px);
+    /* Styles handled by .aurora-modal-panel */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 
@@ -329,4 +326,9 @@ const handleConfirm = async () => {
     width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Flex adjustments for input-row with aurora-input */
+.input-row .aurora-input { flex: 1; min-width: 0; }
+.code-btn { flex-shrink: 0; }
+.aurora-btn-primary { margin-top: 20px; }
 </style>

@@ -13,15 +13,25 @@
     <!-- Glass Effect Background for Navigation -->
     <div class="bg-glass" v-if="variant === 'navigation'"></div>
 
-    <div class="loader-content">
-      <!-- Dual Ring Spinner -->
-      <div class="spinner-container">
-        <div class="ring outer-ring"></div>
-        <div class="ring inner-ring"></div>
-      </div>
+    <div class="loader-content" v-if="variant === 'initial'">
+      <!-- Brand Name -->
+      <h1 class="brand-name">凡图拉</h1>
       
-      <!-- Branding (Only for Initial Load) -->
-      <h1 class="brand-name" v-if="variant === 'initial'">FanTula</h1>
+      <!-- Rolling Text Animation (Horizontally aligned after brand) -->
+      <div class="rolling-text-container">
+        <div class="rolling-track">
+          <div class="rolling-item item-1">可靠</div>
+          <div class="rolling-item item-2">正规</div>
+          <div class="rolling-item item-3">稳定</div>
+          <!-- Duplicate for end state -->
+          <div class="rolling-item item-1">可靠</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple Spinner for Navigation -->
+    <div class="loader-content" v-else>
+       <div class="spinner-simple"></div>
     </div>
   </div>
 </template>
@@ -61,19 +71,8 @@ withDefaults(defineProps<Props>(), {
 
 /* Mode: Navigation (Glass Effect) */
 .global-loader.mode-navigation {
-  background-color: rgba(2, 6, 23, 0.4); /* Semi-transparent dark blue */
-  backdrop-filter: blur(12px); /* Frost glass effect */
-}
-
-/* Mode: Section (Local Area Loader) */
-.global-loader.mode-section {
-  position: absolute; /* Relative to parent container */
-  width: 100%;
-  height: 100%;
-  z-index: 50;
-  border-radius: 24px; /* Match container radius */
   background-color: rgba(2, 6, 23, 0.4);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
 }
 
 .global-loader.is-hidden {
@@ -107,89 +106,109 @@ withDefaults(defineProps<Props>(), {
   mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
 }
 
-.bg-glass {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-}
-
 .loader-content {
   text-align: center;
   position: relative;
   z-index: 10;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
+  flex-direction: row; /* Horizontal alignment */
+  align-items: center; /* Center vertically */
+  justify-content: center;
+  gap: 1.5rem; /* Gap between "Fantula" and rolling text */
 }
 
-/* Spinner Container */
-.spinner-container {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  filter: drop-shadow(0 0 10px rgba(23, 143, 198, 0.3));
-}
-
-.ring {
-  position: absolute;
-  border-radius: 50%;
-  border-style: solid;
-  border-color: transparent;
-}
-
-/* Outer Ring - Blue */
-.outer-ring {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-width: 4px;
-  border-top-color: var(--color-brand-primary); /* Primary Blue */
-  border-left-color: rgba(23, 143, 198, 0.3);
-  animation: spinner 0.6s linear infinite;
-}
-
-/* Inner Ring - Orange */
-.inner-ring {
-  top: 15px;
-  left: 15px;
-  width: 50px;
-  height: 50px;
-  border-width: 4px;
-  border-top-color: #F97316; /* Active Orange */
-  border-right-color: rgba(249, 115, 22, 0.3);
-  animation: spin-reverse 0.4s linear infinite; /* Much faster reverse */
-}
-
-/* Branding Text */
+/* Brand Name */
 .brand-name {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: 4px;
-  text-transform: uppercase;
+  font-size: 3.5rem; /* Large size */
+  font-weight: 800;
+  letter-spacing: 2px;
   color: #fff;
-  opacity: 0.8;
-  animation: pulse 2s ease-in-out infinite;
+  background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.3));
+  margin: 0;
+  line-height: 80px; /* Match container height */
 }
 
-/* Animations */
+/* Rolling Text Container */
+.rolling-text-container {
+  height: 80px; /* Increased height to match larger font */
+  overflow: hidden;
+  position: relative;
+  perspective: 1000px;
+  /* Align with brand name baseline */
+  display: block;
+}
+
+.rolling-track {
+  animation: roll-up 3.5s cubic-bezier(0.25, 1, 0.5, 1); /* Slower animation (3.5s) */
+  animation-fill-mode: forwards;
+}
+
+.rolling-item {
+  height: 80px; /* Match container height */
+  line-height: 80px; /* Vertically center */
+  font-size: 3.5rem; /* Same size as Brand Name */
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-align: left;
+}
+
+/* Colors for rolling items */
+.item-1 { color: #F59E0B; text-shadow: 0 0 15px rgba(245, 158, 11, 0.4); } /* Gold/Orange */
+.item-2 { color: #34D399; text-shadow: 0 0 15px rgba(52, 211, 153, 0.4); } /* Emerald Green */
+.item-3 { color: #38BDF8; text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); } /* Sky Blue */
+
+/* Keyframes - Adjusted for 80px height */
+@keyframes roll-up {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(0); }
+  
+  33% { transform: translateY(-80px); }
+  53% { transform: translateY(-80px); }
+  
+  66% { transform: translateY(-160px); }
+  86% { transform: translateY(-160px); }
+  
+  100% { transform: translateY(-160px); } /* End state */
+}
+
+/* Simple Spinner for non-initial loading */
+.spinner-simple {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #38BDF8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
-@keyframes spin-reverse {
-  0% { transform: rotate(360deg); }
-  100% { transform: rotate(0deg); }
-}
-
-@keyframes pulse {
-  0% { opacity: 0.5; transform: scale(0.98); }
-  50% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0.5; transform: scale(0.98); }
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .loader-content {
+    flex-direction: row; /* Keep horizontal on mobile */
+    gap: 0.8rem;
+  }
+  .brand-name { font-size: 1.8rem; line-height: 40px; }
+  .rolling-text-container { height: 40px; display: block; }
+  .rolling-item { height: 40px; line-height: 40px; font-size: 1.8rem; }
+  
+  @keyframes roll-up {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(0); }
+    
+    33% { transform: translateY(-40px); }
+    53% { transform: translateY(-40px); }
+    
+    66% { transform: translateY(-80px); }
+    86% { transform: translateY(-80px); }
+    
+    100% { transform: translateY(-80px); }
+  }
 }
 </style>

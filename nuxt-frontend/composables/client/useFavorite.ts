@@ -1,11 +1,12 @@
 import { ref } from 'vue'
 import { useModalStore } from '@/stores/client/modal'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 export function useFavorite(productId: Ref<string>, skuId: Ref<string | undefined>) {
     const modal = useModalStore()
     const userStore = useUserStore()
+    const { success, warning, info } = useNotify()
 
     const isFavorited = ref(false)
     const favoriteLoading = ref(false)
@@ -28,14 +29,14 @@ export function useFavorite(productId: Ref<string>, skuId: Ref<string | undefine
         try {
             const { favoriteApi } = await import('@/api/client/common')
             if (isFavorited.value) {
-                ElMessage.info('取消收藏请前往"我的收藏"页面')
+                info('取消收藏请前往"我的收藏"页面')
             } else {
                 const res = await favoriteApi.addFavorite(productId.value, skuId.value)
                 if (res.success) {
                     isFavorited.value = true
-                    ElMessage.success('收藏成功')
+                    success('收藏成功')
                 } else {
-                    ElMessage.warning(res.msg || '收藏失败')
+                    warning(res.msg || '收藏失败')
                 }
             }
         } finally {

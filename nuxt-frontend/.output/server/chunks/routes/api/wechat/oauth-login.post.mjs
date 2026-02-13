@@ -1,6 +1,7 @@
 import { d as defineEventHandler, r as readBody, c as createError, u as useRuntimeConfig } from '../../../nitro/nitro.mjs';
-import { b as getWechatPayConfig, g as getSupabaseServiceClient } from '../../../_/wechat-pay.mjs';
+import { g as getSupabaseServiceClient } from '../../../_/supabase.mjs';
 import { a as generateBindToken } from '../../../_/wechat-login.mjs';
+import { getWechatPayConfig } from '../../../_/wechat-pay.mjs';
 import 'node:http';
 import 'node:https';
 import 'node:events';

@@ -80,7 +80,8 @@ import { wechatLoginApi } from '@/api/client/wechat-login'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { getSupabaseClient } from '~/utils/supabase'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { useGlobalLoading } from '@/composables/useGlobalLoading' // Import
 
 const route = useRoute()
 const router = useRouter()
@@ -113,11 +114,15 @@ const loading = computed(() => baseLoading.value || codeLoading.value)
 // const codeTimer = ref(0) // Replaced
 let codeInterval: any = null // clear on unmount if any? useSendCode handles it.
 
+// Global Loading
+const globalLoading = useGlobalLoading()
+
 onMounted(async () => {
   // 0. 特殊处理：如果是 Magic Link 回调（Hash 中包含 access_token）
   if (route.hash && route.hash.includes('access_token')) {
     console.log('[WechatCallback] Magic Link hash detected')
-    state.value = 'loading'
+    // state.value = 'loading' 
+    globalLoading.show('正在验证登录...') // Global Show
     
     // 监听 Auth 状态变化 (Supabase 客户端会自动处理 Hash 并恢复 Session)
     const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
@@ -127,9 +132,11 @@ onMounted(async () => {
         // 确保 userStore 同步
         await userStore.setUser(session.user, session.access_token)
         
-        state.value = 'success'
+        // state.value = 'success'
+        globalLoading.success('登录成功') // Global Success
         setTimeout(() => {
             const returnTo = route.query.return_to as string
+            globalLoading.hide() // Ensure hide before nav
             if (returnTo) {
                 window.location.href = decodeURIComponent(returnTo)
             } else {
@@ -172,7 +179,8 @@ onMounted(async () => {
   // 场景: 充值获取 OpenID（state=recharge），不是绑定微信
   const urlState = route.query.state as string
   if (urlState === 'recharge') {
-    state.value = 'loading'
+    // state.value = 'loading'
+    globalLoading.show('正在处理充值授权...')
     try {
       // 通过 code 换取 openid 用于支付
       const { wechatPayApi } = await import('@/api/client/wechat-payment')
@@ -198,14 +206,17 @@ onMounted(async () => {
 
   // 场景: 已登录用户绑定微信
   if (userStore.isLoggedIn) {
-     state.value = 'loading'
+     // state.value = 'loading'
+     globalLoading.show('正在绑定微信...')
      try {
         const res = await wechatLoginApi.bindWechatToAccount({ wechatCode: code })
         if (res.success) {
-            state.value = 'success'
+            // state.value = 'success'
+            globalLoading.success('绑定成功')
             // 绑定成功后刷新用户信息以获取最新的 openId
             await userStore.fetchUserInfo()
             setTimeout(() => {
+                globalLoading.hide()
                 const returnTo = route.query.return_to as string
                 if (returnTo) {
                     // 解码 return_to 避免多次编码问题
@@ -216,10 +227,12 @@ onMounted(async () => {
                 }
             }, 1000)
         } else {
+            globalLoading.hide() // Hide loading to show error
             state.value = 'error'
             errorMsg.value = res.msg || '绑定失败'
         }
      } catch (e: any) {
+        globalLoading.hide()
         state.value = 'error'
         errorMsg.value = e.message || '绑定失败'
      }
@@ -227,6 +240,7 @@ onMounted(async () => {
   }
 
   try {
+    globalLoading.show('正在处理微信登录...')
     // 获取 return_to 参数
     const returnTo = route.query.return_to as string
     
@@ -236,6 +250,7 @@ onMounted(async () => {
     })
 
     if (!res.success || !res.data) {
+      globalLoading.hide()
       state.value = 'error'
       errorMsg.value = res.msg || '登录失败'
       return
@@ -247,26 +262,31 @@ onMounted(async () => {
       //       → onMounted 的 hash 分支处理 → 建立 session → 登录成功
       
       if (res.data.actionLink) {
-         state.value = 'success'
+         // state.value = 'success'
+         globalLoading.show('正在跳转...') // Keep showing or update text
          console.log('[WechatCallback] Redirecting to Magic Link for auto-login...')
          window.location.href = res.data.actionLink
       } else {
           // 降级：Magic Link 生成失败，提示用户
+          globalLoading.hide()
           state.value = 'error'
           errorMsg.value = '自动登录失败，请使用邮箱验证码登录'
           console.error('[WechatCallback] No actionLink returned from server')
       }
     } else if (res.data.status === 'need_bind') {
       // 需要绑定邮箱
+      globalLoading.hide() // Show form
       bindToken.value = res.data.bindToken || ''
       bindForm.value.nickname = res.data.nickname
       bindForm.value.avatar = res.data.avatar
       state.value = 'bind'
     } else {
+      globalLoading.hide()
       state.value = 'error'
       errorMsg.value = '未知状态'
     }
   } catch (err: any) {
+    globalLoading.hide()
     state.value = 'error'
     errorMsg.value = err.message || '登录失败'
   }
@@ -343,6 +363,7 @@ const onBind = async () => {
     })
 
     if (res.success && res.data) {
+      globalLoading.show('正在完成绑定...') // Show loading again
       // 🔑 关键：在 Supabase JS Client 上建立 session
       // 否则后续的 auth.getUser() 会返回 null（未登录）
       const client = getSupabaseClient()
@@ -356,8 +377,10 @@ const onBind = async () => {
       // 设置 userStore 并刷新完整用户信息（含 openId）
       userStore.setUser(res.data.user, res.data.session?.access_token)
       await userStore.fetchUserInfo()
-      state.value = 'success'
+      // state.value = 'success' // Use Global
+      globalLoading.success('绑定成功')
       setTimeout(() => {
+        globalLoading.hide()
         const returnTo = route.query.return_to as string
         if (returnTo) {
             window.location.href = decodeURIComponent(returnTo)

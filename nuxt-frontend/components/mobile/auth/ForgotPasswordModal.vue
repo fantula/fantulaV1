@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="handleClose">
-    <div class="modal-content">
+    <div class="modal-content aurora-modal-panel">
       <div class="modal-header">
         <h3 class="modal-title">找回密码</h3>
         <button class="close-btn" @click="handleClose">
@@ -22,6 +22,7 @@
                     <input 
                         v-model="form.code" 
                         type="text" 
+                        class="aurora-input"
                         placeholder="请输入验证码"
                         maxlength="6"
                     />
@@ -39,11 +40,12 @@
                 <input 
                     v-model="form.newPassword" 
                     type="password" 
+                    class="aurora-input"
                     placeholder="请输入新密码 (至少6位)"
                 />
             </div>
 
-            <button class="submit-btn full-width" type="submit" :disabled="loading || !canSubmit">
+            <button class="aurora-btn-primary" type="submit" :disabled="loading || !canSubmit">
                 <div v-if="loading" class="spinner"></div>
                 <span v-else>重置密码</span>
             </button>
@@ -59,7 +61,7 @@ import { ref, reactive, computed, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import EmailInput from '@/components/shared/EmailInput.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
 import { useSendCode } from '@/composables/client/useSendCode'
@@ -76,6 +78,8 @@ const form = reactive({
   code: '',
   newPassword: ''
 })
+
+const { success, error, warning } = useNotify()
 
 const { 
   loading: codeLoading, 
@@ -104,7 +108,7 @@ const handleClose = () => {
 
 const sendCode = async () => {
     if (!isValidEmail.value) {
-        ElMessage.warning('请输入有效的邮箱地址')
+        warning('请输入有效的邮箱地址')
         return
     }
     await sendOtp(form.email)
@@ -122,7 +126,7 @@ const handleSubmit = async () => {
     })
 
     if (res.success) {
-      ElMessage.success('密码重置成功，已自动登录')
+      success('密码重置成功，已自动登录')
       
       const userRes = await authApi.getUserInfo()
       if (userRes.success) {
@@ -133,13 +137,13 @@ const handleSubmit = async () => {
          setTimeout(() => location.reload(), 500)
       } else {
          emit('close')
-         ElMessage.success('密码重置成功，请重新登录')
+         success('密码重置成功，请重新登录')
       }
     } else {
-      ElMessage.error(res.msg || '重置失败')
+      error(res.msg || '重置失败')
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '重置失败')
+    error(e.message || '重置失败')
   } finally {
     baseLoading.value = false
   }
@@ -154,20 +158,12 @@ const handleSubmit = async () => {
     padding: 20px;
 }
 
+/* Global Aurora Modal */
 .modal-content {
-    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.9));
-    width: 100%; max-width: 340px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), 0 10px 40px rgba(0,0,0,0.5);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(20px);
+    /* Styles handled by .aurora-modal-panel */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 
@@ -219,4 +215,9 @@ const handleSubmit = async () => {
     width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Flex adjustments for input-row with aurora-input */
+.input-row .aurora-input { flex: 1; min-width: 0; }
+.mobile-send-btn { flex-shrink: 0; margin-left: 10px; }
+.aurora-btn-primary { margin-top: 20px; }
 </style>

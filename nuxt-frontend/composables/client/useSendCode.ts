@@ -5,7 +5,7 @@
 import { ref, onMounted } from 'vue'
 import { authApi } from '@/api/client/auth'
 import { useAuthTimer } from '@/composables/client/useAuthTimer'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 interface UseSendCodeOptions {
     timerKey: string
@@ -15,6 +15,7 @@ interface UseSendCodeOptions {
 export function useSendCode(options: UseSendCodeOptions) {
     const { timerKey, cooldown = 180 } = options
     const loading = ref(false)
+    const { success, error, warning } = useNotify()
 
     // 使用统一的 Timer Composable
     const { countdown, start, restore } = useAuthTimer()
@@ -33,14 +34,14 @@ export function useSendCode(options: UseSendCodeOptions) {
         if (countdown.value > 0) return
 
         if (!email) {
-            ElMessage.warning('请输入邮箱')
+            warning('请输入邮箱')
             return false
         }
 
         // 简单邮箱格式校验
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
-            ElMessage.warning('邮箱格式不正确')
+            warning('邮箱格式不正确')
             return false
         }
 
@@ -51,15 +52,15 @@ export function useSendCode(options: UseSendCodeOptions) {
             const res = await authApi.getEmailCode(email)
 
             if (res.success) {
-                ElMessage.success('验证码已发送')
+                success('验证码已发送')
                 start(cooldown, timerKey)
                 return true
             } else {
-                ElMessage.error(res.msg || '发送失败')
+                error(res.msg || '发送失败')
                 return false
             }
-        } catch (error: any) {
-            ElMessage.error(error.message || '网络错误')
+        } catch (err: any) {
+            error(err.message || '网络错误')
             return false
         } finally {
             loading.value = false

@@ -125,7 +125,7 @@
 
     <SelectAvatarModal
         :visible="activeModal === 'avatar'"
-        :current-avatar="user?.avatar"
+        :current-avatar="userStore.user?.avatar"
         @close="activeModal = null"
         @success="handleSuccess('头像已更新')"
     />
@@ -139,15 +139,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
+import { ArrowRight, DocumentCopy } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
-import { commonApi } from '@/api/client/common'
-import { clientUserApi } from '@/api/client/user'
-import { authApi } from '@/api/client/auth' // Add missing authApi import if not present
-import { wechatLoginApi } from '@/api/client/wechat-login'
-import { ElMessage } from 'element-plus'
+import { authApi } from '@/api/client/auth'
+import { useNotify } from '@/composables/useNotify'
 
 // Modal Imports
 import EditNicknameModal from '@/components/mobile/profile/modals/EditNicknameModal.vue'
@@ -168,8 +165,10 @@ const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
 const activeModal = ref<string | null>(null)
+const { success, error } = useNotify()
+
 const handleSuccess = (msg: string) => {
-    ElMessage.success({ message: msg, offset: 100, customClass: 'mobile-message' })
+    success(msg)
     userStore.fetchUserInfo()
 }
 
@@ -201,11 +200,16 @@ const copyUID = () => {
     textArea.select()
     try {
         document.execCommand('copy')
-        ElMessage.success({ message: 'UID 已复制', offset: 100, customClass: 'mobile-message' })
+        success('UID 已复制')
     } catch (err) {
-        ElMessage.error('复制失败')
+        error('复制失败')
     }
     document.body.removeChild(textArea)
+}
+
+const handleImageError = (e: Event) => {
+    const target = e.target as HTMLImageElement
+    target.src = '/images/client/pc/avatars/avatar-cat.png'
 }
 </script>
 

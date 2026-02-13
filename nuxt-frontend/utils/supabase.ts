@@ -4,21 +4,38 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
  * Supabase 客户端配置
  * 用于连接 Supabase 后端服务
  * 
- * 自动从 runtimeConfig 获取配置，支持开发/生产环境切换
+ * SSR 安全：
+ * - 客户端：单例模式，persistSession=true（使用 localStorage）
+ * - 服务端：每次调用创建新实例，persistSession=false（不访问 localStorage）
+ *   避免跨请求状态泄露和 500 错误
  */
 
-let supabaseClient: SupabaseClient | null = null
+let clientSideSupabase: SupabaseClient | null = null
 
 /**
- * 获取 Supabase 客户端实例（单例模式）
+ * 获取 Supabase 客户端实例
+ * - 客户端：单例（安全，因为每个浏览器独立）
+ * - 服务端：每次新建（避免跨请求污染）
  */
 export function getSupabaseClient(): SupabaseClient {
-    if (!supabaseClient) {
-        const config = useRuntimeConfig()
-        const SUPABASE_URL = config.public.supabaseUrl || 'http://127.0.0.1:54321'
-        const SUPABASE_ANON_KEY = config.public.supabaseAnonKey || 'sb_publishable_default_key'
+    const config = useRuntimeConfig()
+    const SUPABASE_URL = config.public.supabaseUrl || 'http://127.0.0.1:54321'
+    const SUPABASE_ANON_KEY = config.public.supabaseAnonKey || 'sb_publishable_default_key'
 
-        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    // SSR 服务端：每次创建新实例，不访问 localStorage
+    if (import.meta.server) {
+        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false,
+            },
+        })
+    }
+
+    // 客户端：安全的单例模式
+    if (!clientSideSupabase) {
+        clientSideSupabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
@@ -26,7 +43,7 @@ export function getSupabaseClient(): SupabaseClient {
             },
         })
     }
-    return supabaseClient
+    return clientSideSupabase
 }
 
 /**

@@ -26,9 +26,13 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { HomeFilled, Grid, Service, User } from '@element-plus/icons-vue' // Using Grid for "Functions"
+import { useUserStore } from '@/stores/client/user'
+import { useModalStore } from '@/stores/client/modal'
 
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore()
+const modalStore = useModalStore()
 
 // Check if current path starts with tab path (for nested routes)
 // But for exact tabs (home, category, help, profile) usually exact or prefix match.
@@ -45,6 +49,13 @@ const tabs = computed<Array<{name: string, path: string, icon: any, badge?: numb
 ])
 
 const handleTabClick = (tab: any) => {
+  // Intecept Profile Tab if not logged in
+  if (tab.path === '/mobile/profile' && !userStore.isLoggedIn) {
+      modalStore.openLogin()
+      return
+  }
+  
+  if (route.path === tab.path) return // Prevent duplicate navigation
   router.push(tab.path)
 }
 </script>

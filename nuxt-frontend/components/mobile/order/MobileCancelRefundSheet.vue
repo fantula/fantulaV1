@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="visible" class="modal-overlay" @click="handleClose">
-        <div class="modal-panel-glass" @click.stop>
+        <div class="modal-panel-glass aurora-sheet-panel" @click.stop>
           <!-- Header -->
           <div class="modal-header">
             <div class="header-icon warning">
@@ -71,7 +71,7 @@
 import { ref, computed } from 'vue'
 import { Close, Warning, WarningFilled, InfoFilled } from '@element-plus/icons-vue'
 import { clientOrderApi } from '@/api/client/order'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
@@ -97,6 +97,8 @@ const visible = computed({
   set: (val) => emit('update:modelValue', val)
 })
 
+const { success, error } = useNotify()
+
 const submitting = ref(false)
 
 const handleClose = () => visible.value = false
@@ -108,14 +110,14 @@ const handleConfirm = async () => {
   try {
     const res = await clientOrderApi.cancelRefundRequest(props.orderId)
     if (res.success) {
-      ElMessage.success('已取消退款申请')
+      success('已取消退款申请')
       emit('success')
       handleClose()
     } else {
-      ElMessage.error(res.error || '取消失败')
+      error(res.error || '取消失败')
     }
   } catch (e: any) {
-    ElMessage.error(e.message || '系统错误')
+    error(e.message || '系统错误')
   } finally {
     submitting.value = false
   }
@@ -130,20 +132,12 @@ const handleConfirm = async () => {
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
+  padding: 0;
+  align-items: flex-end; /* Bottom sheet */
 }
 
 .modal-panel-glass {
-  width: 100%;
-  max-width: 340px;
-  background: rgba(30, 41, 59, 0.95);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-  overflow: hidden;
+    /* Global Aurora Style */
 }
 
 /* Header */
@@ -245,11 +239,11 @@ const handleConfirm = async () => {
 .modal-fade-leave-active .modal-panel-glass { animation: pop-out 0.25s ease; }
 
 @keyframes pop-in {
-  from { transform: scale(0.95) translateY(10px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 @keyframes pop-out {
-  from { transform: scale(1) translateY(0); opacity: 1; }
-  to { transform: scale(0.95) translateY(10px); opacity: 0; }
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
 }
 </style>

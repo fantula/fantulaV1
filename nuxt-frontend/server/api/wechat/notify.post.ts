@@ -176,6 +176,21 @@ export default defineEventHandler(async (event) => {
                 })
 
             console.log(`[Notify] Success: User ${attach.userId} recharged ${totalAmount} (amount: ${order.amount}, bonus: ${bonus})`)
+
+            // 异步发送充值到账邮件通知（不阻塞支付回调）
+            const { data: userProfile } = await supabase
+                .from('profiles')
+                .select('email')
+                .eq('id', attach.userId)
+                .single()
+
+            if (userProfile?.email) {
+                sendNotification('recharge_success', userProfile.email, {
+                    amount: orderAmount.toFixed(2),
+                    bonus: bonus.toFixed(2),
+                    balance: newBalance.toFixed(2),
+                }).catch(e => console.error('[Notify] Email send error:', e))
+            }
         }
 
         return { code: 'SUCCESS', message: '成功' }

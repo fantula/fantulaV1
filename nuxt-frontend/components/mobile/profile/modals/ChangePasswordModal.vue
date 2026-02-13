@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content">
+    <div class="modal-content aurora-modal-panel">
       <div class="modal-header">
         <h3 class="modal-title">修改登录密码</h3>
         <button class="close-btn" @click="$emit('close')">
@@ -21,6 +21,7 @@
                     <input 
                         v-model="form.code" 
                         type="text" 
+                        class="aurora-input"
                         placeholder="请输入验证码"
                         maxlength="6"
                     />
@@ -39,6 +40,7 @@
                 <input 
                     v-model="form.newPassword" 
                     type="password" 
+                    class="aurora-input"
                     placeholder="请输入新密码 (6-20位)"
                 />
             </div>
@@ -48,6 +50,7 @@
                 <input 
                     v-model="form.confirmPassword" 
                     type="password" 
+                    class="aurora-input"
                     placeholder="再次输入新密码"
                 />
             </div>
@@ -55,9 +58,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="cancel-btn" @click="$emit('close')">取消</button>
         <button 
-            class="submit-btn" 
+            class="aurora-btn-primary" 
             :disabled="!canSubmit || loading"
             @click="handleConfirm"
         >
@@ -75,7 +77,7 @@ import { ref, reactive, computed, onUnmounted, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 const props = defineProps<{
   visible: boolean
@@ -83,6 +85,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'success'])
 const userStore = useUserStore()
+const { error } = useNotify()
 
 import { useSendCode } from '@/composables/client/useSendCode'
 
@@ -134,7 +137,7 @@ const handleConfirm = async () => {
         // 1. Verify OTP
         const verifyRes = await authApi.verifyOtp(userStore.user.email, form.code)
         if (!verifyRes.success) {
-            ElMessage.error(verifyRes.msg || '验证码错误')
+            error(verifyRes.msg || '验证码错误')
             return
         }
 
@@ -144,10 +147,10 @@ const handleConfirm = async () => {
             emit('success')
             userStore.logout() // Force logout as expected by mobile flow
         } else {
-             ElMessage.error(updateRes.msg || '密码修改失败')
+             error(updateRes.msg || '密码修改失败')
         }
     } catch (e: any) {
-        ElMessage.error(e.message || '操作失败')
+        error(e.message || '操作失败')
     } finally {
         baseLoading.value = false
     }
@@ -161,20 +164,12 @@ const handleConfirm = async () => {
     padding: 20px;
 }
 
+/* Global Aurora Modal */
 .modal-content {
-    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.8));
-    width: 100%; max-width: 320px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), 0 10px 40px rgba(0,0,0,0.5);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(20px);
+    /* Styles handled by .aurora-modal-panel */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 
@@ -243,4 +238,8 @@ const handleConfirm = async () => {
     width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Flex adjustments for input-row with aurora-input */
+.input-row .aurora-input { flex: 1; min-width: 0; }
+.code-btn { flex-shrink: 0; }
 </style>

@@ -25,6 +25,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ProductDetailSheet from '@/components/mobile/goods/ProductDetailSheet.vue'
+import { useProductDetail } from '@/composables/client/useProductDetail' // Import composable
 
 definePageMeta({ layout: 'mobile', hideTabBar: true })
 
@@ -32,6 +33,23 @@ const route = useRoute()
 const router = useRouter()
 const goodsId = route.params.id as string
 const sheetVisible = ref(false)
+
+// Fetch Data for SEO (and pre-fetch for sheet)
+const { goodsSeo } = useProductDetail() 
+
+useHead({
+  title: computed(() => `${goodsSeo.value.title} - 凡图拉`),
+  meta: [
+    { name: 'description', content: computed(() => goodsSeo.value.desc) },
+    { name: 'keywords', content: computed(() => `${goodsSeo.value.title},数字产品,代充,凡图拉`) },
+    // Open Graph
+    { property: 'og:title', content: computed(() => goodsSeo.value.title) },
+    { property: 'og:description', content: computed(() => goodsSeo.value.desc) },
+    { property: 'og:image', content: computed(() => goodsSeo.value.image) },
+    // Mobile Viewport optimization (already global, but safe to ensure)
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' }
+  ]
+})
 
 onMounted(() => {
     // Open sheet immediately on enter

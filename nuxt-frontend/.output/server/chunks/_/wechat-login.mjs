@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { b as getWechatPayConfig } from './wechat-pay.mjs';
+import { getWechatPayConfig } from './wechat-pay.mjs';
 
 let accessTokenCache = null;
 async function getWechatAccessToken() {

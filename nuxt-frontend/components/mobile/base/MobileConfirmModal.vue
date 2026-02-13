@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="visible" class="modal-overlay" @click="handleCancel">
-        <div class="modal-content" @click.stop>
+        <div class="modal-content aurora-dialog-box" @click.stop>
           
           <div class="modal-header">
             <div class="icon-circle" :class="type">
@@ -77,19 +77,10 @@ const handleConfirm = () => {
 }
 
 .modal-content {
-    background: rgba(15, 23, 42, 0.9);
-    width: 100%; max-width: 280px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    display: flex; flex-direction: column; align-items: center;
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Global Aurora Dialog */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-dialog-box */
 
 .modal-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 16px; }
 

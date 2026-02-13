@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, createError } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
 import { u as useRuntimeConfig } from '../../../nitro/nitro.mjs';
-import { g as getSupabaseServiceClient, a as getCurrentUser } from '../../../_/wechat-pay.mjs';
+import { s as sendNotification } from '../../../_/email.mjs';
+import { g as getSupabaseServiceClient, a as getCurrentUser } from '../../../_/supabase.mjs';
 import { v as verifyBindToken, g as getWechatUserInfo } from '../../../_/wechat-login.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/destr/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/hookable/dist/index.mjs';
@@ -22,6 +23,7 @@ import 'node:fs';
 import 'node:url';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/pathe/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
+import '../../../_/wechat-pay.mjs';
 
 const bindWechat_post = defineEventHandler(async (event) => {
   var _a;
@@ -143,6 +145,11 @@ const bindWechat_post = defineEventHandler(async (event) => {
       }
     }
     console.log("[BindWechat] Successfully bound:", { userId: authData.user.id, openid });
+    if (authData.user.email) {
+      sendNotification("account_welcome", authData.user.email, {
+        nickname: body.nickname || authData.user.email.split("@")[0] || "\u65B0\u7528\u6237"
+      }).catch((e) => console.error("[BindWechat] Welcome email error:", e));
+    }
     return {
       success: true,
       message: "\u7ED1\u5B9A\u6210\u529F",
@@ -160,7 +167,7 @@ const bindWechat_post = defineEventHandler(async (event) => {
   }
 });
 async function bindWechatToExistingUser(supabase, userId, wechatCode) {
-  const { getWechatPayConfig } = await import('../../../_/wechat-pay.mjs').then(function (n) { return n.j; });
+  const { getWechatPayConfig } = await import('../../../_/wechat-pay.mjs');
   const config = getWechatPayConfig();
   const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.appid}&secret=${config.appSecret}&code=${wechatCode}&grant_type=authorization_code`;
   const response = await fetch(url);

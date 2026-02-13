@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="sheet-fade">
       <div v-if="visible" class="mobile-sheet-overlay" @click="$emit('close')">
-        <div class="mobile-sheet-content cyber-sheet" @click.stop>
+        <div class="mobile-sheet-content aurora-sheet-panel" @click.stop>
           
           <!-- Header -->
           <div class="sheet-header">
@@ -115,18 +115,7 @@ const updateQty = (delta: number) => {
     backdrop-filter: blur(4px);
     display: flex; align-items: flex-end;
 }
-.mobile-sheet-content {
-    width: 100%;
-    border-radius: 24px 24px 0 0;
-    
-    /* Cyber Theme Application */
-    background: var(--cyber-bg-glass, rgba(10, 10, 25, 0.95));
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-top: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6), 0 -2px 20px rgba(6, 182, 212, 0.15); /* Top glow */
-    
-    padding-bottom: env(safe-area-inset-bottom);
+    /* Global Aurora Panel */
 }
 
 /* Header */

@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click.self="handleClose">
-      <div class="modal-content">
+      <div class="modal-content aurora-modal-panel">
         <div class="modal-header">
           <h3 class="modal-title">修改头像</h3>
           <button class="close-btn" @click="handleClose">
@@ -37,8 +37,7 @@
         </div>
 
         <div class="modal-footer">
-          <button class="cancel-btn" @click="handleClose">取消</button>
-          <button class="submit-btn" @click="handleConfirm" :disabled="loading || !hasChange">
+          <button class="aurora-btn-primary" @click="handleConfirm" :disabled="loading || !hasChange">
             <span v-if="loading" class="spinner"></span>
             <span v-else>保存修改</span>
           </button>
@@ -52,7 +51,7 @@
 import { ref, computed, watch } from 'vue'
 import { Close, Check } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 const props = defineProps<{
   visible: boolean
@@ -61,6 +60,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'success'])
 const userStore = useUserStore()
+const { success, error } = useNotify()
 
 const loading = ref(false)
 const selectedAvatar = ref('')
@@ -105,14 +105,14 @@ const handleConfirm = async () => {
     try {
         const res = await userStore.updateProfile({ avatar: selectedAvatar.value })
         if (res.success) {
-            ElMessage.success({ message: '头像修改成功', offset: 100, customClass: 'mobile-message' })
+            success('头像修改成功')
             emit('success')
             handleClose()
         } else {
-            ElMessage.error(res.message || '修改失败')
+            error(res.message || '修改失败')
         }
     } catch (e: any) {
-        ElMessage.error('操作失败')
+        error('操作失败')
     } finally {
         loading.value = false
     }
@@ -126,20 +126,12 @@ const handleConfirm = async () => {
     padding: 20px;
 }
 
+/* Global Aurora Modal */
 .modal-content {
-    background: var(--cyber-bg-glass, rgba(15, 23, 42, 0.85));
-    width: 100%; max-width: 340px;
-    border-radius: 20px; padding: 24px;
-    border: 1px solid var(--cyber-border, rgba(6, 182, 212, 0.3));
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.15), 0 10px 40px rgba(0,0,0,0.5);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(20px);
+    /* Styles handled by .aurora-modal-panel */
 }
 
-@keyframes popIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 
@@ -197,26 +189,17 @@ const handleConfirm = async () => {
 }
 
 .modal-footer { display: flex; gap: 12px; margin-top: 24px; }
-.cancel-btn, .submit-btn {
-    flex: 1; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
-    transition: all 0.2s;
-}
-.cancel-btn { 
-    background: rgba(255,255,255,0.05); color: #94A3B8;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-.cancel-btn:active { background: rgba(255,255,255,0.1); }
-
-.submit-btn { 
-    background: var(--cyber-gradient-btn, linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%));
-    color: white; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
-}
-.submit-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2); }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
+/* Handled by global aurora classes */
 
 .spinner {
     width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Button layout override to match flex: 1 */
+.aurora-btn-ghost { 
+    flex: 1; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 600; 
+    background: rgba(255,255,255,0.05); color: #94A3B8; border: 1px solid rgba(255,255,255,0.05);
+}
+.aurora-btn-primary { flex: 1; height: 48px; border-radius: 12px; }
 </style>

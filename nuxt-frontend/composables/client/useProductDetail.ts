@@ -5,6 +5,7 @@ import { supabaseProductApi, supabaseFaqApi } from '@/api/client/supabase'
 import { useModalStore } from '@/stores/client/modal'
 import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart'
+import { useNotify } from '@/composables/useNotify'
 
 export const useProductDetail = (overrideId?: string | number | Ref<string | number>) => {
   const route = useRoute()
@@ -12,6 +13,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
   const modal = useModalStore()
   const userStore = useUserStore()
   const cartStore = useCartStore()
+  const { success, warning, error, info } = useNotify()
 
   // --- 1. 商品 ID (优先使用传入的 ID) ---
   const goodsId = computed(() => {
@@ -202,10 +204,14 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
 
   const buyNow = async () => {
     if (!userStore.isLoggedIn) return modal.showLogin = true
-    if (!hasStock.value) return ElMessage.warning('商品暂时缺货')
-    if (!matchedSku.value && hasSkus.value) return ElMessage.warning('请选择商品规格')
+    if (!hasStock.value) return warning('商品暂时缺货')
+    if (!matchedSku.value && hasSkus.value) return warning('请选择商品规格')
 
-    const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
+    const skuId = matchedSku.value ? String(matchedSku.value.id) : String(goodsInfo.value.id)
+    if (!skuId) {
+      warning('商品信息异常')
+      return
+    }
     if (submitting.value) return
 
     submitting.value = true
@@ -215,11 +221,11 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
 
       if (!result.success) {
         if (['DUPLICATE_ORDER', 'LIMIT_EXCEEDED'].includes(result.code)) {
-          ElMessage.warning('您有未完成的订单，请前往订单中心查看')
+          warning('您有未完成的订单，请前往订单中心查看')
           router.push('/profile/orders?tab=待支付')
           return
         }
-        ElMessage.error(result.error || '创建预订单失败')
+        error(result.error || '创建预订单失败')
         return
       }
       router.push(`/checkout/${result.pre_order_id}`)
@@ -232,8 +238,8 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
 
   const addToCart = async (callback?: () => void) => {
     if (!userStore.isLoggedIn) return modal.showLogin = true
-    if (!hasStock.value) return ElMessage.warning('商品暂时缺货')
-    if (!matchedSku.value && hasSkus.value) return ElMessage.warning('请选择商品规格')
+    if (!hasStock.value) return warning('商品暂时缺货')
+    if (!matchedSku.value && hasSkus.value) return warning('请选择商品规格')
 
     const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
     if (submitting.value) return
@@ -245,13 +251,13 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
         if (callback) callback()
         else {
           cartStore.miniCartVisible = true
-          ElMessage.success('已成功加入购物车')
+          success('已成功加入购物车')
         }
       } else {
-        ElMessage.error(result.msg || '加入购物车失败')
+        error(result.msg || '加入购物车失败')
       }
     } catch (e) {
-      ElMessage.error('加入购物车失败')
+      error('加入购物车失败')
     } finally {
       submitting.value = false
     }
@@ -265,7 +271,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
     try {
       const { favoriteApi } = await import('@/api/client/common')
       if (isFavorited.value) {
-        ElMessage.info('取消收藏请前往"我的收藏"页面')
+        info('取消收藏请前往"我的收藏"页面')
       } else {
         const skuId = matchedSku.value?.id ? String(matchedSku.value.id) : undefined
         const res = await favoriteApi.addFavorite(String(goodsId.value), skuId)
@@ -277,9 +283,9 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
             const target = (event.target as HTMLElement).closest('.favorite-btn') as HTMLElement || (event.target as HTMLElement)
             callback(target, selectedSkuImage.value || goodsInfo.value.image)
           }
-          ElMessage.success('收藏成功')
+          success('收藏成功')
         } else {
-          ElMessage.warning(res.msg || '收藏失败')
+          warning(res.msg || '收藏失败')
         }
       }
     } finally {

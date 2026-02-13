@@ -39,10 +39,7 @@
       </el-table-column>
     </AdminDataTable>
 
-    <div v-if="true" class="mt-4 p-4 bg-gray-100 rounded text-xs font-mono">
-      <p>DEBUG INFO:</p>
-      <pre>{{ JSON.stringify({ pending, error, res }, null, 2) }}</pre>
-    </div>
+
   </div>
 </template>
 

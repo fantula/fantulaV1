@@ -83,7 +83,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Search, Plus, Service } from '@element-plus/icons-vue'
 import { supabaseFaqApi } from '@/api/client/supabase'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 definePageMeta({
   layout: 'mobile'
@@ -96,6 +96,7 @@ const categories = ref<any[]>([])
 const activeCategoryId = ref('all')
 const expandedId = ref<string | null>(null)
 const searchQuery = ref('')
+const { success, error } = useNotify()
 
 const filteredFaqs = computed(() => {
    let result = faqs.value
@@ -121,7 +122,7 @@ const toggle = (id: string) => {
 }
 
 const handleContact = () => {
-   ElMessage.success({ message: '正在连接人工客服...', offset: 100, customClass: 'mobile-message' })
+   success('正在连接人工客服...')
 }
 
 const fetchData = async () => {
@@ -140,7 +141,7 @@ const fetchData = async () => {
 
    } catch(e) {
       console.error(e)
-      ElMessage.error('加载失败')
+      error('加载失败')
    } finally {
       loading.value = false
    }

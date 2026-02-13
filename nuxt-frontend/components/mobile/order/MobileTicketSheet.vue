@@ -2,7 +2,7 @@
   <Teleport to="body">
   <Transition name="fade">
   <div v-if="visible" class="sheet-mask" @click="handleClose">
-    <div class="sheet-panel-glass" @click.stop>
+    <div class="sheet-panel-glass aurora-sheet-panel" @click.stop>
        <div class="sheet-header">
           <div class="title">提交工单</div>
           <div class="close-btn" @click="handleClose"><el-icon><Close /></el-icon></div>
@@ -14,7 +14,7 @@
 
           <div class="form-group">
              <label>标题 <span class="req">*</span></label>
-             <input v-model="form.title" class="input-glass" placeholder="简要描述问题" />
+             <input v-model="form.title" class="aurora-input" placeholder="简要描述问题" />
           </div>
 
           <div class="form-group">
@@ -33,7 +33,7 @@
 
           <div class="form-group">
              <label>详细描述 <span class="req">*</span></label>
-             <textarea v-model="form.content" class="input-glass area" rows="4" placeholder="请详细描述..."></textarea>
+             <textarea v-model="form.content" class="aurora-textarea" rows="4" placeholder="请详细描述..."></textarea>
           </div>
 
           <div class="form-group">
@@ -53,7 +53,7 @@
        </div>
 
        <div class="sheet-footer">
-          <button class="submit-btn-glow" :disabled="!isValid || submitting" @click="submit">
+          <button class="aurora-btn-primary" :disabled="!isValid || submitting" @click="submit">
              {{ submitting ? '提交中...' : '提交工单' }}
           </button>
        </div>
@@ -68,7 +68,7 @@ import { ref, reactive, computed } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { ticketApi } from '@/api/client/ticket'
 import { uploadImageToStorage } from '@/utils/uploadImage'
-import { ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 import MobileOrderProductInfo from './MobileOrderProductInfo.vue'
 
 const props = defineProps<{
@@ -77,6 +77,7 @@ const props = defineProps<{
   orderInfo: any // Expecting full order object simplified for display
 }>()
 const emit = defineEmits(['update:modelValue', 'success'])
+const { success, error } = useNotify()
 
 const visible = computed({
   get: () => props.modelValue,
@@ -117,9 +118,9 @@ const handleFile = async (e: Event) => {
       if (result.success && result.url) {
          form.attachments.push(result.url)
       } else {
-         ElMessage.error(result.error || '上传失败')
+         error(result.error || '上传失败')
       }
-   } catch(e) { ElMessage.error('上传失败') }
+   } catch(e) { error('上传失败') }
    finally { uploading.value = false; if(fileRaw.value) fileRaw.value.value = '' }
 }
 
@@ -128,11 +129,11 @@ const submit = async () => {
    try {
       const res = await ticketApi.create(props.orderId, form.title, form.content, form.priority, form.attachments)
       if (res.success) {
-         ElMessage.success('工单已提交')
+         success('工单已提交')
          emit('success')
          handleClose()
-      } else ElMessage.error(res.error || 'Fail')
-   } catch(e) { ElMessage.error('系统错误') }
+      } else error(res.error || 'Fail')
+   } catch(e) { error('系统错误') }
    finally { submitting.value = false }
 }
 </script>
@@ -144,12 +145,12 @@ const submit = async () => {
     display: flex; flex-direction: column; justify-content: flex-end;
 }
 .sheet-panel-glass {
-    background: rgba(15, 23, 42, 0.95); /* Deep Blue Glass */
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-top-left-radius: 24px; border-top-right-radius: 24px;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 60px);
+    /* Aurora styles handled globally by .aurora-sheet-panel */
+    /* Positioning override if needed, but flex-end works with mask */
+    width: 100%;
+    /* Override padding for footer */
+    padding-bottom: 0; 
     max-height: 90vh; display: flex; flex-direction: column;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 .sheet-header {
     padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -165,24 +166,20 @@ const submit = async () => {
 .form-group label { display: block; font-size: 12px; color: #CBD5E1; margin-bottom: 6px; font-weight: 500; }
 .req { color: #EF4444; }
 
-.input-glass {
-    width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
-    padding: 10px; color: #fff; font-size: 13px;
-    transition: all 0.2s;
-}
-.input-glass:focus { border-color: #3B82F6; background: rgba(59, 130, 246, 0.05); outline: none; }
-.area { resize: none; }
+/* .input-glass handled by global .aurora-input */
+.input-glass:focus { /* */ }
+.area { resize: none; height: 120px; }
 
 .priority-row { display: flex; gap: 8px; }
 .p-chip-glass {
-    flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 500;
-    background: rgba(255,255,255,0.05); color: #94A3B8; border: 1px solid transparent;
+    flex: 1; text-align: center; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 500;
+    background: rgba(255,255,255,0.03); color: #94A3B8; border: 1px solid transparent;
     transition: all 0.2s;
+    /* Similar to aurora-option-card but smaller */
 }
-.p-chip-glass.active.low { background: rgba(16, 185, 129, 0.15); color: #34D399; border-color: rgba(16, 185, 129, 0.3); }
-.p-chip-glass.active.medium { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border-color: rgba(245, 158, 11, 0.3); }
-.p-chip-glass.active.high { background: rgba(239, 68, 68, 0.15); color: #F87171; border-color: rgba(239, 68, 68, 0.3); }
+.p-chip-glass.active.low { background: rgba(16, 185, 129, 0.15); color: #34D399; border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 10px rgba(16,185,129,0.1); }
+.p-chip-glass.active.medium { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 10px rgba(245,158,11,0.1); }
+.p-chip-glass.active.high { background: rgba(239, 68, 68, 0.15); color: #F87171; border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 10px rgba(239,68,68,0.1); }
 
 .upload-row { display: flex; gap: 10px; }
 .add-btn-glass {
@@ -197,9 +194,7 @@ const submit = async () => {
 
 .sheet-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
 .submit-btn-glow {
-    width: 100%; padding: 14px; background: linear-gradient(90deg, #3B82F6, #2563EB);
-    color: #fff; font-weight: 600; border-radius: 12px; border: none; font-size: 15px;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+   /* Legacy */
 }
 .submit-btn-glow:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
 

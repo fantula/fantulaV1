@@ -7,7 +7,7 @@
         @mousedown="handleMouseDown"
         @click="handleOverlayClick"
       >
-        <div class="base-modal-container" :class="customClass" :style="{ width: containerWidth }">
+        <div class="base-modal-container" :class="customClass" :style="{ width: containerWidth, padding: contentPadding }">
           <!-- Header -->
           <div v-if="showHeader" class="base-modal-header">
             <h3 class="base-modal-title">{{ title }}</h3>
@@ -15,7 +15,7 @@
           </div>
 
           <!-- Body -->
-          <div class="base-modal-body" :style="{ padding: contentPadding }">
+          <div class="base-modal-body">
             <slot></slot>
           </div>
 
@@ -156,16 +156,14 @@ const handleClose = () => {
     0 0 0 1px rgba(0,0,0,0.4); /* Sharp Outer Edge */
     
   border-radius: 28px;
-  border-radius: 28px;
-  /* padding moved to body or contentPadding prop */
+  /* padding \u7531 contentPadding prop \u901a\u8fc7 inline style \u63a7\u5236 */
   display: flex;
   flex-direction: column;
   max-height: 90vh;
-  /* Scroll & Clip */
-  overflow-y: auto;
+  /* 容器不滚动，由 body 处理滚动 */
+  overflow: hidden;
   transition: all 0.3s;
   position: relative;
-  overflow: hidden;
 }
 
 /* Mascot Style - 基础定位 */
@@ -232,6 +230,7 @@ const handleClose = () => {
   margin-bottom: 28px;
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
 }
 
 .base-modal-title {
@@ -266,9 +265,31 @@ const handleClose = () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   position: relative;
   z-index: 2;
+  /* 内容溢出时仅 body 区域滚动，header/footer 固定 */
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  /* 滚动时的右侧间距补偿 */
+  margin-right: -12px;
+  padding-right: 12px;
+}
+
+/* 美化滚动条 */
+.base-modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+.base-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.base-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.base-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Actions */
@@ -278,6 +299,7 @@ const handleClose = () => {
   gap: 16px;
   position: relative;
   z-index: 2;
+  flex-shrink: 0;
 }
 
 
