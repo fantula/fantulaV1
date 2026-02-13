@@ -217,7 +217,7 @@ const formatStatus = (status?: string) => {
 .price {
   font-size: 16px;
   font-weight: 700;
-  color: #F97316;
+  color: var(--color-accent);
   font-family: 'Outfit', 'Inter', sans-serif;
 }
 .quantity {

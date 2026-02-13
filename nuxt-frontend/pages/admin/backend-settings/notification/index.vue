@@ -2,7 +2,7 @@
   <div class="notification-list-page">
     <div class="page-header">
       <h3>邮件通知配置</h3>
-      <el-button :icon="Refresh" circle @click="refresh" :loading="pending" />
+      <el-button :icon="Refresh" circle @click="() => refresh()" :loading="pending" />
     </div>
 
     <AdminDataTable
@@ -38,6 +38,11 @@
         </template>
       </el-table-column>
     </AdminDataTable>
+
+    <div v-if="true" class="mt-4 p-4 bg-gray-100 rounded text-xs font-mono">
+      <p>DEBUG INFO:</p>
+      <pre>{{ JSON.stringify({ pending, error, res }, null, 2) }}</pre>
+    </div>
   </div>
 </template>
 
@@ -52,7 +57,7 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { data: res, pending, refresh } = await useFetch('/api/admin/system/notifications/templates')
+const { data: res, pending, refresh, error } = await useFetch('/api/admin/system/notifications/templates')
 
 const templates = computed(() => res.value?.data || [])
 

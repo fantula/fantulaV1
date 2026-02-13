@@ -73,6 +73,7 @@ const router = useRouter()
 
 const isConfirmed = ref(false)
 const otpCode = ref('')
+const {
   loading: codeLoading, 
   countdown, 
   sendCode: sendOtp,

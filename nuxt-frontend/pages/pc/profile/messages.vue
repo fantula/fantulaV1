@@ -377,7 +377,7 @@ const formatTime = (dateStr: string) => {
 }
 
 .message-icon.type-system { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
-.message-icon.type-order { background: rgba(249, 115, 22, 0.15); color: #F97316; }
+.message-icon.type-order { background: rgba(249, 115, 22, 0.15); color: var(--color-accent); }
 .message-icon.type-activity { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
 .message-icon.type-security { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
 

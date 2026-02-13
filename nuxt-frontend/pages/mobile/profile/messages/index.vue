@@ -257,7 +257,7 @@ onMounted(() => {
     font-size: 22px; flex-shrink: 0;
 }
 .msg-icon.system { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
-.msg-icon.order { background: rgba(249, 115, 22, 0.1); color: #F97316; }
+.msg-icon.order { background: rgba(249, 115, 22, 0.1); color: var(--color-accent); }
 .msg-icon.activity { background: rgba(168, 85, 247, 0.1); color: #A855F7; }
 .msg-icon.security { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
 

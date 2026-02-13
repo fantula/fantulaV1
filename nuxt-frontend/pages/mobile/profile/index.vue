@@ -254,7 +254,7 @@ onMounted(() => {
 .pill-btn { border-radius: 99px; } /* High border radius for rounded buttons */
 
 .primary-btn {
-    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
     color: #fff; border: none;
     box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
 }

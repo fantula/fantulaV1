@@ -171,7 +171,10 @@ export default defineNuxtConfig({
   },
 
   // SEO 优化配置
-  css: ['@/assets/styles/theme-blue-orange.css'],
+  css: [
+    '@/assets/styles/tokens/index.css',
+    '@/assets/styles/theme-blue-orange.css'
+  ],
 
   hooks: {
     'pages:extend'(pages) {

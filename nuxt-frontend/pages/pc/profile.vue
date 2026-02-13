@@ -225,7 +225,7 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
 
 .highlight-name {
   color: transparent;
-  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   font-family: 'Outfit', sans-serif;

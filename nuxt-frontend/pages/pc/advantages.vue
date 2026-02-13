@@ -144,7 +144,7 @@ useHead({
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   font-size: 42px;
-  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -237,7 +237,7 @@ useHead({
 .cta-button {
   display: inline-block;
   padding: 12px 40px;
-  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
   border-radius: 30px;
   color: white;
   font-weight: 600;

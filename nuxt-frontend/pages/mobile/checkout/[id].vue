@@ -299,7 +299,7 @@ onMounted(() => {
 .countdown-bar-glass {
    background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2);
    border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: center;
-   gap: 8px; color: #F97316; font-size: 14px;
+   gap: 8px; color: var(--color-accent); font-size: 14px;
    backdrop-filter: blur(5px);
 }
 .time-val { font-weight: 700; font-family: monospace; font-size: 16px; }

@@ -98,7 +98,7 @@ defineEmits(['close', 'viewOrder', 'goHome'])
 
 .btn-primary {
     width: 100%; height: 40px; border-radius: 20px; border: none;
-    background: linear-gradient(90deg, #F97316, #EA580C);
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
     color: #fff; font-weight: 600; font-size: 14px;
     box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }

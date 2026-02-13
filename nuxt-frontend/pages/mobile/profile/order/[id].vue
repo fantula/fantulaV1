@@ -296,7 +296,7 @@ const onTicketSuccess = () => {
 .action-btn.ghost:active { background: rgba(255,255,255,0.2); }
 
 .action-btn.primary { background: linear-gradient(90deg, #3B82F6, #2563EB); color: #fff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-.action-btn.warning { background: linear-gradient(90deg, #F97316, #EA580C); color: #fff; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+.action-btn.warning { background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover)); color: #fff; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
 .action-btn.danger { background: rgba(239, 68, 68, 0.15); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.4); }
 .action-btn.disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
 

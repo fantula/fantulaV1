@@ -240,7 +240,7 @@ const updateQty = async (delta: number) => {
 .mc-footer { padding: 8px 12px 12px; border-top: none; }
 .btn-cyber-checkout {
   width: 100%; padding: 8px; /* Reduced padding */
-  background: var(--cyber-gradient-btn, linear-gradient(135deg, #F97316 0%, #EA580C 100%));
+  background: var(--cyber-gradient-btn, linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%));
   color: #fff; border: none; border-radius: 8px;
   font-size: 13px; font-weight: 700;
   box-shadow: var(--cyber-glow-orange, 0 0 15px rgba(249, 115, 22, 0.4));

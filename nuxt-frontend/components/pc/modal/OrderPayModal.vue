@@ -47,7 +47,7 @@
           <div class="pay-title pay-title-other">其他支付方式</div>
           <div class="pay-others">
             <div class="pay-other-item" :class="{active: payType==='balance'}" @click="payType='balance'">
-              <el-icon class="pay-other-icon" :size="24" color="#F97316"><Wallet /></el-icon>
+              <el-icon class="pay-other-icon" :size="24" color="var(--color-accent)"><Wallet /></el-icon>
               <div class="pay-other-info">
                 <div class="pay-other-label">余额支付</div>
                 <div class="pay-other-desc">使用账户余额支付 ¥{{ userBalance.toFixed(2) }}</div>

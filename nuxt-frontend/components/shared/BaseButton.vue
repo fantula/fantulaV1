@@ -138,7 +138,7 @@ const handleClick = (e: MouseEvent) => {
 
 /* [Primary] - Standard Blue Gradient */
 .btn-primary {
-  background: linear-gradient(135deg, #3B82F6, #2563eb);
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-dark));
   color: #fff;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
 }
@@ -150,7 +150,7 @@ const handleClick = (e: MouseEvent) => {
 
 /* [Primary Orange] - Orange Gradient */
 .btn-primary-orange {
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
   color: #fff;
   box-shadow: 0 4px 15px rgba(234, 88, 12, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
 }
@@ -227,7 +227,7 @@ const handleClick = (e: MouseEvent) => {
 
 /* [Marketing] - Product Cards */
 .btn-marketing-buy {
-  background: var(--primary-blue); /* Default Blue */
+  background: var(--color-brand-primary); /* Default Blue */
   color: #fff;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);

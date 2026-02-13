@@ -523,7 +523,7 @@ const goHome = () => {
 .submit-btn {
   width: 100%;
   height: 50px;
-  background: linear-gradient(135deg, #F97316, #EA580C);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
   border: none;
   border-radius: 25px;
   color: #fff;

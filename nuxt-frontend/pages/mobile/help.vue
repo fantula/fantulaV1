@@ -298,7 +298,7 @@ onMounted(() => {
 .contact-card p { font-size: 13px; color: #94A3B8; margin-bottom: 20px; }
 
 .contact-btn {
-   background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+   background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
    border: none; border-radius: 12px;
    width: 100%; height: 48px;
    color: #fff; font-weight: 700; font-size: 15px;

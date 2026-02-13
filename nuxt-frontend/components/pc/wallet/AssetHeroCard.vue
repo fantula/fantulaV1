@@ -169,7 +169,7 @@ const balanceDecimal = computed(() => {
 .neon-action-btn:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 25px rgba(234, 88, 12, 0.5);
-  background: linear-gradient(90deg, #FBBF24, #F97316);
+  background: linear-gradient(90deg, #FBBF24, var(--color-accent));
 }
 
 .card-bg-icon {

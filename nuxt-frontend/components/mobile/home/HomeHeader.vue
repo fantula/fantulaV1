@@ -92,24 +92,33 @@ onUnmounted(() => {
 
 <style scoped>
 .mobile-header {
-  position: sticky;
+  position: absolute; /* Overlay content */
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  padding: var(--safe-area-top) 16px 12px;
-  background: transparent;
-  transition: all 0.3s ease;
+  padding: env(safe-area-inset-top) 16px 12px;
+  background: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, transparent 100%); /* Ambient Shade */
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   flex-direction: column;
 }
 
 .mobile-header.is-scrolled {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  background: rgba(15, 23, 42, 0.75); /* Deep Glass */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  /* Replaced solid border with gradient line below */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+/* Gradient Bottom Line for Scrolled State */
+.mobile-header.is-scrolled::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 80%, transparent 100%);
 }
 
 /* Top Row */
@@ -122,20 +131,24 @@ onUnmounted(() => {
 
 
 /* Logo Area */
+/* Logo Area - Floating Effect */
 .logo-area {
-  display: flex; align-items: center; padding-left: 8px; /* More breathing room */
+  display: flex; align-items: center; padding-left: 4px; 
 }
 .logo-img {
-  height: 40px; 
+  height: 42px; 
   width: auto; object-fit: contain;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 10px;
-  padding: 2px;
-  background: rgba(255,255,255,0.05); /* Slight backing */
+  /* Removed hard border, added projection glow */
+  filter: drop-shadow(0 0 8px var(--color-brand-glow));
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 .site-name {
-  font-size: 18px; font-weight: 700; margin-left: 10px;
-  color: #F1F5F9; letter-spacing: 1px;
+  font-size: 20px; font-weight: 800; margin-left: 10px;
+  color: #fff; letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3); /* Lift text */
+  font-family: 'PingFang SC', sans-serif;
 }
 
 /* Actions */
@@ -153,17 +166,22 @@ onUnmounted(() => {
 }
 
 .icon-btn {
-  width: 40px; height: 40px; /* Slightly larger for easier tap */
+  width: 42px; height: 42px; /* Standard Touch Target */
   display: flex; align-items: center; justify-content: center;
-  border-radius: 14px; /* Squircle */
-  background: rgba(255,255,255,0.03); /* Subtle glass */
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #CBD5E1;
-  font-size: 20px;
+  border-radius: 16px; /* Smooth Squircle */
+  
+  /* Crystal/Liquid Glass Texture */
+  background: rgba(255,255,255,0.02);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass-light); /* Ultra thin */
+  
+  color: #fff;
+  font-size: 22px;
   cursor: pointer;
   padding: 0;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Float depth */
   position: relative;
   overflow: hidden;
 }
@@ -171,9 +189,10 @@ onUnmounted(() => {
 /* Inner Glow & Hover */
 .icon-btn::before {
   content: ''; position: absolute; inset: 0;
-  border-radius: 14px;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
-  opacity: 0; transition: opacity 0.3s;
+  border-radius: 16px;
+  /* Radial micro-glow for crystal feel */
+  background: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 70%);
+  opacity: 0.5; transition: opacity 0.3s;
 }
 
 .icon-btn:active { 
@@ -193,10 +212,11 @@ onUnmounted(() => {
 }
 
 .header-avatar {
-  width: 36px; height: 36px; 
+  width: 38px; height: 38px; 
   border-radius: 50%; 
   position: relative;
   cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 .header-avatar img { 
   width: 100%; height: 100%; 
@@ -208,8 +228,9 @@ onUnmounted(() => {
   position: absolute;
   top: -2px; left: -2px; right: -2px; bottom: -2px;
   border-radius: 50%;
-  border: 1px solid var(--primary);
-  opacity: 0.3; /* Subtle ring */
+  border: 1px solid var(--color-brand-primary);
+  opacity: 0.6; /* Slightly stronger ring */
+  box-shadow: 0 0 8px var(--color-brand-glow);
 }
 
 /* Skeleton Loading */

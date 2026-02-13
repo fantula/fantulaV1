@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="modal-overlay" @click="close">
-    <div class="modal-content" @click.stop>
+    <div class="modal-content aurora-sheet-panel" @click.stop>
       <div class="modal-header">
         <h3 class="modal-title">购置额度</h3>
         <button class="close-btn" @click="close">
@@ -16,7 +16,7 @@
              <div 
                 v-for="(item, idx) in options" 
                 :key="idx"
-                :class="['amount-card', { active: selectedIdx === idx }]"
+                :class="['amount-card', 'aurora-option-card', { active: selectedIdx === idx }]"
                 @click="selectOption(idx)"
              >
                 <div class="amount-val">{{ item.value }}<span class="unit">点</span></div>
@@ -25,7 +25,7 @@
              
              <!-- Custom Option -->
              <div 
-                :class="['amount-card', 'custom-card', { active: selectedIdx === -1 }]"
+                :class="['amount-card', 'aurora-option-card', 'custom-card', { active: selectedIdx === -1 }]"
                 @click="selectOption(-1)"
              >
                 <span class="custom-label">自定义</span>
@@ -38,7 +38,7 @@
                 v-model.number="customValue" 
                 type="number" 
                 placeholder="请输入充值金额" 
-                class="premium-input"
+                class="premium-input aurora-input"
              />
              <span class="suffix">点</span>
          </div>
@@ -84,7 +84,7 @@
           </div>
 
           <button 
-            class="pay-btn" 
+            class="pay-btn aurora-btn-accent" 
             @click="handleRecharge" 
             :disabled="loading || !isValidAmount || !isWechatBrowser"
           >
@@ -383,11 +383,13 @@ declare const WeixinJSBridge: {
 }
 
 .modal-content {
-    width: 100%; background: #1E293B; 
-    border-top-left-radius: 20px; border-top-right-radius: 20px;
+    width: 100%; 
+    /* Aurora Panel handled by global Class */
+    /* background: #1E293B;  <-- Removed, using global */
+    
     padding: 20px 24px 40px 24px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    
+    /* Animation remains */
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     max-height: 85vh; overflow-y: auto;
 }
@@ -408,17 +410,15 @@ declare const WeixinJSBridge: {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
 }
 .amount-card {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; padding: 12px 0;
+    /* Base Layout */
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
     cursor: pointer; position: relative;
-    transition: all 0.2s;
+    padding: 16px 0;
+    /* Aurora style handled by global .aurora-option-card */
 }
-.amount-card.active {
-    background: rgba(249, 115, 22, 0.15); border-color: #F97316;
-}
-.amount-val { font-size: 18px; font-weight: 700; color: #fff; font-family: 'Outfit', sans-serif; }
-.unit { font-size: 12px; font-weight: normal; color: #94A3B8; margin-left: 2px; }
+/* Removed old active/bg styles here as they are in global */
+.amount-val { font-size: 20px; font-weight: 700; color: #fff; font-family: 'Outfit', sans-serif; }
+.unit { font-size: 13px; font-weight: normal; color: #94A3B8; margin-left: 2px; }
 
 .bonus-tag {
     font-size: 10px; background: #F97316; color: #fff; padding: 2px 6px; border-radius: 100px;
@@ -428,14 +428,10 @@ declare const WeixinJSBridge: {
 
 /* Custom Input */
 .custom-input-wrap {
-    margin-top: 12px; position: relative;
+    margin-top: 16px; position: relative;
 }
-.premium-input {
-    width: 100%; height: 48px; background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-    padding: 0 40px 0 16px; color: #fff; font-size: 16px; outline: none;
-}
-.premium-input:focus { border-color: #F97316; }
+/* .premium-input handled by .aurora-input */
+.premium-input:focus { /* Logic in global */ }
 .suffix { position: absolute; right: 16px; top: 14px; color: #94A3B8; font-size: 14px; }
 
 /* Pay Methods */
@@ -477,12 +473,10 @@ declare const WeixinJSBridge: {
 .total-val { font-size: 20px; color: #F97316; font-weight: 700; font-family: 'Outfit', sans-serif; }
 .bonus-hint { color: #10B981; }
 
+/* Pay btn handled globally */
 .pay-btn {
-    width: 100%; height: 50px; 
-    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-    border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+    /* Layout specific */
+    margin-top: 0;
 }
 .pay-btn:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
 

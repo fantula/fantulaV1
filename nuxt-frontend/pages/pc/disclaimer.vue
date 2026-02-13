@@ -145,7 +145,7 @@ useHead({
   font-size: 36px;
   font-weight: 700;
   /* Blue-Orange Gradient */
-  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 20px;

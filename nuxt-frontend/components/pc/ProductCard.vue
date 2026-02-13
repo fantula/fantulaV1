@@ -160,7 +160,7 @@ const tagsList = computed(() => {
 }
 .bg-hot { background: linear-gradient(135deg, var(--active-orange), #EA580C); }
 .bg-new { background: linear-gradient(135deg, var(--primary-blue), #0284C7); }
-.bg-recommend { background: linear-gradient(135deg, var(--active-orange), #F97316); }
+.bg-recommend { background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover)); }
 .bg-limited { background: linear-gradient(135deg, var(--primary-blue), #0369A1); color: #fff; }
 .bg-promo { background: linear-gradient(135deg, var(--primary-blue), #0EA5E9); }
 

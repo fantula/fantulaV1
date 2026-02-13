@@ -122,7 +122,7 @@ const { formatDate } = useBizFormat()
 
 .price-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 4px; }
 /* Price: Orange #F97316 */
-.price { color: #F97316; font-family: 'DIN Alternate'; font-weight: 700; display: flex; align-items: baseline; gap: 1px; }
+.price { color: var(--color-accent); font-family: 'DIN Alternate'; font-weight: 700; display: flex; align-items: baseline; gap: 1px; }
 .price .amount { font-size: 18px; }
 .price .unit { font-size: 11px; font-weight: normal; margin-right: 1px; }
 .qty { font-size: 12px; color: #64748B; }

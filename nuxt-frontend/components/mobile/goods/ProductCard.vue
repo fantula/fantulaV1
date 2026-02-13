@@ -127,7 +127,7 @@ const getBadgeClass = (label: string) => {
 
 .badge-hot { background: linear-gradient(135deg, var(--accent) 0%, #EA580C 100%); }
 .badge-new { background: linear-gradient(135deg, var(--primary) 0%, #0284C7 100%); }
-.badge-recommend { background: linear-gradient(135deg, var(--accent) 0%, #F97316 100%); }
+.badge-recommend { background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%); }
 .badge-limited { background: linear-gradient(135deg, var(--primary) 0%, #0369A1 100%); }
 .badge-promo { background: linear-gradient(135deg, var(--primary) 0%, #0EA5E9 100%); }
 

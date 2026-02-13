@@ -1,0 +1,46 @@
+/* =========================================
+   2. Semantic Tokens (语义层)
+   定义功能角色。换肤时只需覆盖此文件或通过 data-theme 覆盖变量。
+   ========================================= */
+:root {
+    /* --- Brand & Accent --- */
+    /* 主品牌色 (默认为蓝色系) */
+    --color-brand-primary: var(--blue-500);
+    --color-brand-highlight: var(--blue-400);
+    --color-brand-dark: var(--blue-600);
+
+    /* 强调/转化色 (默认为橙色系 - 用于购买/支付) */
+    --color-accent: var(--orange-500);
+    --color-accent-hover: var(--orange-600);
+    --color-accent-light: var(--orange-400);
+
+    /* --- Backgrounds --- */
+    /* 页面背景 (深邃) */
+    --bg-page: var(--slate-950);
+    /* 玻璃面板背景 (用于卡片、弹窗) */
+    --bg-glass-panel: rgba(30, 41, 59, 0.75);
+    --bg-glass-heavy: rgba(15, 23, 42, 0.85);
+    /* 较厚的玻璃 (Header) */
+
+    /* --- Borders --- */
+    --border-glass-light: rgba(255, 255, 255, 0.08);
+    --border-glass-highlight: rgba(255, 255, 255, 0.15);
+
+    /* --- Text --- */
+    --text-primary: var(--text-white);
+    --text-secondary: var(--text-gray);
+    --text-tertiary: var(--text-dark);
+
+    /* --- Feedback --- */
+    --color-danger: var(--red-500);
+    --color-success: var(--green-500);
+
+    /* --- Effects --- */
+    --glass-blur-md: 12px;
+    --glass-blur-lg: 20px;
+
+    /* Glows (Dynamic Alpha) */
+    --color-brand-glow: color-mix(in srgb, var(--color-brand-primary), transparent 60%);
+    /* 40% opacity */
+    --color-accent-glow: color-mix(in srgb, var(--color-accent), transparent 60%);
+}

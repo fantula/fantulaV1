@@ -11,15 +11,29 @@
       <!-- 1. Banners -->
       <HomeBanner :banners="banners" />
 
-      <!-- 2. Categories -->
+    <!-- 2. Categories -->
       <HomeCategoryNav 
         :categories="categories"
-        v-model="activeCategoryId"
+        :model-value="activeCategoryId"
         @change="handleCategoryChange"
       />
 
+      <!-- Pull to Refresh Overlay -->
+      <div 
+        class="pull-refresh-indicator" 
+        :style="{ height: `${pullDistance}px`, opacity: pullDistance > 0 ? 1 : 0 }"
+      >
+        <div class="spinner-mini" v-if="isRefreshing"></div>
+        <span v-else class="text-xs text-muted">{{ pullText }}</span>
+      </div>
+
       <!-- 3. Goods List -->
-      <div class="goods-list-section">
+      <div 
+        class="goods-list-section"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
+        @touchend="handleTouchEnd"
+      >
         
         <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
            <ProductCardSkeleton v-for="i in 6" :key="i" />
@@ -59,6 +73,17 @@
 
     </div>
 
+    <!-- Back to Top Button -->
+    <transition name="fade">
+      <button 
+        v-show="showBackToTop" 
+        class="back-to-top-btn"
+        @click="scrollToTop"
+      >
+        <el-icon><ArrowUpBold /></el-icon>
+      </button>
+    </transition>
+
     <!-- Sheets -->
     <ProductDetailSheet 
       v-model:visible="showDetailSheet" 
@@ -75,6 +100,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { ArrowUpBold } from '@element-plus/icons-vue'
 // import { commonApi } from '@/api/client/common' // Removed
 // import { goodsApi } from '@/api/client/goods' // Removed
 import { wechatLoginApi } from '@/api/client/wechat-login'
@@ -120,10 +146,23 @@ const {
 
 // UI State (Mobile Specific)
 const isScrolled = ref(false)
+const showBackToTop = ref(false)
 const scrollThreshold = 20
 const showDetailSheet = ref(false)
 const showLoginSheet = ref(false)
 const selectedGoodsId = ref<string | number>('')
+
+// Pull to Refresh State
+const pullDistance = ref(0)
+const isRefreshing = ref(false)
+const startY = ref(0)
+const PULL_THRESHOLD = 60
+const MAX_PULL = 120
+
+const pullText = computed(() => {
+  if (isRefreshing.value) return 'Refreshing...'
+  return pullDistance.value > PULL_THRESHOLD ? 'Release to Refresh' : 'Pull to Refresh'
+})
 
 // Refs for IntersectionObserver
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -168,7 +207,52 @@ const setupObserver = () => {
 
 const handleScroll = (e: Event) => {
   const target = e.target as HTMLElement
-  isScrolled.value = target.scrollTop > scrollThreshold
+  const scrollTop = target.scrollTop
+  isScrolled.value = scrollTop > scrollThreshold
+  showBackToTop.value = scrollTop > 500 // Show after ~1-2 screens
+}
+
+const scrollToTop = () => {
+  scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// Touch Handlers for Pull to Refresh
+const handleTouchStart = (e: TouchEvent) => {
+  if (scrollContainer.value && scrollContainer.value.scrollTop === 0) {
+    startY.value = e.touches[0].clientY
+  }
+}
+
+const handleTouchMove = (e: TouchEvent) => {
+  if (scrollContainer.value && scrollContainer.value.scrollTop === 0 && startY.value > 0 && !isRefreshing.value) {
+    const currentY = e.touches[0].clientY
+    const diff = currentY - startY.value
+    if (diff > 0) {
+      // Resistance effect
+      pullDistance.value = Math.min(diff * 0.4, MAX_PULL)
+      if (pullDistance.value > 10) {
+         e.preventDefault() // Prevent native scroll only if pulling down
+      }
+    }
+  }
+}
+
+const handleTouchEnd = async () => {
+  if (pullDistance.value > PULL_THRESHOLD && !isRefreshing.value) {
+    isRefreshing.value = true
+    pullDistance.value = 50 // Keep showing indicator
+    try {
+      await initData(activeCategoryId.value)
+    } finally {
+      setTimeout(() => {
+        isRefreshing.value = false
+        pullDistance.value = 0
+      }, 500)
+    }
+  } else {
+    pullDistance.value = 0
+  }
+  startY.value = 0
 }
 
 // Init
@@ -326,6 +410,34 @@ onUnmounted(() => {
   font-size: 12px;
   opacity: 0.6;
 }
+
+
+/* Pull to Refresh */
+.pull-refresh-indicator {
+  display: flex; justify-content: center; align-items: center;
+  overflow: hidden;
+  transition: height 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  width: 100%;
+}
+
+/* Back to Top */
+.back-to-top-btn {
+  position: fixed;
+  bottom: calc(130px + env(safe-area-inset-bottom)); /* Safe above TabBar */
+  right: 20px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 90;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.back-to-top-btn:active { transform: scale(0.9); }
 
 .tab-bar-spacer { height: 80px; }
 </style>

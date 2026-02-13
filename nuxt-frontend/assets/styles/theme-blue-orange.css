@@ -4,21 +4,19 @@
    1. 全局配置
    ========================================= */
 :root {
-  /* 形象大使发色 - 统一色卡 */
-  --primary-blue: #178fc6;
-  /* 亮天蓝 (Sky Blue 500) - 对应左侧头发 */
-  --active-orange: #F97316;
-  /* 活力橙 (Orange 500) - 对应右侧头发 */
+  /* 形象大使发色 - 映射到 Semantic Tokens */
+  --primary-blue: var(--color-brand-primary);
+  /* Was #178fc6 */
+  --active-orange: var(--color-accent);
+  /* Was #F97316 */
 
-  --text-main: #F8FAFC;
-  --text-sub: #94A3B8;
-  /* Slate-400 */
+  --text-main: var(--text-primary);
+  --text-sub: var(--text-secondary);
 
-  /* 覆盖 Element Plus 主题色 - 让所有组件自动同步 */
-  --el-color-primary: var(--primary-blue);
-  --el-button-hover-bg-color: var(--active-orange);
-  --el-button-active-bg-color: #EA580C;
-  /* Orange-600 */
+  /* 覆盖 Element Plus 主题色 */
+  --el-color-primary: var(--color-brand-primary);
+  --el-button-hover-bg-color: var(--color-accent);
+  --el-button-active-bg-color: var(--color-accent-hover);
 }
 
 /* 
@@ -35,7 +33,7 @@ body {
 
 body {
   /* 移除静态背景图，使用纯色深黑，配合粒子组件 */
-  background: #020617 !important;
+  background: var(--bg-page) !important;
   color: var(--text-main) !important;
   font-family: 'PingFang SC', system-ui, sans-serif;
 }
@@ -138,30 +136,7 @@ body::after {
 }
 
 /* 分类导航 - 极透玻璃 */
-.category-item {
-  background: rgba(15, 23, 42, 0.6) !important;
-  /* 深色底，防看不清文字 */
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  color: #CBD5E1 !important;
-}
-
-.category-item:hover {
-  background: rgba(255, 122, 69, 0.15) !important;
-  color: #fff !important;
-  transform: translateY(-3px);
-  border-color: rgba(255, 122, 69, 0.4) !important;
-}
-
-.category-item.active {
-  background: linear-gradient(135deg, var(--active-orange) 0%, #FB923C 100%) !important;
-  color: #fff !important;
-  border-color: transparent !important;
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4) !important;
-  /* Increased shadow for depth */
-  transform: translateY(-4px) !important;
-  /* Elevation effect */
-}
+/* 分类导航 - 样式已迁移至组件内部 (CategoryNav.vue) */
 
 /* 商品卡片 - 核心玻璃层 */
 /* Second goods-card block removed to prevent override */

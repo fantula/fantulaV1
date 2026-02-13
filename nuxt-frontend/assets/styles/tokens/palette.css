@@ -1,0 +1,31 @@
+/* =========================================
+   1. Primitive Color Palette (基础色盘)
+   定义所有可用颜色，不含语义。
+   ========================================= */
+:root {
+  /* Blue Scale (Based on existing theme-blue-orange & dark-orange) */
+  --blue-400: #38BDF8; /* Sky Blue */
+  --blue-500: #178fc6; /* Generic Brand Blue */
+  --blue-600: #2563EB; /* Darker Blue */
+  --blue-neon: #0EA5E9; /* Cyan/Neon Blue */
+
+  /* Orange Scale (Based on existing active-orange) */
+  --orange-400: #FB923C;
+  --orange-500: #F97316; /* Standard Orange */
+  --orange-600: #EA580C; /* Darker/Hover Orange */
+  
+  /* Slate/Dark Scale (Backgrounds) */
+  --slate-950: #020617; /* Deepest Black/Blue */
+  --slate-900: #0F172A; /* Standard Dark Bg */
+  --slate-800: #1E293B; /* Panel Bg */
+  --slate-700: #334155; /* Border/Line */
+
+  /* Text Scale */
+  --text-white: #F8FAFC; /* Slate-50 */
+  --text-gray: #94A3B8;  /* Slate-400 */
+  --text-dark: #64748B;  /* Slate-500 */
+
+  /* Functional */
+  --red-500: #EF4444;
+  --green-500: #10B981;
+}

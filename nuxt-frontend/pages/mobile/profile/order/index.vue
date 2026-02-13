@@ -290,7 +290,7 @@ const handleConfirmDelete = async () => {
 }
 .modal-btn.cancel { background: rgba(255,255,255,0.05); color: #94A3B8; }
 .modal-btn.confirm { 
-    background: linear-gradient(135deg, #F97316, #EA580C); 
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover)); 
     color: #fff; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); 
 }
 </style>

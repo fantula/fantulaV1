@@ -175,7 +175,7 @@ const handleSendTest = async () => {
   
   if (!template.value) return
 
-  let testData = {}
+  let testData: any = {}
   try {
     if (testDataJson.value) {
       testData = JSON.parse(testDataJson.value)

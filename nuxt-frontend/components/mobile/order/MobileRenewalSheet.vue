@@ -354,7 +354,7 @@ watch(originalAmount, () => fetchCoupons()) // Refresh coupons if price changes 
     border-color: rgba(16, 185, 129, 0.3);
     color: #34D399;
 }
-.c-val { color: #F97316; font-weight: 700; margin-right: 6px; }
+.c-val { color: var(--color-accent); font-weight: 700; margin-right: 6px; }
 .chk { font-size: 16px; }
 
 .sheet-footer {

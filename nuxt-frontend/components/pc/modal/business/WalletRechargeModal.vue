@@ -435,7 +435,7 @@ onUnmounted(() => {
 }
 
 .amount-option.active {
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%) !important;
   border-color: #FB923C !important;
   box-shadow: 0 8px 24px -6px rgba(234, 88, 12, 0.5);
   transform: translateY(-2px) scale(1.02);
@@ -462,7 +462,7 @@ onUnmounted(() => {
   padding: 2px 8px; /* Tighter padding */
   border-radius: 100px;
   background: rgba(249, 115, 22, 0.15);
-  color: #F97316;
+  color: var(--color-accent);
   border: 1px solid rgba(249, 115, 22, 0.3);
   display: flex; align-items: center; gap: 2px;
 }

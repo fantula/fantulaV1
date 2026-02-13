@@ -8,7 +8,7 @@
 
     <!-- Bottom Sheet -->
     <transition name="slide-up">
-      <div v-if="visible" class="sheet-panel" @click.stop>
+      <div v-if="visible" class="sheet-panel aurora-sheet-panel" @click.stop>
          <!-- Handle Bar -->
          <div class="sheet-handle-bar">
             <div class="sheet-handle"></div>
@@ -55,7 +55,7 @@
                          <span>同意 <span class="link">用户协议</span> 和 <span class="link">隐私政策</span></span>
                       </label>
                   </div>
-                  <button class="submit-btn" type="submit" :disabled="loading || !loginForm.agree">
+                  <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !loginForm.agree">
                      {{ loading ? '登录中...' : '立即登录' }}
                   </button>
                </form>
@@ -78,7 +78,7 @@
                          <span>同意 <span class="link">用户协议</span> 和 <span class="link">隐私政策</span></span>
                       </label>
                   </div>
-                  <button class="submit-btn" type="submit" :disabled="loading || !loginCodeForm.agree">
+                  <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !loginCodeForm.agree">
                      {{ loading ? '登录中...' : '立即登录' }}
                   </button>
                </form>
@@ -110,7 +110,7 @@
                          <span>同意 <span class="link">用户协议</span> 和 <span class="link">隐私政策</span></span>
                       </label>
                   </div>
-                  <button class="submit-btn" type="submit" :disabled="loading || !registerForm.agree">
+                  <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !registerForm.agree">
                      {{ loading ? '注册中...' : '立即注册' }}
                   </button>
                </form>
@@ -271,15 +271,13 @@ const onWechatLogin = () => {
 }
 .sheet-panel {
    position: fixed; bottom: 0; left: 0; right: 0;
-   background: rgba(15, 23, 42, 0.9);
-   backdrop-filter: blur(20px);
-   -webkit-backdrop-filter: blur(20px);
-   border-radius: 24px 24px 0 0;
+   /* Universal Aurora Style Applied */
+   /* Inherits from .aurora-sheet-panel properties added manually via Template Class */
+   /* But we keep positioning here */
    z-index: 10001;
    padding-bottom: max(20px, env(safe-area-inset-bottom));
    max-height: 90vh; overflow-y: auto;
-   box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-   border-top: 1px solid rgba(255,255,255,0.1);
+   /* Shared style handles background/border/shadow */
 }
 
 .sheet-handle-bar {
@@ -295,15 +293,24 @@ const onWechatLogin = () => {
 .h-title { font-size: 24px; color: #fff; font-weight: 700; margin-bottom: 4px; }
 .h-sub { font-size: 13px; color: #64748B; margin-bottom: 24px; }
 .auth-tabs {
-   display: flex; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 4px;
+   /* Using universal class structure */
+   display: flex; 
+   background: rgba(0,0,0,0.3); /* Deeper groove */
+   border-radius: 16px; 
+   padding: 4px;
    margin-bottom: 24px;
 }
 .tab-item {
-   flex: 1; text-align: center; padding: 10px 0; font-size: 14px; font-weight: 600;
-   color: #94A3B8; border-radius: 8px; transition: all 0.3s;
+   flex: 1; text-align: center; padding: 12px 0; font-size: 15px; font-weight: 600;
+   color: #64748B; border-radius: 12px; transition: all 0.3s;
+   position: relative; z-index: 1;
 }
 .tab-item.active {
-   background: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--primary-glow);
+   /* Glass Pill Active State */
+   background: rgba(255, 255, 255, 0.1); 
+   color: #fff; 
+   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+   border: 1px solid rgba(255,255,255,0.05);
 }
 
 .sheet-body { padding: 0 24px; }
@@ -313,14 +320,21 @@ const onWechatLogin = () => {
 .login-type-switch span { cursor: pointer; padding-bottom: 4px; border-bottom: 2px solid transparent; transition: all 0.2s; }
 .login-type-switch span.active { color: #fff; border-color: var(--primary); }
 
-.input-group { margin-bottom: 16px; position: relative; } /* Constraint for absolute button */
+.input-group { margin-bottom: 20px; position: relative; } 
 .input-group input,
 :deep(.custom-email-input) {
-   width: 100%; height: 50px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-   border-radius: 12px; padding: 0 16px; color: #fff; font-size: 15px; outline: none;
-   transition: border 0.2s, background 0.2s;
+   /* Universal Aurora Input Logic */
+   width: 100%; height: 54px; 
+   background: rgba(0,0,0,0.25); /* Deep Groove */
+   border: none; border-bottom: 2px solid rgba(255,255,255,0.05);
+   border-radius: 16px; padding: 0 16px; color: #fff; font-size: 16px; outline: none;
+   transition: all 0.3s;
 }
-.input-group input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
+.input-group input:focus { 
+    background: rgba(0,0,0,0.4);
+    border-bottom-color: var(--color-brand-primary); 
+    box-shadow: 0 4px 15px -4px var(--color-brand-glow);
+}
 
 /* Code Row: Button sits INSIDE the input now */
 .code-row input { padding-right: 120px; } /* Space for SendCodeButton */
@@ -332,15 +346,12 @@ const onWechatLogin = () => {
 .form-agreement input { margin-right: 8px; }
 .link { color: var(--primary); }
 
+/* Submit Button now uses .aurora-btn-primary globally, overriding specific styles here if needed, 
+   but cleaner to delete specific styles and rely on global class in template. 
+   We will update the template class usage. */
 .submit-btn {
-   width: 100%; height: 50px; background: linear-gradient(135deg, var(--primary), #0c6a96);
-   border: none; border-radius: 16px; /* Exquisite Squircle-ish */
-   color: #fff; font-size: 16px; font-weight: 600; text-letter-spacing: 1px;
-   box-shadow: 0 4px 20px rgba(23, 143, 198, 0.4);
-   transition: transform 0.2s, box-shadow 0.2s;
+   /* Legacy Mapping to check if we missed anything (Empty) */
 }
-.submit-btn:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(23, 143, 198, 0.3); }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 
 

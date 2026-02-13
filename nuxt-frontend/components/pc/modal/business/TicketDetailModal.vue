@@ -233,7 +233,7 @@ watch(() => props.visible, (val) => {
     font-size: 12px; color: #fff; font-weight: 600;
     flex-shrink: 0;
 }
-.avatar.user { background: linear-gradient(135deg, #F97316, #EA580C); order: 2; margin-left: -4px;}
+.avatar.user { background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover)); order: 2; margin-left: -4px;}
 .avatar.admin { background: linear-gradient(135deg, #3B82F6, #2563EB); }
 
 .message-content-wrapper { 

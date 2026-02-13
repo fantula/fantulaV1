@@ -1,4 +1,4 @@
-import { getSupabaseServiceClient } from '~/server/utils/supabase'
+
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)

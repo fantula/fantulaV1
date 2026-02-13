@@ -6,7 +6,10 @@
           v-for="cat in props.categories"
           :key="cat.id"
           class="category-item"
-          :class="{ active: props.activeId === cat.id }"
+          :class="{ 
+            active: props.activeId === cat.id, 
+            'active-glow-border': props.activeId === cat.id 
+          }"
           @click="handleSelect($event, cat.id)"
         >
           <span class="cat-label">{{ cat.name }}</span>
@@ -139,6 +142,37 @@ const handleSelect = (e: MouseEvent, id: string | number) => {
     /* 允许横滚 */
     justify-content: flex-start; 
   }
+}
+
+/* 
+  Self-contained Styles (Refactored from Global Theme) 
+  Uses Semantic Tokens for independence.
+*/
+.category-item {
+  background: var(--bg-glass-panel);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass-light);
+  color: var(--text-secondary);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.category-item:hover {
+  background: rgba(255, 255, 255, 0.05); /* Subtle hover */
+  color: #fff;
+  transform: translateY(-2px);
+  border-color: var(--color-brand-primary); /* Blue border interaction as requested */
+  box-shadow: 0 4px 12px var(--color-brand-glow);
+}
+
+.category-item.active {
+  color: #fff;
+  /* Background: Handled by animations.css (--glow-inner-bg) */
+  --glow-inner-bg: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+  
+  /* Border: Handled by animations.css */
+  /* Remove transform to ensure exact same size as inactive state */
+  transform: none; 
+  box-shadow: 0 0 15px var(--color-brand-glow);
 }
 </style>
 

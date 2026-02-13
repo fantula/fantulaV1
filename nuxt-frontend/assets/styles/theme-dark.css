@@ -31,7 +31,6 @@ body,
 
 /* 2. 容器与卡片：增加半透明磨砂感，让背景透出来 */
 .goods-card,
-.category-item,
 .banner-container,
 .service-modal-content,
 .login-modal-content,
@@ -105,17 +104,7 @@ p,
 }
 
 /* 4. 分类导航激活态 */
-.category-item {
-    background: rgba(30, 41, 59, 0.5) !important;
-    color: #94A3B8 !important;
-}
-
-.category-item.active {
-    background: linear-gradient(90deg, #0EA5E9 0%, #2563EB 100%) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4) !important;
-    border: none !important;
-}
+/* 4. 分类导航 - 样式已迁移至 CategoryNav.vue */
 
 /* 5. 按钮发光效果 */
 .login-btn,

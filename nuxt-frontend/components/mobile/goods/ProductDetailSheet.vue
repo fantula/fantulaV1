@@ -6,7 +6,7 @@
       </transition>
 
       <transition name="sheet-slide">
-        <div v-if="visible" class="sheet-panel" @click.stop>
+        <div v-if="visible" class="sheet-panel aurora-sheet-panel" @click.stop>
           
           <!-- Top Marketing Strip (Premium Glass) -->
           <div class="marketing-strip-glass">
@@ -144,7 +144,7 @@
                      加入购物车
                   </button>
                   <button 
-                    class="btn-mobile-base btn-mobile-accent btn-buy-now" 
+                    class="aurora-btn-accent btn-buy-now" 
                     @click="buyNow" 
                     :disabled="!hasStock || pending"
                   >
@@ -360,16 +360,15 @@ watch(() => props.visible, async (val) => {
 
 .sheet-panel {
   position: fixed; bottom: 0; left: 0; width: 100%; 
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px 24px 0 0;
+  /* Global Aurora Panel */
+  /* background: rgba(15, 23, 42, 0.9); */ 
+  
   z-index: 3051;
   padding-bottom: 0; /* Footer handles padding */
   max-height: 85vh;
   display: flex; flex-direction: column;
-  box-shadow: 0 -8px 30px rgba(0,0,0,0.5);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  /* box-shadow: 0 -8px 30px rgba(0,0,0,0.5); */ /* Handled by aurora */
+  
   overflow: hidden;
 }
 
@@ -500,7 +499,7 @@ watch(() => props.visible, async (val) => {
   padding-bottom: calc(env(safe-area-inset-bottom) + 30px); /* Extra lift */
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255,255,255,0.05); /* Lighter border */
   display: flex; gap: 16px; align-items: center;
 }
 .icon-btns { display: flex; gap: 16px; }
@@ -523,12 +522,7 @@ watch(() => props.visible, async (val) => {
 }
 .btn-buy-now { 
     flex: 1.5; 
-    height: 50px; /* Taller */
-    border-radius: 14px; /* Squircle */
-    font-size: 16px; 
-    font-weight: 700;
-    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4); /* Stronger shadow */
-    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+    /* Handled by .aurora-btn-accent globally */
 }
 
 .btn-cart:disabled, .btn-buy-now:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; filter: grayscale(100%); }

@@ -1,0 +1,102 @@
+/* =========================================
+   Global Animations (High Performance)
+   Imported in tokens/index.css
+   ========================================= */
+
+/* 
+   Active State: Rotating Border Glow
+   Usage: Add class .active-glow-border to any relative container
+   Requires: overflow: hidden (usually) or specific structure
+*/
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes spin-glow {
+    0% {
+        --angle: 0deg;
+    }
+
+    100% {
+        --angle: 360deg;
+    }
+}
+
+/* Fallback for browsers not supporting @property (though widely supported now)
+   We use a simple pseudo-element rotation if needed, but let's try the modern mask approach first.
+   Actually, the most robust way for "Border Only" without obscuring transparent backgrounds 
+   is using a pseudo-element behind, with a mask-composite.
+*/
+
+.active-glow-border {
+    position: relative;
+    z-index: 1;
+    /* Ensure context */
+    border-color: transparent !important;
+    /* Hide original border */
+    overflow: hidden !important;
+    /* Contain the glow */
+}
+
+.active-glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    /* Border width */
+    z-index: -1;
+    /* Gradient: Sharper, Brighter Blue using Bright Cyan/Blue mix */
+    background: conic-gradient(from var(--angle),
+            transparent 0%,
+            #38BDF8 15%,
+            /* Bright Sky Blue */
+            var(--color-brand-primary) 25%,
+            transparent 50%,
+            transparent 60%,
+            #38BDF8 75%,
+            var(--color-brand-primary) 85%,
+            transparent 100%);
+    animation: spin-glow 4s linear infinite;
+    /* Slightly slower for elegance */
+    border-radius: inherit;
+}
+
+.active-glow-border::after {
+    content: '';
+    position: absolute;
+    /* Inset 2px = 2px Thicker Border */
+    inset: 2px;
+    z-index: -1;
+    background: var(--glow-inner-bg, var(--bg-glass-panel));
+    /* Restore background */
+    border-radius: inherit;
+    backdrop-filter: blur(12px);
+}
+
+/* If the browser doesn't support @property (like older Safari), we use standard rotation */
+@supports not (background: paint(something)) {
+    .active-glow-border::before {
+        background: conic-gradient(transparent 0deg,
+                var(--color-brand-primary) 90deg,
+                transparent 180deg,
+                transparent 270deg,
+                var(--color-brand-primary) 360deg);
+        animation: spin-standard 3s linear infinite;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+    }
+}
+
+@keyframes spin-standard {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

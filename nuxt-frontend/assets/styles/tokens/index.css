@@ -1,0 +1,8 @@
+/* =========================================
+   Global Design Tokens
+   Import this file first in nuxt.config.ts
+   ========================================= */
+
+@import './palette.css';
+@import './semantic.css';
+@import './animations.css';

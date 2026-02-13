@@ -40,7 +40,7 @@ defineProps<{
 
 <style scoped>
 .banner-section {
-    padding: 12px 16px 20px;
+    padding: calc(env(safe-area-inset-top) + 56px) 16px 20px; /* Header (44) + Gap (12) + Safe Area */
     position: relative;
     z-index: 10;
 }

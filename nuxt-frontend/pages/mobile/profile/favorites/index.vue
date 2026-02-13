@@ -265,7 +265,7 @@ watch(activeTab, () => {
 }
 
 .price-wrap {
-    color: #F97316; font-family: 'DIN Alternate', sans-serif; font-weight: bold;
+    color: var(--color-accent); font-family: 'DIN Alternate', sans-serif; font-weight: bold;
     display: flex; align-items: baseline;
 }
 .symbol { font-size: 12px; margin-right: 1px; }

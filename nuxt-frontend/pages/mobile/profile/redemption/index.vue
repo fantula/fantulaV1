@@ -349,8 +349,9 @@ const getExpiryText = (dateStr?: string) => {
 
 .redeem-btn {
     width: 80px;
+    color: var(--color-accent);
     height: 48px;
-    background: linear-gradient(135deg, #F97316, #EA580C);
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
     border: none;
     border-radius: 12px;
     color: #fff;

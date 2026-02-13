@@ -2157,22 +2157,7 @@ const plugins = [
 _fy54yt5h8gnrY5ksk0ToqrUYohroiU1U2cOhUCV49Mc
 ];
 
-const assets = {
-  "/index.mjs": {
-    "type": "text/javascript; charset=utf-8",
-    "etag": "\"29548-lW648PxgOJjYx1A1kK2QkTefqPA\"",
-    "mtime": "2026-02-12T13:48:50.464Z",
-    "size": 169288,
-    "path": "index.mjs"
-  },
-  "/index.mjs.map": {
-    "type": "application/json",
-    "etag": "\"a0b95-ta/0xqo5w7G20c2kuFuMIzhnJHs\"",
-    "mtime": "2026-02-12T13:48:50.464Z",
-    "size": 658325,
-    "path": "index.mjs.map"
-  }
-};
+const assets = {};
 
 function readAsset (id) {
   const serverDir = dirname$1(fileURLToPath(globalThis._importMeta_.url));
@@ -3014,6 +2999,9 @@ function getSupabaseServiceClient() {
   const config = useRuntimeConfig();
   const supabaseUrl = config.public.apiBase || "http://127.0.0.1:54321";
   const serviceKey = String(config.supabaseServiceKey || config.supabaseKey || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU");
+  console.log("[Supabase] Init Service Client. URL:", supabaseUrl);
+  console.log("[Supabase] Service Key (conf):", config.supabaseServiceKey ? "Yes" : "No");
+  console.log("[Supabase] Using Key:", serviceKey.substring(0, 15) + "...");
   return createClient(supabaseUrl, serviceKey);
 }
 async function getCurrentUser(event) {
@@ -3026,18 +3014,27 @@ async function getCurrentUser(event) {
 }
 
 const templates_get = defineEventHandler(async (event) => {
-  const client = getSupabaseServiceClient();
-  const { data, error } = await client.from("notification_templates").select("*").order("event_type");
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message
-    });
+  console.log("[API] /admin/system/notifications/templates called");
+  try {
+    const client = getSupabaseServiceClient();
+    console.log("[API] Client initialized");
+    const { data, error } = await client.from("notification_templates").select("*").order("event_type");
+    if (error) {
+      console.error("[API] Supabase Error:", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: error.message
+      });
+    }
+    console.log(`[API] Found ${data == null ? void 0 : data.length} templates`);
+    return {
+      success: true,
+      data
+    };
+  } catch (e) {
+    console.error("[API] Unexpected Error:", e);
+    throw e;
   }
-  return {
-    success: true,
-    data
-  };
 });
 
 const templates_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({

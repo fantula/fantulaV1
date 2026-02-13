@@ -148,9 +148,9 @@ withDefaults(defineProps<Props>(), {
   width: 100%;
   height: 100%;
   border-width: 4px;
-  border-top-color: #178fc6; /* Primary Blue */
+  border-top-color: var(--color-brand-primary); /* Primary Blue */
   border-left-color: rgba(23, 143, 198, 0.3);
-  animation: spin 1s linear infinite; /* Increased speed */
+  animation: spinner 0.6s linear infinite;
 }
 
 /* Inner Ring - Orange */

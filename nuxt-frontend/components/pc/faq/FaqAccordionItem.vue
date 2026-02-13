@@ -106,7 +106,7 @@ defineEmits(['toggle'])
 
 .faq-card.active .toggle-icon {
   transform: rotate(135deg); /* Rotate Plus to X */
-  color: #F97316; /* Orange active */
+  color: var(--color-accent); /* Orange active */
 }
 
 /* Card Body (Answer) */

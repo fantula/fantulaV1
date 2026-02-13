@@ -5,7 +5,10 @@
         v-for="cat in categories" 
         :key="cat.id" 
         class="category-pill"
-        :class="{ active: modelValue === cat.id }"
+        :class="{ 
+          active: modelValue === cat.id,
+          'active-glow-border': modelValue === cat.id
+        }"
         @click="handleCategoryClick(cat.id)"
       >
         <span class="pill-text">{{ cat.name }}</span>
@@ -56,7 +59,7 @@ watch(() => props.modelValue, () => {
 .category-scroll-wrapper {
   padding: 0 16px;
   position: sticky;
-  top: 60px; /* Below Header */
+  top: calc(env(safe-area-inset-top) + 60px); /* Header + Safe Area */
   z-index: 90;
   margin-bottom: 16px;
 }
@@ -89,10 +92,14 @@ watch(() => props.modelValue, () => {
 
 .category-pill.active {
   color: #fff;
-  background: var(--accent); /* Orange for active state (Match PC) */
-  border-color: transparent;
   font-weight: 600;
-  box-shadow: 0 4px 12px var(--accent-glow); /* Orange shadow */
+  /* Background handled by .active-glow-border::after via var */
+  --glow-inner-bg: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+
+  box-shadow: 0 4px 12px var(--color-brand-glow);
+  /* Removing background/border as animation handles it */
+  background: transparent;
+  border-color: transparent;
 }
 
 .pill-text {

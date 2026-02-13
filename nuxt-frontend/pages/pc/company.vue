@@ -109,7 +109,7 @@ useHead({
   font-weight: 700;
   font-size: 42px;
   /* Blue-Orange Gradient Text */
-  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 15px;

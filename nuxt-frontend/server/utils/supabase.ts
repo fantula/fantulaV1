@@ -26,6 +26,10 @@ export function getSupabaseServiceClient() {
     const supabaseUrl = config.public.apiBase || 'http://127.0.0.1:54321'
     const serviceKey = String(config.supabaseServiceKey || config.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU')
 
+    console.log('[Supabase] Init Service Client. URL:', supabaseUrl)
+    console.log('[Supabase] Service Key (conf):', config.supabaseServiceKey ? 'Yes' : 'No')
+    console.log('[Supabase] Using Key:', serviceKey.substring(0, 15) + '...')
+
     return createClient(supabaseUrl, serviceKey)
 }
 

@@ -176,7 +176,7 @@ useHead({
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   font-size: 42px;
-  background: linear-gradient(135deg, #60A5FA 0%, #F97316 100%);
+  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -315,8 +315,8 @@ useHead({
 
 .apply-btn {
   background: transparent;
-  border: 1px solid #F97316;
-  color: #F97316;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
   padding: 8px 24px;
   border-radius: 20px;
   font-size: 14px;

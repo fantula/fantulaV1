@@ -353,7 +353,7 @@ const goShopping = () => {
 
 .favorite-card:hover .product-img {
   transform: translate(-50%, -50%) scale(1.1) rotate(3deg);
-  border-color: #F97316;
+  border-color: var(--color-accent);
 }
 
 /* Content */

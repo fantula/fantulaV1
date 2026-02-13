@@ -323,7 +323,7 @@ const handleConfirm = async () => {
 }
 
 .avatar-item.active {
-  border-color: #F97316;
+  border-color: var(--color-accent);
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
 }
