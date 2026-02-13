@@ -122,11 +122,8 @@ withDefaults(defineProps<Props>(), {
   font-size: 3.5rem; /* Large size */
   font-weight: 800;
   letter-spacing: 2px;
-  color: #fff;
-  background: linear-gradient(135deg, #fff 0%, #94A3B8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.3));
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   margin: 0;
   line-height: 80px; /* Match container height */
 }

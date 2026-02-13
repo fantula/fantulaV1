@@ -74,6 +74,7 @@ nuxtApp.hook('page:finish', () => {
 html, body {
   height: 100%;
   font-family: 'PingFang SC', 'Noto Sans SC', sans-serif;
+  background-color: #020617; /* Match loader background to prevent white flash */
 }
 
 #__nuxt {
