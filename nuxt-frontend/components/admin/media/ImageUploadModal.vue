@@ -43,6 +43,7 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { adminImageApi, type AdminImageCategory } from '@/api/admin/media'
+import { getAuthToken } from '@/utils/supabase'
 import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 
 const props = defineProps<{
@@ -87,8 +88,7 @@ const submitUpload = async () => {
   
   uploading.value = true
   try {
-    const session = useSupabaseSession()
-    const token = session.value?.access_token
+    const token = await getAuthToken()
 
     if (!token) {
         ElMessage.error('请登录管理员账号')
@@ -98,6 +98,8 @@ const submitUpload = async () => {
 
     const file = fileList.value[0].raw
     const { uploadImageToStorage } = await import('@/utils/uploadImage')
+    // uploadImageToStorage will also call getAuthToken if token is undefined, 
+    // but we pass it explicitly here since we already checked it.
     const uploadRes = await uploadImageToStorage(file, 'uploads', undefined, token)
     
     if (!uploadRes.success) {

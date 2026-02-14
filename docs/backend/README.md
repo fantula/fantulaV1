@@ -12,6 +12,7 @@
 |------|------|----------|
 | [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | 数据库表结构完整定义 | 后端开发/AI测试 |
 | [FUNCTION_REFERENCE.md](./FUNCTION_REFERENCE.md) | 数据库函数API参考 | 前后端开发 |
+| [EDGE_FUNCTIONS.md](./EDGE_FUNCTIONS.md) | Edge Functions 开发与 R2 集成 | 后端开发 |
 | [RLS_POLICIES.md](./RLS_POLICIES.md) | 行级安全策略说明 | 安全审查/维护 |
 | [AI_MAINTENANCE_GUIDE.md](./AI_MAINTENANCE_GUIDE.md) | AI维护工作流程与规则 | AI助手 |
 | [ENUM_STATUS_VALUES.md](./ENUM_STATUS_VALUES.md) | 状态值和枚举定义 | 前后端开发 |

@@ -146,6 +146,13 @@ const dialog = useAdminDialog({
   onSubmit: async (form, isEdit) => {
     // 密码字段处理：编辑模式下若为空则不提交
     const payload = { ...form }
+    
+    // Fix: Convert empty string to null for UUID validation
+    // if (!payload.department_id) {
+    //     // @ts-ignore
+    //     payload.department_id = null
+    // }
+
     if (isEdit) {
        // @ts-ignore
        if (!payload.password) delete payload.password

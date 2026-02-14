@@ -152,8 +152,8 @@
     <BindEmailModal v-model:visible="modals.email" :current-email="user.email" @close="closeModal('email')" @confirm="updateEmail" />
     <BindGoogleModal v-model:visible="modals.google" :is-bound="!!user.isGoogleBound" :current-google-email="user.googleEmail" @close="closeModal('google')" @bind="handleGoogleBind" />
     <BindWechatModal v-model:visible="modals.wechat" :is-bound="!!user.openId" :open-id="user.openId" @close="closeModal('wechat')" @success="handleWechatSuccess" />
-    <ChangePasswordModal v-model:visible="modals.password" :email="user.email" @close="closeModal('password')" />
-    <DeleteAccountModal v-model:visible="modals.delete" :email="user.email" @close="closeModal('delete')" @confirm="handleDeleteAccount" />
+    <PcChangePasswordModal v-model:visible="modals.password" :email="user.email" @close="closeModal('password')" />
+    <PcDeleteAccountModal v-model:visible="modals.delete" :email="user.email" @close="closeModal('delete')" @confirm="handleDeleteAccount" />
   </div>
 </template>
 
@@ -175,8 +175,8 @@ import ChangeNicknameModal from '@/components/pc/modal/ChangeNicknameModal.vue'
 import BindEmailModal from '@/components/pc/modal/BindEmailModal.vue'
 import BindGoogleModal from '@/components/pc/modal/BindGoogleModal.vue'
 import BindWechatModal from '@/components/pc/modal/BindWechatModal.vue'
-import ChangePasswordModal from '@/components/pc/modal/ChangePasswordModal.vue'
-import DeleteAccountModal from '@/components/pc/modal/DeleteAccountModal.vue'
+import PcChangePasswordModal from '@/components/pc/modal/PcChangePasswordModal.vue'
+import PcDeleteAccountModal from '@/components/pc/modal/PcDeleteAccountModal.vue'
 
 // Define Props
 interface Props {

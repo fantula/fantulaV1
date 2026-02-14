@@ -76,7 +76,7 @@
     </div>
 
     <!-- 退出确认模态框 -->
-    <LogoutModal 
+    <PcLogoutModal 
       v-if="showLogoutModal" 
       @close="showLogoutModal = false" 
       @confirm="handleConfirmLogout" 
@@ -89,7 +89,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/client/user'
 import { authApi } from '@/api/client/auth'
-import LogoutModal from '@/components/pc/modal/LogoutModal.vue'
+import PcLogoutModal from '@/components/pc/modal/PcLogoutModal.vue'
 import { DEFAULT_AVATAR } from '@/utils/constants'
 import { 
   SwitchButton, 

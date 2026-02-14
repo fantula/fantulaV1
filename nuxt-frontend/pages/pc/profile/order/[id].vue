@@ -57,7 +57,7 @@
                  </div>
 
                  <!-- Pass Single Slot Context -->
-                 <FulfillmentShared 
+                 <PcFulfillmentShared 
                     :cdk-item="getCdkForSlot(slot)"
                     :slot-index="slot.slot_index"
                  />
@@ -66,13 +66,13 @@
           
           <!-- One-Time CDK: Standard List -->
           <template v-else-if="order.orderType === 'one_time_cdk'">
-              <FulfillmentCdk :cdk-list="cdkList" />
+              <PcFulfillmentCdk :cdk-list="cdkList" />
           </template>
 
           <!-- Virtual: Single View (First CDK only) -->
           <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
              <div class="virtual-item-group">
-               <FulfillmentSubmitForm
+               <PcFulfillmentSubmitForm
                   :order-id="order.id || ''"
                   :order-status="order.status || ''"
                   :cdk-fields="getFieldsForCdk(cdkList[0])"
@@ -80,7 +80,7 @@
                   @submit-success="handleFulfillmentSuccess"
                />
 
-               <FulfillmentHistory
+               <PcFulfillmentHistory
                   ref="historyRef"
                   :order-id="order.id || ''"
                   :filter-cdk-id="cdkList[0].id"
@@ -165,10 +165,10 @@ import {
 import { clientOrderApi } from '@/api/client'
 import { ticketApi } from '@/api/client/ticket'
 import { useOrderDetail } from '@/composables/client/useOrderDetail'
-import FulfillmentShared from '@/components/pc/order/FulfillmentShared.vue'
-import FulfillmentCdk from '@/components/pc/order/FulfillmentCdk.vue'
-import FulfillmentSubmitForm from '@/components/pc/order/FulfillmentSubmitForm.vue'
-import FulfillmentHistory from '@/components/pc/order/FulfillmentHistory.vue'
+import PcFulfillmentCdk from '@/components/pc/order/PcFulfillmentCdk.vue'
+import PcFulfillmentShared from '@/components/pc/order/PcFulfillmentShared.vue'
+import PcFulfillmentSubmitForm from '@/components/pc/order/PcFulfillmentSubmitForm.vue'
+import PcFulfillmentHistory from '@/components/pc/order/PcFulfillmentHistory.vue'
 import OrderDetailHero from '@/components/pc/order/OrderDetailHero.vue'
 import RefundingCard from '@/components/pc/order/RefundingCard.vue'
 import RenewalModal from '@/components/pc/order/RenewalModal.vue'

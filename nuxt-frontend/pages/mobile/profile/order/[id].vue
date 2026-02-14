@@ -61,7 +61,7 @@
               <!-- Shared Account -->
               <template v-if="order.orderType === 'shared_account'">
                  <div v-for="(slot, idx) in slotList" :key="slot.id || idx" class="section-group">
-                     <FulfillmentShared 
+                     <MobileFulfillmentShared 
                          :cdk-item="getCdkForSlot(slot) as any"
                          :slot-index="slot.slot_index"
                      />
@@ -72,35 +72,45 @@
               <template v-else-if="order.orderType === 'one_time_cdk'">
                   <div class="section-group">
                       <div class="section-header">卡密信息</div>
-                      <FulfillmentCdk :cdk-list="cdkList" />
+                      <MobileFulfillmentCdk :cdk-list="cdkList" />
                   </div>
               </template>
 
               <!-- Virtual -->
-              <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
+              <template v-else-if="order.orderType === 'virtual'">
                   <div class="section-group">
                      <div class="section-header">充值进度</div>
-                     
-                     <div class="virtual-item-group">
-                         <FulfillmentSubmitForm
-                            :order-id="order.id || ''"
-                            :order-status="order.status || ''"
-                            :cdk-fields="getFieldsForCdk(cdkList[0])"
-                            :cdk-id="cdkList[0].id"
-                            @submit-success="handleFulfillmentSuccess"
-                         />
+                  <!-- Delivery Content -->
+                  <div class="delivery-content">
+                      <div v-if="order.delivery_type === 'cdk'">
+                      <MobileFulfillmentCdk :cdk-list="cdkList" />
+                      </div>
 
-                         <FulfillmentHistory
-                            ref="historyRef"
-                            :order-id="order.id || ''"
-                            :filter-cdk-id="cdkList[0].id"
-                         />
-                     </div>
+                      <div v-else-if="['manual', 'shared'].includes(order.delivery_type)">
+                          <MobileFulfillmentSubmitForm 
+                              v-if="!hasFulfillmentRecord"
+                              :order-id="order.id"
+                              :delivery-type="order.delivery_type"
+                              @success="refreshData"
+                          />
+                          <MobileFulfillmentShared 
+                              v-else
+                              :fulfillment="fulfillmentData"
+                          />
+                      </div>
                   </div>
-              </template>
+              </div>
 
-          </div>
-       </template>
+
+            <!-- History -->
+            <div v-if="fulfillmentHistory.length > 0" class="detail-card">
+               <h3 class="card-title">发货记录</h3>
+               <MobileFulfillmentHistory :history="fulfillmentHistory" />
+            </div>
+       </template> <!-- Closes Virtual -->
+       
+       </div> <!-- Closes fulfillment-container -->
+    </template> <!-- Closes Active/Pending Wrapper -->
 
        <!-- Tutorial -->
        <div class="section-group" v-if="instructionImage && order.status !== 'refunding'">
@@ -148,10 +158,10 @@ import {
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 import MobileOrderProductInfo from '@/components/mobile/order/MobileOrderProductInfo.vue'
 import { useOrderDetail } from '@/composables/client/useOrderDetail'
-import FulfillmentShared from '@/components/mobile/order/FulfillmentShared.vue'
-import FulfillmentCdk from '@/components/mobile/order/FulfillmentCdk.vue'
-import FulfillmentSubmitForm from '@/components/mobile/order/FulfillmentSubmitForm.vue'
-import FulfillmentHistory from '@/components/mobile/order/FulfillmentHistory.vue'
+import MobileFulfillmentShared from '@/components/mobile/order/MobileFulfillmentShared.vue'
+import MobileFulfillmentCdk from '@/components/mobile/order/MobileFulfillmentCdk.vue'
+import MobileFulfillmentSubmitForm from '@/components/mobile/order/MobileFulfillmentSubmitForm.vue'
+import MobileFulfillmentHistory from '@/components/mobile/order/MobileFulfillmentHistory.vue'
 
 // Mobile Sheets
 import MobileRenewalSheet from '@/components/mobile/order/MobileRenewalSheet.vue'

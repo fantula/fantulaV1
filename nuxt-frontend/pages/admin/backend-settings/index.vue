@@ -54,10 +54,21 @@
 
           <div class="status-item">
              <div class="status-label">
-                <el-icon><Service /></el-icon> Edge Function (Hello)
+                <el-icon><Service /></el-icon> Gateway Network (Kong)
              </div>
              <div class="status-value">
-                 <el-tag :type="edgeStatus.type">{{ edgeStatus.text }}</el-tag>
+                 <el-tag :type="networkStatus.type">{{ networkStatus.text }}</el-tag>
+             </div>
+          </div>
+
+          <el-divider direction="horizontal" style="margin: 12px 0;" />
+
+          <div class="status-item">
+             <div class="status-label">
+                <el-icon><Monitor /></el-icon> Server Internet (Outbound)
+             </div>
+             <div class="status-value">
+                 <el-tag :type="internetStatus.type">{{ internetStatus.text }}</el-tag>
              </div>
           </div>
         </div>
@@ -68,7 +79,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { DataLine, Files, Service } from '@element-plus/icons-vue'
+import { DataLine, Files, Service, Monitor } from '@element-plus/icons-vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import { useAdminSystemStatus } from '@/composables/admin/useAdminSystemStatus'
 
@@ -83,6 +94,8 @@ const {
   edgeUrl, 
   dbStatus, 
   r2Status, 
+  networkStatus,
+  internetStatus,
   edgeStatus, 
   checking, 
   checkAll 

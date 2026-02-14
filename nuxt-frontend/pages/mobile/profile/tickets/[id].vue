@@ -346,7 +346,7 @@ onMounted(() => {
     z-index: 100;
 }
 .input-wrapper {
-    display: flex; gap: 10px; alignItems: center;
+    display: flex; gap: 10px; align-items: center;
 }
 .glass-input {
     flex: 1; height: 40px;

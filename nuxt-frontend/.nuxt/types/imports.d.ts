@@ -492,7 +492,6 @@ declare global {
   const useNotify: typeof import('../../composables/useNotify').useNotify
   const useNuxtApp: typeof import('../../node_modules/nuxt/dist/app/nuxt').useNuxtApp
   const useNuxtData: typeof import('../../node_modules/nuxt/dist/app/composables/asyncData').useNuxtData
-  const useNuxtDevTools: typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools').useNuxtDevTools
   const useOrderDetail: typeof import('../../composables/client/useOrderDetail').useOrderDetail
   const useOrderDetailLogic: typeof import('../../composables/client/useOrderDetailLogic').useOrderDetailLogic
   const useOrderList: typeof import('../../composables/client/useOrderList').useOrderList
@@ -1108,7 +1107,6 @@ declare module 'vue' {
     readonly useNotify: UnwrapRef<typeof import('../../composables/useNotify')['useNotify']>
     readonly useNuxtApp: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/nuxt')['useNuxtApp']>
     readonly useNuxtData: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/asyncData')['useNuxtData']>
-    readonly useNuxtDevTools: UnwrapRef<typeof import('../../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools')['useNuxtDevTools']>
     readonly useOrderDetail: UnwrapRef<typeof import('../../composables/client/useOrderDetail')['useOrderDetail']>
     readonly useOrderDetailLogic: UnwrapRef<typeof import('../../composables/client/useOrderDetailLogic')['useOrderDetailLogic']>
     readonly useOrderList: UnwrapRef<typeof import('../../composables/client/useOrderList')['useOrderList']>

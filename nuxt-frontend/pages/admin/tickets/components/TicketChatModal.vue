@@ -375,8 +375,8 @@ const handleFileSelect = async (event: Event) => {
 
     isUploading.value = true
     try {
-        const session = useSupabaseSession()
-        const token = session.value?.access_token
+        const { getAuthToken } = await import('@/utils/supabase')
+        const token = await getAuthToken()
         
         if (!token) {
            ElMessage.error('请登录')

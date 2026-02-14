@@ -26,7 +26,8 @@
 │   ├── supabase-db        (PostgreSQL 数据库)
 │   ├── supabase-auth      (GoTrue 认证服务)
 │   ├── supabase-rest       (PostgREST API)
-│   ├── supabase-storage    (文件存储)
+│   ├── supabase-storage    (文件存储 - S3/R2 Backend)
+│   ├── supabase-edge-functions (Deno Edge Runtime - Self Hosted)
 │   └── supabase-kong       (API 网关)
 │
 ├── PM2 管理的 Node 进程
@@ -35,79 +36,46 @@
 │
 └── Nginx (反向代理)
     ├── fantula.com → localhost:3000 (前端)
+    ├── /functions/v1/ → localhost:8000 (Kong -> Edge Functions)
     └── API 路由 → 对应后端服务
 ```
 
 ---
 
-## 三、部署流程
+## 三、标准化部署流程 (Standard Deployment)
 
-### 3.1 标准部署（前端代码更新）
+> **唯一操作入口**：`./scripts/deploy.sh`
+> 详情参考：`docs/guides/DEPLOYMENT_STANDARD.md`
 
-```bash
-# === 本地执行 ===
-
-# 1. 构建
-cd /Users/dalin/fantula/nuxt-frontend
-npm run build
-
-# 2. 上传构建产物
-rsync -az --delete \
-  /Users/dalin/fantula/nuxt-frontend/.output/ \
-  root@180.163.87.70:/opt/fantula/nuxt-frontend/.output/
-
-# 3. 重启 PM2
-ssh root@180.163.87.70 "cd /opt/fantula/nuxt-frontend && pm2 restart fantula --update-env"
-
-# 4. 验证
-ssh root@180.163.87.70 "pm2 status fantula"
-```
-
-### 3.2 带数据库变更的部署
-
-> ⚠️ 严禁执行 `supabase db reset`，参考 `/database-migration` 工作流
+### 3.1 常用命令
 
 ```bash
-# 1. 先在数据库执行 DDL
-ssh root@180.163.87.70 "
-docker exec supabase-db psql -U supabase_admin -d postgres -c '
-  ALTER TABLE xxx ADD COLUMN yyy;
-'
-"
+# === 场景 A: 快速更新 (Quick Fix) ===
+# 仅同步代码，重启服务 (不重装依赖)
+./scripts/deploy.sh staging quick
 
-# 2. 验证变更
-ssh root@180.163.87.70 "
-docker exec supabase-db psql -U supabase_admin -d postgres -c '
-  \d tablename
-'
-"
-
-# 3. 再部署前端代码（同 3.1）
+# === 场景 B: 完整发布 (Full Release) ===
+# 同步代码 + 清理/重装依赖 (自动使用国内镜像)
+./scripts/deploy.sh staging full
 ```
 
-### 3.3 定时器部署（Scheduler）
+### 3.2 部署原理
+1.  **Local Build**: 本地构建 `.output`。
+2.  **Rsync**: 增量同步 (排除 `node_modules` 以节省带宽和保护环境)。
+3.  **Remote Install** (Full模式): 服务器端使用国内镜像 (`npmmirror`) 重装 Linux 依赖。
+4.  **Restart**: `pm2 reload` 实现零停机重启。
 
-定时器是独立的 Node.js 进程，代码位于 `scripts/scheduler/`。
+---
 
-```bash
-# === 本地执行 ===
+## 四、运维与维护 (Maintenance)
 
-# 1. 上传定时器代码（不含 node_modules）
-rsync -az --exclude='node_modules' \
-  /Users/dalin/fantula/scripts/scheduler/ \
-  root@180.163.87.70:/opt/fantula/scripts/scheduler/
+详细运维操作请参阅：**[服务器长期维护手册](docs/guides/MAINTENANCE_MANUAL.md)**
 
-# 2. 安装依赖（如 package.json 有变更）
-ssh root@180.163.87.70 "cd /opt/fantula/scripts/scheduler && npm install"
-
-# 3. 重启定时器
-ssh root@180.163.87.70 "pm2 restart fantula-scheduler --update-env"
-
-# 4. 验证
-ssh root@180.163.87.70 "curl -s http://127.0.0.1:3001/status"
-```
-
-> ⚠️ 定时器使用自己的 `.env`，不共用 Nuxt 的环境变量。
+涵盖内容：
+- 每周健康检查 (Health Check)
+- 日志清理 (Log Rotation)
+- 灾难恢复 (Disaster Recovery)
+- 数据库备份与还原
 
 ---
 
@@ -198,6 +166,25 @@ docker exec supabase-db pg_dump -U supabase_admin -d postgres --data-only > data
 docker exec supabase-db pg_dump -U supabase_admin -d postgres --schema-only > schema_backup.sql
 ```
 
+### 3.3 部署 Edge Functions (Self-Hosted)
+
+> **注意**: 由于网络和依赖问题，目前采用**手动部署**方式，不使用 Supabase CLI 的自动部署。
+
+1.  **准备代码**: 确保 `supabase/functions/upload-r2/index.ts` 包含所有依赖（内联 R2 工具函数）。
+2.  **上传代码**:
+    ```bash
+    scp supabase/functions/upload-r2/index.ts root@180.163.87.70:/opt/supabase/docker/volumes/functions/upload-r2/index.ts
+    ```
+3.  **重启服务** (加载代码变更):
+    ```bash
+    ssh root@180.163.87.70 "docker restart supabase-edge-functions"
+    ```
+4.  **验证**:
+    ```bash
+    curl -I -X POST https://www.fantula.com/functions/v1/upload-r2
+    # 预期返回 401 Unauthorized (鉴权成功) 或 400 Bad Request
+    ```
+
 ---
 
 ## 六、环境变量
@@ -207,25 +194,30 @@ docker exec supabase-db pg_dump -U supabase_admin -d postgres --schema-only > sc
 ```
 /opt/fantula/nuxt-frontend/.env         # Nuxt 前端
 /opt/fantula/scripts/scheduler/.env     # 定时器
+/opt/supabase/docker/.env              # Supabase 基础配置
+/opt/supabase/docker/docker-compose.yml # Edge Functions 环境变量 (R2)
 ```
 
 ### 6.2 关键环境变量
 
-| 变量名 | 说明 | 注意事项 |
-|--------|------|---------|
-| `NUXT_WECHAT_APP_SECRET` | 微信公众号 AppSecret | **必须** `NUXT_` 前缀才能运行时覆盖 |
-| `NUXT_SUPABASE_SERVICE_KEY` | Supabase Service Role Key | admin 权限，绝不暴露给前端 |
-| `NUXT_WECHAT_PAY_MCH_ID` | 微信支付商户号 | |
-| `NUXT_WECHAT_PAY_API_V3_KEY` | 微信支付 V3 密钥 | |
-| `NUXT_WECHAT_PAY_PRIVATE_KEY` | 商户证书私钥 | 单行格式，`\n` 替换换行 |
-| `NUXT_WECHAT_PAY_SERIAL_NO` | 商户证书序列号 | |
-| `NUXT_PUBLIC_SUPABASE_URL` | Supabase API 地址 | public 前缀 = 前端可见 |
-| `NUXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase 匿名 Key | public 前缀 = 前端可见 |
+| 变量名 | 说明 | 位置 |
+|--------|------|------|
+| `NUXT_WECHAT_APP_SECRET` | 微信公众号 AppSecret | Nuxt .env |
+| `NUXT_SUPABASE_SERVICE_KEY` | Supabase Service Role Key | Nuxt .env |
+| `R2_ACCOUNT_ID` | Cloudflare R2 账户 ID | docker-compose.yml (functions service) |
+| `R2_ACCESS_KEY_ID` | R2 Access Key | docker-compose.yml (functions service) |
+| `R2_SECRET_ACCESS_KEY` | R2 Secret Key | docker-compose.yml (functions service) |
+| `R2_BUCKET_NAME` | R2 存储桶名称 | docker-compose.yml (functions service) |
+| `R2_PUBLIC_BASE_URL` | R2 公网访问域名 | docker-compose.yml (functions service) |
 
 > ⚠️ **Nuxt 3 运行时覆盖规则**：  
 > 构建时 `npm run build` 会把 `nuxt.config.ts` 的 runtimeConfig 默认值打包进 `.output`。  
 > 运行时只有 `NUXT_` 前缀的环境变量才能覆盖这些默认值。  
 > 修改 `.env` 后必须执行 `pm2 restart fantula --update-env` 才生效。
+
+> ⚠️ **Edge Functions 配置规则**：
+> R2 变量必须直接注入到 `/opt/supabase/docker/docker-compose.yml` 的 `functions` 服务 `environment` 块中。
+> 修改后需执行 `docker restart supabase-edge-functions`。
 
 ### 6.3 Scheduler 环境变量
 

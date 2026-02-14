@@ -71,19 +71,13 @@
         @success="handleSuccess('昵称已更新')"
     />
 
-    <ChangePasswordModal 
+    <MobileChangePasswordModal 
         :visible="activeModal === 'password'"
         @close="activeModal = null"
         @success="handleSuccess('密码已修改')"
     />
 
-    <ChangeEmailModal 
-        :visible="activeModal === 'email'"
-        @close="activeModal = null"
-        @success="handleSuccess('请查收确认邮件')"
-    />
-
-    <DeleteAccountModal 
+    <MobileDeleteAccountModal 
         :visible="activeModal === 'delete'"
         @close="activeModal = null"
     />
@@ -101,9 +95,9 @@ import { useUserStore } from '@/stores/client/user'
 
 // Import Modals
 import EditNicknameModal from './modals/EditNicknameModal.vue'
-import ChangePasswordModal from './modals/ChangePasswordModal.vue'
+import MobileChangePasswordModal from './modals/MobileChangePasswordModal.vue'
 import ChangeEmailModal from './modals/ChangeEmailModal.vue'
-import DeleteAccountModal from './modals/DeleteAccountModal.vue'
+import MobileDeleteAccountModal from './modals/MobileDeleteAccountModal.vue'
 
 const props = defineProps<{
   visible: boolean

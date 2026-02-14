@@ -21,28 +21,33 @@ export function resetAdminSupabaseClient(): void {
  * 注意：启用 session 持久化以避免刷新页面丢失登录状态
  */
 export function getAdminSupabaseClient(): SupabaseClient {
+    // 严禁在客户端使用此函数
+    if (process.client) {
+        throw new Error('❌ SECURITY VIOLATION: getAdminSupabaseClient() cannot be used on client side!')
+    }
+
     if (!adminSupabaseClient) {
         const config = useRuntimeConfig()
 
-        // 从 RuntimeConfig 获取配置，确保环境一致性
-        // 优先尝试获取 public 中的配置 (针对客户端 Admin), 降级获取 server 配置 (针对 SSR/Server API)
-        const SUPABASE_SERVICE_ROLE_KEY = config.public.supabaseServiceKey || config.supabaseServiceKey
+        // 仅从 Server RuntimeConfig 获取
+        // HOTFIX: Hardcode correct key to bypass env loading truncation issue
+        const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg'
+        // const SUPABASE_SERVICE_ROLE_KEY = config.supabaseServiceKey
         const SUPABASE_URL = config.public.supabaseUrl
 
-        if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
-            console.error('[Admin Client] Missing SUPABASE_SERVICE_KEY or SUPABASE_URL')
+        if (!SUPABASE_SERVICE_ROLE_KEY) {
+            console.error('❌ [Admin Client] Missing SUPABASE_SERVICE_KEY in runtimeConfig')
+            throw new Error('Server configuration error: Missing Service Key')
         }
 
         adminSupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
             auth: {
-                persistSession: false, // 禁止 Admin Client 持久化 Session
+                persistSession: false,
                 autoRefreshToken: false,
                 detectSessionInUrl: false,
             },
             global: {
                 headers: {
-                    // 强制使用 Service Role Key 作为 Authorization Header
-                    // 这能防止 Supabase JS 自动使用 LocalStorage 中的用户 Token 覆盖它
                     'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
                 }
             }

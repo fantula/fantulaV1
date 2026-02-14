@@ -1,0 +1,1 @@
+import{h as i,Q as u,Z as c,l}from"./BZpGQicP.js";const p=()=>{const n=l(null),a=async()=>{const s=c(),{data:e}=await s.auth.getSession();return n.value=e.session,s};let t=null;return i(async()=>{{const s=await a(),{data:e}=s.auth.onAuthStateChange((r,o)=>{n.value=o});t=e.subscription}}),u(()=>{t&&t.unsubscribe()}),n};export{p as u};

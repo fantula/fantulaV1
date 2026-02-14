@@ -599,8 +599,11 @@ export const useUserStore = defineStore('user', () => {
     confirmPassword: string
   }) => {
     try {
-      console.warn('重置密码功能暂未实现，使用模拟返回')
-      return { success: true }
+      // Implement password reset logic via API
+      // const response = await authApi.resetPassword(params)
+      // return response
+      console.warn('重置密码功能暂未实现 (API binding pending)')
+      return { success: false, message: '功能暂未开放' }
     } catch (error: any) {
       return { success: false, message: error.message || '重置密码失败' }
     }
@@ -630,14 +633,7 @@ export const useUserStore = defineStore('user', () => {
         await fetchUserInfo()
       } catch (error) {
         console.warn('获取用户信息失败，可能需要重新登录:', error)
-        if (process.dev && token.value?.includes('mock_token_')) {
-          console.log('检测到mock token，保持开发登录状态')
-          return
-        }
-        // 如果 API 失败且 token 无效，才清除状态
-        // token.value = null 
-        // user.value = null
-        // 暂不强制清除，允许离线/缓存查看
+        // 暂不强制清除
       }
     }
   }
@@ -659,32 +655,7 @@ export const useUserStore = defineStore('user', () => {
     cartStore.initCart()
   }
 
-  const mockLogin = () => {
-    const mockUser = {
-      id: '145e6b60-03db-47f0-a812-41a257e04468',
-      uid: '88888888',
-      username: 'dev_user',
-      nickname: '开发用户',
-      email: 'admin@fantula.com',
-      status: 1,
-      createTime: new Date().toISOString(),
-      updateTime: new Date().toISOString(),
-      balance: 5888.5
-    }
-    const mockToken = 'mock_token_' + Date.now()
-    user.value = mockUser
-    token.value = mockToken
-    if (process.client) {
-      localStorage.setItem('user_info', JSON.stringify(mockUser))
-    }
-    loadFavorites()
-    loadOrders()
-    unreadMessageCount.value = 5 // 模拟未读消息
-    const cartStore = useCartStore()
-    cartStore.initCart()
-    console.log('🚀 模拟登录成功！用户信息:', mockUser)
-    return { success: true, data: { user: mockUser, token: mockToken } }
-  }
+  // mockLogin removed for production safety
 
   return {
     // 状态
@@ -706,7 +677,6 @@ export const useUserStore = defineStore('user', () => {
     fetchUserInfo,
     init,
     setUser,
-    mockLogin,
     fetchUnreadMessageCount, // 导出获取方法
 
     // 收藏相关方法

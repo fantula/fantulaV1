@@ -654,7 +654,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "0edb8baf-b392-41af-b1d4-0127e34e40fa",
+    "buildId": "fef476ed-a337-408c-b602-650c63d66399",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -4805,14 +4805,16 @@ const createUserSchema = z.object({
   email: z.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"),
   password: z.string().min(6, "\u5BC6\u7801\u81F3\u5C11\u9700\u89816\u4F4D"),
   name: z.string().min(1, "\u59D3\u540D\u4E0D\u80FD\u4E3A\u7A7A"),
-  department_id: z.string().uuid("\u90E8\u95E8ID\u65E0\u6548").optional().nullable(),
+  // Relax UUID validation to string because some legacy IDs (like Super Admin) are not RFC-compliant
+  department_id: z.string().min(1, "\u90E8\u95E8ID\u65E0\u6548"),
   status: z.enum(["enabled", "disabled"]).optional().default("enabled")
 });
 const sendOtpSchema = z.object({
   email: z.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E")
 });
 const deleteUserSchema = z.object({
-  id: z.string().uuid("\u65E0\u6548\u7684\u7528\u6237ID")
+  id: z.string()
+  // Relaxed from uuid()
 });
 async function validateBody(event, schema) {
   const body = await readBody(event);
@@ -5090,6 +5092,7 @@ const _YsYiNJ = lazyEventHandler(() => {
 const _lazy_M0YVZa = () => import('../routes/api/admin/auth/login.post.mjs');
 const _lazy_MibnQE = () => import('../routes/api/admin/auth/me.get.mjs');
 const _lazy_EUeWgX = () => import('../routes/api/admin/auth/send-otp.post.mjs');
+const _lazy_tm9JhC = () => import('../routes/api/admin/system/status.get.mjs');
 const _lazy_xx2F8b = () => import('../routes/api/admin/users/create.post.mjs');
 const _lazy_hlFyYY = () => import('../routes/api/admin/users/delete.post.mjs');
 const _lazy_dcHuVB = () => import('../routes/api/auth/bind-wechat.post.mjs');
@@ -5112,6 +5115,7 @@ const handlers = [
   { route: '/api/admin/auth/login', handler: _lazy_M0YVZa, lazy: true, middleware: false, method: "post" },
   { route: '/api/admin/auth/me', handler: _lazy_MibnQE, lazy: true, middleware: false, method: "get" },
   { route: '/api/admin/auth/send-otp', handler: _lazy_EUeWgX, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/system/status', handler: _lazy_tm9JhC, lazy: true, middleware: false, method: "get" },
   { route: '/api/admin/users/create', handler: _lazy_xx2F8b, lazy: true, middleware: false, method: "post" },
   { route: '/api/admin/users/delete', handler: _lazy_hlFyYY, lazy: true, middleware: false, method: "post" },
   { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },

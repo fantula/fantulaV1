@@ -99,28 +99,23 @@
         @success="handleSuccess('昵称已更新')"
     />
 
-    <ChangePasswordModal 
-        :visible="activeModal === 'password'"
-        @close="activeModal = null"
-        @success="handleSuccess('密码已修改')"
+    <MobileChangePasswordModal 
+      :visible="activeModal === 'password'"
+      @close="activeModal = null"
+      @success="handleSuccess('密码已修改')"
+    />
+    
+    <!-- Delete Account Modal -->
+    <MobileDeleteAccountModal 
+      :visible="activeModal === 'delete'" 
+      @close="activeModal = null" 
     />
 
-    <ChangeEmailModal 
-        :visible="activeModal === 'email'"
-        @close="activeModal = null"
-        @success="handleSuccess('请查收确认邮件')"
-    />
-
-    <DeleteAccountModal 
-        :visible="activeModal === 'delete'"
-        @close="activeModal = null"
-    />
-
-    <LogoutModal 
-        :visible="activeModal === 'logout'"
-        :loading="loading"
-        @close="activeModal = null"
-        @confirm="handleLogoutConfirm"
+    <MobileLogoutModal
+      :visible="activeModal === 'logout'"
+      :loading="loading"
+      @close="activeModal = null"
+      @confirm="handleLogoutConfirm"
     />
 
     <SelectAvatarModal
@@ -149,10 +144,10 @@ import { DEFAULT_AVATAR } from '@/utils/constants'
 
 // Modal Imports
 import EditNicknameModal from '@/components/mobile/profile/modals/EditNicknameModal.vue'
-import ChangePasswordModal from '@/components/mobile/profile/modals/ChangePasswordModal.vue'
+import MobileChangePasswordModal from '@/components/mobile/profile/modals/MobileChangePasswordModal.vue'
 import ChangeEmailModal from '@/components/mobile/profile/modals/ChangeEmailModal.vue'
-import DeleteAccountModal from '@/components/mobile/profile/modals/DeleteAccountModal.vue'
-import LogoutModal from '@/components/mobile/profile/modals/LogoutModal.vue'
+import MobileDeleteAccountModal from '@/components/mobile/profile/modals/MobileDeleteAccountModal.vue'
+import MobileLogoutModal from '@/components/mobile/profile/modals/MobileLogoutModal.vue'
 import SelectAvatarModal from '@/components/mobile/profile/modals/SelectAvatarModal.vue' // New
 import WechatBindModal from '@/components/mobile/profile/modals/WechatBindModal.vue' // New
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'

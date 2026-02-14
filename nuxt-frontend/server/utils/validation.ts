@@ -24,7 +24,8 @@ export const createUserSchema = z.object({
     email: z.string().email('邮箱格式不正确'),
     password: z.string().min(6, '密码至少需要6位'),
     name: z.string().min(1, '姓名不能为空'),
-    department_id: z.string().uuid('部门ID无效').optional().nullable(),
+    // Relax UUID validation to string because some legacy IDs (like Super Admin) are not RFC-compliant
+    department_id: z.string().min(1, '部门ID无效'),
     status: z.enum(['enabled', 'disabled']).optional().default('enabled')
 })
 
@@ -33,13 +34,14 @@ export const sendOtpSchema = z.object({
 })
 
 export const deleteUserSchema = z.object({
-    id: z.string().uuid('无效的用户ID')
+    id: z.string() // Relaxed from uuid()
 })
 
 // --- Validator ---
 
 export async function validateBody<T>(event: H3Event, schema: z.ZodSchema<T>): Promise<T> {
     const body = await readBody(event)
+    // Logs removed
     const result = schema.safeParse(body)
 
     if (!result.success) {

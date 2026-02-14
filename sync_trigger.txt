@@ -1,0 +1,14 @@
+                            prosrc                             
+---------------------------------------------------------------
+                                                              +
+ BEGIN                                                        +
+   -- When auth.users.email is updated, sync to profiles.email+
+   UPDATE public.profiles                                     +
+   SET email = NEW.email                                      +
+   WHERE id = NEW.id;                                         +
+                                                              +
+   RETURN NEW;                                                +
+ END;                                                         +
+ 
+(1 row)
+

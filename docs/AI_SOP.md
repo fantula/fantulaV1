@@ -92,24 +92,27 @@
 ```
 1. docs/AI_WORKFLOW.md
 2. docs/AI_SOP.md (本文档)
-3. docs/admin/ADMIN_TEST_OPTIMIZATION_GUIDE.md
-4. docs/admin/ADMIN_ENGINEERING_STANDARD.md
+3. docs/guides/SYSTEM_AUDIT_PROTOCOL.md (系统体检标准)
+4. docs/admin/ADMIN_TEST_OPTIMIZATION_GUIDE.md
+5. docs/admin/ADMIN_ENGINEERING_STANDARD.md
 ```
 
 #### PC 客户端
 ```
 1. docs/AI_WORKFLOW.md
 2. docs/AI_SOP.md (本文档)
-3. docs/client/CLIENT_TEST_OPTIMIZATION_GUIDE.md
-4. docs/client/ORDER_DETAIL.md (如涉及订单)
+3. docs/guides/SYSTEM_AUDIT_PROTOCOL.md (系统体检标准)
+4. docs/client/CLIENT_TEST_OPTIMIZATION_GUIDE.md
+5. docs/client/ORDER_DETAIL.md (如涉及订单)
 ```
 
 #### 移动端
 ```
 1. docs/AI_WORKFLOW.md
 2. docs/AI_SOP.md (本文档)
-3. docs/mobile/README.md (核心原则!)
-4. docs/mobile/MOBILE_TEST_OPTIMIZATION_GUIDE.md
+3. docs/guides/SYSTEM_AUDIT_PROTOCOL.md (系统体检标准)
+4. docs/mobile/README.md (核心原则!)
+5. docs/mobile/MOBILE_TEST_OPTIMIZATION_GUIDE.md
 ```
 
 ### 输出格式

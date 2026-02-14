@@ -272,6 +272,8 @@ docs/
 ├── AI_WORKFLOW.md              # 📋 本文档 (主框架入口)
 ├── AI_SOP.md                   # 📋 标准操作流程 (必读)
 ├── PERFORMANCE_OPTIMIZATION.md # 🚀 性能优化方案 (新增)
+├── guides/                     # 📘 通用指南
+│   └── DEPLOYMENT_AND_OPTIMIZATION_SOP.md # 🚀 全流程部署与优化 S.O.P
 │
 ├── admin/                      # 🔧 后台管理
 │   ├── README.md               # 索引
@@ -346,5 +348,22 @@ docs/
 2. 检查 business_rules/CORE_FREEZE_RULES.md
 3. 确认不在禁区
 4. 使用 MCP 工具执行
+```
+
+### 场景5: 部署与全站优化
+
+```
+1. 阅读 guides/DEPLOYMENT_AND_OPTIMIZATION_SOP.md
+2. 按 Phase 0 -> Phase 6 顺序执行
+3. 严禁跳过 Staging 验证
+```
+
+### 场景6: 系统全景体检 (Routine Audit)
+
+```
+1. 阅读 guides/SYSTEM_AUDIT_PROTOCOL.md
+2. 按照 Phase 1 -> Phase 5 顺序执行
+3. 重点检查 Mobile/PC 逻辑一致性
+4. 输出体检报告
 ```
 

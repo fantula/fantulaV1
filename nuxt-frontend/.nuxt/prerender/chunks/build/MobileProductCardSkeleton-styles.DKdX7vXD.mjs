@@ -1,0 +1,8 @@
+const MobileProductCardSkeleton_vue_vue_type_style_index_0_scoped_0050002c_lang = ".goods-card-skeleton[data-v-0050002c]{background:#ffffff08;border:1px solid hsla(0,0%,100%,.05);border-radius:12px;display:flex;gap:12px;margin-bottom:12px;padding:12px}.skeleton-thumb[data-v-0050002c]{animation:shimmer-0050002c 1.5s infinite;background:linear-gradient(90deg,#ffffff0d 25%,#ffffff1a,#ffffff0d 75%);background-size:200% 100%;border-radius:8px;flex-shrink:0;height:110px;width:110px}.skeleton-info[data-v-0050002c]{display:flex;flex:1;flex-direction:column;justify-content:space-between;padding:2px 0}.skeleton-title[data-v-0050002c]{height:20px;margin-bottom:8px;width:90%}.skeleton-tags[data-v-0050002c],.skeleton-title[data-v-0050002c]{animation:shimmer-0050002c 1.5s infinite;background:#ffffff0d;border-radius:4px}.skeleton-tags[data-v-0050002c]{height:16px;width:40%}.skeleton-bottom[data-v-0050002c]{align-items:flex-end;display:flex;justify-content:space-between;margin-top:auto}.skeleton-price[data-v-0050002c]{border-radius:4px;height:24px;width:30%}.skeleton-btn[data-v-0050002c],.skeleton-price[data-v-0050002c]{animation:shimmer-0050002c 1.5s infinite;background:#ffffff0d}.skeleton-btn[data-v-0050002c]{border-radius:14px;height:28px;width:70px}@keyframes shimmer-0050002c{0%{background-position:200% 0}to{background-position:-200% 0}}";
+
+const MobileProductCardSkeletonStyles_DKdX7vXD = [
+  MobileProductCardSkeleton_vue_vue_type_style_index_0_scoped_0050002c_lang
+];
+
+export { MobileProductCardSkeletonStyles_DKdX7vXD as default };
+//# sourceMappingURL=MobileProductCardSkeleton-styles.DKdX7vXD.mjs.map

@@ -28,13 +28,18 @@ import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/fast-xml-parser/s
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ipx/dist/index.mjs';
 
 const sendOtp_post = defineEventHandler(async (event) => {
+  var _a, _b, _c;
   try {
     const body = await validateBody(event, sendOtpSchema);
     const { email } = body;
     const adminClient = getAdminSupabaseClient();
     const config = useRuntimeConfig();
+    console.log("Using Admin Client. Key Length:", (_a = config.supabaseServiceKey) == null ? void 0 : _a.length);
+    console.log("Key Prefix:", (_b = config.supabaseServiceKey) == null ? void 0 : _b.substring(0, 10));
+    console.log("Key Suffix:", (_c = config.supabaseServiceKey) == null ? void 0 : _c.substring(config.supabaseServiceKey.length - 5));
     const { data: adminData, error: fetchError } = await adminClient.from("admin_users").select("id, status, auth_user_id").eq("email", email).single();
     if (fetchError || !adminData) {
+      console.error("Admin Auth Lookup Failed:", { email, error: fetchError, data: adminData });
       throw createError({ statusCode: 403, statusMessage: "\u90AE\u7BB1\u672A\u6CE8\u518C\u4E3A\u7BA1\u7406\u5458" });
     }
     if (adminData.status !== "enabled") {

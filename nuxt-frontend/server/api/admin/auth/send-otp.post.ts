@@ -12,6 +12,10 @@ export default defineEventHandler(async (event) => {
         const config = useRuntimeConfig()
 
         // 1. Verify Admin User
+        console.log('Using Admin Client. Key Length:', config.supabaseServiceKey?.length)
+        console.log('Key Prefix:', config.supabaseServiceKey?.substring(0, 10))
+        console.log('Key Suffix:', config.supabaseServiceKey?.substring(config.supabaseServiceKey.length - 5))
+
         const { data: adminData, error: fetchError } = await adminClient
             .from('admin_users')
             .select('id, status, auth_user_id')
@@ -19,6 +23,7 @@ export default defineEventHandler(async (event) => {
             .single()
 
         if (fetchError || !adminData) {
+            console.error('Admin Auth Lookup Failed:', { email, error: fetchError, data: adminData })
             throw createError({ statusCode: 403, statusMessage: '邮箱未注册为管理员' })
         }
 

@@ -2,11 +2,11 @@
   <section class="goods-section">
     <div class="container">
       <div class="goods-grid" v-if="loading">
-        <ProductCardSkeleton v-for="i in 8" :key="i" />
+        <PcProductCardSkeleton v-for="i in 8" :key="i" />
       </div>
 
       <div class="goods-grid" v-else-if="goodsList && goodsList.length > 0">
-        <ProductCard 
+        <PcProductCard 
           v-for="item in goodsList" 
           :key="item.id" 
           :goods="item"
@@ -32,8 +32,8 @@
 </template>
 
 <script setup lang="ts">
-import ProductCard from '@/components/pc/ProductCard.vue'
-import ProductCardSkeleton from '@/components/pc/base/ProductCardSkeleton.vue'
+import PcProductCard from '@/components/pc/PcProductCard.vue'
+import PcProductCardSkeleton from '@/components/pc/base/PcProductCardSkeleton.vue'
 
 // Prop type matches the fields defined in AdminProduct for high fidelity
 interface GoodsDisplayItem {

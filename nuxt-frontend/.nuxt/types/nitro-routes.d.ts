@@ -12,6 +12,9 @@ declare module "nitropack/types" {
     '/api/admin/auth/send-otp': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/auth/send-otp.post').default>>>>
     }
+    '/api/admin/system/status': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/system/status.get').default>>>>
+    }
     '/api/admin/users/create': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/users/create.post').default>>>>
     }

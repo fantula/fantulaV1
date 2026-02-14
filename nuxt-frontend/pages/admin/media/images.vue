@@ -290,12 +290,17 @@ const confirmEdit = async () => {
   }
 }
 
+// --- Edit/Delete Logic ---
+// ... (start of script setup)
+
+// ...
+
 const handleDelete = async (img: AdminImage) => {
    await confirmDelete(
       '确认删除此图片？',
       async () => {
-          const token = session.value?.access_token
-          const res = await adminImageApi.deleteImage(img.id, token)
+          const token = await getAuthToken()
+          const res = await adminImageApi.deleteImage(img.id, token || undefined)
           if (res.success) {
              fetchImages()
           }
@@ -308,8 +313,8 @@ const handleBatchDelete = async () => {
   await confirmAction(
     `确认删除选中的 ${selectedIds.value.length} 张图片？`,
     async () => {
-        const token = session.value?.access_token
-        const res = await adminImageApi.deleteImages(selectedIds.value, token)
+        const token = await getAuthToken()
+        const res = await adminImageApi.deleteImages(selectedIds.value, token || undefined)
         if (res.success) {
              fetchImages()
         }
@@ -324,7 +329,7 @@ const syncing = ref(false)
 const syncFromR2 = async () => {
   syncing.value = true
   try {
-    const token = session.value?.access_token
+    const token = await getAuthToken()
     if (!token) return ElMessage.error('请登录管理员账号')
 
     const { getEdgeFunctionsUrl } = await import('@/utils/supabase')
@@ -333,6 +338,8 @@ const syncFromR2 = async () => {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ prefix: 'uploads' })
     })
+    
+    // ... (rest of logic)
     
     const result = await response.json()
     if (result.error) throw new Error(result.error)

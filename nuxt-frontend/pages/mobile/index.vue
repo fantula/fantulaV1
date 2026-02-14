@@ -42,7 +42,7 @@
       <div class="goods-list-section">
         
         <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
-           <ProductCardSkeleton v-for="i in 6" :key="i" />
+           <MobileProductCardSkeleton v-for="i in 6" :key="i" />
         </div>
         
         <div v-else-if="currentGoods.length === 0" class="empty-state bg-glass-card">
@@ -50,14 +50,14 @@
            <p class="text-muted text-sm">暂无相关商品</p>
         </div>
 
-        <div v-else class="goods-list">
-           <ProductCard 
-             v-for="(item, index) in currentGoods" 
-             :key="item.id" 
-             :goods="item"
+        <div class="goods-list" v-else>
+           <MobileProductCard 
+             v-for="(g, index) in currentGoods" 
+             :key="g.id" 
+             :goods="g"
              class="animate-fade-in"
              :style="{ animationDelay: `${index * 0.05}s` }"
-             @click="openDetail(item.id)"
+             @click="openDetail(g.id)"
            />
         </div>
 
@@ -115,8 +115,8 @@ import { useHomeData } from '@/composables/client/useHomeData'
 import HomeHeader from '@/components/mobile/home/HomeHeader.vue'
 import HomeBanner from '@/components/mobile/home/HomeBanner.vue'
 import HomeCategoryNav from '@/components/mobile/home/HomeCategoryNav.vue'
-import ProductCard from '@/components/mobile/goods/ProductCard.vue'
-import ProductCardSkeleton from '@/components/mobile/goods/ProductCardSkeleton.vue'
+import MobileProductCard from '@/components/mobile/goods/MobileProductCard.vue'
+import MobileProductCardSkeleton from '@/components/mobile/goods/MobileProductCardSkeleton.vue'
 const ProductDetailSheet = defineAsyncComponent(() => import('@/components/mobile/goods/ProductDetailSheet.vue'))
 const MobileLoginSheet = defineAsyncComponent(() => import('@/components/mobile/auth/MobileLoginSheet.vue'))
 

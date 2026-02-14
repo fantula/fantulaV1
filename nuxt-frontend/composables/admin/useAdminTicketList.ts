@@ -63,9 +63,9 @@ export function useAdminTicketList() {
             await confirmAction(
                 '此操作将永久删除7天前的"已解决"工单中的所有图片附件以释放空间。聊天记录将保留，但图片将无法查看。确定要执行吗？',
                 async () => {
-                    const session = useSupabaseSession()
-                    const token = session.value?.access_token
-                    const res = await adminTicketApi.cleanupImages(7, token)
+                    const { getAuthToken } = await import('@/utils/supabase')
+                    const token = await getAuthToken()
+                    const res = await adminTicketApi.cleanupImages(7, token || undefined)
                     // Append concrete count info to success message if possible? 
                     // Since confirmAction uses fixed success message, we accept generic message or rely on res.success
                     return res

@@ -61,7 +61,6 @@ import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 
 const testing = ref(false)
 const testResult = ref<{ success: boolean; message: string } | null>(null)
-const session = useSupabaseSession()
 
 const testConnection = async () => {
   testing.value = true
@@ -69,11 +68,13 @@ const testConnection = async () => {
   
   try {
     const { callEdgeFunction } = await import('@/utils/supabase')
-    const token = session.value?.access_token
-
+    const { getAuthToken } = await import('@/utils/supabase')
+    const token = await getAuthToken()
+    
     if (!token) {
-        testResult.value = { success: false, message: '无法获取登录凭证，请刷新页面' }
-        return
+       ElMessage.error('请登录')
+       testing.value = false
+       return
     }
 
     // No body needed; function uses env vars
