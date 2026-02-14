@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { adminProductApi } from '@/api/admin/product'
-import { adminSkuApi, type SharedSkuGroup } from '@/api/admin/sku'
+import { adminSkuApi, adminSharedSkuApi, type SharedSkuGroup } from '@/api/admin'
 
 export function useAdminSkuEditor() {
     const route = useRoute()
@@ -31,7 +31,7 @@ export function useAdminSkuEditor() {
 
     // Actions
     const loadSharedGroups = async () => {
-        const res = await adminSkuApi.getSharedSkuGroups()
+        const res = await adminSharedSkuApi.getSharedSkuGroups()
         if (res.success) {
             sharedGroups.value = res.groups || []
             // Refill if in shared mode
@@ -119,7 +119,7 @@ export function useAdminSkuEditor() {
                     duration: s.duration,
                     intro: s.intro,
                     image: s.image,
-                    tag: s.tag
+                    tag: group.tag
                 }
             })
 

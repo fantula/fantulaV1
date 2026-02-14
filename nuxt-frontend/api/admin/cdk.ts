@@ -3,7 +3,7 @@
  * 从 admin-supabase.ts 独立拆分
  */
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 // ========================================
 // 类型定义
@@ -36,7 +36,7 @@ export const adminCdkApi = {
         limit?: number
         offset?: number
     }): Promise<{ success: boolean; cdks: AdminCDK[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         let query = client
             .from('cdks')
@@ -74,7 +74,7 @@ export const adminCdkApi = {
         account_data?: Record<string, any>
         product_snapshot?: { product_id: string; product_name: string; product_image?: string }
     }): Promise<{ success: boolean; count: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // Virtual 类型检查：通过 SKU 检查是否已有绑定的 virtual CDK
         if (data.cdk_type === 'virtual') {
@@ -162,7 +162,7 @@ export const adminCdkApi = {
      * 删除 CDK（仅允许删除 idle 状态）
      */
     async deleteCdk(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { data: cdk } = await client.from('cdks').select('status').eq('id', id).single()
         if (cdk?.status !== 'idle') return { success: false, error: '只能删除未使用的 CDK' }
@@ -181,7 +181,7 @@ export const adminCdkApi = {
      */
     async deleteCdks(ids: string[]): Promise<{ success: boolean; count: number; error?: string }> {
         if (!ids.length) return { success: true, count: 0 }
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error, count } = await client.from('cdks').delete({ count: 'exact' }).in('id', ids).eq('status', 'idle')
         if (error) return { success: false, count: 0, error: error.message }
         return { success: true, count: count || 0 }
@@ -191,7 +191,7 @@ export const adminCdkApi = {
      * CDK 上架
      */
     async enableCdk(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: cdk } = await client.from('cdks').select('status').eq('id', id).single()
         if (cdk?.status !== 'disabled') return { success: false, error: '只能上架已下架的 CDK' }
         const { error } = await client.from('cdks').update({ status: 'idle' }).eq('id', id)
@@ -203,7 +203,7 @@ export const adminCdkApi = {
      * CDK 下架
      */
     async disableCdk(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: cdk } = await client.from('cdks').select('status').eq('id', id).single()
         if (cdk?.status !== 'idle') return { success: false, error: '只能下架空闲状态的 CDK' }
         const { error } = await client.from('cdks').update({ status: 'disabled' }).eq('id', id)
@@ -216,7 +216,7 @@ export const adminCdkApi = {
      */
     async enableCdks(ids: string[]): Promise<{ success: boolean; count: number; error?: string }> {
         if (!ids.length) return { success: true, count: 0 }
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error, count } = await client.from('cdks').update({ status: 'idle' }).in('id', ids).eq('status', 'disabled')
         if (error) return { success: false, count: 0, error: error.message }
         return { success: true, count: count || 0 }
@@ -227,7 +227,7 @@ export const adminCdkApi = {
      */
     async disableCdks(ids: string[]): Promise<{ success: boolean; count: number; error?: string }> {
         if (!ids.length) return { success: true, count: 0 }
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error, count } = await client.from('cdks').update({ status: 'disabled' }).in('id', ids).eq('status', 'idle')
         if (error) return { success: false, count: 0, error: error.message }
         return { success: true, count: count || 0 }
@@ -237,7 +237,7 @@ export const adminCdkApi = {
      * 获取单个 CDK 详情
      */
     async getCdkById(id: string): Promise<{ success: boolean; cdk?: AdminCDK; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('cdks')
             .select(`*, sku_mappings:cdk_sku_map(id, sku_id, sku:product_skus(id, spec_combination, price, product_type))`)
@@ -253,7 +253,7 @@ export const adminCdkApi = {
         max_slots?: number; code?: string; account_data?: Record<string, any>; stock?: number;
         product_snapshot?: { product_id: string; product_name: string; product_image?: string }
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { data: currentCdk } = await client.from('cdks').select('cdk_type, max_slots').eq('id', id).single()
         if (!currentCdk) return { success: false, error: 'CDK 不存在' }
@@ -307,7 +307,7 @@ export const adminCdkApi = {
      * 获取 CDK 的 SKU 绑定列表
      */
     async getCdkSkuMappings(cdkId: string): Promise<{ success: boolean; mappings: any[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('cdk_sku_map')
             .select(`id, sku_id, sku:product_skus(id, spec_combination, price, product_type), created_at`)
@@ -320,7 +320,7 @@ export const adminCdkApi = {
      * 添加 CDK ↔ SKU 绑定
      */
     async addCdkSkuMapping(cdkId: string, skuId: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         console.log('[addCdkSkuMapping] params:', { cdkId, skuId })
 
         const { data: existing } = await client
@@ -342,7 +342,7 @@ export const adminCdkApi = {
      * 删除 CDK ↔ SKU 绑定
      */
     async removeCdkSkuMapping(mappingId: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('cdk_sku_map').delete().eq('id', mappingId)
         if (error) return { success: false, error: error.message }
         return { success: true }
@@ -366,7 +366,7 @@ export const adminCdkApi = {
 
         // 1. 如果指定了 SKU，则查询这些 SKU 下已有的 CDK codes
         if (skuIds.length > 0) {
-            const client = getAdminSupabaseClient()
+            const client = getSupabaseClient()
             const { data: mappings } = await client
                 .from('cdk_sku_map')
                 .select('cdk:cdks!inner(code, cdk_type)')

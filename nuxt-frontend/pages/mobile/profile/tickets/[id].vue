@@ -49,7 +49,7 @@
               >
                  <!-- Avatar -->
                  <div class="msg-avatar">
-                     <img v-if="msg.sender === 'user'" :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" />
+                     <img v-if="msg.sender === 'user'" :src="userStore.user?.avatar || DEFAULT_AVATAR" />
                      <div v-else class="service-icon"><el-icon><Headset /></el-icon></div>
                  </div>
 
@@ -92,6 +92,7 @@ import { useUserStore } from '@/stores/client/user'
 import { useToast } from '@/composables/mobile/useToast'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 import MobileOrderProductInfo from '@/components/mobile/order/MobileOrderProductInfo.vue'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 definePageMeta({
   layout: 'mobile',

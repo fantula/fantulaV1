@@ -6,7 +6,7 @@
       <div class="banner-content">
         <div class="hero-left">
           <div class="hero-avatar-wrapper" @click="showModal('avatar')">
-            <img :src="user.avatar || '/images/client/pc/avatars/avatar-cat.png'" class="hero-avatar" />
+            <img :src="user.avatar || DEFAULT_AVATAR" class="hero-avatar" />
             <div class="hero-avatar-overlay"><el-icon><Camera /></el-icon></div>
           </div>
           <div class="hero-text">
@@ -167,6 +167,7 @@ import {
   Message, EditPen, Lock, Key, Connection, Warning, ArrowRight 
 } from '@element-plus/icons-vue'
 import { CLIENT_MESSAGES } from '@/utils/clientMessages'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 // Component Imports (Explicit to fix hydration/loading issues)
 import ChangeAvatarModal from '@/components/pc/modal/ChangeAvatarModal.vue'

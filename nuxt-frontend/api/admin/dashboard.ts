@@ -1,4 +1,4 @@
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface DashboardStats {
     today_orders: number
@@ -23,7 +23,7 @@ export const adminDashboardApi = {
      * 获取仪表盘统计数据
      */
     async getStats(): Promise<{ success: boolean; data?: DashboardStats; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // Call the RPC function
         const { data, error } = await client.rpc('admin_get_dashboard_stats')

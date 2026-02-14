@@ -1,4 +1,7 @@
 import { d as defineEventHandler, u as useRuntimeConfig } from '../../../nitro/nitro.mjs';
+import '@supabase/supabase-js';
+import 'zod';
+import 'crypto';
 import 'node:http';
 import 'node:https';
 import 'node:events';
@@ -6,7 +9,11 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
+import 'vue';
+import 'consola';
 import 'node:url';
+import 'fast-xml-parser';
+import 'ipx';
 
 const config = useRuntimeConfig();
 const appid = config.wechatAppid || config.public.wechatAppid;

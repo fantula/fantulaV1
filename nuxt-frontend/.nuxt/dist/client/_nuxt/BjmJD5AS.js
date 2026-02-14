@@ -1,0 +1,1 @@
+import{bG as o}from"./esl5K6it.js";const f=()=>{const t=o("contact-config",()=>null);return{contactConfig:t,fetchContactConfig:async()=>{if(t.value)return t.value;try{const{data:c,success:n}=await $fetch("/api/client/config/contact");n&&(t.value=c)}catch(c){console.error("Failed to fetch contact config",c)}return t.value}}};export{f as u};

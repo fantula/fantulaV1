@@ -2,7 +2,7 @@
   <div class="member-card" @click="$emit('click')">
     <div class="card-content">
       <div class="avatar-wrap">
-        <img :src="user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" class="avatar-img" />
+        <img :src="user?.avatar || DEFAULT_AVATAR" class="avatar-img" />
       </div>
       <div class="user-details">
         <h1 class="username">{{ user?.nickname || 'FANTULA User' }}</h1>
@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 import { CircleCheckFilled, ArrowRight } from '@element-plus/icons-vue'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 defineProps<{
   user: any

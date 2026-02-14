@@ -1,0 +1,1 @@
+import{ag as l}from"./D_9AR362.js";import{m as t,aM as u}from"./esl5K6it.js";const i=["class","style"],E=/^on[A-Z]/,f=(a={})=>{const{excludeListeners:o=!1,excludeKeys:e}=a,c=t(()=>(e?.value||[]).concat(i)),s=u();return s?t(()=>{var r;return l(Object.entries((r=s.proxy)==null?void 0:r.$attrs).filter(([n])=>!c.value.includes(n)&&!(o&&E.test(n))))}):t(()=>({}))};export{f as u};

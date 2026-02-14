@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="global-loader"
     :class="[
       { 'is-hidden': !loading },
@@ -9,14 +9,14 @@
     <!-- Background Effects -->
     <div class="bg-grid" v-if="variant === 'initial'"></div>
     <div class="bg-radial" v-if="variant === 'initial'"></div>
-    
+
     <!-- Glass Effect Background for Navigation -->
     <div class="bg-glass" v-if="variant === 'navigation'"></div>
 
     <div class="loader-content" v-if="variant === 'initial'">
       <!-- Brand Name -->
       <h1 class="brand-name">凡图拉</h1>
-      
+
       <!-- Rolling Text Animation (Horizontally aligned after brand) -->
       <div class="rolling-text-container">
         <div class="rolling-track">
@@ -98,7 +98,7 @@ withDefaults(defineProps<Props>(), {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -161,13 +161,13 @@ withDefaults(defineProps<Props>(), {
 @keyframes roll-up {
   0% { transform: translateY(0); }
   20% { transform: translateY(0); }
-  
+
   33% { transform: translateY(-80px); }
   53% { transform: translateY(-80px); }
-  
+
   66% { transform: translateY(-160px); }
   86% { transform: translateY(-160px); }
-  
+
   100% { transform: translateY(-160px); } /* End state */
 }
 
@@ -194,17 +194,17 @@ withDefaults(defineProps<Props>(), {
   .brand-name { font-size: 1.8rem; line-height: 40px; }
   .rolling-text-container { height: 40px; display: block; }
   .rolling-item { height: 40px; line-height: 40px; font-size: 1.8rem; }
-  
+
   @keyframes roll-up {
     0% { transform: translateY(0); }
     20% { transform: translateY(0); }
-    
+
     33% { transform: translateY(-40px); }
     53% { transform: translateY(-40px); }
-    
+
     66% { transform: translateY(-80px); }
     86% { transform: translateY(-80px); }
-    
+
     100% { transform: translateY(-80px); }
   }
 }

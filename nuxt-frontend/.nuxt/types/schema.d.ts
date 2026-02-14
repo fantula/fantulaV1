@@ -148,8 +148,6 @@ import { NuxtModule, ModuleDependencyMeta } from '@nuxt/schema'
 
    supabaseAnonKey: string,
 
-   supabaseServiceKey: string,
-
    schedulerUrl: string,
 
    "nuxt-robots": {

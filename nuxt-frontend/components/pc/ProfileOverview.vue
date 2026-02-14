@@ -26,7 +26,7 @@
       <div class="user-profile">
         <div class="avatar-section">
           <img 
-            :src="user.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
+            :src="user.avatar || DEFAULT_AVATAR" 
             :alt="`${user.nickname}的头像`"
             class="user-avatar"
           />
@@ -166,6 +166,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 // 组件属性定义
 interface Props {

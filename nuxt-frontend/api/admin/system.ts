@@ -1,5 +1,5 @@
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface AdminContactConfig {
     wechat_id: string
@@ -14,7 +14,7 @@ export const adminSystemApi = {
      * 获取联系方式配置
      */
     async getContactConfig(): Promise<{ success: boolean; data?: AdminContactConfig; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         
         const { data, error } = await client
             .from('system_configs')
@@ -46,7 +46,7 @@ export const adminSystemApi = {
      * 更新联系方式配置
      */
     async updateContactConfig(config: AdminContactConfig): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { error } = await client
             .from('system_configs')

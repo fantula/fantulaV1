@@ -1,4 +1,4 @@
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface AdminImageCategory {
     id: string
@@ -32,7 +32,7 @@ export const adminImageCategoryApi = {
      * 获取图片分类列表
      */
     async getCategories(): Promise<{ success: boolean; categories: AdminImageCategory[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('image_categories')
             .select('*')
@@ -46,7 +46,7 @@ export const adminImageCategoryApi = {
      * 创建图片分类
      */
     async createCategory(name: string): Promise<{ success: boolean; category?: AdminImageCategory; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         // 获取当前最大排序
         const { data: maxOrder } = await client
             .from('image_categories')
@@ -71,7 +71,7 @@ export const adminImageCategoryApi = {
      * 删除图片分类
      */
     async deleteCategory(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // 检查该分类下是否有图片
         const { count } = await client
@@ -98,7 +98,7 @@ export const adminImageApi = {
      * 获取图片列表
      */
     async getImages(params?: { category_id?: string; keyword?: string }): Promise<{ success: boolean; images: AdminImage[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         let query = client.from('images').select(`
             *,
             category:image_categories(*)
@@ -116,7 +116,7 @@ export const adminImageApi = {
      * 创建图片记录
      */
     async createImage(data: { name: string; url: string; category_id?: string }): Promise<{ success: boolean; image?: AdminImage; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: image, error } = await client.from('images').insert(data).select().single()
         if (error) return { success: false, error: error.message }
         return { success: true, image }
@@ -126,7 +126,7 @@ export const adminImageApi = {
      * 更新图片信息
      */
     async updateImage(id: string, data: Partial<AdminImage>): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('images').update(data).eq('id', id)
         if (error) return { success: false, error: error.message }
         return { success: true }
@@ -148,7 +148,7 @@ export const adminImageApi = {
     async deleteImages(ids: string[], token?: string): Promise<{ success: boolean; error?: string }> {
         if (!ids.length) return { success: true }
 
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // 1. 获取图片信息以拿到 URL
         const { data: images, error: fetchError } = await client
@@ -210,7 +210,7 @@ export const adminBannerApi = {
      * 获取轮播图列表
      */
     async getBanners(): Promise<{ success: boolean; banners: AdminBanner[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('banners')
             .select(`
@@ -227,7 +227,7 @@ export const adminBannerApi = {
      * 添加轮播图
      */
     async createBanner(data: { image_id: string; title?: string; link?: string; sort_order?: number }): Promise<{ success: boolean; banner?: AdminBanner; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: banner, error } = await client
             .from('banners')
             .insert({
@@ -245,7 +245,7 @@ export const adminBannerApi = {
      * 更新轮播图状态/排序
      */
     async updateBanner(id: string, data: Partial<AdminBanner>): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('banners').update(data).eq('id', id)
         if (error) return { success: false, error: error.message }
         return { success: true }
@@ -255,7 +255,7 @@ export const adminBannerApi = {
      * 删除轮播图
      */
     async deleteBanner(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('banners').delete().eq('id', id)
         if (error) return { success: false, error: error.message }
         return { success: true }
@@ -277,7 +277,7 @@ export const adminSettingsApi = {
         }
         error?: string
     }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         try {
             const { data, error } = await client
@@ -331,7 +331,7 @@ export const adminSettingsApi = {
         R2_BUCKET_NAME: string
         R2_PUBLIC_BASE_URL: string
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         try {
             const updates = Object.entries(settings)

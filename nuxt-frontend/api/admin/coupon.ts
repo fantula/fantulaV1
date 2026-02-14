@@ -3,7 +3,7 @@
  * 从 admin-supabase.ts 独立拆分
  */
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 // ========================================
 // 类型定义
@@ -52,7 +52,7 @@ export const adminCouponApi = {
         limit?: number
         offset?: number
     }): Promise<{ success: boolean; coupons: AdminCoupon[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         let query = client.from('coupons').select('*', { count: 'exact' })
 
@@ -76,7 +76,7 @@ export const adminCouponApi = {
      * 获取单个优惠券详情
      */
     async getCouponById(id: string): Promise<{ success: boolean; coupon?: AdminCoupon; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client.from('coupons').select('*').eq('id', id).single()
         if (error) return { success: false, error: error.message }
         return { success: true, coupon: data }
@@ -97,7 +97,7 @@ export const adminCouponApi = {
         end_date?: string | null
         status?: boolean
     }): Promise<{ success: boolean; coupon?: AdminCoupon; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const payload = {
             name: data.name,
@@ -120,7 +120,7 @@ export const adminCouponApi = {
      * 更新优惠券规则
      */
     async updateCoupon(id: string, data: Partial<AdminCoupon>): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const payload: any = { ...data }
         if (payload.product_ids) {
@@ -143,7 +143,7 @@ export const adminCouponApi = {
         customCode?: string,
         usageLimit?: number
     ): Promise<{ success: boolean; count?: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const payload: any = { p_coupon_id: couponId, p_quantity: quantity, p_mode: mode }
         if (mode === 'universal') {
@@ -163,7 +163,7 @@ export const adminCouponApi = {
      * 删除优惠券规则
      */
     async deleteCoupon(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('coupons').delete().eq('id', id)
         if (error) return { success: false, error: error.message }
         return { success: true }
@@ -177,7 +177,7 @@ export const adminCouponApi = {
         size?: number
         status?: string
     }): Promise<{ success: boolean; codes: any[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const page = params?.page || 1
         const pageSize = params?.size || 20
         const offset = (page - 1) * pageSize
@@ -202,7 +202,7 @@ export const adminCouponApi = {
      * 批量删除兑换码
      */
     async deleteCouponCodes(ids: string[]): Promise<{ success: boolean; count?: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client.rpc('admin_delete_coupon_codes', { p_ids: ids })
         if (error) return { success: false, error: error.message }
 
@@ -220,7 +220,7 @@ export const adminCouponApi = {
         code?: string
         userUid?: string
     }): Promise<{ success: boolean; data: AdminCouponStat[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const page = params.page
         const pageSize = params.pageSize
         const offset = (page - 1) * pageSize
@@ -323,7 +323,7 @@ export const adminCouponApi = {
      * 批量删除使用记录
      */
     async deleteCouponUsages(ids: string[]): Promise<{ success: boolean; count?: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         // 删除 coupon_codes 表记录 (Primary source)
         const { error, count } = await client.from('coupon_codes').delete().in('id', ids)
 
@@ -335,7 +335,7 @@ export const adminCouponApi = {
      * 更新优惠券说明（code 字段）
      */
     async updateCouponCode(id: string, code: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('coupons').update({ code }).eq('id', id)
         if (error) return { success: false, error: error.message }
         return { success: true }

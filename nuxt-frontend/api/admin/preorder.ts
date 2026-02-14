@@ -1,5 +1,5 @@
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface AdminPreOrder {
     id: string
@@ -34,7 +34,7 @@ export const adminPreOrderApi = {
         limit?: number   // 或者直接指定 limit
         status?: string  // 前端筛选
     }): Promise<{ success: boolean; orders: AdminPreOrder[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         // 默认加载最近 500 条 (保持原有逻辑以便计算统计)
         const limit = params.limit || 500
 
@@ -73,7 +73,7 @@ export const adminPreOrderApi = {
      * 批量删除预订单
      */
     async deletePreOrders(ids: string[]): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('pre_orders')
             .delete()

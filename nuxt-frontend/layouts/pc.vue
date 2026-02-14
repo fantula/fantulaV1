@@ -6,8 +6,8 @@
       <slot />
     </div>
     <AppFooter />
-    <!-- 开发工具组件 -->
-    <DevLoginTool />
+    <!-- 开发工具组件（仅开发环境） -->
+    <DevLoginTool v-if="isDev" />
     <!-- 粒子背景 -->
     <ClientOnly>
       <ParticleBackground />
@@ -21,6 +21,9 @@ import AppHeader from '@/components/pc/AppHeader.vue'
 import AppFooter from '@/components/pc/AppFooter.vue'
 import DevLoginTool from '@/components/pc/DevLoginTool.vue'
 import ParticleBackground from '@/components/pc/ParticleBackground.vue'
+
+// 只在开发环境显示开发工具
+const isDev = import.meta.dev
 </script>
 
 <style scoped>

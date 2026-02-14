@@ -6,11 +6,12 @@ import crypto$1 from 'node:crypto';
 import { parentPort, threadId } from 'node:worker_threads';
 import { escapeHtml } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@vue/shared/dist/shared.cjs.js';
 import { createClient } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
+import { z } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/zod/index.js';
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue-bundle-renderer/dist/runtime.mjs';
 import { parseURL, withoutBase, joinURL, getQuery, withQuery, hasProtocol, withHttps, withoutTrailingSlash, withTrailingSlash, decodePath, withLeadingSlash, joinRelativeURL, withBase, parsePath, stringifyQuery, parseQuery, encodePath, stringifyParsedURL } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ufo/dist/index.mjs';
 import { renderToString } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue/server-renderer/index.mjs';
 import destr, { destr as destr$1 } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/destr/dist/index.mjs';
-import { createHooks } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/hookable/dist/index.mjs';
+import { createHooks } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/nitropack/node_modules/hookable/dist/index.mjs';
 import { createFetch, Headers as Headers$1 } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ofetch/dist/node.mjs';
 import { fetchNodeRequestHandler, callNodeRequestHandler } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/node-mock-http/dist/index.mjs';
 import { createStorage, prefixStorage } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/dist/index.mjs';
@@ -25,7 +26,7 @@ import { readFile } from 'node:fs/promises';
 import consola, { createConsola, consola as consola$1 } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/consola/dist/index.mjs';
 import { ErrorParser } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/youch-core/build/index.js';
 import { Youch } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/youch/build/index.js';
-import { SourceMapConsumer } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/nitropack/node_modules/source-map/source-map.js';
+import { SourceMapConsumer } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/source-map/source-map.js';
 import devalue from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@nuxt/devalue/dist/devalue.mjs';
 import { toValue, isVNode, isRef } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue/index.mjs';
 import { AsyncLocalStorage } from 'node:async_hooks';
@@ -743,13 +744,12 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
-    "apiBase": "https://www.fantula.com",
+    "apiBase": "http://127.0.0.1:54321",
     "appName": "凡图拉",
     "siteUrl": "https://www.fantula.com",
     "wechatAppid": "wxc2042fae927b28b8",
-    "supabaseUrl": "https://www.fantula.com",
-    "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNjEwNzUzLCJleHAiOjMzMzA2NjEwNzUzfQ.OVRG41EylWMyAEJQSel5TqDg3D5oygrCtxyAT27kH9I",
-    "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg",
+    "supabaseUrl": "http://127.0.0.1:54321",
+    "supabaseAnonKey": "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
     "schedulerUrl": "/api/admin/scheduler",
     "nuxt-robots": {
       "version": "5.7.0",
@@ -757,6 +757,51 @@ const _inlineRuntimeConfig = {
       "debug": false,
       "credits": true,
       "groups": [
+        {
+          "comment": [],
+          "disallow": [],
+          "allow": [
+            "/",
+            "/community",
+            "/article/*",
+            "/about-us",
+            "/service",
+            "/faq"
+          ],
+          "userAgent": [
+            "*"
+          ],
+          "contentUsage": [],
+          "contentSignal": [],
+          "_indexable": true,
+          "_rules": [
+            {
+              "pattern": "/",
+              "allow": true
+            },
+            {
+              "pattern": "/community",
+              "allow": true
+            },
+            {
+              "pattern": "/article/*",
+              "allow": true
+            },
+            {
+              "pattern": "/about-us",
+              "allow": true
+            },
+            {
+              "pattern": "/service",
+              "allow": true
+            },
+            {
+              "pattern": "/faq",
+              "allow": true
+            }
+          ],
+          "_normalized": true
+        },
         {
           "comment": [],
           "disallow": [],
@@ -816,8 +861,8 @@ const _inlineRuntimeConfig = {
     }
   },
   "apiSecret": "",
-  "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzcwNjEwNzUzLCJleHAiOjMzMzA2NjEwNzUzfQ.OVRG41EylWMyAEJQSel5TqDg3D5oygrCtxyAT27kH9I",
-  "supabaseServiceKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg",
+  "supabaseKey": "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
+  "supabaseServiceKey": "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz",
   "wechatPayMchid": "1716074381",
   "wechatPayAppid": "wxc2042fae927b28b8",
   "wechatPayApiV3Key": "lWm9tNYwCIDsnzhedfqz1QVvK4pmAoBb",
@@ -869,6 +914,7 @@ const _inlineRuntimeConfig = {
         "include": [],
         "exclude": [
           "/_**",
+          "/_nuxt/**",
           "/_nuxt/**"
         ],
         "includeAppSources": true
@@ -905,6 +951,51 @@ const _inlineRuntimeConfig = {
     "debug": false,
     "credits": true,
     "groups": [
+      {
+        "comment": [],
+        "disallow": [],
+        "allow": [
+          "/",
+          "/community",
+          "/article/*",
+          "/about-us",
+          "/service",
+          "/faq"
+        ],
+        "userAgent": [
+          "*"
+        ],
+        "contentUsage": [],
+        "contentSignal": [],
+        "_indexable": true,
+        "_rules": [
+          {
+            "pattern": "/",
+            "allow": true
+          },
+          {
+            "pattern": "/community",
+            "allow": true
+          },
+          {
+            "pattern": "/article/*",
+            "allow": true
+          },
+          {
+            "pattern": "/about-us",
+            "allow": true
+          },
+          {
+            "pattern": "/service",
+            "allow": true
+          },
+          {
+            "pattern": "/faq",
+            "allow": true
+          }
+        ],
+        "_normalized": true
+      },
       {
         "comment": [],
         "disallow": [],
@@ -6198,6 +6289,100 @@ function renderTemplate(template, data) {
   });
 }
 
+function mapSupabaseError(error) {
+  var _a, _b;
+  console.error("[Supabase Error]", error);
+  const defaultMessage = "An unexpected error occurred";
+  let statusCode = 500;
+  let statusMessage = defaultMessage;
+  if (error.statusCode) {
+    return error;
+  }
+  if (error.code) {
+    switch (error.code) {
+      case "23505":
+        statusCode = 409;
+        if ((_a = error.details) == null ? void 0 : _a.includes("email")) {
+          statusMessage = "\u8BE5\u90AE\u7BB1\u5DF2\u88AB\u6CE8\u518C";
+        } else if ((_b = error.details) == null ? void 0 : _b.includes("phone")) {
+          statusMessage = "\u8BE5\u624B\u673A\u53F7\u5DF2\u88AB\u6CE8\u518C";
+        } else {
+          statusMessage = "\u6570\u636E\u5DF2\u5B58\u5728 (\u91CD\u590D\u8BB0\u5F55)";
+        }
+        break;
+      case "23503":
+        statusCode = 400;
+        statusMessage = "\u5173\u8054\u6570\u636E\u4E0D\u5B58\u5728 (\u5916\u952E\u7EA6\u675F)";
+        break;
+      case "42501":
+        statusCode = 403;
+        statusMessage = "\u6743\u9650\u4E0D\u8DB3 (RLS\u62D2\u7EDD)";
+        break;
+      case "PGRST116":
+        statusCode = 404;
+        statusMessage = "\u8BB0\u5F55\u672A\u627E\u5230";
+        break;
+    }
+  }
+  if (error.message) {
+    if (error.message.includes("Database error checking email")) {
+      statusCode = 409;
+      statusMessage = "\u90AE\u7BB1\u5DF2\u88AB\u5360\u7528 (\u5305\u62EC\u672A\u6FC0\u6D3B\u8D26\u53F7\u6216\u5386\u53F2\u6570\u636E)";
+    } else if (error.message.includes("Invalid login credentials")) {
+      statusCode = 401;
+      statusMessage = "\u8D26\u53F7\u6216\u5BC6\u7801\u9519\u8BEF";
+    } else if (error.message.includes("Password should be at least")) {
+      statusCode = 400;
+      statusMessage = "\u5BC6\u7801\u957F\u5EA6\u4E0D\u8DB3 (\u81F3\u5C116\u4F4D)";
+    } else {
+      statusMessage = error.message;
+    }
+  }
+  return createError({ statusCode, statusMessage });
+}
+
+const passwordLoginSchema = z.object({
+  email: z.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"),
+  password: z.string().min(6, "\u5BC6\u7801\u81F3\u5C11\u9700\u89816\u4F4D"),
+  type: z.literal("password")
+});
+const verifyOtpSchema = z.object({
+  email: z.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"),
+  code: z.string().min(6, "\u9A8C\u8BC1\u7801\u65E0\u6548"),
+  type: z.literal("otp")
+});
+const loginBaseSchema = z.object({
+  type: z.enum(["password", "otp"])
+}).passthrough();
+const createUserSchema = z.object({
+  email: z.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"),
+  password: z.string().min(6, "\u5BC6\u7801\u81F3\u5C11\u9700\u89816\u4F4D"),
+  name: z.string().min(1, "\u59D3\u540D\u4E0D\u80FD\u4E3A\u7A7A"),
+  department_id: z.string().uuid("\u90E8\u95E8ID\u65E0\u6548").optional().nullable(),
+  status: z.enum(["enabled", "disabled"]).optional().default("enabled")
+});
+const sendOtpSchema = z.object({
+  email: z.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E")
+});
+const deleteUserSchema = z.object({
+  id: z.string().uuid("\u65E0\u6548\u7684\u7528\u6237ID")
+});
+async function validateBody(event, schema) {
+  const body = await readBody(event);
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    const errorMap = result.error.flatten().fieldErrors;
+    const firstKey = Object.keys(errorMap)[0];
+    const firstError = firstKey && errorMap[firstKey] ? errorMap[firstKey][0] : "\u53C2\u6570\u6821\u9A8C\u5931\u8D25";
+    throw createError({
+      statusCode: 400,
+      statusMessage: firstError,
+      data: errorMap
+    });
+  }
+  return result.data;
+}
+
 function getWechatPayConfig() {
   const config = useRuntimeConfig();
   const privateKeyRaw = String(config.wechatPayPrivateKey || "");
@@ -6455,10 +6640,11 @@ const _YsYiNJ = lazyEventHandler(() => {
   return useBase(opts.baseURL, ipxHandler);
 });
 
-const _lazy_XeHggU = () => Promise.resolve().then(function () { return ____path_$1; });
-const _lazy_k_WUKv = () => Promise.resolve().then(function () { return templates_get$1; });
-const _lazy_2ED9bq = () => Promise.resolve().then(function () { return templates_post$1; });
-const _lazy_wKDF6C = () => Promise.resolve().then(function () { return test_post$1; });
+const _lazy_M0YVZa = () => Promise.resolve().then(function () { return login_post$1; });
+const _lazy_MibnQE = () => Promise.resolve().then(function () { return me_get$1; });
+const _lazy_EUeWgX = () => Promise.resolve().then(function () { return sendOtp_post$1; });
+const _lazy_xx2F8b = () => Promise.resolve().then(function () { return create_post$1; });
+const _lazy_hlFyYY = () => Promise.resolve().then(function () { return delete_post$1; });
 const _lazy_dcHuVB = () => Promise.resolve().then(function () { return bindWechat_post$1; });
 const _lazy_hMjmce = () => Promise.resolve().then(function () { return contact_get$1; });
 const _lazy_rPysyX = () => Promise.resolve().then(function () { return test$1; });
@@ -6476,10 +6662,11 @@ const _lazy_8EFkQE = () => Promise.resolve().then(function () { return renderer$
 
 const handlers = [
   { route: '', handler: _2qpWSd, lazy: false, middleware: true, method: undefined },
-  { route: '/api/admin/scheduler/**:path', handler: _lazy_XeHggU, lazy: true, middleware: false, method: undefined },
-  { route: '/api/admin/system/notifications/templates', handler: _lazy_k_WUKv, lazy: true, middleware: false, method: "get" },
-  { route: '/api/admin/system/notifications/templates', handler: _lazy_2ED9bq, lazy: true, middleware: false, method: "post" },
-  { route: '/api/admin/system/notifications/test', handler: _lazy_wKDF6C, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/auth/login', handler: _lazy_M0YVZa, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/auth/me', handler: _lazy_MibnQE, lazy: true, middleware: false, method: "get" },
+  { route: '/api/admin/auth/send-otp', handler: _lazy_EUeWgX, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/users/create', handler: _lazy_xx2F8b, lazy: true, middleware: false, method: "post" },
+  { route: '/api/admin/users/delete', handler: _lazy_hlFyYY, lazy: true, middleware: false, method: "post" },
   { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },
   { route: '/api/client/config/contact', handler: _lazy_hMjmce, lazy: true, middleware: false, method: "get" },
   { route: '/api/test', handler: _lazy_rPysyX, lazy: true, middleware: false, method: undefined },
@@ -7184,129 +7371,268 @@ const childSources = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProper
   sources: sources
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const ____path_ = defineEventHandler(async (event) => {
-  var _a;
-  const config = useRuntimeConfig();
-  const schedulerBaseUrl = config.schedulerInternalUrl || "http://127.0.0.1:3001";
-  const path = ((_a = event.context.params) == null ? void 0 : _a.path) || "";
-  const targetUrl = `${schedulerBaseUrl}/${path}`;
-  const method = event.method;
-  try {
-    const fetchOptions = {
-      method,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    if (method === "POST") {
-      try {
-        const body = await readBody(event);
-        if (body) {
-          fetchOptions.body = JSON.stringify(body);
-        }
-      } catch {
-      }
+let adminSupabaseClient = null;
+function getAdminSupabaseClient() {
+  if (!adminSupabaseClient) {
+    const config = useRuntimeConfig();
+    const SUPABASE_SERVICE_ROLE_KEY = config.public.supabaseServiceKey || config.supabaseServiceKey;
+    const SUPABASE_URL = config.public.supabaseUrl;
+    if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
+      console.error("[Admin Client] Missing SUPABASE_SERVICE_KEY or SUPABASE_URL");
     }
-    const query = getQuery$1(event);
-    const queryString = new URLSearchParams(query).toString();
-    const finalUrl = queryString ? `${targetUrl}?${queryString}` : targetUrl;
-    const response = await fetch(finalUrl, fetchOptions);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`[Scheduler Proxy] Failed to reach ${targetUrl}:`, error.message);
-    throw createError({
-      statusCode: 502,
-      message: `\u5B9A\u65F6\u5668\u670D\u52A1\u8FDE\u63A5\u5931\u8D25: ${error.message}`
+    adminSupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: {
+        persistSession: false,
+        // 禁止 Admin Client 持久化 Session
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      },
+      global: {
+        headers: {
+          // 强制使用 Service Role Key 作为 Authorization Header
+          // 这能防止 Supabase JS 自动使用 LocalStorage 中的用户 Token 覆盖它
+          "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
     });
   }
-});
+  return adminSupabaseClient;
+}
 
-const ____path_$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
-  __proto__: null,
-  default: ____path_
-}, Symbol.toStringTag, { value: 'Module' }));
-
-const templates_get = defineEventHandler(async (event) => {
-  console.log("[API] /admin/system/notifications/templates called");
+const login_post = defineEventHandler(async (event) => {
   try {
-    const client = getSupabaseServiceClient();
-    console.log("[API] Client initialized");
-    const { data, error } = await client.from("notification_templates").select("*").order("event_type");
-    if (error) {
-      console.error("[API] Supabase Error:", error);
-      throw createError({
-        statusCode: 500,
-        statusMessage: error.message
-      });
+    const baseBody = await validateBody(event, loginBaseSchema);
+    const { type } = baseBody;
+    const config = useRuntimeConfig();
+    const supabaseUrl = config.public.supabaseUrl;
+    const supabaseAnonKey = config.public.supabaseAnonKey;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey);
+    const adminClient = getAdminSupabaseClient();
+    let authResult;
+    let email = "";
+    if (type === "password") {
+      const { email: e, password } = await validateBody(event, passwordLoginSchema);
+      email = e;
+      authResult = await authClient.auth.signInWithPassword({ email, password });
+    } else {
+      const { email: e, code } = await validateBody(event, verifyOtpSchema);
+      email = e;
+      authResult = await authClient.auth.verifyOtp({ email, token: code, type: "email" });
     }
-    console.log(`[API] Found ${data == null ? void 0 : data.length} templates`);
+    const { data, error } = authResult;
+    if (error) {
+      throw error;
+    }
+    if (!(data == null ? void 0 : data.session)) {
+      throw createError({ statusCode: 401, statusMessage: "Unable to start session" });
+    }
+    const userId = data.session.user.id;
+    const userEmail = data.session.user.email;
+    let { data: adminData, error: adminError } = await adminClient.from("admin_users").select(`
+        *,
+        department:admin_departments(id, name, permissions)
+    `).eq("auth_user_id", userId).single();
+    if ((adminError || !adminData) && type === "otp") {
+      const { data: adminByEmail } = await adminClient.from("admin_users").select(`*, department:admin_departments(id, name, permissions)`).eq("email", userEmail).single();
+      if (adminByEmail) {
+        await adminClient.from("admin_users").update({ auth_user_id: userId }).eq("id", adminByEmail.id);
+        adminData = adminByEmail;
+      }
+    }
+    if (!adminData) {
+      await authClient.auth.signOut();
+      throw createError({ statusCode: 403, statusMessage: "\u8BE5\u8D26\u53F7\u4E0D\u662F\u7BA1\u7406\u5458" });
+    }
+    if (adminData.status !== "enabled") {
+      await authClient.auth.signOut();
+      throw createError({ statusCode: 403, statusMessage: "\u8BE5\u8D26\u53F7\u5DF2\u88AB\u7981\u7528" });
+    }
     return {
       success: true,
-      data
+      session: data.session,
+      adminInfo: adminData
     };
-  } catch (e) {
-    console.error("[API] Unexpected Error:", e);
-    throw e;
+  } catch (err) {
+    throw mapSupabaseError(err);
   }
 });
 
-const templates_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const login_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
-  default: templates_get
+  default: login_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const templates_post = defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const client = getSupabaseServiceClient();
-  if (!body.id || !body.event_type) {
-    throw createError({ statusCode: 400, statusMessage: "Missing ID or Event Type" });
+const me_get = defineEventHandler(async (event) => {
+  const authHeader = getHeader(event, "Authorization");
+  if (!authHeader) {
+    throw createError({ statusCode: 401, statusMessage: "No token" });
   }
-  const updates = {};
-  if (body.subject_template !== void 0) updates.subject_template = body.subject_template;
-  if (body.body_template !== void 0) updates.body_template = body.body_template;
-  if (body.is_enabled !== void 0) updates.is_enabled = body.is_enabled;
-  updates.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  const { data, error } = await client.from("notification_templates").update(updates).eq("id", body.id).select().single();
-  if (error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: error.message
-    });
+  const token = authHeader.replace("Bearer ", "");
+  const config = useRuntimeConfig();
+  const authClient = createClient(config.public.supabaseUrl, config.public.supabaseAnonKey);
+  const { data: { user }, error: authError } = await authClient.auth.getUser(token);
+  if (authError || !user) {
+    throw createError({ statusCode: 401, statusMessage: "Invalid token" });
   }
-  return {
-    success: true,
-    data
-  };
+  const adminClient = getAdminSupabaseClient();
+  const { data: adminData, error: adminError } = await adminClient.from("admin_users").select(`
+        *,
+        department:admin_departments(id, name, permissions)
+    `).eq("auth_user_id", user.id).single();
+  if (adminError || !adminData) {
+    throw createError({ statusCode: 403, statusMessage: "User is not admin" });
+  }
+  return { success: true, adminInfo: adminData };
 });
 
-const templates_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const me_get$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
-  default: templates_post
+  default: me_get
 }, Symbol.toStringTag, { value: 'Module' }));
 
-const test_post = defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  if (!body.event_type || !body.to) {
-    throw createError({ statusCode: 400, statusMessage: "Missing event_type or to address" });
-  }
-  const templateData = body.data || {};
-  const result = await sendNotification(body.event_type, body.to, templateData);
-  if (!result.success) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: result.message || "Send failed"
+const sendOtp_post = defineEventHandler(async (event) => {
+  try {
+    const body = await validateBody(event, sendOtpSchema);
+    const { email } = body;
+    const adminClient = getAdminSupabaseClient();
+    const config = useRuntimeConfig();
+    const { data: adminData, error: fetchError } = await adminClient.from("admin_users").select("id, status, auth_user_id").eq("email", email).single();
+    if (fetchError || !adminData) {
+      throw createError({ statusCode: 403, statusMessage: "\u90AE\u7BB1\u672A\u6CE8\u518C\u4E3A\u7BA1\u7406\u5458" });
+    }
+    if (adminData.status !== "enabled") {
+      throw createError({ statusCode: 403, statusMessage: "\u8BE5\u8D26\u53F7\u5DF2\u88AB\u7981\u7528" });
+    }
+    const supabaseUrl = config.public.supabaseUrl;
+    const supabaseAnonKey = config.public.supabaseAnonKey;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey);
+    const shouldCreateUser = !adminData.auth_user_id;
+    const { error } = await authClient.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser
+      }
     });
+    if (error) {
+      if (error.message.includes("Signups not allowed")) {
+        throw createError({ statusCode: 403, statusMessage: "\u8D26\u53F7\u672A\u521D\u59CB\u5316\uFF0C\u8BF7\u8054\u7CFB\u8D85\u7EA7\u7BA1\u7406\u5458" });
+      }
+      throw error;
+    }
+    return { success: true };
+  } catch (err) {
+    throw mapSupabaseError(err);
   }
-  return {
-    success: true,
-    message: "Test email sent successfully"
-  };
 });
 
-const test_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const sendOtp_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
-  default: test_post
+  default: sendOtp_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const create_post = defineEventHandler(async (event) => {
+  try {
+    const authHeader = getHeader(event, "Authorization");
+    if (!authHeader) {
+      throw createError({ statusCode: 401, statusMessage: "No token" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const config = useRuntimeConfig();
+    const authClient = createClient(config.public.supabaseUrl, config.public.supabaseAnonKey);
+    const { data: { user: caller }, error: callerError } = await authClient.auth.getUser(token);
+    if (callerError || !caller) {
+      throw createError({ statusCode: 401, statusMessage: "Invalid token" });
+    }
+    const adminClient = getAdminSupabaseClient();
+    const { data: adminCaller, error: adminError } = await adminClient.from("admin_users").select("id, status").eq("auth_user_id", caller.id).single();
+    if (adminError || !adminCaller || adminCaller.status !== "enabled") {
+      throw createError({ statusCode: 403, statusMessage: "Unauthorized: Admin access required" });
+    }
+    const body = await validateBody(event, createUserSchema);
+    const { email, password, name, department_id, status } = body;
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name, role: "admin" }
+    });
+    if (authError) {
+      throw authError;
+    }
+    if (!authData.user) {
+      throw createError({ statusCode: 500, statusMessage: "Auth user creation returned no data" });
+    }
+    const encoder = new TextEncoder();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(password));
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const password_hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const { data: newUser, error: dbError } = await adminClient.from("admin_users").insert({
+      name,
+      email,
+      password_hash,
+      auth_user_id: authData.user.id,
+      department_id: department_id || null,
+      // Zod handles optional/null
+      status: status || "enabled"
+    }).select().single();
+    if (dbError) {
+      await adminClient.auth.admin.deleteUser(authData.user.id);
+      throw dbError;
+    }
+    return { success: true, user: newUser };
+  } catch (err) {
+    throw mapSupabaseError(err);
+  }
+});
+
+const create_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: create_post
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const delete_post = defineEventHandler(async (event) => {
+  try {
+    const authHeader = getHeader(event, "Authorization");
+    if (!authHeader) {
+      throw createError({ statusCode: 401, statusMessage: "No token" });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const config = useRuntimeConfig();
+    const authClient = createClient(config.public.supabaseUrl, config.public.supabaseAnonKey);
+    const { data: { user: caller }, error: callerError } = await authClient.auth.getUser(token);
+    if (callerError || !caller) {
+      throw createError({ statusCode: 401, statusMessage: "Invalid token" });
+    }
+    const adminClient = getAdminSupabaseClient();
+    const { data: adminCaller, error: adminError } = await adminClient.from("admin_users").select("id, status").eq("auth_user_id", caller.id).single();
+    if (adminError || !adminCaller || adminCaller.status !== "enabled") {
+      throw createError({ statusCode: 403, statusMessage: "Unauthorized: Admin access required" });
+    }
+    const body = await validateBody(event, deleteUserSchema);
+    const { id } = body;
+    const { data: targetUser, error: fetchError } = await adminClient.from("admin_users").select("auth_user_id").eq("id", id).single();
+    if (fetchError || !targetUser) {
+      throw createError({ statusCode: 404, statusMessage: "User not found" });
+    }
+    const { error: deleteError } = await adminClient.from("admin_users").delete().eq("id", id);
+    if (deleteError) {
+      throw deleteError;
+    }
+    if (targetUser.auth_user_id) {
+      const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(targetUser.auth_user_id);
+      if (authDeleteError) {
+        console.error(`Failed to delete auth user ${targetUser.auth_user_id}:`, authDeleteError.message);
+      }
+    }
+    return { success: true };
+  } catch (err) {
+    throw mapSupabaseError(err);
+  }
+});
+
+const delete_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: delete_post
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const bindWechat_post = defineEventHandler(async (event) => {
@@ -7523,34 +7849,6 @@ const bindWechat_post$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineP
   __proto__: null,
   default: bindWechat_post
 }, Symbol.toStringTag, { value: 'Module' }));
-
-let adminSupabaseClient = null;
-function getAdminSupabaseClient() {
-  if (!adminSupabaseClient) {
-    const config = useRuntimeConfig();
-    const SUPABASE_SERVICE_ROLE_KEY = config.public.supabaseServiceKey || config.supabaseServiceKey;
-    const SUPABASE_URL = config.public.supabaseUrl;
-    if (!SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_URL) {
-      console.error("[Admin Client] Missing SUPABASE_SERVICE_KEY or SUPABASE_URL");
-    }
-    adminSupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-      auth: {
-        persistSession: false,
-        // 禁止 Admin Client 持久化 Session
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-      },
-      global: {
-        headers: {
-          // 强制使用 Service Role Key 作为 Authorization Header
-          // 这能防止 Supabase JS 自动使用 LocalStorage 中的用户 Token 覆盖它
-          "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
-        }
-      }
-    });
-  }
-  return adminSupabaseClient;
-}
 
 const contact_get = defineEventHandler(async (event) => {
   const client = getAdminSupabaseClient();

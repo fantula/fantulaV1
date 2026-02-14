@@ -13,7 +13,7 @@
                     <span class="label">头像</span>
                 </div>
                 <div class="right">
-                    <img :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" class="avatar-img" @error="handleImageError" />
+                    <img :src="userStore.user?.avatar || DEFAULT_AVATAR" class="avatar-img" @error="handleImageError" />
                     <el-icon class="arrow"><ArrowRight /></el-icon>
                 </div>
             </div>
@@ -145,6 +145,7 @@ import { ArrowRight, DocumentCopy } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { authApi } from '@/api/client/auth'
 import { useNotify } from '@/composables/useNotify'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 // Modal Imports
 import EditNicknameModal from '@/components/mobile/profile/modals/EditNicknameModal.vue'
@@ -209,7 +210,7 @@ const copyUID = () => {
 
 const handleImageError = (e: Event) => {
     const target = e.target as HTMLImageElement
-    target.src = '/images/client/pc/avatars/avatar-cat.png'
+    target.src = DEFAULT_AVATAR
 }
 </script>
 

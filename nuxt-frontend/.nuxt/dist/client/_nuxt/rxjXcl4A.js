@@ -1,0 +1,1 @@
+import{d as o,c as t,f as n,o as _,E as a}from"./esl5K6it.js";const c={class:"mobile-profile-layout"},m=o({__name:"profile",setup(s){return(r,p)=>{const e=a;return _(),t("div",c,[n(e)])}}});export{m as default};

@@ -1,7 +1,7 @@
 /**
  * 消息管理 API
  */
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface AdminMessage {
     id: string
@@ -18,7 +18,7 @@ export const adminMessageApi = {
         limit?: number
         offset?: number
     }): Promise<{ success: boolean; messages: AdminMessage[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         let query = client
             .from('messages')
             .select('*', { count: 'exact' })
@@ -49,7 +49,7 @@ export const adminMessageApi = {
         type: 'system' | 'order' | 'activity' | 'security' = 'system',
         link?: string
     ): Promise<{ success: boolean; message_id?: string; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { data: profile, error: profileError } = await client
             .from('profiles')
@@ -84,7 +84,7 @@ export const adminMessageApi = {
      * 获取客户消息通知配置
      */
     async getNotificationSettings(): Promise<{ success: boolean; settings?: any; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('system_settings')
             .select('value')
@@ -112,7 +112,7 @@ export const adminMessageApi = {
      * 更新客户消息通知配置
      */
     async updateNotificationSettings(settings: any): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // Ensure it's stored as JSON
         const value = settings

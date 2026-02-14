@@ -23,7 +23,7 @@
         <div v-else class="user-hero-content">
           <div class="avatar-wrapper">
             <img 
-              :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
+              :src="userStore.user?.avatar || DEFAULT_AVATAR" 
               class="user-avatar"
             />
             <div class="status-dot"></div>
@@ -90,6 +90,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/client/user'
 import { authApi } from '@/api/client/auth'
 import LogoutModal from '@/components/pc/modal/LogoutModal.vue'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 import { 
   SwitchButton, 
   ArrowLeft, 

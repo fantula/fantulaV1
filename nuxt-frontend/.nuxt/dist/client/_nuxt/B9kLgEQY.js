@@ -1,0 +1,1 @@
+import{d as o,h as n,c as t,J as a,o as s}from"./esl5K6it.js";const c={class:"loading-redirect"},p=o({__name:"index",setup(r){const e=a();return n(()=>{e.replace("/admin/coupons/balance")}),(d,_)=>(s(),t("div",c))}});export{p as default};

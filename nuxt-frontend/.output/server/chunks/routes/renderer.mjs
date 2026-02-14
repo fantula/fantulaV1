@@ -1,5 +1,5 @@
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'vue-bundle-renderer/runtime';
-import { j as joinRelativeURL, u as useRuntimeConfig, f as getResponseStatusText, h as getResponseStatus, i as defineRenderHandler, g as getQuery, c as createError, k as getRouteRules, l as joinURL, m as useNitroApp } from '../nitro/nitro.mjs';
+import { K as buildAssetsURL, u as useRuntimeConfig, L as getResponseStatusText, M as getResponseStatus, N as defineRenderHandler, O as publicAssetsURL, o as getQuery, c as createError, P as getRouteRules, Q as joinURL, R as useNitroApp } from '../nitro/nitro.mjs';
 import { renderToString } from 'vue/server-renderer';
 import { createHead as createHead$1, propsToString, renderSSRHead } from 'unhead/server';
 import { stringify, uneval } from 'devalue';
@@ -74,8 +74,6 @@ function createHead(options = {}) {
   return head;
 }
 
-const NUXT_RUNTIME_PAYLOAD_EXTRACTION = false;
-
 const appHead = {"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"name":"description","content":"提供 Netflix、Spotify、YouTube Premium 等流媒体会员代充服务，价格稳定，售后支持"},{"name":"keywords","content":"凡图拉,流媒体,数字产品,Netflix,Disney+,Apple TV,技术支持,社区帮助"},{"name":"author","content":"凡图拉团队"},{"name":"robots","content":"index, follow"},{"name":"googlebot","content":"index, follow"},{"name":"language","content":"zh-CN"},{"name":"revisit-after","content":"7 days"},{"property":"og:title","content":"凡图拉｜智能海外代充代付平台"},{"property":"og:description","content":"提供 Netflix、Spotify、YouTube Premium 等流媒体会员代充服务，价格稳定，售后支持"},{"property":"og:type","content":"website"},{"property":"og:site_name","content":"凡图拉"},{"property":"og:locale","content":"zh_CN"},{"property":"og:image","content":"/images/og-image.jpg"},{"property":"og:image:width","content":"1200"},{"property":"og:image:height","content":"630"},{"property":"og:url","content":"https://www.fantula.com"},{"name":"twitter:card","content":"summary_large_image"},{"name":"twitter:title","content":"凡图拉｜智能海外代充代付平台"},{"name":"twitter:description","content":"提供 Netflix、Spotify、YouTube Premium 等流媒体会员代充服务，价格稳定，售后支持。"},{"name":"twitter:image","content":"/images/og-image.jpg"}],"link":[{"rel":"icon","type":"image/x-icon","href":"/favicon.ico"},{"rel":"canonical","href":"https://www.fantula.com"},{"rel":"alternate","hreflang":"zh-CN","href":"https://www.fantula.com"},{"rel":"preconnect","href":"https://fonts.googleapis.com"},{"rel":"dns-prefetch","href":"https://www.fantula.com"}],"style":[],"script":[],"noscript":[],"title":"凡图拉｜智能海外代充代付平台"};
 
 const appRootTag = "div";
@@ -87,24 +85,6 @@ const appTeleportTag = "div";
 const appTeleportAttrs = {"id":"teleports"};
 
 const appId = "nuxt-app";
-
-function baseURL() {
-	// TODO: support passing event to `useRuntimeConfig`
-	return useRuntimeConfig().app.baseURL;
-}
-function buildAssetsDir() {
-	// TODO: support passing event to `useRuntimeConfig`
-	return useRuntimeConfig().app.buildAssetsDir;
-}
-function buildAssetsURL(...path) {
-	return joinRelativeURL(publicAssetsURL(), buildAssetsDir(), ...path);
-}
-function publicAssetsURL(...path) {
-	// TODO: support passing event to `useRuntimeConfig`
-	const app = useRuntimeConfig().app;
-	const publicBase = app.cdnURL || app.baseURL;
-	return path.length ? joinRelativeURL(publicBase, ...path) : publicBase;
-}
 
 const APP_ROOT_OPEN_TAG = `<${appRootTag}${propsToString(appRootAttrs)}>`;
 const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
@@ -307,7 +287,7 @@ const renderer = defineRenderHandler(async (event) => {
 	// Get route options (for `ssr: false`, `isr`, `cache` and `noScripts`)
 	const routeOptions = getRouteRules(event);
 	// Whether we are prerendering route or using ISR/SWR caching
-	const _PAYLOAD_EXTRACTION = !ssrContext.noSSR && (NUXT_RUNTIME_PAYLOAD_EXTRACTION);
+	const _PAYLOAD_EXTRACTION = !ssrContext.noSSR && ((routeOptions.isr || routeOptions.cache));
 	const isRenderingPayload = (_PAYLOAD_EXTRACTION || false) && PAYLOAD_URL_RE.test(ssrContext.url);
 	if (isRenderingPayload) {
 		const url = ssrContext.url.substring(0, ssrContext.url.lastIndexOf("/")) || "/";
@@ -486,5 +466,5 @@ const renderer$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty
   default: renderer
 }, Symbol.toStringTag, { value: 'Module' }));
 
-export { baseURL as b, headSymbol as h, publicAssetsURL as p, renderer$1 as r, useHead as u };
+export { headSymbol as h, renderer$1 as r, useHead as u };
 //# sourceMappingURL=renderer.mjs.map

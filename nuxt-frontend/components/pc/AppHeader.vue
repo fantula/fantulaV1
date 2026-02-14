@@ -79,7 +79,7 @@
             <!-- 已加载：真实头像 -->
             <div v-else @click="navigateToProfile" class="user-info" title="进入个人中心">
               <img 
-                :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
+                :src="userStore.user?.avatar || DEFAULT_AVATAR" 
                 :alt="userStore.user?.nickName || userStore.user?.nickname || '用户头像'"
                 class="user-avatar"
               />
@@ -106,6 +106,7 @@ import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
 import ChannelRecognitionModal from '@/components/pc/modal/ChannelRecognitionModal.vue'
 import MiniCartPopup from '@/components/pc/cart/MiniCartPopup.vue'
 import { ShoppingCart, Star, StarFilled } from '@element-plus/icons-vue'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 const isPageFavorited = useState('is-current-page-favorited', () => false)
 

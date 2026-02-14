@@ -1,10 +1,9 @@
 /**
  * 后台管理员状态管理
- * 使用独立的 Admin Supabase Client（与客户端完全分离）
+ * 使用 Server API 进行权限操作，不再在前端使用 Service Key
  */
 
 import { defineStore } from 'pinia'
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
 import { getSupabaseClient } from '@/utils/supabase'
 
 interface AdminUser {
@@ -43,30 +42,27 @@ export const useAdminStore = defineStore('admin', () => {
         loading.value = true
         try {
             const authClient = getSupabaseClient() // 使用标准客户端获取 Session
-            const adminClient = getAdminSupabaseClient() // 使用 Admin 客户端获取数据
-
             const { data: { session } } = await authClient.auth.getSession()
 
             if (session) {
-                // 验证是否在 admin_users 表中，并获取部门权限
-                const { data: adminData } = await adminClient
-                    .from('admin_users')
-                    .select(`
-                        *,
-                        department:admin_departments(id, name, permissions)
-                    `)
-                    .eq('auth_user_id', session.user.id)
-                    .single()
+                // 调用服务端 API 获取管理员信息 (不再直接查库)
+                const response = await $fetch<{ success: boolean; adminInfo: AdminInfo | null }>('/api/admin/auth/me', {
+                    headers: {
+                        Authorization: `Bearer ${session.access_token}`
+                    }
+                }).catch(() => ({ success: false, adminInfo: null }))
 
-                if (adminData) {
+                const info = response.adminInfo
+
+                if (response.success && info) {
                     adminUser.value = {
                         id: session.user.id,
                         email: session.user.email || '',
-                        role: adminData.role || 'admin'
+                        role: info.role || 'admin'
                     }
-                    adminInfo.value = adminData
+                    adminInfo.value = info
                 } else {
-                    // 有 session 但不是管理员
+                    // 有 session 但获取不到管理员信息 (Token失效或非管理员)
                     await logout()
                 }
             } else {
@@ -84,48 +80,38 @@ export const useAdminStore = defineStore('admin', () => {
     }
 
     /**
-     * 管理员登录
+     * 管理员登录 (密码)
      */
     const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
         try {
             const authClient = getSupabaseClient()
-            const adminClient = getAdminSupabaseClient()
 
-            const { data, error } = await authClient.auth.signInWithPassword({
-                email,
-                password
+            // 调用服务端登录 API
+            const result = await $fetch<{ success: boolean, session: any, adminInfo: any, error?: string }>('/api/admin/auth/login', {
+                method: 'POST',
+                body: { type: 'password', email, password }
+            }).catch(err => ({ success: false, error: err.data?.statusMessage || err.message, session: null, adminInfo: null }))
+
+            if (!result.success || !result.session) {
+                return { success: false, error: result.error || '登录失败' }
+            }
+
+            // 恢复客户端 Session
+            const { error: setSessionError } = await authClient.auth.setSession({
+                access_token: result.session.access_token,
+                refresh_token: result.session.refresh_token
             })
 
-            if (error) {
-                return { success: false, error: error.message }
-            }
-
-            if (!data.session) {
-                return { success: false, error: '登录失败，无法获取 Session' }
-            }
-
-            // 验证是否在 admin_users 表中，并获取部门权限
-            const { data: adminData, error: adminError } = await adminClient
-                .from('admin_users')
-                .select(`
-                    *,
-                    department:admin_departments(id, name, permissions)
-                `)
-                .eq('auth_user_id', data.session.user.id)
-                .single()
-
-            if (adminError || !adminData) {
-                // 不是管理员，登出
-                await authClient.auth.signOut()
-                return { success: false, error: '该账号不是管理员' }
+            if (setSessionError) {
+                return { success: false, error: 'Session设置失败' }
             }
 
             adminUser.value = {
-                id: data.session.user.id,
-                email: data.session.user.email || '',
-                role: adminData.role || 'admin'
+                id: result.session.user.id,
+                email: result.session.user.email || '',
+                role: result.adminInfo.role || 'admin'
             }
-            adminInfo.value = adminData
+            adminInfo.value = result.adminInfo
 
             return { success: true }
         } catch (error: any) {
@@ -150,137 +136,53 @@ export const useAdminStore = defineStore('admin', () => {
 
     /**
      * 发送验证码（OTP）
-     * 对于 admin_users 表中的管理员，如果尚未创建 auth.users 账号，会自动创建
      */
     const sendOtp = async (email: string): Promise<{ success: boolean; error?: string }> => {
         try {
-            const authClient = getSupabaseClient()
-            const adminClient = getAdminSupabaseClient()
-
-            // 先检查该邮箱是否是管理员，并获取 auth_user_id
-            const { data: adminData } = await adminClient
-                .from('admin_users')
-                .select('id, status, auth_user_id')
-                .eq('email', email)
-                .single()
-
-            if (!adminData) {
-                return { success: false, error: '该邮箱未注册为管理员' }
-            }
-
-            if (adminData.status !== 'enabled') {
-                return { success: false, error: '该账号已被禁用' }
-            }
-
-            // 检查是否已有 auth_user_id
-            // 如果没有，说明需要为该管理员创建 auth.users 账号
-            const shouldCreateUser = !adminData.auth_user_id
-
-            // 发送 OTP
-            const { error } = await authClient.auth.signInWithOtp({
-                email,
-                options: {
-                    // 只有管理员表中没有 auth_user_id 时才允许创建用户
-                    shouldCreateUser: shouldCreateUser
-                }
+            // 调用服务端 API 发送验证码
+            await $fetch('/api/admin/auth/send-otp', {
+                method: 'POST',
+                body: { email }
             })
-
-            if (error) {
-                // 特殊处理：如果用户不存在且我们不允许创建，给出更友好的提示
-                if (error.message.includes('Signups not allowed')) {
-                    return { success: false, error: '账号未初始化，请联系超级管理员' }
-                }
-                return { success: false, error: error.message }
-            }
-
             return { success: true }
         } catch (error: any) {
-            return { success: false, error: error.message || '发送验证码失败' }
+            return { success: false, error: error.data?.statusMessage || error.message || '发送验证码失败' }
         }
     }
 
     /**
      * 验证码登录（OTP）
-     * 如果是首次登录，会自动关联 admin_users 表的 auth_user_id
      */
     const loginWithOtp = async (email: string, code: string): Promise<{ success: boolean; error?: string }> => {
         try {
             const authClient = getSupabaseClient()
-            const adminClient = getAdminSupabaseClient()
 
-            // 验证 OTP
-            const { data, error } = await authClient.auth.verifyOtp({
-                email,
-                token: code,
-                type: 'email'
+            // 调用服务端登录 API
+            const result = await $fetch<{ success: boolean, session: any, adminInfo: any, error?: string }>('/api/admin/auth/login', {
+                method: 'POST',
+                body: { type: 'otp', email, code }
+            }).catch(err => ({ success: false, error: err.data?.statusMessage || err.message, session: null, adminInfo: null }))
+
+            if (!result.success || !result.session) {
+                return { success: false, error: result.error || '登录失败' }
+            }
+
+            // 恢复客户端 Session
+            const { error: setSessionError } = await authClient.auth.setSession({
+                access_token: result.session.access_token,
+                refresh_token: result.session.refresh_token
             })
 
-            if (error) {
-                // 处理常见错误
-                if (error.message.includes('Token has expired') || error.message.includes('invalid')) {
-                    return { success: false, error: '验证码已过期或无效' }
-                }
-                return { success: false, error: error.message }
-            }
-
-            if (!data.session) {
-                return { success: false, error: '登录失败，无法获取 Session' }
-            }
-
-            const authUserId = data.session.user.id
-
-            // 先尝试通过 auth_user_id 查找管理员
-            let { data: adminData, error: adminError } = await adminClient
-                .from('admin_users')
-                .select(`
-                    *,
-                    department:admin_departments(id, name, permissions)
-                `)
-                .eq('auth_user_id', authUserId)
-                .single()
-
-            // 如果通过 auth_user_id 找不到，尝试通过邮箱查找并更新关联
-            if (adminError || !adminData) {
-                const { data: adminByEmail, error: emailError } = await adminClient
-                    .from('admin_users')
-                    .select(`
-                        *,
-                        department:admin_departments(id, name, permissions)
-                    `)
-                    .eq('email', email)
-                    .single()
-
-                if (emailError || !adminByEmail) {
-                    // 确实不是管理员，登出
-                    await authClient.auth.signOut()
-                    return { success: false, error: '该账号不是管理员' }
-                }
-
-                // 找到了，更新 auth_user_id 关联
-                const { error: updateError } = await adminClient
-                    .from('admin_users')
-                    .update({ auth_user_id: authUserId })
-                    .eq('id', adminByEmail.id)
-
-                if (updateError) {
-                    console.error('更新 auth_user_id 失败:', updateError)
-                    // 不阻止登录，只是记录错误
-                }
-
-                adminData = adminByEmail
-            }
-
-            if (adminData.status !== 'enabled') {
-                await authClient.auth.signOut()
-                return { success: false, error: '该账号已被禁用' }
+            if (setSessionError) {
+                return { success: false, error: 'Session设置失败' }
             }
 
             adminUser.value = {
-                id: authUserId,
-                email: data.session.user.email || '',
-                role: adminData.role || 'admin'
+                id: result.session.user.id,
+                email: result.session.user.email || '',
+                role: result.adminInfo.role || 'admin'
             }
-            adminInfo.value = adminData
+            adminInfo.value = result.adminInfo
 
             return { success: true }
         } catch (error: any) {
@@ -291,36 +193,24 @@ export const useAdminStore = defineStore('admin', () => {
 
     /**
      * 检查页面权限
-     * 支持子路由权限检查（如访问 /users/accounts 时检查 /users 权限）
      */
     const hasPermission = (path: string): boolean => {
         if (!adminUser.value) return false
-        // 超级管理员总是有权限（部门名称包含"超级"或 permissions 包含 "*"）
         const deptName = adminInfo.value?.department?.name || ''
         const perms = adminInfo.value?.department?.permissions || []
         if (deptName.includes('超级') || perms.includes('*')) return true
-
-        // 仪表盘始终可访问
         if (path === '/admin') return true
-
-        // 如果没有权限配置，默认允许全部（兼容旧数据）
         if (permissions.value.length === 0) return true
-
-        // 精确匹配
         if (permissions.value.includes(path)) return true
-
-        // 子路由匹配：检查是否有父路由权限
-        // 例如访问 /admin/users/accounts 时，检查是否有 /admin/users 权限
         for (const perm of permissions.value) {
             if (path.startsWith(perm + '/')) return true
         }
-
         return false
     }
 
     return {
         // 状态
-        user: readonly(adminUser), // 兼容旧代码
+        user: readonly(adminUser),
         adminUser: readonly(adminUser),
         adminInfo: readonly(adminInfo),
         isLoggedIn,

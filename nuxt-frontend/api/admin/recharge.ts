@@ -1,7 +1,7 @@
 /**
  * 充值管理 API
  */
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface RechargeTier {
     id: string
@@ -14,7 +14,7 @@ export interface RechargeTier {
 
 export const adminRechargeApi = {
     async getTiers(): Promise<{ success: boolean; data: RechargeTier[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('recharge_tiers')
             .select('*')
@@ -32,7 +32,7 @@ export const adminRechargeApi = {
         sort_order: number
         status: 'on' | 'off'
     }): Promise<{ success: boolean; data?: RechargeTier; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('recharge_tiers')
             .insert(tierData)
@@ -51,7 +51,7 @@ export const adminRechargeApi = {
         sort_order: number
         status: 'on' | 'off'
     }>): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('recharge_tiers')
             .update(tierData)
@@ -64,7 +64,7 @@ export const adminRechargeApi = {
     },
 
     async deleteTier(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('recharge_tiers')
             .delete()

@@ -1,16 +1,15 @@
 import { defineEventHandler, readBody, createError } from 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/h3/dist/index.mjs';
-import { u as useRuntimeConfig } from '../../../nitro/nitro.mjs';
-import { s as sendNotification } from '../../../_/email.mjs';
-import { g as getSupabaseServiceClient, a as getCurrentUser } from '../../../_/supabase.mjs';
-import { v as verifyBindToken, g as getWechatUserInfo } from '../../../_/wechat-login.mjs';
+import { g as getSupabaseServiceClient, b as getCurrentUser, e as verifyBindToken, f as getWechatUserInfo, u as useRuntimeConfig, h as sendNotification } from '../../../nitro/nitro.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ufo/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/zod/index.js';
+import 'node:crypto';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/destr/dist/index.mjs';
-import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/hookable/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/nitropack/node_modules/hookable/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ofetch/dist/node.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/node-mock-http/dist/index.mjs';
-import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ufo/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/drivers/fs.mjs';
-import 'node:crypto';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/drivers/fs-lite.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unstorage/drivers/lru-cache.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ohash/dist/index.mjs';
@@ -19,11 +18,13 @@ import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/defu/dist/defu.mj
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/scule/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/unctx/dist/index.mjs';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/radix3/dist/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/vue/index.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/consola/dist/index.mjs';
 import 'node:fs';
 import 'node:url';
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/pathe/dist/index.mjs';
-import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/@supabase/supabase-js/dist/index.mjs';
-import '../../../_/wechat-pay.mjs';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/fast-xml-parser/src/fxp.js';
+import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ipx/dist/index.mjs';
 
 const bindWechat_post = defineEventHandler(async (event) => {
   var _a;
@@ -167,7 +168,7 @@ const bindWechat_post = defineEventHandler(async (event) => {
   }
 });
 async function bindWechatToExistingUser(supabase, userId, wechatCode) {
-  const { getWechatPayConfig } = await import('../../../_/wechat-pay.mjs');
+  const { getWechatPayConfig } = await import('../../../nitro/nitro.mjs').then(function (n) { return n.L; });
   const config = getWechatPayConfig();
   const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.appid}&secret=${config.appSecret}&code=${wechatCode}&grant_type=authorization_code`;
   const response = await fetch(url);

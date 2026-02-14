@@ -1,7 +1,7 @@
 /**
  * 商品分类管理 API
  */
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface ProductCategory {
     id: string
@@ -14,7 +14,7 @@ export interface ProductCategory {
 
 export const adminCategoryApi = {
     async getCategories(): Promise<{ success: boolean; categories: ProductCategory[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('product_categories')
             .select('*')
@@ -54,7 +54,7 @@ export const adminCategoryApi = {
         sort_order?: number
         status?: 'on' | 'off'
     }): Promise<{ success: boolean; category?: ProductCategory; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: category, error } = await client
             .from('product_categories')
             .insert({
@@ -76,7 +76,7 @@ export const adminCategoryApi = {
         sort_order?: number
         status?: 'on' | 'off'
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('product_categories')
             .update(data)
@@ -89,7 +89,7 @@ export const adminCategoryApi = {
     },
 
     async deleteCategory(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { count } = await client
             .from('products')
             .select('*', { count: 'exact', head: true })
@@ -111,7 +111,7 @@ export const adminCategoryApi = {
     },
 
     async batchUpdateSort(items: { id: string; sort_order: number }[]): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         for (const item of items) {
             const { error } = await client
                 .from('product_categories')

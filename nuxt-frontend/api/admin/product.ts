@@ -1,6 +1,28 @@
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
-import type { AdminProduct, ProductCategory } from '@/api/admin'
+
+import { getSupabaseClient } from '@/utils/supabase'
+import type { ProductCategory } from './category'
+
+export interface AdminProduct {
+    id: string
+    product_name: string
+    status: 'on' | 'off'
+    category_id: string | null
+    image: string | null         // 商品头图
+    sort_order: number           // 排序
+    display_price: number        // 虚假展示价格
+    tags: string[]               // 商品标签组
+    initial_sales: number        // 初始销量
+    badge_label: string | null   // 角标标签 (如：热卖、新品)
+    rating: number               // 好评度
+    allow_addon: boolean         // 是否支持加购
+    detail_modules: any[]        // 详情页内容模块 (JSONB)
+    created_at: string
+    stock?: number
+    category?: ProductCategory
+}
+
+
 
 export const adminProductApi = {
     /**
@@ -13,7 +35,7 @@ export const adminProductApi = {
         page?: number
         page_size?: number
     }): Promise<{ success: boolean; products: AdminProduct[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const page = params?.page || 1
         const pageSize = params?.page_size || 20
         const offset = (page - 1) * pageSize
@@ -89,7 +111,7 @@ export const adminProductApi = {
      * 获取单个商品详情（用于编辑）
      */
     async getProductById(id: string): Promise<{ success: boolean; product?: AdminProduct; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('products')
             .select('*, category:product_categories(id, name)')
@@ -106,7 +128,7 @@ export const adminProductApi = {
      * 创建商品
      */
     async createProduct(data: Partial<AdminProduct>): Promise<{ success: boolean; product?: AdminProduct; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: product, error } = await client
             .from('products')
             .insert({
@@ -134,7 +156,7 @@ export const adminProductApi = {
      * 更新商品
      */
     async updateProduct(id: string, data: Partial<AdminProduct>): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('products')
             .update(data)
@@ -156,7 +178,7 @@ export const adminProductApi = {
      * 级联删除：先删映射，再删商品
      */
     async deleteProducts(ids: string[]): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // 1. 删除映射
         await client.from('product_sku_map').delete().in('product_id', ids)
@@ -179,7 +201,7 @@ export const adminProductApi = {
         skus?: any[]
         error?: string
     }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // 1. 商品信息
         const { data: product, error: pError } = await client
@@ -226,7 +248,7 @@ export const adminProductApi = {
      * 注意：这是创建新的 ProductSKU 记录
      */
     async createProductSkus(productId: string, skus: any[]): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const skuData = skus.map(sku => ({
             product_type: sku.product_type,
@@ -271,7 +293,7 @@ export const adminProductApi = {
         skus?: any[]
         sharedTag?: number
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // 1. 共享模式：重置为引用
         if (options.mode === 'shared') {

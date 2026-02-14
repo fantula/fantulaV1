@@ -37,8 +37,8 @@
                 <div v-if="userStore.loading" class="avatar-skeleton"></div>
                 <template v-else>
                     <img 
-                      :src="userStore.user?.avatar || '/images/client/pc/avatars/avatar-cat.png'" 
-                      @error="(e) => (e.target as HTMLImageElement).src = '/images/client/pc/avatars/avatar-cat.png'"
+                      :src="userStore.user?.avatar || DEFAULT_AVATAR" 
+                      @error="(e) => (e.target as HTMLImageElement).src = DEFAULT_AVATAR"
                     />
                     <div class="avatar-ring"></div>
                 </template>
@@ -56,6 +56,7 @@ import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart'
 import { ShoppingCart, User, Star } from '@element-plus/icons-vue'
 import MobileMiniCart from '@/components/mobile/cart/MobileMiniCart.vue'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 defineProps<{
   isScrolled: boolean

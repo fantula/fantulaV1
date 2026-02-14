@@ -1,4 +1,4 @@
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface AdminTicket {
   id: string
@@ -30,7 +30,7 @@ export interface TicketMessage {
 export const adminTicketApi = {
   // 1. Get List
   async getList(params: { page: number, pageSize: number, status?: string }): Promise<{ success: boolean; data: any; total: number; error?: string }> {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { page, pageSize, status } = params
 
     let query = client
@@ -51,7 +51,7 @@ export const adminTicketApi = {
 
   // 1.5 Get Detail
   async getDetail(ticketId: string): Promise<{ success: boolean; data: any; error?: string }> {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { data, error } = await client
       .from('tickets')
       .select('*, profiles(email), orders(id, order_no, product_snapshot, sku_snapshot, total_amount, quantity, status, created_at, end_time, expires_at)')
@@ -64,7 +64,7 @@ export const adminTicketApi = {
 
   // 2. Get Messages for a Ticket
   async getMessages(ticketId: string): Promise<{ success: boolean; data: TicketMessage[]; error?: string }> {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { data, error } = await client
       .from('ticket_messages')
       .select('*, profiles(email)')
@@ -77,7 +77,7 @@ export const adminTicketApi = {
 
   // 3. Admin Reply
   async reply(ticketId: string, content: string, attachments: string[] = []): Promise<{ success: boolean; error?: string }> {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
 
     // Admin ID logic: ideally we fetch logged in admin profile. 
     // BUT admin API often uses service_role. 
@@ -101,7 +101,7 @@ export const adminTicketApi = {
 
   // 4. Resolve Ticket
   async resolve(ticketId: string): Promise<{ success: boolean; error?: string }> {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { error } = await client
       .from('tickets')
       .update({ status: 'resolved', resolved_at: new Date(), updated_at: new Date() })
@@ -113,7 +113,7 @@ export const adminTicketApi = {
 
   // 5. Cleanup Images (One-Click) - 使用 R2 Edge Function
   async cleanupImages(daysOld: number = 7, token?: string): Promise<{ success: boolean; count: number; error?: string }> {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const dateLimit = new Date();
     dateLimit.setDate(dateLimit.getDate() - daysOld);
 

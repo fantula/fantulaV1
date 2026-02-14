@@ -25,6 +25,7 @@ declare global {
   const createParametricQrCode: typeof import('../../server/utils/wechat-login').createParametricQrCode
   const createRouter: typeof import('../../node_modules/h3').createRouter
   const createSitePathResolver: typeof import('../../node_modules/nuxt-site-config/dist/runtime/server/composables/utils').createSitePathResolver
+  const createUserSchema: typeof import('../../server/utils/validation').createUserSchema
   const decryptCallback: typeof import('../../server/utils/wechat-pay').decryptCallback
   const defaultContentType: typeof import('../../node_modules/h3').defaultContentType
   const defineAppConfig: typeof import('../../node_modules/@nuxt/nitro-server/dist/runtime/utils/config').defineAppConfig
@@ -45,6 +46,7 @@ declare global {
   const defineWebSocket: typeof import('../../node_modules/h3').defineWebSocket
   const defineWebSocketHandler: typeof import('../../node_modules/h3').defineWebSocketHandler
   const deleteCookie: typeof import('../../node_modules/h3').deleteCookie
+  const deleteUserSchema: typeof import('../../server/utils/validation').deleteUserSchema
   const dynamicEventHandler: typeof import('../../node_modules/h3').dynamicEventHandler
   const eventHandler: typeof import('../../node_modules/h3').eventHandler
   const fetchWithEvent: typeof import('../../node_modules/h3').fetchWithEvent
@@ -108,9 +110,12 @@ declare global {
   const isStream: typeof import('../../node_modules/h3').isStream
   const isWebResponse: typeof import('../../node_modules/h3').isWebResponse
   const lazyEventHandler: typeof import('../../node_modules/h3').lazyEventHandler
+  const loginBaseSchema: typeof import('../../server/utils/validation').loginBaseSchema
+  const mapSupabaseError: typeof import('../../server/utils/error-mapper').mapSupabaseError
   const nitroPlugin: typeof import('../../node_modules/nitropack/dist/runtime/internal/plugin').nitroPlugin
   const parseCookies: typeof import('../../node_modules/h3').parseCookies
   const parseWechatEventXml: typeof import('../../server/utils/wechat-login').parseWechatEventXml
+  const passwordLoginSchema: typeof import('../../server/utils/validation').passwordLoginSchema
   const promisifyNodeListener: typeof import('../../node_modules/h3').promisifyNodeListener
   const proxyRequest: typeof import('../../node_modules/h3').proxyRequest
   const readBody: typeof import('../../node_modules/h3').readBody
@@ -128,6 +133,7 @@ declare global {
   const sendIterable: typeof import('../../node_modules/h3').sendIterable
   const sendNoContent: typeof import('../../node_modules/h3').sendNoContent
   const sendNotification: typeof import('../../server/utils/email').sendNotification
+  const sendOtpSchema: typeof import('../../server/utils/validation').sendOtpSchema
   const sendProxy: typeof import('../../node_modules/h3').sendProxy
   const sendRedirect: typeof import('../../node_modules/h3').sendRedirect
   const sendStream: typeof import('../../node_modules/h3').sendStream
@@ -159,8 +165,10 @@ declare global {
   const useSession: typeof import('../../node_modules/h3').useSession
   const useSiteConfig: typeof import('../../node_modules/nuxt-site-config/dist/runtime/server/composables/useSiteConfig').useSiteConfig
   const useStorage: typeof import('../../node_modules/nitropack/dist/runtime/internal/storage').useStorage
+  const validateBody: typeof import('../../server/utils/validation').validateBody
   const verifyBindToken: typeof import('../../server/utils/wechat-login').verifyBindToken
   const verifyCallbackSignature: typeof import('../../server/utils/wechat-pay').verifyCallbackSignature
+  const verifyOtpSchema: typeof import('../../server/utils/validation').verifyOtpSchema
   const wechatPayRequest: typeof import('../../server/utils/wechat-pay').wechatPayRequest
   const withSiteTrailingSlash: typeof import('../../node_modules/nuxt-site-config/dist/runtime/server/composables/utils').withSiteTrailingSlash
   const withSiteUrl: typeof import('../../node_modules/nuxt-site-config/dist/runtime/server/composables/utils').withSiteUrl
@@ -207,6 +215,8 @@ export { getPathRobotConfig } from '/Users/dalin/fantula/nuxt-frontend/node_modu
 export { getSiteRobotConfig } from '/Users/dalin/fantula/nuxt-frontend/node_modules/@nuxtjs/robots/dist/runtime/server/composables/getSiteRobotConfig';
 export { useRuntimeConfigNuxtRobots } from '/Users/dalin/fantula/nuxt-frontend/node_modules/@nuxtjs/robots/dist/runtime/server/composables/useRuntimeConfigNuxtRobots';
 export { sendNotification } from '/Users/dalin/fantula/nuxt-frontend/server/utils/email';
+export { mapSupabaseError } from '/Users/dalin/fantula/nuxt-frontend/server/utils/error-mapper';
 export { getSupabaseClient, getSupabaseServiceClient, getCurrentUser } from '/Users/dalin/fantula/nuxt-frontend/server/utils/supabase';
+export { passwordLoginSchema, verifyOtpSchema, loginBaseSchema, createUserSchema, sendOtpSchema, deleteUserSchema, validateBody } from '/Users/dalin/fantula/nuxt-frontend/server/utils/validation';
 export { getWechatAccessToken, createParametricQrCode, getQrCodeImageUrl, generateLoginScene, parseWechatEventXml, generateBindToken, verifyBindToken, getWechatUserInfo } from '/Users/dalin/fantula/nuxt-frontend/server/utils/wechat-login';
 export { getWechatPayConfig, generateNonceStr, getTimestamp, buildAuthHeader, decryptCallback, verifyCallbackSignature, wechatPayRequest, generateOutTradeNo, generateJsapiPaySign } from '/Users/dalin/fantula/nuxt-frontend/server/utils/wechat-pay';

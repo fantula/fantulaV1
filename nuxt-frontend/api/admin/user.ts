@@ -1,13 +1,14 @@
 /**
  * 用户管理 API
  */
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface AdminUser {
     id: string
     uid: string
     email: string
     status: 'active' | 'disabled'
+    avatar?: string
     created_at: string
 }
 
@@ -17,7 +18,7 @@ export const adminUserApi = {
         limit?: number
         offset?: number
     }): Promise<{ success: boolean; users: AdminUser[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         let query = client
             .from('profiles')
             .select('*', { count: 'exact' })
@@ -42,7 +43,7 @@ export const adminUserApi = {
     },
 
     async getUserByUid(uid: string): Promise<{ success: boolean; user?: AdminUser; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('profiles')
             .select('*')
@@ -56,7 +57,7 @@ export const adminUserApi = {
     },
 
     async toggleStatus(id: string, status: 'active' | 'disabled'): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('profiles')
             .update({ status })

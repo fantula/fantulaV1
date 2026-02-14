@@ -53,6 +53,8 @@ import { Close, Check } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { useNotify } from '@/composables/useNotify'
 
+import { DEFAULT_AVATAR, SYSTEM_AVATARS } from '@/utils/constants'
+
 const props = defineProps<{
   visible: boolean
   currentAvatar?: string
@@ -64,18 +66,10 @@ const { success, error } = useNotify()
 
 const loading = ref(false)
 const selectedAvatar = ref('')
-const defaultAvatar = '/images/client/pc/avatars/avatar-cat.png'
+const defaultAvatar = DEFAULT_AVATAR
 
-const presetAvatars = [
-  '/images/client/pc/avatars/avatar-cat.png',
-  '/images/client/pc/avatars/avatar-dog.png',
-  '/images/client/pc/avatars/avatar-bear.png',
-  '/images/client/pc/avatars/avatar-rabbit.png',
-  '/images/client/pc/avatars/avatar-fox.png',
-  '/images/client/pc/avatars/avatar-panda.png',
-  '/images/client/pc/avatars/avatar-lion.png',
-  '/images/client/pc/avatars/avatar-tiger.png'
-]
+
+const presetAvatars = SYSTEM_AVATARS
 
 const hasChange = computed(() => {
     return selectedAvatar.value && selectedAvatar.value !== props.currentAvatar

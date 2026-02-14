@@ -3,21 +3,19 @@
  */
 
 // 默认头像路径（统一使用）
-export const DEFAULT_AVATAR = '/images/client/pc/avatars/avatar-cat.png'
+export const DEFAULT_AVATAR = '/images/avatars/01.png'
 
 // 系统头像列表
 export const SYSTEM_AVATARS = [
-    '/images/client/pc/avatars/avatar-cat.png',
-    '/images/client/pc/avatars/avatar-penguin.png',
-    '/images/client/pc/avatars/avatar-bunny.png',
-    '/images/client/pc/avatars/avatar-owl.png',
-    '/images/client/pc/avatars/avatar-frog.png',
-    '/images/client/pc/avatars/avatar-bear.png',
-    '/images/client/pc/avatars/avatar-1.png',
-    '/images/client/pc/avatars/avatar-2.png',
-    '/images/client/pc/head1.png',
-    '/images/client/pc/head2.png',
-    '/images/client/pc/head3.png'
+    '/images/avatars/01.png',
+    '/images/avatars/02.png',
+    '/images/avatars/03.png',
+    '/images/avatars/04.png',
+    '/images/avatars/05.png',
+    '/images/avatars/06.png',
+    '/images/avatars/07.png',
+    '/images/avatars/08.png',
+    '/images/avatars/09.png'
 ]
 
 // 头像上传配置

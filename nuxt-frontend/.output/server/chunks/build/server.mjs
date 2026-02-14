@@ -1,6 +1,5 @@
-import process from 'node:process';globalThis._importMeta_=globalThis._importMeta_||{url:"file:///_entry.js",env:process.env};import { defineComponent, ref, inject, h, Suspense, shallowRef, getCurrentInstance, provide, cloneVNode, createElementBlock, computed, unref, toRef, isRef, hasInjectionContext, Fragment, shallowReactive, reactive, effectScope, isReactive, toRaw, getCurrentScope, onScopeDispose, watch, nextTick, toRefs, markRaw, useSSRContext, defineAsyncComponent, createApp, mergeProps, withCtx, createVNode, onErrorCaptured, onServerPrefetch, resolveDynamicComponent, isReadonly, isShallow } from 'vue';
-import { c as createError$1, p as parseURL, n as encodePath, o as decodePath, q as klona, t as hasProtocol, v as isScriptProtocol, l as joinURL, w as withQuery, x as getRequestHeader, y as destr, z as isEqual, A as sanitizeStatusCode, B as getContext, C as setCookie, D as getCookie, E as deleteCookie, $ as $fetch, F as createHooks, G as defu, H as executeAsync } from '../nitro/nitro.mjs';
-import { b as baseURL } from '../routes/renderer.mjs';
+import process from 'node:process';globalThis._importMeta_=globalThis._importMeta_||{url:"file:///_entry.js",env:process.env};import { defineComponent, ref, inject, h, Suspense, shallowRef, getCurrentInstance, provide, cloneVNode, createElementBlock, computed, unref, toRef, isRef, hasInjectionContext, readonly, Fragment, shallowReactive, reactive, effectScope, isReactive, toRaw, getCurrentScope, onScopeDispose, watch, nextTick, toRefs, markRaw, useSSRContext, defineAsyncComponent, createApp, withCtx, createVNode, mergeProps, onErrorCaptured, onServerPrefetch, resolveDynamicComponent, isReadonly, isShallow } from 'vue';
+import { c as createError$1, S as parseURL, T as encodePath, U as decodePath, V as klona, W as hasProtocol, X as isScriptProtocol, Q as joinURL, Y as withQuery, Z as getRequestHeader, _ as destr, $ as isEqual, a0 as sanitizeStatusCode, a1 as getContext, a2 as setCookie, a3 as getCookie, a4 as deleteCookie, a5 as $fetch, a6 as baseURL, a7 as defu, a8 as executeAsync } from '../nitro/nitro.mjs';
 import { RouterView, useRoute as useRoute$1, createMemoryHistory, createRouter, START_LOCATION } from 'vue-router';
 import { isClient, computedEager } from '@vueuse/core';
 import { isArray as isArray$1, isObject as isObject$1, isString as isString$1 } from '@vue/shared';
@@ -17,7 +16,10 @@ import followRedirects from 'follow-redirects';
 import zlib from 'zlib';
 import stream, { Readable } from 'stream';
 import { EventEmitter } from 'events';
-import { ssrRenderAttrs, ssrRenderComponent, ssrRenderSuspense, ssrRenderVNode } from 'vue/server-renderer';
+import { ssrRenderTeleport, ssrInterpolate, ssrRenderComponent, ssrRenderAttrs, ssrRenderSuspense, ssrRenderVNode } from 'vue/server-renderer';
+import { u as useHead$1, h as headSymbol } from '../routes/renderer.mjs';
+import '@supabase/supabase-js';
+import 'zod';
 import 'node:http';
 import 'node:https';
 import 'node:events';
@@ -25,12 +27,220 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
+import 'consola';
 import 'node:url';
+import 'fast-xml-parser';
+import 'ipx';
 import 'vue-bundle-renderer/runtime';
 import 'unhead/server';
 import 'devalue';
 import 'unhead/utils';
 import 'unhead/plugins';
+
+function flatHooks(configHooks, hooks = {}, parentName) {
+  for (const key in configHooks) {
+    const subHook = configHooks[key];
+    const name = parentName ? `${parentName}:${key}` : key;
+    if (typeof subHook === "object" && subHook !== null) {
+      flatHooks(subHook, hooks, name);
+    } else if (typeof subHook === "function") {
+      hooks[name] = subHook;
+    }
+  }
+  return hooks;
+}
+const defaultTask = { run: (function_) => function_() };
+const _createTask = () => defaultTask;
+const createTask = typeof console.createTask !== "undefined" ? console.createTask : _createTask;
+function serialTaskCaller(hooks, args) {
+  const name = args.shift();
+  const task = createTask(name);
+  return hooks.reduce(
+    (promise, hookFunction) => promise.then(() => task.run(() => hookFunction(...args))),
+    Promise.resolve()
+  );
+}
+function parallelTaskCaller(hooks, args) {
+  const name = args.shift();
+  const task = createTask(name);
+  return Promise.all(hooks.map((hook) => task.run(() => hook(...args))));
+}
+function callEachWith(callbacks, arg0) {
+  for (const callback of [...callbacks]) {
+    callback(arg0);
+  }
+}
+
+class Hookable {
+  constructor() {
+    this._hooks = {};
+    this._before = void 0;
+    this._after = void 0;
+    this._deprecatedMessages = void 0;
+    this._deprecatedHooks = {};
+    this.hook = this.hook.bind(this);
+    this.callHook = this.callHook.bind(this);
+    this.callHookWith = this.callHookWith.bind(this);
+  }
+  hook(name, function_, options = {}) {
+    if (!name || typeof function_ !== "function") {
+      return () => {
+      };
+    }
+    const originalName = name;
+    let dep;
+    while (this._deprecatedHooks[name]) {
+      dep = this._deprecatedHooks[name];
+      name = dep.to;
+    }
+    if (dep && !options.allowDeprecated) {
+      let message = dep.message;
+      if (!message) {
+        message = `${originalName} hook has been deprecated` + (dep.to ? `, please use ${dep.to}` : "");
+      }
+      if (!this._deprecatedMessages) {
+        this._deprecatedMessages = /* @__PURE__ */ new Set();
+      }
+      if (!this._deprecatedMessages.has(message)) {
+        console.warn(message);
+        this._deprecatedMessages.add(message);
+      }
+    }
+    if (!function_.name) {
+      try {
+        Object.defineProperty(function_, "name", {
+          get: () => "_" + name.replace(/\W+/g, "_") + "_hook_cb",
+          configurable: true
+        });
+      } catch {
+      }
+    }
+    this._hooks[name] = this._hooks[name] || [];
+    this._hooks[name].push(function_);
+    return () => {
+      if (function_) {
+        this.removeHook(name, function_);
+        function_ = void 0;
+      }
+    };
+  }
+  hookOnce(name, function_) {
+    let _unreg;
+    let _function = (...arguments_) => {
+      if (typeof _unreg === "function") {
+        _unreg();
+      }
+      _unreg = void 0;
+      _function = void 0;
+      return function_(...arguments_);
+    };
+    _unreg = this.hook(name, _function);
+    return _unreg;
+  }
+  removeHook(name, function_) {
+    if (this._hooks[name]) {
+      const index = this._hooks[name].indexOf(function_);
+      if (index !== -1) {
+        this._hooks[name].splice(index, 1);
+      }
+      if (this._hooks[name].length === 0) {
+        delete this._hooks[name];
+      }
+    }
+  }
+  deprecateHook(name, deprecated) {
+    this._deprecatedHooks[name] = typeof deprecated === "string" ? { to: deprecated } : deprecated;
+    const _hooks = this._hooks[name] || [];
+    delete this._hooks[name];
+    for (const hook of _hooks) {
+      this.hook(name, hook);
+    }
+  }
+  deprecateHooks(deprecatedHooks) {
+    Object.assign(this._deprecatedHooks, deprecatedHooks);
+    for (const name in deprecatedHooks) {
+      this.deprecateHook(name, deprecatedHooks[name]);
+    }
+  }
+  addHooks(configHooks) {
+    const hooks = flatHooks(configHooks);
+    const removeFns = Object.keys(hooks).map(
+      (key) => this.hook(key, hooks[key])
+    );
+    return () => {
+      for (const unreg of removeFns.splice(0, removeFns.length)) {
+        unreg();
+      }
+    };
+  }
+  removeHooks(configHooks) {
+    const hooks = flatHooks(configHooks);
+    for (const key in hooks) {
+      this.removeHook(key, hooks[key]);
+    }
+  }
+  removeAllHooks() {
+    for (const key in this._hooks) {
+      delete this._hooks[key];
+    }
+  }
+  callHook(name, ...arguments_) {
+    arguments_.unshift(name);
+    return this.callHookWith(serialTaskCaller, name, ...arguments_);
+  }
+  callHookParallel(name, ...arguments_) {
+    arguments_.unshift(name);
+    return this.callHookWith(parallelTaskCaller, name, ...arguments_);
+  }
+  callHookWith(caller, name, ...arguments_) {
+    const event = this._before || this._after ? { name, args: arguments_, context: {} } : void 0;
+    if (this._before) {
+      callEachWith(this._before, event);
+    }
+    const result = caller(
+      name in this._hooks ? [...this._hooks[name]] : [],
+      arguments_
+    );
+    if (result instanceof Promise) {
+      return result.finally(() => {
+        if (this._after && event) {
+          callEachWith(this._after, event);
+        }
+      });
+    }
+    if (this._after && event) {
+      callEachWith(this._after, event);
+    }
+    return result;
+  }
+  beforeEach(function_) {
+    this._before = this._before || [];
+    this._before.push(function_);
+    return () => {
+      if (this._before !== void 0) {
+        const index = this._before.indexOf(function_);
+        if (index !== -1) {
+          this._before.splice(index, 1);
+        }
+      }
+    };
+  }
+  afterEach(function_) {
+    this._after = this._after || [];
+    this._after.push(function_);
+    return () => {
+      if (this._after !== void 0) {
+        const index = this._after.indexOf(function_);
+        if (index !== -1) {
+          this._after.splice(index, 1);
+        }
+      }
+    };
+  }
+}
+function createHooks() {
+  return new Hookable();
+}
 
 function parse(str, options) {
   if (typeof str !== "string") {
@@ -456,14 +666,63 @@ function toArray$1(value) {
   return Array.isArray(value) ? value : [value];
 }
 const matcher = /* @__PURE__ */ (() => {
-  const $0 = {};
+  const $0 = { payload: true, payload: true }, $1 = {};
   return (m, p) => {
     let r = [];
     if (p.charCodeAt(p.length - 1) === 47) p = p.slice(0, -1) || "/";
+    if (p === "/") {
+      r.unshift({ data: $0 });
+    }
+    if (p === "/pc") {
+      r.unshift({ data: $0 });
+    }
+    if (p === "/mobile") {
+      r.unshift({ data: $0 });
+    }
+    if (p === "/__sitemap__/style.xsl") {
+      r.unshift({ data: $1 });
+    }
+    if (p === "/sitemap.xml") {
+      r.unshift({ data: $1 });
+    }
+    if (p === "/_nuxt") {
+      r.unshift({ data: $1 });
+    }
     let s = p.split("/");
     s.length - 1;
     if (s[1] === "admin") {
-      r.unshift({ data: $0, params: { "_": s.slice(2).join("/") } });
+      r.unshift({ data: $1, params: { "_": s.slice(2).join("/") } });
+    }
+    if (s[1] === "api") {
+      r.unshift({ data: $1, params: { "_": s.slice(2).join("/") } });
+    }
+    if (s[1] === "pc") {
+      if (s[2] === "product") {
+        r.unshift({ data: $0, params: { "_": s.slice(3).join("/") } });
+      }
+      if (s[2] === "article") {
+        r.unshift({ data: $0, params: { "_": s.slice(3).join("/") } });
+      }
+      if (s[2] === "profile") {
+        r.unshift({ data: $1, params: { "_": s.slice(3).join("/") } });
+      }
+      if (s[2] === "checkout") {
+        r.unshift({ data: $1, params: { "_": s.slice(3).join("/") } });
+      }
+    }
+    if (s[1] === "mobile") {
+      if (s[2] === "product") {
+        r.unshift({ data: $0, params: { "_": s.slice(3).join("/") } });
+      }
+      if (s[2] === "article") {
+        r.unshift({ data: $0, params: { "_": s.slice(3).join("/") } });
+      }
+      if (s[2] === "profile") {
+        r.unshift({ data: $1, params: { "_": s.slice(3).join("/") } });
+      }
+      if (s[2] === "checkout") {
+        r.unshift({ data: $1, params: { "_": s.slice(3).join("/") } });
+      }
     }
     return r;
   };
@@ -892,91 +1151,91 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$1W || {},
-    component: () => import('./index-CGiL2DWY.mjs')
+    component: () => import('./index-CvlX4WyM.mjs')
   },
   {
     name: "pc-faq",
     path: "/pc/faq",
     meta: __nuxt_page_meta$1V || {},
-    component: () => import('./faq-DK01AEbq.mjs')
+    component: () => import('./faq-DwY5ajpp.mjs')
   },
   {
     name: "pc-id",
     path: "/pc/:id()",
     meta: __nuxt_page_meta$1U || {},
-    component: () => import('./_id_-BXcjd5Ph.mjs')
+    component: () => import('./_id_-_lcM85TO.mjs')
   },
   {
     name: "pc-about",
     path: "/pc/about",
     meta: __nuxt_page_meta$1T || {},
-    component: () => import('./about-B1XwNVo-.mjs')
+    component: () => import('./about-CAut7xBu.mjs')
   },
   {
     name: "pc",
     path: "/pc",
     meta: __nuxt_page_meta$1S || {},
-    component: () => import('./index-G-c9eLwn.mjs')
+    component: () => import('./index-BXQmoCQq.mjs')
   },
   {
     name: __nuxt_page_meta$1I?.name,
     path: "/admin/cdk",
     meta: { ...__nuxt_page_meta$1I || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./cdk-Cot0m7Mw.mjs'),
+    component: () => import('./cdk-mpzBErok.mjs'),
     children: [
       {
         name: "admin-cdk-cdks",
         path: "cdks",
         meta: { ...__nuxt_page_meta$1R || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./cdks-DOPIKjhl.mjs')
+        component: () => import('./cdks-CT0OdN-w.mjs')
       },
       {
         name: "admin-cdk-keys",
         path: "keys",
         meta: { ...__nuxt_page_meta$1Q || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./keys-CuU85-Vr.mjs')
+        component: () => import('./keys-mVy4HAni.mjs')
       },
       {
         name: "admin-cdk-post",
         path: "post",
         meta: { ...__nuxt_page_meta$1P || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-BPWZh6vp.mjs')
+        component: () => import('./post-DeoEy-PA.mjs')
       },
       {
         name: "admin-cdk-debug",
         path: "debug",
         meta: { ...__nuxt_page_meta$1O || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./debug-Dw2Z6bBU.mjs')
+        component: () => import('./debug-D2vorysp.mjs')
       },
       {
         name: "admin-cdk",
         path: "",
         meta: __nuxt_page_meta$1N || {},
-        component: () => import('./index-DL4A39in.mjs')
+        component: () => import('./index-DY1mH1Ug.mjs')
       },
       {
         name: "admin-cdk-virtual",
         path: "virtual",
         meta: { ...__nuxt_page_meta$1M || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./virtual-BTeQYFAE.mjs')
+        component: () => import('./virtual-jc0TWvLx.mjs')
       },
       {
         name: "admin-cdk-accounts",
         path: "accounts",
         meta: { ...__nuxt_page_meta$1L || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./accounts-1quL8WiT.mjs')
+        component: () => import('./accounts-6fvb9tbl.mjs')
       },
       {
         name: "admin-cdk-edit-id",
         path: "edit/:id()",
         meta: { ...__nuxt_page_meta$1K || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./_id_-BxaegCFl.mjs')
+        component: () => import('./_id_-Bnju1CTE.mjs')
       },
       {
         name: "admin-cdk-channel-recognition",
         path: "channel-recognition",
         meta: { ...__nuxt_page_meta$1J || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./channel-recognition-prrl1glQ.mjs')
+        component: () => import('./channel-recognition-BAXtm6vk.mjs')
       }
     ]
   },
@@ -984,91 +1243,91 @@ const _routes = [
     name: "pc-policy",
     path: "/pc/policy",
     meta: __nuxt_page_meta$1H || {},
-    component: () => import('./policy-JFwbj4S0.mjs')
+    component: () => import('./policy-BnbPI7mc.mjs')
   },
   {
     name: "pc-refund",
     path: "/pc/refund",
     meta: __nuxt_page_meta$1G || {},
-    component: () => import('./refund-B6P-6EHm.mjs')
+    component: () => import('./refund-39vI_i_t.mjs')
   },
   {
     name: "pc-company",
     path: "/pc/company",
     meta: __nuxt_page_meta$1F || {},
-    component: () => import('./company-BLf3oTXA.mjs')
+    component: () => import('./company-15BGOJcQ.mjs')
   },
   {
     name: "pc-contact",
     path: "/pc/contact",
     meta: __nuxt_page_meta$1E || {},
-    component: () => import('./contact-A7OtRbSU.mjs')
+    component: () => import('./contact-Bt5CiqkK.mjs')
   },
   {
     name: "pc-join-us",
     path: "/pc/join-us",
     meta: __nuxt_page_meta$1D || {},
-    component: () => import('./join-us-CMHyks9Y.mjs')
+    component: () => import('./join-us-5AjZMQU0.mjs')
   },
   {
     name: "pc-privacy",
     path: "/pc/privacy",
     meta: __nuxt_page_meta$1C || {},
-    component: () => import('./privacy-th8y0ekm.mjs')
+    component: () => import('./privacy-D72d6Toq.mjs')
   },
   {
     name: __nuxt_page_meta$1t?.name,
     path: "/pc/profile",
     meta: __nuxt_page_meta$1t || {},
-    component: () => import('./profile-B_njVmP7.mjs'),
+    component: () => import('./profile-BQQoVYTX.mjs'),
     children: [
       {
         name: "pc-profile",
         path: "",
         meta: __nuxt_page_meta$1B || {},
-        component: () => import('./index-tBKGuUyC.mjs')
+        component: () => import('./index-LHz8Jamn.mjs')
       },
       {
         name: "pc-profile-wallet",
         path: "wallet",
         meta: __nuxt_page_meta$1A || {},
-        component: () => import('./wallet-DDiYkWPL.mjs')
+        component: () => import('./wallet-BWEgksHE.mjs')
       },
       {
         name: "pc-profile-tickets",
         path: "tickets",
         meta: __nuxt_page_meta$1z || {},
-        component: () => import('./tickets-B8dHjEvs.mjs')
+        component: () => import('./tickets-Bdx2IDB0.mjs')
       },
       {
         name: "pc-profile-exchange",
         path: "exchange",
         meta: __nuxt_page_meta$1y || {},
-        component: () => import('./exchange-BFLjbhe2.mjs')
+        component: () => import('./exchange-D1c1Rc2a.mjs')
       },
       {
         name: "pc-profile-messages",
         path: "messages",
         meta: __nuxt_page_meta$1x || {},
-        component: () => import('./messages-DydPcYtN.mjs')
+        component: () => import('./messages-B0ZDNPKL.mjs')
       },
       {
         name: "pc-profile-favorites",
         path: "favorites",
         meta: __nuxt_page_meta$1w || {},
-        component: () => import('./favorites-hedhNRsp.mjs')
+        component: () => import('./favorites-CYvk-UN4.mjs')
       },
       {
         name: "pc-profile-order-id",
         path: "order/:id()",
         meta: __nuxt_page_meta$1v || {},
-        component: () => import('./_id_-BK-BYfnK.mjs')
+        component: () => import('./_id_-BaF8Mwy3.mjs')
       },
       {
         name: "pc-profile-order",
         path: "order",
         meta: __nuxt_page_meta$1u || {},
-        component: () => import('./index-DS-ZJs0d.mjs')
+        component: () => import('./index-98YbJBgQ.mjs')
       }
     ]
   },
@@ -1076,43 +1335,43 @@ const _routes = [
     name: "pc-service",
     path: "/pc/service",
     meta: __nuxt_page_meta$1s || {},
-    component: () => import('./service-CCx0IqB6.mjs')
+    component: () => import('./service-lrKAhQSh.mjs')
   },
   {
     name: "admin",
     path: "/admin",
     meta: { ...__nuxt_page_meta$1r || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-CT2g_TDy.mjs')
+    component: () => import('./index-DANCYFTG.mjs')
   },
   {
     name: "admin-login",
     path: "/admin/login",
     meta: { ...__nuxt_page_meta$1q || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./login-DJ4BifYV.mjs')
+    component: () => import('./login-DVKaeREo.mjs')
   },
   {
     name: __nuxt_page_meta$1m?.name,
     path: "/admin/media",
     meta: { ...__nuxt_page_meta$1m || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./media-BlBu2ck6.mjs'),
+    component: () => import('./media-nN31KGeZ.mjs'),
     children: [
       {
         name: "admin-media",
         path: "",
         meta: { ...__nuxt_page_meta$1p || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-u4p-mgQl.mjs')
+        component: () => import('./index-Bl2Aeuhb.mjs')
       },
       {
         name: "admin-media-images",
         path: "images",
         meta: { ...__nuxt_page_meta$1o || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./images-DeOjoPpn.mjs')
+        component: () => import('./images-D3_3CeSn.mjs')
       },
       {
         name: "admin-media-banners",
         path: "banners",
         meta: { ...__nuxt_page_meta$1n || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./banners-CWIDBx3Z.mjs')
+        component: () => import('./banners-D4hkPej1.mjs')
       }
     ]
   },
@@ -1120,25 +1379,25 @@ const _routes = [
     name: __nuxt_page_meta$1i?.name,
     path: "/admin/users",
     meta: { ...__nuxt_page_meta$1i || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./users-CzguXf6s.mjs'),
+    component: () => import('./users-Cofmkb2I.mjs'),
     children: [
       {
         name: "admin-users",
         path: "",
         meta: { ...__nuxt_page_meta$1l || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DNtV2SIj.mjs')
+        component: () => import('./index-BpFAOCTN.mjs')
       },
       {
         name: "admin-users-accounts",
         path: "accounts",
         meta: { ...__nuxt_page_meta$1k || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CgPRnLzT.mjs')
+        component: () => import('./index-Cos4uotp.mjs')
       },
       {
         name: "admin-users-departments",
         path: "departments",
         meta: { ...__nuxt_page_meta$1j || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-Dce7Yen-.mjs')
+        component: () => import('./index-Cn18r9LD.mjs')
       }
     ]
   },
@@ -1146,79 +1405,79 @@ const _routes = [
     name: "mobile-cart",
     path: "/mobile/cart",
     meta: __nuxt_page_meta$1h || {},
-    component: () => import('./cart-vUmvzqon.mjs')
+    component: () => import('./cart-BLVOyZ67.mjs')
   },
   {
     name: "mobile-help",
     path: "/mobile/help",
     meta: __nuxt_page_meta$1g || {},
-    component: () => import('./help-B6kLmxMQ.mjs')
+    component: () => import('./help-DAP2qAIF.mjs')
   },
   {
     name: "pc-about-us",
     path: "/pc/about-us",
     meta: __nuxt_page_meta$1f || {},
-    component: () => import('./about-us-CXfQ4mEt.mjs')
+    component: () => import('./about-us-ChouTBAg.mjs')
   },
   {
     name: "admin-orders",
     path: "/admin/orders",
     meta: { ...__nuxt_page_meta$15 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./orders-DYzmRBmV.mjs'),
+    component: () => import('./orders-BzcC_AAA.mjs'),
     children: [
       {
         name: "admin-orders-cdkey",
         path: "cdkey",
         meta: { ...__nuxt_page_meta$1e || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CPOkc3_f.mjs')
+        component: () => import('./index-Dp0O6OK5.mjs')
       },
       {
         name: "admin-orders-share",
         path: "share",
         meta: { ...__nuxt_page_meta$1d || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CVJnNbKm.mjs')
+        component: () => import('./index-B9pgh1q4.mjs')
       },
       {
         name: "admin-orders-cdkey-detail",
         path: "cdkey/detail",
         meta: { ...__nuxt_page_meta$1c || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./detail-DvWxLr2q.mjs')
+        component: () => import('./detail-D6LzkbyX.mjs')
       },
       {
         name: "admin-orders-refund",
         path: "refund",
         meta: { ...__nuxt_page_meta$1b || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DZuBaEn3.mjs')
+        component: () => import('./index-NJPRn0-e.mjs')
       },
       {
         name: "admin-orders-share-detail",
         path: "share/detail",
         meta: { ...__nuxt_page_meta$1a || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./detail-f2Xnf3FO.mjs')
+        component: () => import('./detail-BEYqd2co.mjs')
       },
       {
         name: "admin-orders-recharge",
         path: "recharge",
         meta: { ...__nuxt_page_meta$19 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-B6m-UQ7F.mjs')
+        component: () => import('./index-BOtIVgFt.mjs')
       },
       {
         name: "admin-orders-preorders",
         path: "preorders",
         meta: { ...__nuxt_page_meta$18 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-Dk7Wy2yz.mjs')
+        component: () => import('./index-BPv83nC7.mjs')
       },
       {
         name: "admin-orders-recharge-detail",
         path: "recharge/detail",
         meta: { ...__nuxt_page_meta$17 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./detail-DXshmSgr.mjs')
+        component: () => import('./detail-D7fVDpxw.mjs')
       },
       {
         name: "admin-orders-cancelled-refunds",
         path: "cancelled-refunds",
         meta: { ...__nuxt_page_meta$16 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-nDLRVXBF.mjs')
+        component: () => import('./index-CrjDrk2T.mjs')
       }
     ]
   },
@@ -1226,67 +1485,67 @@ const _routes = [
     name: "mobile",
     path: "/mobile",
     meta: __nuxt_page_meta$14 || {},
-    component: () => import('./index-DgI_EDiX.mjs')
+    component: () => import('./index-BNpk3TAa.mjs')
   },
   {
     name: "pc-community",
     path: "/pc/community",
     meta: __nuxt_page_meta$13 || {},
-    component: () => import('./community-BVe4WfOR.mjs')
+    component: () => import('./community-DN389XAO.mjs')
   },
   {
     name: __nuxt_page_meta$W?.name,
     path: "/admin/coupons",
     meta: { ...__nuxt_page_meta$W || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./coupons--5Cn3hHE.mjs'),
+    component: () => import('./coupons-BqiR6TXI.mjs'),
     children: [
       {
         name: "admin-coupons",
         path: "",
         meta: { ...__nuxt_page_meta$12 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DKoCZZiB.mjs')
+        component: () => import('./index-z5bBvPUq.mjs')
       },
       {
         name: "admin-coupons-flat-post",
         path: "flat/post",
         meta: { ...__nuxt_page_meta$11 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-DRLHFdLz.mjs')
+        component: () => import('./post-CzkoTBFJ.mjs')
       },
       {
         name: "admin-coupons-flat",
         path: "flat",
         meta: { ...__nuxt_page_meta$10 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-1IIAqh1M.mjs')
+        component: () => import('./index-twgoTgiQ.mjs')
       },
       {
         name: "admin-coupons-stats",
         path: "stats",
         meta: { ...__nuxt_page_meta$$ || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-BvCDxQQK.mjs')
+        component: () => import('./index-BUSxRgzj.mjs')
       },
       {
         name: "admin-coupons-balance-post",
         path: "balance/post",
         meta: { ...__nuxt_page_meta$_ || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-D0ceS6cY.mjs')
+        component: () => import('./post-B-fKYSRC.mjs')
       },
       {
         name: "admin-coupons-product-post",
         path: "product/post",
         meta: { ...__nuxt_page_meta$Z || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-BjiAeqSv.mjs')
+        component: () => import('./post-B1xul8r7.mjs')
       },
       {
         name: "admin-coupons-balance",
         path: "balance",
         meta: { ...__nuxt_page_meta$Y || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-zg7FWJYF.mjs')
+        component: () => import('./index-DQfFoOBv.mjs')
       },
       {
         name: "admin-coupons-product",
         path: "product",
         meta: { ...__nuxt_page_meta$X || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CKwAvp-O.mjs')
+        component: () => import('./index-DEeTK6m7.mjs')
       }
     ]
   },
@@ -1294,43 +1553,43 @@ const _routes = [
     name: "pc-advantages",
     path: "/pc/advantages",
     meta: __nuxt_page_meta$V || {},
-    component: () => import('./advantages-DaLGyTJ1.mjs')
+    component: () => import('./advantages-Dqsi7FWt.mjs')
   },
   {
     name: "pc-disclaimer",
     path: "/pc/disclaimer",
     meta: __nuxt_page_meta$U || {},
-    component: () => import('./disclaimer-CqT7Z5i3.mjs')
+    component: () => import('./disclaimer-BocPbvXA.mjs')
   },
   {
     name: "pc-goods-id",
     path: "/pc/goods/:id()",
     meta: __nuxt_page_meta$T || {},
-    component: () => import('./_id_-CmXyKxr_.mjs')
+    component: () => import('./_id_-BIJ1cjpK.mjs')
   },
   {
     name: __nuxt_page_meta$P?.name,
     path: "/admin/messages",
     meta: { ...__nuxt_page_meta$P || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./messages-D_T2_DRc.mjs'),
+    component: () => import('./messages-ByJp-s2v.mjs'),
     children: [
       {
         name: "admin-messages",
         path: "",
         meta: __nuxt_page_meta$S || {},
-        component: () => import('./index-e3kmf1HS.mjs')
+        component: () => import('./index-CDLz1qRf.mjs')
       },
       {
         name: "admin-messages-settings",
         path: "settings",
         meta: { ...__nuxt_page_meta$R || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./settings-CRROwgEF.mjs')
+        component: () => import('./settings-0Kx2oHg5.mjs')
       },
       {
         name: "admin-messages-batch-send",
         path: "batch-send",
         meta: { ...__nuxt_page_meta$Q || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./batch-send-CCaixZ0B.mjs')
+        component: () => import('./batch-send-DsHFWh7O.mjs')
       }
     ]
   },
@@ -1338,43 +1597,43 @@ const _routes = [
     name: __nuxt_page_meta$I?.name,
     path: "/admin/products",
     meta: { ...__nuxt_page_meta$I || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./products-Ciry-Ia4.mjs'),
+    component: () => import('./products-COra90i6.mjs'),
     children: [
       {
         name: "admin-products-edit",
         path: "edit",
         meta: { ...__nuxt_page_meta$O || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./edit-DpAEwqNA.mjs')
+        component: () => import('./edit-B60fS-G2.mjs')
       },
       {
         name: "admin-products-skus",
         path: "skus",
         meta: { ...__nuxt_page_meta$N || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./skus-B8FieJYh.mjs')
+        component: () => import('./skus-PsO9p6ex.mjs')
       },
       {
         name: "admin-products",
         path: "",
         meta: { ...__nuxt_page_meta$M || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CO6tLtky.mjs')
+        component: () => import('./index-BHXZYGHg.mjs')
       },
       {
         name: "admin-products-categories",
         path: "categories",
         meta: { ...__nuxt_page_meta$L || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./categories-65dqw6AF.mjs')
+        component: () => import('./categories-h1cnvDF2.mjs')
       },
       {
         name: "admin-products-shared-sku",
         path: "shared-sku",
         meta: { ...__nuxt_page_meta$K || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./shared-sku-BmBanoRe.mjs')
+        component: () => import('./shared-sku-av4EiB-v.mjs')
       },
       {
         name: "admin-products-specs-id",
         path: "specs/:id()",
         meta: { ...__nuxt_page_meta$J || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./_id_-p5OZFWP0.mjs')
+        component: () => import('./_id_-C_sGO7B9.mjs')
       }
     ]
   },
@@ -1382,25 +1641,25 @@ const _routes = [
     name: __nuxt_page_meta$E?.name,
     path: "/admin/recharge",
     meta: { ...__nuxt_page_meta$E || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./recharge-BIc3u5QJ.mjs'),
+    component: () => import('./recharge-BcTXGYrF.mjs'),
     children: [
       {
         name: "admin-recharge",
         path: "",
         meta: __nuxt_page_meta$H || {},
-        component: () => import('./index-CNowTfjV.mjs')
+        component: () => import('./index-DXzjqgKD.mjs')
       },
       {
         name: "admin-recharge-tiers",
         path: "tiers",
         meta: { ...__nuxt_page_meta$G || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./tiers-CdRgOjne.mjs')
+        component: () => import('./tiers-BBL7MIK4.mjs')
       },
       {
         name: "admin-recharge-orders",
         path: "orders",
         meta: { ...__nuxt_page_meta$F || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./orders-CbdFa6U1.mjs')
+        component: () => import('./orders-BhagwqsR.mjs')
       }
     ]
   },
@@ -1408,72 +1667,72 @@ const _routes = [
     name: "mobile-channel",
     path: "/mobile/channel",
     meta: __nuxt_page_meta$D || {},
-    component: () => import('./channel-YF_Ym6nJ.mjs')
+    component: () => import('./channel-U7wHLs_g.mjs')
   },
   {
     name: __nuxt_page_meta$s?.name,
     path: "/mobile/profile",
-    component: () => import('./profile-Bh4-RIfq.mjs'),
+    component: () => import('./profile-Dtw1z-Sp.mjs'),
     children: [
       {
         name: "mobile-profile",
         path: "",
         meta: { ...__nuxt_page_meta$C || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-CAqGKIFa.mjs')
+        component: () => import('./index-BLdIlDm-.mjs')
       },
       {
         name: "mobile-profile-wallet",
         path: "wallet",
         meta: { ...__nuxt_page_meta$B || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./wallet-BS7iVcWL.mjs')
+        component: () => import('./wallet-CF3YLP5P.mjs')
       },
       {
         name: "mobile-profile-order-id",
         path: "order/:id()",
         meta: { ...__nuxt_page_meta$A || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./_id_-BgRgHobs.mjs')
+        component: () => import('./_id_-CZLXtPpZ.mjs')
       },
       {
         name: "mobile-profile-order",
         path: "order",
         meta: { ...__nuxt_page_meta$z || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-Df20EHZ0.mjs')
+        component: () => import('./index-CvmRBrcT.mjs')
       },
       {
         name: "mobile-profile-tickets-id",
         path: "tickets/:id()",
         meta: { ...__nuxt_page_meta$y || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./_id_-DEWjB_7l.mjs')
+        component: () => import('./_id_-D_MRRS3n.mjs')
       },
       {
         name: "mobile-profile-account",
         path: "account",
         meta: { ...__nuxt_page_meta$x || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-BK1CxQ59.mjs')
+        component: () => import('./index-4jhgCBZ9.mjs')
       },
       {
         name: "mobile-profile-tickets",
         path: "tickets",
         meta: { ...__nuxt_page_meta$w || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-BZ8qEggT.mjs')
+        component: () => import('./index-DRRlzl7r.mjs')
       },
       {
         name: "mobile-profile-messages",
         path: "messages",
         meta: { ...__nuxt_page_meta$v || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-DOgaFz-0.mjs')
+        component: () => import('./index-CaYMgmyu.mjs')
       },
       {
         name: "mobile-profile-favorites",
         path: "favorites",
         meta: { ...__nuxt_page_meta$u || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-D3xRO7FX.mjs')
+        component: () => import('./index-DV5CaSXB.mjs')
       },
       {
         name: "mobile-profile-redemption",
         path: "redemption",
         meta: { ...__nuxt_page_meta$t || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-NmOrs10H.mjs')
+        component: () => import('./index-tXtKjgDg.mjs')
       }
     ]
   },
@@ -1481,37 +1740,37 @@ const _routes = [
     name: "pc-article-id",
     path: "/pc/article/:id()",
     meta: __nuxt_page_meta$r || {},
-    component: () => import('./_id_-oJkUOvLJ.mjs')
+    component: () => import('./_id_-DjYiAPVu.mjs')
   },
   {
     name: "pc-checkout-id",
     path: "/pc/checkout/:id()",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./_id_-wHvAdmI8.mjs')
+    component: () => import('./_id_-OUv8snCQ.mjs')
   },
   {
     name: __nuxt_page_meta$i?.name,
     path: "/admin/help-center",
     meta: { ...__nuxt_page_meta$i || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./help-center-GU7SAv7d.mjs'),
+    component: () => import('./help-center-DNcIV8h1.mjs'),
     children: [
       {
         name: "admin-help-center",
         path: "",
         meta: { ...__nuxt_page_meta$p || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-BskEA4pO.mjs')
+        component: () => import('./index-DFmESQGk.mjs')
       },
       {
         name: "admin-help-center-articles",
         path: "articles",
         meta: { ...__nuxt_page_meta$n || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./articles-CY-LmjPl.mjs'),
+        component: () => import('./articles-PITtM3Rr.mjs'),
         children: [
           {
             name: "admin-help-center-articles-post",
             path: "post",
             meta: { ...__nuxt_page_meta$o || {}, ...{ "middleware": ["mgmt-auth"] } },
-            component: () => import('./post-BnfZbP2j.mjs')
+            component: () => import('./post-DdwIkd4B.mjs')
           }
         ]
       },
@@ -1519,25 +1778,25 @@ const _routes = [
         name: "admin-help-center-faq-post",
         path: "faq/post",
         meta: { ...__nuxt_page_meta$m || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-CWrmM9ZA.mjs')
+        component: () => import('./post-B3z-Wh3t.mjs')
       },
       {
         name: "admin-help-center-faq",
         path: "faq",
         meta: { ...__nuxt_page_meta$l || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DWNCzOML.mjs')
+        component: () => import('./index-BPjHPyid.mjs')
       },
       {
         name: "admin-help-center-faq-categories",
         path: "faq-categories",
         meta: { ...__nuxt_page_meta$k || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./faq-categories-vf7ySv01.mjs')
+        component: () => import('./faq-categories-DvoRkDfX.mjs')
       },
       {
         name: "admin-help-center-article-categories",
         path: "article-categories",
         meta: { ...__nuxt_page_meta$j || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./article-categories-D4HRAILh.mjs')
+        component: () => import('./article-categories-DGjSO_w2.mjs')
       }
     ]
   },
@@ -1545,224 +1804,224 @@ const _routes = [
     name: "mobile-goods-id",
     path: "/mobile/goods/:id()",
     meta: __nuxt_page_meta$h || {},
-    component: () => import('./_id_-CFYlndbk.mjs')
+    component: () => import('./_id_-DNa7CNTe.mjs')
   },
   {
     name: "admin-article-post",
     path: "/admin/article/post",
     meta: { ...__nuxt_page_meta$g || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./post-Du8RyV7J.mjs')
+    component: () => import('./post-Bbgu2ihQ.mjs')
   },
   {
     name: "admin-images",
     path: "/admin/images",
     meta: { ...__nuxt_page_meta$f || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-D29TRMup.mjs')
+    component: () => import('./index-CYqnqFFm.mjs')
   },
   {
     name: "admin-article",
     path: "/admin/article",
     meta: { ...__nuxt_page_meta$e || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-5o2RThUc.mjs')
+    component: () => import('./index-DpfvVwru.mjs')
   },
   {
     name: "admin-banners",
     path: "/admin/banners",
     meta: { ...__nuxt_page_meta$d || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-vJKHb8hj.mjs')
+    component: () => import('./index-vIw9TO6F.mjs')
   },
   {
     name: "admin-refunds",
     path: "/admin/refunds",
     meta: { ...__nuxt_page_meta$c || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-BF9d4ojC.mjs')
+    component: () => import('./index-BjNTZz2q.mjs')
   },
   {
     name: "admin-tickets",
     path: "/admin/tickets",
     meta: { ...__nuxt_page_meta$b || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-CCiZoVnr.mjs')
+    component: () => import('./index-zYc9a32p.mjs')
   },
   {
     name: "mobile-checkout-id",
     path: "/mobile/checkout/:id()",
     meta: __nuxt_page_meta$a || {},
-    component: () => import('./_id_-DrscWduS.mjs')
+    component: () => import('./_id_-BpcQg5ol.mjs')
   },
   {
     name: __nuxt_page_meta$3?.name,
     path: "/admin/backend-settings",
     meta: { ...__nuxt_page_meta$3 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./backend-settings-gnAz70O_.mjs'),
+    component: () => import('./backend-settings-COxidk6k.mjs'),
     children: [
       {
         name: "admin-backend-settings",
         path: "",
         meta: { ...__nuxt_page_meta$9 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-ByP_F9Qz.mjs')
+        component: () => import('./index-DME9Yk-m.mjs')
       },
       {
         name: "admin-backend-settings-contact",
         path: "contact",
         meta: { ...__nuxt_page_meta$8 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./contact-46_C8mtz.mjs')
+        component: () => import('./contact-BrNT0H8I.mjs')
       },
       {
         name: "admin-backend-settings-storage",
         path: "storage",
         meta: { ...__nuxt_page_meta$7 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./storage-COkuBXs8.mjs')
+        component: () => import('./storage-CZEFyESu.mjs')
       },
       {
         name: "admin-backend-settings-scheduler",
         path: "scheduler",
         meta: { ...__nuxt_page_meta$6 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./scheduler-BBIrtD5Y.mjs')
+        component: () => import('./scheduler-BSaN_u15.mjs')
       },
       {
         name: "admin-backend-settings-notification",
         path: "notification",
         meta: { ...__nuxt_page_meta$5 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DyiAA-Pi.mjs')
+        component: () => import('./index-Cw0_LMF7.mjs')
       },
       {
         name: "admin-backend-settings-notification-template-id",
         path: "notification/template/:id()",
         meta: { ...__nuxt_page_meta$4 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./_id_-CY3guHY2.mjs')
+        component: () => import('./_id_-DGqAlw-Q.mjs')
       }
     ]
   },
   {
     name: "mobile-wechat-callback",
     path: "/mobile/wechat-callback",
-    component: () => import('./wechat-callback-C8B2qvdm.mjs')
+    component: () => import('./wechat-callback-CBHBfH6h.mjs')
   },
   {
     name: "admin-article-categories",
     path: "/admin/article/categories",
     meta: { ...__nuxt_page_meta$2 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./categories-Ba8V13mp.mjs')
+    component: () => import('./categories-Bi74rgT7.mjs')
   },
   {
     name: "pc-support-refund-create",
     path: "/pc/support/refund/create",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./create-BuIQv5gg.mjs')
+    component: () => import('./create-BLiUqpw6.mjs')
   },
   {
     name: "admin-tickets-components-TicketChatModal",
     path: "/admin/tickets/components/TicketChatModal",
     meta: { ...__nuxt_page_meta || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./TicketChatModal-JtoCWjjH.mjs').then((n) => n.b)
+    component: () => import('./TicketChatModal-CmvecED6.mjs')
   },
   {
     name: "root-pc-faq",
     path: "/faq",
     meta: __nuxt_page_meta$1V || {},
-    component: () => import('./faq-DK01AEbq.mjs')
+    component: () => import('./faq-DwY5ajpp.mjs')
   },
   {
     name: "root-pc-id",
     path: "/:id()",
     meta: __nuxt_page_meta$1U || {},
-    component: () => import('./_id_-BXcjd5Ph.mjs')
+    component: () => import('./_id_-_lcM85TO.mjs')
   },
   {
     name: "root-pc-about",
     path: "/about",
     meta: __nuxt_page_meta$1T || {},
-    component: () => import('./about-B1XwNVo-.mjs')
+    component: () => import('./about-CAut7xBu.mjs')
   },
   {
     name: "root-pc-policy",
     path: "/policy",
     meta: __nuxt_page_meta$1H || {},
-    component: () => import('./policy-JFwbj4S0.mjs')
+    component: () => import('./policy-BnbPI7mc.mjs')
   },
   {
     name: "root-pc-refund",
     path: "/refund",
     meta: __nuxt_page_meta$1G || {},
-    component: () => import('./refund-B6P-6EHm.mjs')
+    component: () => import('./refund-39vI_i_t.mjs')
   },
   {
     name: "root-pc-company",
     path: "/company",
     meta: __nuxt_page_meta$1F || {},
-    component: () => import('./company-BLf3oTXA.mjs')
+    component: () => import('./company-15BGOJcQ.mjs')
   },
   {
     name: "root-pc-contact",
     path: "/contact",
     meta: __nuxt_page_meta$1E || {},
-    component: () => import('./contact-A7OtRbSU.mjs')
+    component: () => import('./contact-Bt5CiqkK.mjs')
   },
   {
     name: "root-pc-join-us",
     path: "/join-us",
     meta: __nuxt_page_meta$1D || {},
-    component: () => import('./join-us-CMHyks9Y.mjs')
+    component: () => import('./join-us-5AjZMQU0.mjs')
   },
   {
     name: "root-pc-privacy",
     path: "/privacy",
     meta: __nuxt_page_meta$1C || {},
-    component: () => import('./privacy-th8y0ekm.mjs')
+    component: () => import('./privacy-D72d6Toq.mjs')
   },
   {
     name: __nuxt_page_meta$1t?.name,
     path: "/profile",
     meta: __nuxt_page_meta$1t || {},
-    component: () => import('./profile-B_njVmP7.mjs'),
+    component: () => import('./profile-BQQoVYTX.mjs'),
     children: [
       {
         name: "pc-profile",
         path: "",
         meta: __nuxt_page_meta$1B || {},
-        component: () => import('./index-tBKGuUyC.mjs')
+        component: () => import('./index-LHz8Jamn.mjs')
       },
       {
         name: "pc-profile-wallet",
         path: "wallet",
         meta: __nuxt_page_meta$1A || {},
-        component: () => import('./wallet-DDiYkWPL.mjs')
+        component: () => import('./wallet-BWEgksHE.mjs')
       },
       {
         name: "pc-profile-tickets",
         path: "tickets",
         meta: __nuxt_page_meta$1z || {},
-        component: () => import('./tickets-B8dHjEvs.mjs')
+        component: () => import('./tickets-Bdx2IDB0.mjs')
       },
       {
         name: "pc-profile-exchange",
         path: "exchange",
         meta: __nuxt_page_meta$1y || {},
-        component: () => import('./exchange-BFLjbhe2.mjs')
+        component: () => import('./exchange-D1c1Rc2a.mjs')
       },
       {
         name: "pc-profile-messages",
         path: "messages",
         meta: __nuxt_page_meta$1x || {},
-        component: () => import('./messages-DydPcYtN.mjs')
+        component: () => import('./messages-B0ZDNPKL.mjs')
       },
       {
         name: "pc-profile-favorites",
         path: "favorites",
         meta: __nuxt_page_meta$1w || {},
-        component: () => import('./favorites-hedhNRsp.mjs')
+        component: () => import('./favorites-CYvk-UN4.mjs')
       },
       {
         name: "pc-profile-order-id",
         path: "order/:id()",
         meta: __nuxt_page_meta$1v || {},
-        component: () => import('./_id_-BK-BYfnK.mjs')
+        component: () => import('./_id_-BaF8Mwy3.mjs')
       },
       {
         name: "pc-profile-order",
         path: "order",
         meta: __nuxt_page_meta$1u || {},
-        component: () => import('./index-DS-ZJs0d.mjs')
+        component: () => import('./index-98YbJBgQ.mjs')
       }
     ]
   },
@@ -1770,55 +2029,55 @@ const _routes = [
     name: "root-pc-service",
     path: "/service",
     meta: __nuxt_page_meta$1s || {},
-    component: () => import('./service-CCx0IqB6.mjs')
+    component: () => import('./service-lrKAhQSh.mjs')
   },
   {
     name: "root-pc-about-us",
     path: "/about-us",
     meta: __nuxt_page_meta$1f || {},
-    component: () => import('./about-us-CXfQ4mEt.mjs')
+    component: () => import('./about-us-ChouTBAg.mjs')
   },
   {
     name: "root-pc-community",
     path: "/community",
     meta: __nuxt_page_meta$13 || {},
-    component: () => import('./community-BVe4WfOR.mjs')
+    component: () => import('./community-DN389XAO.mjs')
   },
   {
     name: "root-pc-advantages",
     path: "/advantages",
     meta: __nuxt_page_meta$V || {},
-    component: () => import('./advantages-DaLGyTJ1.mjs')
+    component: () => import('./advantages-Dqsi7FWt.mjs')
   },
   {
     name: "root-pc-disclaimer",
     path: "/disclaimer",
     meta: __nuxt_page_meta$U || {},
-    component: () => import('./disclaimer-CqT7Z5i3.mjs')
+    component: () => import('./disclaimer-BocPbvXA.mjs')
   },
   {
     name: "root-pc-goods-id",
     path: "/goods/:id()",
     meta: __nuxt_page_meta$T || {},
-    component: () => import('./_id_-CmXyKxr_.mjs')
+    component: () => import('./_id_-BIJ1cjpK.mjs')
   },
   {
     name: "root-pc-article-id",
     path: "/article/:id()",
     meta: __nuxt_page_meta$r || {},
-    component: () => import('./_id_-oJkUOvLJ.mjs')
+    component: () => import('./_id_-DjYiAPVu.mjs')
   },
   {
     name: "root-pc-checkout-id",
     path: "/checkout/:id()",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./_id_-wHvAdmI8.mjs')
+    component: () => import('./_id_-OUv8snCQ.mjs')
   },
   {
     name: "root-pc-support-refund-create",
     path: "/support/refund/create",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./create-BuIQv5gg.mjs')
+    component: () => import('./create-BLiUqpw6.mjs')
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -1931,11 +2190,20 @@ const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to, from) => {
   });
   return error;
 });
-const loading_45global = /* @__PURE__ */ defineNuxtRouteMiddleware((to, from) => {
-  if (to.path.startsWith("/admin")) {
-    return;
+function injectHead(nuxtApp) {
+  const nuxt = nuxtApp || tryUseNuxtApp();
+  return nuxt?.ssrContext?.head || nuxt?.runWithContext(() => {
+    if (hasInjectionContext()) {
+      return inject(headSymbol);
+    }
+  });
+}
+function useHead(input, options = {}) {
+  const head = injectHead(options.nuxt);
+  if (head) {
+    return useHead$1(input, { head, ...options });
   }
-});
+}
 function useRequestEvent(nuxtApp) {
   nuxtApp ||= useNuxtApp();
   return nuxtApp.ssrContext?.event;
@@ -1946,6 +2214,15 @@ function useRequestFetch() {
 const redirect_45global = /* @__PURE__ */ defineNuxtRouteMiddleware((to, from) => {
   if (to.path === "/admin/orders" || to.path === "/admin/orders/") {
     return navigateTo("/admin/orders/recharge");
+  }
+  if (to.path === "/") {
+    let isMobile = false;
+    {
+      const event = useRequestEvent();
+      const userAgent = event?.node?.req?.headers?.["user-agent"] || "";
+      isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    }
+    return navigateTo(isMobile ? "/mobile" : "/pc");
   }
   {
     const event = useRequestEvent();
@@ -1968,13 +2245,12 @@ const manifest_45route_45rule = /* @__PURE__ */ defineNuxtRouteMiddleware((to) =
 });
 const globalMiddleware = [
   validate,
-  loading_45global,
   redirect_45global,
   manifest_45route_45rule
 ];
 const namedMiddleware = {
-  "client-auth": () => import('./client-auth-5uS7SeRq.mjs'),
-  "mgmt-auth": () => import('./mgmt-auth-D5MsYXGi.mjs')
+  "client-auth": () => import('./client-auth-Tk2ITR1I.mjs'),
+  "mgmt-auth": () => import('./mgmt-auth-M001I7Gz.mjs')
 };
 const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:router",
@@ -2170,11 +2446,159 @@ const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
     return { provide: { router } };
   }
 });
+defineComponent({
+  name: "ServerPlaceholder",
+  render() {
+    return createElementBlock("div");
+  }
+});
+const clientOnlySymbol = /* @__PURE__ */ Symbol.for("nuxt:client-only");
+const __nuxt_component_0$2 = defineComponent({
+  name: "ClientOnly",
+  inheritAttrs: false,
+  props: ["fallback", "placeholder", "placeholderTag", "fallbackTag"],
+  ...false,
+  setup(props, { slots, attrs }) {
+    const mounted = shallowRef(false);
+    const vm = getCurrentInstance();
+    if (vm) {
+      vm._nuxtClientOnly = true;
+    }
+    provide(clientOnlySymbol, true);
+    return () => {
+      if (mounted.value) {
+        const vnodes = slots.default?.();
+        if (vnodes && vnodes.length === 1) {
+          return [cloneVNode(vnodes[0], attrs)];
+        }
+        return vnodes;
+      }
+      const slot = slots.fallback || slots.placeholder;
+      if (slot) {
+        return h(slot);
+      }
+      const fallbackStr = props.fallback || props.placeholder || "";
+      const fallbackTag = props.fallbackTag || props.placeholderTag || "span";
+      return createElementBlock(fallbackTag, attrs, fallbackStr);
+    };
+  }
+});
+const useStateKeyPrefix = "$s";
+function useState(...args) {
+  const autoKey = typeof args[args.length - 1] === "string" ? args.pop() : void 0;
+  if (typeof args[0] !== "string") {
+    args.unshift(autoKey);
+  }
+  const [_key, init] = args;
+  if (!_key || typeof _key !== "string") {
+    throw new TypeError("[nuxt] [useState] key must be a string: " + _key);
+  }
+  if (init !== void 0 && typeof init !== "function") {
+    throw new Error("[nuxt] [useState] init must be a function: " + init);
+  }
+  const key = useStateKeyPrefix + _key;
+  const nuxtApp = useNuxtApp();
+  const state = toRef(nuxtApp.payload.state, key);
+  if (state.value === void 0 && init) {
+    const initialValue = init();
+    if (isRef(initialValue)) {
+      nuxtApp.payload.state[key] = initialValue;
+      return initialValue;
+    }
+    state.value = initialValue;
+  }
+  return state;
+}
+const CookieDefaults = {
+  path: "/",
+  watch: true,
+  decode: (val) => {
+    const decoded = decodeURIComponent(val);
+    const parsed = destr(decoded);
+    if (typeof parsed === "number" && (!Number.isFinite(parsed) || String(parsed) !== decoded)) {
+      return decoded;
+    }
+    return parsed;
+  },
+  encode: (val) => encodeURIComponent(typeof val === "string" ? val : JSON.stringify(val))
+};
+function useCookie(name, _opts) {
+  const opts = { ...CookieDefaults, ..._opts };
+  opts.filter ??= (key) => key === name;
+  const cookies2 = readRawCookies(opts) || {};
+  let delay;
+  if (opts.maxAge !== void 0) {
+    delay = opts.maxAge * 1e3;
+  } else if (opts.expires) {
+    delay = opts.expires.getTime() - Date.now();
+  }
+  const hasExpired = delay !== void 0 && delay <= 0;
+  const cookieValue = klona(hasExpired ? void 0 : cookies2[name] ?? opts.default?.());
+  const cookie = ref(cookieValue);
+  {
+    const nuxtApp = useNuxtApp();
+    const writeFinalCookieValue = () => {
+      if (opts.readonly || isEqual(cookie.value, cookies2[name])) {
+        return;
+      }
+      nuxtApp._cookies ||= {};
+      if (name in nuxtApp._cookies) {
+        if (isEqual(cookie.value, nuxtApp._cookies[name])) {
+          return;
+        }
+      }
+      nuxtApp._cookies[name] = cookie.value;
+      writeServerCookie(useRequestEvent(nuxtApp), name, cookie.value, opts);
+    };
+    const unhook = nuxtApp.hooks.hookOnce("app:rendered", writeFinalCookieValue);
+    nuxtApp.hooks.hookOnce("app:error", () => {
+      unhook();
+      return writeFinalCookieValue();
+    });
+  }
+  return cookie;
+}
+function readRawCookies(opts = {}) {
+  {
+    return parse(getRequestHeader(useRequestEvent(), "cookie") || "", opts);
+  }
+}
+function writeServerCookie(event, name, value, opts = {}) {
+  if (event) {
+    if (value !== null && value !== void 0) {
+      return setCookie(event, name, value, opts);
+    }
+    if (getCookie(event, name) !== void 0) {
+      return deleteCookie(event, name, opts);
+    }
+  }
+}
 function definePayloadReducer(name, reduce) {
   {
     useNuxtApp().ssrContext["~payloadReducers"][name] = reduce;
   }
 }
+const _0_siteConfig_tU0SxKrPeVRXWcGu2sOnIfhNDbYiKNfDCvYZhRueG0Q = /* @__PURE__ */ defineNuxtPlugin({
+  name: "nuxt-site-config:init",
+  enforce: "pre",
+  async setup(nuxtApp) {
+    const stack = useRequestEvent()?.context?.siteConfig;
+    const state = useState("site-config");
+    {
+      nuxtApp.hooks.hook("app:rendered", () => {
+        state.value = stack?.get({
+          debug: (/* @__PURE__ */ useRuntimeConfig())["nuxt-site-config"].debug,
+          resolveRefs: true
+        });
+      });
+    }
+    return {
+      provide: {
+        nuxtSiteConfig: stack
+      }
+    };
+  }
+});
 const reducers = [
   ["NuxtError", (data) => isNuxtError(data) && data.toJSON()],
   ["EmptyShallowRef", (data) => isRef(data) && isShallow(data) && !data.value && (typeof data.value === "bigint" ? "0n" : JSON.stringify(data.value) || "_")],
@@ -2536,133 +2960,6 @@ function defineStore(idOrOptions, setup, setupOptions) {
   useStore.$id = id;
   return useStore;
 }
-defineComponent({
-  name: "ServerPlaceholder",
-  render() {
-    return createElementBlock("div");
-  }
-});
-const clientOnlySymbol = /* @__PURE__ */ Symbol.for("nuxt:client-only");
-const __nuxt_component_0$2 = defineComponent({
-  name: "ClientOnly",
-  inheritAttrs: false,
-  props: ["fallback", "placeholder", "placeholderTag", "fallbackTag"],
-  ...false,
-  setup(props, { slots, attrs }) {
-    const mounted = shallowRef(false);
-    const vm = getCurrentInstance();
-    if (vm) {
-      vm._nuxtClientOnly = true;
-    }
-    provide(clientOnlySymbol, true);
-    return () => {
-      if (mounted.value) {
-        const vnodes = slots.default?.();
-        if (vnodes && vnodes.length === 1) {
-          return [cloneVNode(vnodes[0], attrs)];
-        }
-        return vnodes;
-      }
-      const slot = slots.fallback || slots.placeholder;
-      if (slot) {
-        return h(slot);
-      }
-      const fallbackStr = props.fallback || props.placeholder || "";
-      const fallbackTag = props.fallbackTag || props.placeholderTag || "span";
-      return createElementBlock(fallbackTag, attrs, fallbackStr);
-    };
-  }
-});
-const useStateKeyPrefix = "$s";
-function useState(...args) {
-  const autoKey = typeof args[args.length - 1] === "string" ? args.pop() : void 0;
-  if (typeof args[0] !== "string") {
-    args.unshift(autoKey);
-  }
-  const [_key, init] = args;
-  if (!_key || typeof _key !== "string") {
-    throw new TypeError("[nuxt] [useState] key must be a string: " + _key);
-  }
-  if (init !== void 0 && typeof init !== "function") {
-    throw new Error("[nuxt] [useState] init must be a function: " + init);
-  }
-  const key = useStateKeyPrefix + _key;
-  const nuxtApp = useNuxtApp();
-  const state = toRef(nuxtApp.payload.state, key);
-  if (state.value === void 0 && init) {
-    const initialValue = init();
-    if (isRef(initialValue)) {
-      nuxtApp.payload.state[key] = initialValue;
-      return initialValue;
-    }
-    state.value = initialValue;
-  }
-  return state;
-}
-const CookieDefaults = {
-  path: "/",
-  watch: true,
-  decode: (val) => {
-    const decoded = decodeURIComponent(val);
-    const parsed = destr(decoded);
-    if (typeof parsed === "number" && (!Number.isFinite(parsed) || String(parsed) !== decoded)) {
-      return decoded;
-    }
-    return parsed;
-  },
-  encode: (val) => encodeURIComponent(typeof val === "string" ? val : JSON.stringify(val))
-};
-function useCookie(name, _opts) {
-  const opts = { ...CookieDefaults, ..._opts };
-  opts.filter ??= (key) => key === name;
-  const cookies2 = readRawCookies(opts) || {};
-  let delay;
-  if (opts.maxAge !== void 0) {
-    delay = opts.maxAge * 1e3;
-  } else if (opts.expires) {
-    delay = opts.expires.getTime() - Date.now();
-  }
-  const hasExpired = delay !== void 0 && delay <= 0;
-  const cookieValue = klona(hasExpired ? void 0 : cookies2[name] ?? opts.default?.());
-  const cookie = ref(cookieValue);
-  {
-    const nuxtApp = useNuxtApp();
-    const writeFinalCookieValue = () => {
-      if (opts.readonly || isEqual(cookie.value, cookies2[name])) {
-        return;
-      }
-      nuxtApp._cookies ||= {};
-      if (name in nuxtApp._cookies) {
-        if (isEqual(cookie.value, nuxtApp._cookies[name])) {
-          return;
-        }
-      }
-      nuxtApp._cookies[name] = cookie.value;
-      writeServerCookie(useRequestEvent(nuxtApp), name, cookie.value, opts);
-    };
-    const unhook = nuxtApp.hooks.hookOnce("app:rendered", writeFinalCookieValue);
-    nuxtApp.hooks.hookOnce("app:error", () => {
-      unhook();
-      return writeFinalCookieValue();
-    });
-  }
-  return cookie;
-}
-function readRawCookies(opts = {}) {
-  {
-    return parse(getRequestHeader(useRequestEvent(), "cookie") || "", opts);
-  }
-}
-function writeServerCookie(event, name, value, opts = {}) {
-  if (event) {
-    if (value !== null && value !== void 0) {
-      return setCookie(event, name, value, opts);
-    }
-    if (getCookie(event, name) !== void 0) {
-      return deleteCookie(event, name, opts);
-    }
-  }
-}
 const plugin = /* @__PURE__ */ defineNuxtPlugin({
   name: "pinia",
   setup(nuxtApp) {
@@ -2681,6 +2978,25 @@ const plugin = /* @__PURE__ */ defineNuxtPlugin({
 });
 const components_plugin_z4hgvsiddfKkfXTP6M8M4zG5Cb7sGnDhcryKVM45Di4 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:global-components"
+});
+const robot_meta_server_bRHpso_4KN_Ec3RJzqCvbuvfZsNOeE_4TgpL8dCNuwk = /* @__PURE__ */ defineNuxtPlugin({
+  setup() {
+    const event = useRequestEvent();
+    const ctx = event?.context?.robots;
+    event?.context?.robotsProduction;
+    if (!ctx)
+      return;
+    useHead({
+      meta: [
+        {
+          "name": "robots",
+          "content": () => ctx.rule || "",
+          "data-hint": () => void 0,
+          "data-production-content": () => void 0
+        }
+      ]
+    });
+  }
 });
 const element_plus_teleports_plugin_3k7A_fjEiCzFRl6aN3qftblOS_EZCmhIb_4gXrhvbuY = /* @__PURE__ */ defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook("app:rendered", (ctx) => {
@@ -2856,11 +3172,11 @@ const kindOf = /* @__PURE__ */ ((cache) => (thing) => {
   const str = toString.call(thing);
   return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
 })(/* @__PURE__ */ Object.create(null));
-const kindOfTest = (type) => {
-  type = type.toLowerCase();
-  return (thing) => kindOf(thing) === type;
+const kindOfTest = (type2) => {
+  type2 = type2.toLowerCase();
+  return (thing) => kindOf(thing) === type2;
 };
-const typeOfTest = (type) => (thing) => typeof thing === type;
+const typeOfTest = (type2) => (thing) => typeof thing === type2;
 const { isArray } = Array;
 const isUndefined = typeOfTest("undefined");
 function isBuffer(val) {
@@ -2909,7 +3225,12 @@ const isFormData = (thing) => {
   kind === "object" && isFunction$1(thing.toString) && thing.toString() === "[object FormData]"));
 };
 const isURLSearchParams = kindOfTest("URLSearchParams");
-const [isReadableStream, isRequest, isResponse, isHeaders] = ["ReadableStream", "Request", "Response", "Headers"].map(kindOfTest);
+const [isReadableStream, isRequest, isResponse, isHeaders] = [
+  "ReadableStream",
+  "Request",
+  "Response",
+  "Headers"
+].map(kindOfTest);
 const trim = (str) => str.trim ? str.trim() : str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
 function forEach(obj, fn, { allOwnKeys = false } = {}) {
   if (obj === null || typeof obj === "undefined") {
@@ -2962,6 +3283,9 @@ function merge() {
   const { caseless, skipUndefined } = isContextDefined(this) && this || {};
   const result = {};
   const assignValue = (val, key) => {
+    if (key === "__proto__" || key === "constructor" || key === "prototype") {
+      return;
+    }
     const targetKey = caseless && findKey(result, key) || key;
     if (isPlainObject(result[targetKey]) && isPlainObject(val)) {
       result[targetKey] = merge(result[targetKey], val);
@@ -2979,23 +3303,27 @@ function merge() {
   return result;
 }
 const extend = (a, b, thisArg, { allOwnKeys } = {}) => {
-  forEach(b, (val, key) => {
-    if (thisArg && isFunction$1(val)) {
-      Object.defineProperty(a, key, {
-        value: bind(val, thisArg),
-        writable: true,
-        enumerable: true,
-        configurable: true
-      });
-    } else {
-      Object.defineProperty(a, key, {
-        value: val,
-        writable: true,
-        enumerable: true,
-        configurable: true
-      });
-    }
-  }, { allOwnKeys });
+  forEach(
+    b,
+    (val, key) => {
+      if (thisArg && isFunction$1(val)) {
+        Object.defineProperty(a, key, {
+          value: bind(val, thisArg),
+          writable: true,
+          enumerable: true,
+          configurable: true
+        });
+      } else {
+        Object.defineProperty(a, key, {
+          value: val,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        });
+      }
+    },
+    { allOwnKeys }
+  );
   return a;
 };
 const stripBOM = (content) => {
@@ -3005,7 +3333,10 @@ const stripBOM = (content) => {
   return content;
 };
 const inherits = (constructor, superConstructor, props, descriptors) => {
-  constructor.prototype = Object.create(superConstructor.prototype, descriptors);
+  constructor.prototype = Object.create(
+    superConstructor.prototype,
+    descriptors
+  );
   Object.defineProperty(constructor.prototype, "constructor", {
     value: constructor,
     writable: true,
@@ -3082,12 +3413,9 @@ const matchAll = (regExp, str) => {
 };
 const isHTMLForm = kindOfTest("HTMLFormElement");
 const toCamelCase = (str) => {
-  return str.toLowerCase().replace(
-    /[-_\s]([a-z\d])(\w*)/g,
-    function replacer(m, p1, p2) {
-      return p1.toUpperCase() + p2;
-    }
-  );
+  return str.toLowerCase().replace(/[-_\s]([a-z\d])(\w*)/g, function replacer(m, p1, p2) {
+    return p1.toUpperCase() + p2;
+  });
 };
 const hasOwnProperty = (({ hasOwnProperty: hasOwnProperty2 }) => (obj, prop) => hasOwnProperty2.call(obj, prop))(Object.prototype);
 const isRegExp = kindOfTest("RegExp");
@@ -3171,20 +3499,21 @@ const _setImmediate = ((setImmediateSupported, postMessageSupported) => {
     return setImmediate;
   }
   return postMessageSupported ? ((token, callbacks) => {
-    _global.addEventListener("message", ({ source, data }) => {
-      if (source === _global && data === token) {
-        callbacks.length && callbacks.shift()();
-      }
-    }, false);
+    _global.addEventListener(
+      "message",
+      ({ source, data }) => {
+        if (source === _global && data === token) {
+          callbacks.length && callbacks.shift()();
+        }
+      },
+      false
+    );
     return (cb) => {
       callbacks.push(cb);
       _global.postMessage(token, "*");
     };
   })(`axios@${Math.random()}`, []) : (cb) => setTimeout(cb);
-})(
-  typeof setImmediate === "function",
-  isFunction$1(_global.postMessage)
-);
+})(typeof setImmediate === "function", isFunction$1(_global.postMessage));
 const asap = typeof queueMicrotask !== "undefined" ? queueMicrotask.bind(_global) : typeof process !== "undefined" && process.nextTick || _setImmediate;
 const isIterable = (thing) => thing != null && isFunction$1(thing[iterator]);
 const utils$1 = {
@@ -3544,7 +3873,8 @@ class InterceptorManager {
 const transitionalDefaults = {
   silentJSONParsing: true,
   forcedJSONParsing: true,
-  clarifyTimeoutError: false
+  clarifyTimeoutError: false,
+  legacyInterceptorReqResOrdering: true
 };
 const URLSearchParams = require$$7.URLSearchParams;
 const ALPHA = "abcdefghijklmnopqrstuvwxyz";
@@ -4077,6 +4407,9 @@ function settle(resolve, reject, response) {
   }
 }
 function isAbsoluteURL(url2) {
+  if (typeof url2 !== "string") {
+    return false;
+  }
   return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url2);
 }
 function combineURLs(baseURL2, relativeURL) {
@@ -4089,7 +4422,7 @@ function buildFullPath(baseURL2, requestedURL, allowAbsoluteUrls) {
   }
   return requestedURL;
 }
-const VERSION$1 = "1.13.4";
+const VERSION$1 = "1.13.5";
 function parseProtocol(url2) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url2);
   return match && match[1] || "";
@@ -5243,11 +5576,16 @@ function mergeConfig$1(config1, config2) {
     validateStatus: mergeDirectKeys,
     headers: (a, b, prop) => mergeDeepProperties(headersToObject(a), headersToObject(b), prop, true)
   };
-  utils$1.forEach(Object.keys({ ...config1, ...config2 }), function computeConfigValue(prop) {
-    const merge2 = mergeMap[prop] || mergeDeepProperties;
-    const configValue = merge2(config1[prop], config2[prop], prop);
-    utils$1.isUndefined(configValue) && merge2 !== mergeDirectKeys || (config[prop] = configValue);
-  });
+  utils$1.forEach(
+    Object.keys({ ...config1, ...config2 }),
+    function computeConfigValue(prop) {
+      if (prop === "__proto__" || prop === "constructor" || prop === "prototype")
+        return;
+      const merge2 = utils$1.hasOwnProp(mergeMap, prop) ? mergeMap[prop] : mergeDeepProperties;
+      const configValue = merge2(config1[prop], config2[prop], prop);
+      utils$1.isUndefined(configValue) && merge2 !== mergeDirectKeys || (config[prop] = configValue);
+    }
+  );
   return config;
 }
 const resolveConfig = (config) => {
@@ -5442,13 +5780,13 @@ const factory = (env) => {
     stream: supportsResponseStream && ((res) => res.body)
   };
   isFetchSupported && (() => {
-    ["text", "arrayBuffer", "blob", "formData", "stream"].forEach((type) => {
-      !resolvers[type] && (resolvers[type] = (res, config) => {
-        let method = res && res[type];
+    ["text", "arrayBuffer", "blob", "formData", "stream"].forEach((type2) => {
+      !resolvers[type2] && (resolvers[type2] = (res, config) => {
+        let method = res && res[type2];
         if (method) {
           return method.call(res);
         }
-        throw new AxiosError$1(`Response type '${type}' is not supported`, AxiosError$1.ERR_NOT_SUPPORT, config);
+        throw new AxiosError$1(`Response type '${type2}' is not supported`, AxiosError$1.ERR_NOT_SUPPORT, config);
       });
     });
   })();
@@ -5573,13 +5911,13 @@ const factory = (env) => {
       unsubscribe && unsubscribe();
       if (err && err.name === "TypeError" && /Load failed|fetch/i.test(err.message)) {
         throw Object.assign(
-          new AxiosError$1("Network Error", AxiosError$1.ERR_NETWORK, config, request),
+          new AxiosError$1("Network Error", AxiosError$1.ERR_NETWORK, config, request, err && err.response),
           {
             cause: err.cause || err
           }
         );
       }
-      throw AxiosError$1.from(err, err && err.code, config, request);
+      throw AxiosError$1.from(err, err && err.code, config, request, err && err.response);
     }
   };
 };
@@ -5709,9 +6047,9 @@ function dispatchRequest(config) {
   });
 }
 const validators$1 = {};
-["object", "boolean", "number", "function", "string", "symbol"].forEach((type, i) => {
-  validators$1[type] = function validator2(thing) {
-    return typeof thing === type || "a" + (i < 1 ? "n " : " ") + type;
+["object", "boolean", "number", "function", "string", "symbol"].forEach((type2, i) => {
+  validators$1[type2] = function validator2(thing) {
+    return typeof thing === type2 || "a" + (i < 1 ? "n " : " ") + type2;
   };
 });
 const deprecatedWarnings = {};
@@ -5820,7 +6158,8 @@ let Axios$1 = class Axios {
       validator.assertOptions(transitional2, {
         silentJSONParsing: validators.transitional(validators.boolean),
         forcedJSONParsing: validators.transitional(validators.boolean),
-        clarifyTimeoutError: validators.transitional(validators.boolean)
+        clarifyTimeoutError: validators.transitional(validators.boolean),
+        legacyInterceptorReqResOrdering: validators.transitional(validators.boolean)
       }, false);
     }
     if (paramsSerializer != null) {
@@ -5864,7 +6203,13 @@ let Axios$1 = class Axios {
         return;
       }
       synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
-      requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+      const transitional3 = config.transitional || transitionalDefaults;
+      const legacyInterceptorReqResOrdering = transitional3 && transitional3.legacyInterceptorReqResOrdering;
+      if (legacyInterceptorReqResOrdering) {
+        requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
+      } else {
+        requestInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
+      }
     });
     const responseInterceptorChain = [];
     this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
@@ -6260,9 +6605,11 @@ const directives_Y6D8IjviQKB3EteSmgkh6nr8GGru_rC_DjhQ3lLa_GM = /* @__PURE__ */ d
 const plugins = [
   unhead_k2P3m_ZDyjlr2mMYnoDPwavjsDN8hBlk9cFai0bbopU,
   plugin$1,
+  _0_siteConfig_tU0SxKrPeVRXWcGu2sOnIfhNDbYiKNfDCvYZhRueG0Q,
   revive_payload_server_MVtmlZaQpj6ApFmshWfUWl5PehCebzaBf2NuRMiIbms,
   plugin,
   components_plugin_z4hgvsiddfKkfXTP6M8M4zG5Cb7sGnDhcryKVM45Di4,
+  robot_meta_server_bRHpso_4KN_Ec3RJzqCvbuvfZsNOeE_4TgpL8dCNuwk,
   element_plus_teleports_plugin_3k7A_fjEiCzFRl6aN3qftblOS_EZCmhIb_4gXrhvbuY,
   element_plus_injection_plugin_LfLkpoHjV8s4Q4lRVuq_y_LbzJB5vFvehZzxqpiP_nk,
   axios_nKQInGxkjkGyJUCE2J7W14opqRZSZPNVns2t0UtSgnM,
@@ -6399,43 +6746,57 @@ const __nuxt_component_0$1 = defineComponent({
     }, slots);
   }
 });
+const visible = ref(false);
+const text = ref("Loading...");
+const type = ref("loading");
+function useGlobalLoading() {
+  const show = (loadingText = "Loading...") => {
+    visible.value = true;
+    text.value = loadingText;
+    type.value = "loading";
+  };
+  const hide = () => {
+    visible.value = false;
+  };
+  const success = (successText = "Success!", duration = 1500) => {
+    text.value = successText;
+    type.value = "success";
+    visible.value = true;
+    setTimeout(() => {
+      hide();
+    }, duration);
+  };
+  const error = (errorText = "Error", duration = 2e3) => {
+    text.value = errorText;
+    type.value = "error";
+    visible.value = true;
+    setTimeout(() => {
+      hide();
+    }, duration);
+  };
+  return {
+    visible: readonly(visible),
+    text: readonly(text),
+    type: readonly(type),
+    show,
+    hide,
+    success,
+    error
+  };
+}
 const _sfc_main$3 = /* @__PURE__ */ defineComponent({
-  __name: "GlobalLoader",
+  __name: "GlobalLoading",
   __ssrInlineRender: true,
-  props: {
-    loading: { type: Boolean },
-    variant: { default: "initial" }
-  },
   setup(__props) {
+    const { visible: visible2, text: text2 } = useGlobalLoading();
     return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(mergeProps({
-        class: ["global-loader", [
-          { "is-hidden": !__props.loading },
-          `mode-${__props.variant}`
-        ]]
-      }, _attrs))} data-v-1d9905f3>`);
-      if (__props.variant === "initial") {
-        _push(`<div class="bg-grid" data-v-1d9905f3></div>`);
-      } else {
-        _push(`<!---->`);
-      }
-      if (__props.variant === "initial") {
-        _push(`<div class="bg-radial" data-v-1d9905f3></div>`);
-      } else {
-        _push(`<!---->`);
-      }
-      if (__props.variant === "navigation") {
-        _push(`<div class="bg-glass" data-v-1d9905f3></div>`);
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`<div class="loader-content" data-v-1d9905f3><div class="spinner-container" data-v-1d9905f3><div class="ring outer-ring" data-v-1d9905f3></div><div class="ring inner-ring" data-v-1d9905f3></div></div>`);
-      if (__props.variant === "initial") {
-        _push(`<h1 class="brand-name" data-v-1d9905f3>FanTula</h1>`);
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div></div>`);
+      ssrRenderTeleport(_push, (_push2) => {
+        if (unref(visible2)) {
+          _push2(`<div class="global-loading-overlay" data-v-a50c39a5><div class="glass-panel" data-v-a50c39a5><div class="spinner-container" data-v-a50c39a5><div class="spinner" data-v-a50c39a5></div></div><div class="loading-text" data-v-a50c39a5>${ssrInterpolate(unref(text2))}</div></div></div>`);
+        } else {
+          _push2(`<!---->`);
+        }
+      }, "body", false, _parent);
     };
   }
 });
@@ -6449,14 +6810,14 @@ const _export_sfc = (sfc, props) => {
 const _sfc_setup$3 = _sfc_main$3.setup;
 _sfc_main$3.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/shared/GlobalLoader.vue");
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/shared/GlobalLoading.vue");
   return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
 };
-const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-1d9905f3"]]);
+const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-a50c39a5"]]);
 const layouts = {
-  mgmt: defineAsyncComponent(() => import('./mgmt-BIFB7fTL.mjs').then((m) => m.default || m)),
-  mobile: defineAsyncComponent(() => import('./mobile-DoDwxsEC.mjs').then((m) => m.default || m)),
-  pc: defineAsyncComponent(() => import('./pc-DiyWcfe_.mjs').then((m) => m.default || m))
+  mgmt: defineAsyncComponent(() => import('./mgmt-CsqWBipg.mjs').then((m) => m.default || m)),
+  mobile: defineAsyncComponent(() => import('./mobile-B3pu23sr.mjs').then((m) => m.default || m)),
+  pc: defineAsyncComponent(() => import('./pc-D-Xp3T-9.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({
@@ -6670,57 +7031,38 @@ function normalizeSlot(slot, data) {
   const slotContent = slot(data);
   return slotContent.length === 1 ? h(slotContent[0]) : h(Fragment, void 0, slotContent);
 }
-const usePageLoading = () => {
-  const isLoading = useState("global-loading", () => true);
-  const loadingVariant = useState("global-loading-variant", () => "initial");
-  const startLoading = (variant = "navigation") => {
-    loadingVariant.value = variant;
-    isLoading.value = true;
-  };
-  const stopLoading = () => {
-    setTimeout(() => {
-      isLoading.value = false;
-    }, 100);
-  };
-  return {
-    isLoading,
-    loadingVariant,
-    startLoading,
-    stopLoading
-  };
-};
 const _sfc_main$2 = /* @__PURE__ */ defineComponent({
   __name: "app",
   __ssrInlineRender: true,
   setup(__props) {
-    const { isLoading, loadingVariant, stopLoading } = usePageLoading();
-    const nuxtApp = useNuxtApp();
-    const route = useRoute();
-    const isMobile = computed(() => route.path.startsWith("/mobile"));
-    nuxtApp.hook("page:finish", () => {
-      if (loadingVariant.value === "navigation") {
-        stopLoading();
-      }
-    });
+    const GlobalLoader = defineAsyncComponent(() => import('./GlobalLoader-0UX4yygD.mjs'));
+    useRoute$1();
+    const showGlobalLoader = ref(false);
+    const handleLoaderFinish = () => {
+      setTimeout(() => {
+        showGlobalLoader.value = false;
+      }, 4e3);
+    };
     return (_ctx, _push, _parent, _attrs) => {
       const _component_NuxtLoadingIndicator = __nuxt_component_0$1;
-      const _component_GlobalLoader = __nuxt_component_1;
+      const _component_GlobalLoading = __nuxt_component_1;
       const _component_NuxtLayout = __nuxt_component_2;
       const _component_NuxtPage = __nuxt_component_0;
       _push(`<!--[-->`);
+      if (showGlobalLoader.value) {
+        _push(ssrRenderComponent(unref(GlobalLoader), {
+          loading: showGlobalLoader.value,
+          onFinish: handleLoaderFinish
+        }, null, _parent));
+      } else {
+        _push(`<!---->`);
+      }
       _push(ssrRenderComponent(_component_NuxtLoadingIndicator, {
         color: "#3B82F6",
         height: 3,
         throttle: 200
       }, null, _parent));
-      if (!unref(isMobile)) {
-        _push(ssrRenderComponent(_component_GlobalLoader, {
-          loading: unref(isLoading) && unref(loadingVariant) === "initial",
-          variant: "initial"
-        }, null, _parent));
-      } else {
-        _push(`<!---->`);
-      }
+      _push(ssrRenderComponent(_component_GlobalLoading, null, null, _parent));
       _push(ssrRenderComponent(_component_NuxtLayout, null, {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
@@ -6743,34 +7085,34 @@ _sfc_main$2.setup = (props, ctx) => {
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("app.vue");
   return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
 };
-const _sfc_main$1 = {
-  __name: "nuxt-error-page",
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "error",
   __ssrInlineRender: true,
   props: {
     error: Object
   },
   setup(__props) {
     const props = __props;
-    const _error = props.error;
-    const status = Number(_error.statusCode || 500);
-    const is404 = status === 404;
-    const statusText = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
-    const description = _error.message || _error.toString();
-    const stack = void 0;
-    const _Error404 = defineAsyncComponent(() => import('./error-404-CaFiwFvH.mjs'));
-    const _Error = defineAsyncComponent(() => import('./error-500-DTq_Nb_1.mjs'));
-    const ErrorTemplate = is404 ? _Error404 : _Error;
+    const errorTitle = computed(() => {
+      if (props.error.statusCode === 404) return "页面未找到";
+      return "发生了一些错误";
+    });
+    const errorDescription = computed(() => {
+      if (props.error.statusCode === 404) return "抱歉，您访问的页面不存在或已被移除。";
+      return "服务器遇到了一点问题，请稍后再试。";
+    });
     return (_ctx, _push, _parent, _attrs) => {
-      _push(ssrRenderComponent(unref(ErrorTemplate), mergeProps({ status: unref(status), statusText: unref(statusText), statusCode: unref(status), statusMessage: unref(statusText), description: unref(description), stack: unref(stack) }, _attrs), null, _parent));
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "error-page" }, _attrs))} data-v-252d77ad><div class="error-content" data-v-252d77ad><div class="error-code" data-v-252d77ad>${ssrInterpolate(__props.error.statusCode)}</div><h1 class="error-title" data-v-252d77ad>${ssrInterpolate(unref(errorTitle))}</h1><p class="error-desc" data-v-252d77ad>${ssrInterpolate(unref(errorDescription))}</p><div class="actions" data-v-252d77ad><button class="home-btn" data-v-252d77ad>返回首页</button></div></div></div>`);
     };
   }
-};
+});
 const _sfc_setup$1 = _sfc_main$1.setup;
 _sfc_main$1.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/nuxt/dist/app/components/nuxt-error-page.vue");
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("error.vue");
   return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
 };
+const ErrorComponent = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-252d77ad"]]);
 const _sfc_main = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
@@ -6799,7 +7141,7 @@ const _sfc_main = {
           if (unref(abortRender)) {
             _push(`<div></div>`);
           } else if (unref(error)) {
-            _push(ssrRenderComponent(unref(_sfc_main$1), { error: unref(error) }, null, _parent));
+            _push(ssrRenderComponent(unref(ErrorComponent), { error: unref(error) }, null, _parent));
           } else if (unref(islandContext)) {
             _push(ssrRenderComponent(unref(IslandRenderer), { context: unref(islandContext) }, null, _parent));
           } else if (unref(SingleRenderer)) {
@@ -6839,5 +7181,5 @@ let entry;
 }
 const entry_default = ((ssrContext) => entry(ssrContext));
 
-export { __nuxt_component_0 as A, __nuxt_component_0$2 as B, isPropAbsent as C, useGetDerivedNamespace as D, useIdInjection as E, isEmpty as F, useState as G, usePageLoading as H, asyncDataDefaults as I, createError as J, fetchDefaults as K, useRequestFetch as L, defineNuxtRouteMiddleware as M, ID_INJECTION_KEY as N, ZINDEX_INJECTION_KEY as Z, _export_sfc as _, useNuxtApp as a, useRuntimeConfig as b, nuxtLinkDefaults as c, isStringNumber as d, entry_default as default, encodeRoutePath as e, debugWarn as f, useNamespace as g, useRoute as h, isNumber$1 as i, defineStore as j, useCookie as k, isBoolean$1 as l, isElement as m, navigateTo as n, namespaceContextKey as o, defaultNamespace as p, useZIndex as q, resolveRouteObject as r, defaultInitialZIndex as s, tryUseNuxtApp as t, useRouter as u, useId as v, isUndefined$1 as w, isWindow as x, throwError as y, zIndexContextKey as z };
+export { throwError as A, __nuxt_component_0 as B, __nuxt_component_0$2 as C, isPropAbsent as D, useGetDerivedNamespace as E, useIdInjection as F, isEmpty as G, useState as H, asyncDataDefaults as I, createError as J, fetchDefaults as K, useRequestFetch as L, defineNuxtRouteMiddleware as M, ID_INJECTION_KEY as N, ZINDEX_INJECTION_KEY as Z, _export_sfc as _, isStringNumber as a, useNamespace as b, useRoute as c, debugWarn as d, entry_default as default, defineStore as e, useRouter as f, encodeRoutePath as g, useNuxtApp as h, isNumber$1 as i, useRuntimeConfig as j, nuxtLinkDefaults as k, useGlobalLoading as l, useCookie as m, navigateTo as n, isBoolean$1 as o, isElement as p, namespaceContextKey as q, resolveRouteObject as r, defaultNamespace as s, useZIndex as t, useHead as u, defaultInitialZIndex as v, useId as w, isUndefined$1 as x, isWindow as y, zIndexContextKey as z };
 //# sourceMappingURL=server.mjs.map

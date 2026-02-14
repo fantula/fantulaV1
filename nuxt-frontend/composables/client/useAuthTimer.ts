@@ -37,7 +37,7 @@ export function useAuthTimer() {
     function start(seconds: number, key: string, isNew = true) {
         countdown.value = seconds
 
-        if (isNew) {
+        if (isNew && typeof window !== 'undefined') {
             const endTime = Date.now() + seconds * 1000
             localStorage.setItem(key, endTime.toString())
         }
@@ -61,7 +61,9 @@ export function useAuthTimer() {
             timerInterval = null
         }
         countdown.value = 0
-        localStorage.removeItem(key)
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(key)
+        }
     }
 
     onUnmounted(() => {

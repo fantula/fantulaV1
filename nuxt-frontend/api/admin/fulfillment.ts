@@ -1,4 +1,4 @@
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 import type { OrderFulfillment } from '@/types/order'
 
 export interface FulfillmentResult {
@@ -13,7 +13,7 @@ export const adminFulfillmentApi = {
      */
     async getOrderFulfillment(orderId: string): Promise<FulfillmentResult> {
         try {
-            const client = getAdminSupabaseClient()
+            const client = getSupabaseClient()
             const { data, error } = await client
                 .from('order_fulfillments')
                 .select('*')
@@ -37,7 +37,7 @@ export const adminFulfillmentApi = {
      */
     async approveFulfillment(fulfillmentId: string, orderId: string): Promise<{ success: boolean; error?: string }> {
         try {
-            const client = getAdminSupabaseClient()
+            const client = getSupabaseClient()
 
             // 1. Update fulfillment status
             const { error: fulfillmentError } = await client
@@ -73,7 +73,7 @@ export const adminFulfillmentApi = {
      */
     async rejectFulfillment(fulfillmentId: string, reason: string): Promise<{ success: boolean; error?: string }> {
         try {
-            const client = getAdminSupabaseClient()
+            const client = getSupabaseClient()
             const { error } = await client
                 .from('order_fulfillments')
                 .update({

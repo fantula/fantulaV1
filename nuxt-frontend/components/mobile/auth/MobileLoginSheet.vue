@@ -249,13 +249,14 @@ const oauth = (provider: string) => {
 const onWechatLogin = () => {
     // 检测是否在微信浏览器内
     const isWechat = /MicroMessenger/i.test(navigator.userAgent)
-    
+
     if (!isWechat) {
         warning('请在微信内打开此页面使用微信登录')
         return
     }
-    
-    // 构建 OAuth 授权 URL 并跳转
+
+    // 不显示loading，直接跳转（避免双动画）
+    // OAuth跳转过程中浏览器会自然显示加载状态
     const redirectUri = window.location.origin + '/mobile/wechat-callback'
     const authUrl = wechatLoginApi.getOAuthUrl(redirectUri, 'login')
     window.location.href = authUrl

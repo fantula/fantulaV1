@@ -6,16 +6,22 @@
     />
 
     <!-- Content Scroll -->
-    <div class="content-scroll no-scrollbar" ref="scrollContainer" @scroll="handleScroll">
-      
+    <div
+      class="content-scroll no-scrollbar"
+      ref="scrollContainer"
+      @scroll="handleScroll"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+    >
+
       <!-- 1. Banners -->
-      <!-- 1. Banners -->
-      <HomeBanner 
-        :banners="banners" 
+      <HomeBanner
+        :banners="banners"
         :loading="bannerLoading"
       />
 
-    <!-- 2. Categories -->
+      <!-- 2. Categories -->
       <HomeCategoryNav 
         :categories="categories"
         :model-value="activeCategoryId"
@@ -33,12 +39,7 @@
       </div>
 
       <!-- 3. Goods List -->
-      <div 
-        class="goods-list-section"
-        @touchstart="handleTouchStart"
-        @touchmove="handleTouchMove"
-        @touchend="handleTouchEnd"
-      >
+      <div class="goods-list-section">
         
         <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
            <ProductCardSkeleton v-for="i in 6" :key="i" />
@@ -103,16 +104,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
+import { ref, onMounted, onUnmounted, defineAsyncComponent, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowUpBold } from '@element-plus/icons-vue'
-// import { commonApi } from '@/api/client/common' // Removed
-// import { goodsApi } from '@/api/client/goods' // Removed
 import { wechatLoginApi } from '@/api/client/wechat-login'
-// import { useSimpleCache } from '@/composables/shared/useSimpleCache' // Removed
-import { usePageLoading } from '@/composables/usePageLoading'
 import { useUserStore } from '@/stores/client/user'
-// import type { Banner, Goods, GoodsCategory } from '@/types/api' // Removed
 import { useHomeData } from '@/composables/client/useHomeData'
 
 // Components
@@ -131,8 +127,6 @@ definePageMeta({
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
-// const { getCache, setCache } = useSimpleCache() // Removed
-const { startLoading, stopLoading } = usePageLoading()
 
 // Shared Logic from Composable
 const { 
@@ -163,6 +157,7 @@ const selectedGoodsId = ref<string | number>('')
 const pullDistance = ref(0)
 const isRefreshing = ref(false)
 const startY = ref(0)
+const hasVibrated = ref(false)
 const PULL_THRESHOLD = 60
 const MAX_PULL = 120
 
@@ -170,6 +165,10 @@ const pullText = computed(() => {
   if (isRefreshing.value) return 'Refreshing...'
   return pullDistance.value > PULL_THRESHOLD ? 'Release to Refresh' : 'Pull to Refresh'
 })
+
+// RAF optimization for pull to refresh
+let rafId: number | null = null
+let lastTouchY = 0
 
 // Refs for IntersectionObserver
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -190,73 +189,134 @@ const handleCategoryChange = async (categoryId: string | number) => {
 }
 
 // 设置 IntersectionObserver
-const setupObserver = () => {
+const setupObserver = async () => {
   if (observer) observer.disconnect()
-  
-  // 等待 DOM 更新后设置
-  setTimeout(() => {
-    if (loadMoreTrigger.value) {
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore.value && !isLoadingMore.value) {
-            loadMore()
-          }
-        },
-        { 
-          root: scrollContainer.value,
-          rootMargin: '100px'
+
+  // 使用 nextTick 等待 DOM 更新
+  await nextTick()
+
+  if (loadMoreTrigger.value) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore.value && !isLoadingMore.value) {
+          loadMore()
         }
-      )
-      observer.observe(loadMoreTrigger.value)
-    }
-  }, 100)
+      },
+      {
+        root: scrollContainer.value,
+        rootMargin: '100px'
+      }
+    )
+    observer.observe(loadMoreTrigger.value)
+  }
 }
 
+// 滚动处理（使用节流优化性能）
+let scrollRafId: number | null = null
 const handleScroll = (e: Event) => {
-  const target = e.target as HTMLElement
-  const scrollTop = target.scrollTop
-  isScrolled.value = scrollTop > scrollThreshold
-  showBackToTop.value = scrollTop > 500 // Show after ~1-2 screens
+  if (scrollRafId !== null) return
+
+  scrollRafId = requestAnimationFrame(() => {
+    const target = e.target as HTMLElement
+    const scrollTop = target.scrollTop
+    isScrolled.value = scrollTop > scrollThreshold
+    showBackToTop.value = scrollTop > 500
+    scrollRafId = null
+  })
 }
 
 const scrollToTop = () => {
   scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// Touch Handlers for Pull to Refresh
+// Touch Handlers for Pull to Refresh (优化版)
 const handleTouchStart = (e: TouchEvent) => {
-  if (scrollContainer.value && scrollContainer.value.scrollTop === 0) {
+  if (scrollContainer.value?.scrollTop === 0) {
     startY.value = e.touches[0].clientY
+    hasVibrated.value = false
   }
 }
 
 const handleTouchMove = (e: TouchEvent) => {
-  if (scrollContainer.value && scrollContainer.value.scrollTop === 0 && startY.value > 0 && !isRefreshing.value) {
-    const currentY = e.touches[0].clientY
-    const diff = currentY - startY.value
-    if (diff > 0) {
-      // Resistance effect
-      pullDistance.value = Math.min(diff * 0.4, MAX_PULL)
-      if (pullDistance.value > 10) {
-         e.preventDefault() // Prevent native scroll only if pulling down
+  if (scrollContainer.value?.scrollTop !== 0 || startY.value === 0 || isRefreshing.value) {
+    return
+  }
+
+  lastTouchY = e.touches[0].clientY
+
+  // 使用 RAF 节流优化性能
+  if (rafId === null) {
+    rafId = requestAnimationFrame(() => {
+      const diff = lastTouchY - startY.value
+      if (diff > 0) {
+        // 阻力效果：越拉越难（平方根曲线）
+        pullDistance.value = Math.min(Math.sqrt(diff * 30), MAX_PULL)
+
+        // 触发触觉反馈（达到阈值时）
+        if (pullDistance.value > PULL_THRESHOLD && !hasVibrated.value) {
+          if (navigator?.vibrate) {
+            navigator.vibrate(10) // 轻微震动10ms
+          }
+          hasVibrated.value = true
+        }
+
+        // 防止默认滚动行为
+        if (pullDistance.value > 10) {
+          e.preventDefault()
+        }
       }
-    }
+      rafId = null
+    })
   }
 }
 
 const handleTouchEnd = async () => {
+  // 取消未完成的 RAF
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId)
+    rafId = null
+  }
+
   if (pullDistance.value > PULL_THRESHOLD && !isRefreshing.value) {
     isRefreshing.value = true
-    pullDistance.value = 50 // Keep showing indicator
+    hasVibrated.value = false
+    pullDistance.value = 50 // 保持指示器显示
+
     try {
       await initData(activeCategoryId.value)
+      // 成功后触觉反馈
+      if (navigator?.vibrate) {
+        navigator.vibrate([30, 20, 30]) // 成功的节奏感震动
+      }
+    } catch (error) {
+      if (import.meta.dev) {
+        console.error('Refresh failed:', error)
+      }
     } finally {
-      setTimeout(() => {
-        isRefreshing.value = false
-        pullDistance.value = 0
-      }, 500)
+      // 平滑收回动画（使用 RAF）
+      const startDist = pullDistance.value
+      const duration = 300
+      const startTime = Date.now()
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const easeOut = 1 - Math.pow(1 - progress, 3) // cubic ease-out
+
+        pullDistance.value = startDist * (1 - easeOut)
+
+        if (progress < 1) {
+          requestAnimationFrame(animate)
+        } else {
+          isRefreshing.value = false
+          pullDistance.value = 0
+        }
+      }
+
+      requestAnimationFrame(animate)
     }
   } else {
+    // 快速回弹
     pullDistance.value = 0
   }
   startY.value = 0
@@ -264,20 +324,23 @@ const handleTouchEnd = async () => {
 
 // Init
 onMounted(async () => {
-    startLoading('initial')
     try {
         // 【关键】处理微信授权回调的 code 参数
         const code = route.query.code as string
         // const state = route.query.state as string
-        
+
         if (code && !userStore.isLoggedIn) {
-            console.log('[MobileHome] Processing WeChat OAuth callback...')
+            if (import.meta.dev) {
+                console.log('[MobileHome] Processing WeChat OAuth callback...')
+            }
             try {
                 const res = await wechatLoginApi.oauthLogin(code)
                 if (res.success && res.data) {
                     if (res.data.status === 'logged_in' && res.data.actionLink) {
-                        // 有 Magic Link，跳转完成登录
-                        console.log('[MobileHome] Redirecting to Magic Link...')
+                        // 有 Magic Link，直接跳转（不显示loading避免双动画）
+                        if (import.meta.dev) {
+                            console.log('[MobileHome] Redirecting to Magic Link...')
+                        }
                         window.location.href = res.data.actionLink
                         return // 停止后续执行
                     } else if (res.data.status === 'need_bind') {
@@ -287,7 +350,9 @@ onMounted(async () => {
                     }
                 }
             } catch (e) {
-                console.error('[MobileHome] OAuth login failed:', e)
+                if (import.meta.dev) {
+                    console.error('[MobileHome] OAuth login failed:', e)
+                }
             }
             // 清除 URL 中的 code 参数
             router.replace({ path: '/mobile', query: {} })
@@ -308,13 +373,18 @@ onMounted(async () => {
             showLoginSheet.value = true
             router.replace({ query: { ...route.query, login: undefined } })
         }
-    } finally {
-        setTimeout(() => stopLoading(), 500)
+    } catch (error) {
+        if (import.meta.dev) {
+            console.error('[MobileHome] Init error:', error)
+        }
     }
 })
 
 onUnmounted(() => {
   if (observer) observer.disconnect()
+  // 清理 RAF
+  if (rafId !== null) cancelAnimationFrame(rafId)
+  if (scrollRafId !== null) cancelAnimationFrame(scrollRafId)
 })
 </script>
 

@@ -1,4 +1,4 @@
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 import type { Article, Category } from '@/api/client/community'
 
 export interface AdminFaqCategory {
@@ -27,7 +27,7 @@ export const adminFaqApi = {
     // --- FAQ Category Management ---
 
     async getCategories(): Promise<{ success: boolean; categories: AdminFaqCategory[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('faq_categories')
             .select('*')
@@ -38,7 +38,7 @@ export const adminFaqApi = {
     },
 
     async createCategory(data: { name: string; sort_order: number; is_checkout_visible?: boolean }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('faq_categories')
             .insert({
@@ -52,7 +52,7 @@ export const adminFaqApi = {
     },
 
     async updateCategory(id: string, data: { name?: string; sort_order?: number; is_active?: boolean; is_checkout_visible?: boolean }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('faq_categories')
             .update(data)
@@ -62,7 +62,7 @@ export const adminFaqApi = {
     },
 
     async deleteCategory(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         // Check if has FAQs
         const { count } = await client.from('faqs').select('*', { count: 'exact', head: true }).eq('category_id', id)
         if (count && count > 0) {
@@ -82,7 +82,7 @@ export const adminFaqApi = {
         page?: number
         page_size?: number
     }): Promise<{ success: boolean; faqs: AdminFaq[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const page = params?.page || 1
         const pageSize = params?.page_size || 20
         const offset = (page - 1) * pageSize
@@ -113,7 +113,7 @@ export const adminFaqApi = {
     },
 
     async getFaqById(id: string): Promise<{ success: boolean; faq?: AdminFaq; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('faqs')
             .select(`
@@ -135,7 +135,7 @@ export const adminFaqApi = {
         sort_order?: number
         is_active?: boolean
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('faqs').insert({
             category_id: data.category_id || null,
             question: data.question,
@@ -156,7 +156,7 @@ export const adminFaqApi = {
         sort_order?: number
         is_active?: boolean
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('faqs').update({
             category_id: data.category_id || null,
             question: data.question,
@@ -171,7 +171,7 @@ export const adminFaqApi = {
     },
 
     async deleteFaq(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client.from('faqs').delete().eq('id', id)
         if (error) return { success: false, error: error.message }
         return { success: true }
@@ -181,7 +181,7 @@ export const adminFaqApi = {
 export const adminArticleApi = {
     // Articles
     async getArticles(page = 1, pageSize = 20) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const from = (page - 1) * pageSize
         const to = from + pageSize - 1
@@ -196,23 +196,23 @@ export const adminArticleApi = {
     },
 
     async createArticle(article: Partial<Article>) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client.from('community_articles').insert([article]).select()
     },
 
     async updateArticle(id: string, updates: Partial<Article>) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client.from('community_articles').update(updates).eq('id', id).select()
     },
 
     async deleteArticle(id: string) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client.from('community_articles').delete().eq('id', id)
     },
 
     // Get single article by ID (admin - can fetch drafts)
     async getArticleById(id: string) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('community_articles')
             .select('*')
@@ -227,7 +227,7 @@ export const adminArticleApi = {
 
     // Categories
     async getCategories() {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client
             .from('community_categories')
             .select('*')
@@ -235,17 +235,17 @@ export const adminArticleApi = {
     },
 
     async createCategory(category: Partial<Category>) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client.from('community_categories').insert([category]).select()
     },
 
     async updateCategory(id: string, updates: Partial<Category>) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client.from('community_categories').update(updates).eq('id', id).select()
     },
 
     async deleteCategory(id: string) {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         return await client.from('community_categories').delete().eq('id', id)
     }
 }

@@ -15,15 +15,12 @@
     <MobileToast />
 
     <!-- Global Login Sheet -->
-    <MobileLoginSheet 
-      :visible="modalStore.showLogin" 
-      @close="modalStore.closeLogin()" 
+    <MobileLoginSheet
+      :visible="modalStore.showLogin"
+      @close="modalStore.closeLogin()"
     />
 
-    <!-- Particle Background (Synced with PC) -->
-    <ClientOnly>
-      <ParticleBackground />
-    </ClientOnly>
+    <!-- 移除粒子背景：移动端性能优先，不需要装饰性背景 -->
   </div>
 </template>
 
@@ -32,7 +29,6 @@ import '@/assets/styles/mobile.css'
 import MobileTabBar from '@/components/mobile/MobileTabBar.vue'
 import MobileToast from '@/components/mobile/base/MobileToast.vue'
 import MobileLoginSheet from '@/components/mobile/auth/MobileLoginSheet.vue'
-import ParticleBackground from '@/components/pc/ParticleBackground.vue'
 import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/client/modal'
 

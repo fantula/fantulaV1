@@ -3,15 +3,20 @@ import type { Serialize, Simplify } from "nitropack/types";
 declare module "nitropack/types" {
   type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T
   interface InternalApi {
-    '/api/admin/scheduler/**:path': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/scheduler/[...path]').default>>>>
+    '/api/admin/auth/login': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/auth/login.post').default>>>>
     }
-    '/api/admin/system/notifications/templates': {
-      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/system/notifications/templates.get').default>>>>
-      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/system/notifications/templates.post').default>>>>
+    '/api/admin/auth/me': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/auth/me.get').default>>>>
     }
-    '/api/admin/system/notifications/test': {
-      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/system/notifications/test.post').default>>>>
+    '/api/admin/auth/send-otp': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/auth/send-otp.post').default>>>>
+    }
+    '/api/admin/users/create': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/users/create.post').default>>>>
+    }
+    '/api/admin/users/delete': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/admin/users/delete.post').default>>>>
     }
     '/api/auth/bind-wechat': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/bind-wechat.post').default>>>>
@@ -58,20 +63,8 @@ declare module "nitropack/types" {
     '/__nuxt_island/**': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/#internal/nuxt/island-renderer').default>>>>
     }
-    '/__site-config__/debug.json': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/nuxt-site-config/dist/runtime/server/routes/__site-config__/debug').default>>>>
-    }
     '/robots.txt': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxtjs/robots/dist/runtime/server/routes/robots-txt').default>>>>
-    }
-    '/__robots__/debug.json': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxtjs/robots/dist/runtime/server/routes/__robots__/debug').default>>>>
-    }
-    '/__robots__/debug-path.json': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxtjs/robots/dist/runtime/server/routes/__robots__/debug-path').default>>>>
-    }
-    '/__sitemap__/debug.json': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxtjs/sitemap/dist/runtime/server/routes/__sitemap__/debug').default>>>>
     }
     '/__sitemap__/style.xsl': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/@nuxtjs/sitemap/dist/runtime/server/routes/sitemap.xsl').default>>>>

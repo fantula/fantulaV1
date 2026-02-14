@@ -3,7 +3,7 @@
  * 遵循 api/admin/ 规范
  */
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 // ========================================
 // 类型定义
@@ -26,7 +26,7 @@ export const adminDepartmentApi = {
      * 获取部门列表（含用户数统计）
      */
     async getDepartments(): Promise<{ success: boolean; departments: AdminDepartment[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { data, error } = await client
             .from('admin_departments')
@@ -59,7 +59,7 @@ export const adminDepartmentApi = {
         name: string
         permissions?: string[]
     }): Promise<{ success: boolean; department?: AdminDepartment; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { data: department, error } = await client
             .from('admin_departments')
@@ -84,7 +84,7 @@ export const adminDepartmentApi = {
         name?: string
         permissions?: string[]
     }): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         const { error } = await client
             .from('admin_departments')
@@ -102,7 +102,7 @@ export const adminDepartmentApi = {
      * 删除部门（有用户时禁止删除）
      */
     async deleteDepartment(id: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
 
         // 检查是否有用户
         const { count } = await client

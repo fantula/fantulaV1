@@ -1,11 +1,11 @@
 
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 // ========================================
 // 类型定义 (从 admin-supabase.ts 迁移)
 // ========================================
 
-export interface AdminProduct {
+export interface OrderProductSnapshot {
     id: string
     product_name: string
     image: string | null
@@ -27,7 +27,7 @@ export interface AdminOrder {
     end_time: string
     status: 'pending_delivery' | 'active' | 'refunding' | 'refunded' | 'expired'
     created_at: string
-    product?: AdminProduct
+    product?: OrderProductSnapshot
     sku?: any
     slot_occupancy_ids?: string[]
     // 关联的用户信息
@@ -86,7 +86,7 @@ export const adminOrderApi = {
         exclude_status?: string[] // 排除的状态列表
         keyword?: string // 搜索订单号
     }): Promise<{ success: boolean; orders: AdminOrder[]; total: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { page = 1, pageSize = 20, order_type, status, exclude_status, keyword } = params
 
         let query = client
@@ -145,7 +145,7 @@ export const adminOrderApi = {
      * 更新订单状态
      */
     async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('orders')
             .update({ status })
@@ -161,7 +161,7 @@ export const adminOrderApi = {
      * 删除订单 (软删除或硬删除，视业务而定，目前假设是硬删除)
      */
     async deleteOrders(ids: string[]): Promise<{ success: boolean; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { error } = await client
             .from('orders')
             .delete()

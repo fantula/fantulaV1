@@ -1,7 +1,7 @@
 /**
  * 共享规格管理 API
  */
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export interface SharedSkuGroup {
     tag: number
@@ -20,7 +20,7 @@ export interface SharedSkuGroup {
 
 export const adminSharedSkuApi = {
     async getSharedSkuGroups(): Promise<{ success: boolean; groups: SharedSkuGroup[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('product_skus')
             .select('*')
@@ -45,7 +45,7 @@ export const adminSharedSkuApi = {
     },
 
     async getNextTag(): Promise<{ success: boolean; tag: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('product_skus')
             .select('tag')
@@ -68,7 +68,7 @@ export const adminSharedSkuApi = {
         image?: string
         sort_order: number
     }[], tagName?: string): Promise<{ success: boolean; count: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const skuData = skus.map(sku => ({
             tag,
             tag_name: tagName || null,
@@ -89,7 +89,7 @@ export const adminSharedSkuApi = {
     },
 
     async getSkusByTag(tag: number): Promise<{ success: boolean; skus: any[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data, error } = await client
             .from('product_skus')
             .select('*')
@@ -103,7 +103,7 @@ export const adminSharedSkuApi = {
     },
 
     async getProductsBySharedTag(tag: number): Promise<{ success: boolean; products?: any[]; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: skus } = await client.from('product_skus').select('id').eq('tag', tag)
         if (!skus || !skus.length) return { success: true, products: [] }
 
@@ -136,7 +136,7 @@ export const adminSharedSkuApi = {
         image?: string
         sort_order: number
     }[], tagName?: string): Promise<{ success: boolean; updated: number; inserted: number; deleted: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: existingSkus } = await client.from('product_skus').select('id').eq('tag', tag)
 
         let linkedProductIds: string[] = []
@@ -214,7 +214,7 @@ export const adminSharedSkuApi = {
     },
 
     async deleteSharedSkuGroup(tag: number): Promise<{ success: boolean; count: number; error?: string }> {
-        const client = getAdminSupabaseClient()
+        const client = getSupabaseClient()
         const { data: mappings } = await client
             .from('product_sku_map')
             .select('id, sku:product_skus!inner(tag)')

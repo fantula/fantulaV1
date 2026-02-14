@@ -1,66 +1,71 @@
 <template>
-  <!-- 顶部进度条 (导航时唯一的加载指示) -->
+  <!-- 全局 Logo 动画 (仅PC端首次访问) -->
+  <GlobalLoader v-if="showGlobalLoader" :loading="showGlobalLoader" @finish="handleLoaderFinish" />
+
+  <!-- 顶部进度条 (页面导航时的加载指示) -->
   <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="200" />
-  
-  <!-- 全屏 Loader (所有设备首次加载显示) -->
-  <GlobalLoader 
-    :loading="isLoading && loadingVariant === 'initial'" 
-    variant="initial" 
-  />
+
+  <!-- 全局加载指示器（API请求等操作时显示） -->
   <GlobalLoading />
-  
+
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-// 引入 Element Plus 暗黑模式变量 (供后台管理使用)
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import 'element-plus/theme-chalk/dark/css-vars.css'
-// GlobalLoader is auto-imported
 
-// 使用全局 Loading 状态管理
-const { isLoading, loadingVariant, startLoading, stopLoading } = usePageLoading()
-const nuxtApp = useNuxtApp()
+const GlobalLoader = defineAsyncComponent(() => import('@/components/shared/GlobalLoader.vue'))
+
 const route = useRoute()
+const showGlobalLoader = ref(false)
 
-// 检测是否为移动端路由
-const isMobile = computed(() => route.path.startsWith('/mobile'))
+// 改进的设备检测函数
+const isPC = () => {
+  if (process.server) return false
+
+  // 1. 检查屏幕宽度
+  const isLargeScreen = window.innerWidth >= 768
+
+  // 2. 检查UserAgent（排除移动设备）
+  const ua = navigator.userAgent
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)
+
+  // 3. 综合判断：大屏幕 且 不是移动设备UA
+  return isLargeScreen && !isMobileUA
+}
 
 onMounted(() => {
-  // 1. 设置初始 loading 状态
-  startLoading('initial')
+  // 只在PC端显示动画
+  if (!isPC()) {
+    return
+  }
 
-  // 2. 最小展示时间 (等待滚动动画完整播放 3.5s + 停留 0.5s)
-  const minTimePromise = new Promise(resolve => setTimeout(resolve, 4000))
-  
-  // 3. 实际资源加载完成
-  const loadPromise = new Promise((resolve) => {
-    if (document.readyState === 'complete') {
-      resolve(true)
-    } else {
-      window.addEventListener('load', () => resolve(true))
+  // 检查当前路由是否为PC路由
+  const isPCRoute = route.path.startsWith('/pc') || route.path === '/'
+
+  if (isPCRoute) {
+    // 使用localStorage替代sessionStorage（更持久）
+    // 但使用日期作为key，每天首次访问都显示
+    const today = new Date().toDateString()
+    const lastVisit = localStorage.getItem('fantula_last_logo_visit')
+
+    if (lastVisit !== today) {
+      showGlobalLoader.value = true
+      localStorage.setItem('fantula_last_logo_visit', today)
     }
-  })
-
-  // 4. 等待两者都完成
-  Promise.all([loadPromise, minTimePromise]).then(() => {
-    stopLoading()
-  })
-
-  // 5. 安全兜底
-  setTimeout(() => {
-    isLoading.value = false
-  }, 5000)
-})
-
-// 监听页面导航完成事件，关闭 Loading
-nuxtApp.hook('page:finish', () => {
-  // 只有在导航模式下才自动关闭，初始模式由 onMounted 控制 (更精确)
-  if (loadingVariant.value === 'navigation') {
-    stopLoading()
   }
 })
+
+const handleLoaderFinish = () => {
+  // 等待动画完整播放后关闭
+  setTimeout(() => {
+    showGlobalLoader.value = false
+  }, 4000)
+}
 </script>
 
 <style>
