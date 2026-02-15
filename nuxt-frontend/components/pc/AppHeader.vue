@@ -27,66 +27,80 @@
       
       <!-- 用户区域 -->
       <div class="header-actions">
-        <!-- 未登录状态：显示登录按钮 -->
-        <NuxtLink 
-          v-if="!userStore.isLoggedIn" 
-          to="#" 
-          class="login-btn" 
-          @click.prevent="modal.openLogin()"
-        >
-          登录/注册
-        </NuxtLink>
-        
-        <!-- 已登录状态：显示购物车和用户信息 -->
-        <div v-else class="user-section">
-          <!-- 购物车图标容器 -->
-          <div class="cart-wrapper" style="position: relative;" ref="cartWrapperRef">
-            <div class="cart-icon" title="购物车" @click.stop="toggleMiniCart" id="cart-icon-ref">
-              <div class="cart-icon-wrapper">
-                <el-icon :size="26" color="#E2E8F0"><ShoppingCart /></el-icon>
-                <!-- 购物车数量badge -->
-                <span v-if="cartStore.totalCount > 0" class="cart-badge">{{ cartStore.totalCount }}</span>
-              </div>
-            </div>
-            
-            <MiniCartPopup 
-              :visible="cartStore.miniCartVisible" 
-              @close="cartStore.miniCartVisible = false"
-              class="header-mini-cart"
-            />
-          </div>
+        <!-- HYDRATION SAFETY: Use ClientOnly -->
+        <ClientOnly>
+          <template #fallback>
+             <!-- Fallback: Guest State -->
+             <NuxtLink 
+               to="#" 
+               class="login-btn" 
+               @click.prevent="modal.openLogin()"
+             >
+               登录/注册
+             </NuxtLink>
+          </template>
 
-          <!-- Favorites Icon (Dynamic) -->
-          <div 
-            class="favorites-wrapper" 
-            :class="{ 'is-active': isPageFavorited }"
-            @click="navigateToFavorites" 
-            id="favorites-icon-ref" 
-            title="我的收藏"
+          <!-- Client Content -->
+          <NuxtLink 
+            v-if="!userStore.isLoggedIn" 
+            to="#" 
+            class="login-btn" 
+            @click.prevent="modal.openLogin()"
           >
-            <el-icon :size="24" class="fav-icon">
-              <StarFilled v-if="isPageFavorited" />
-              <Star v-else />
-            </el-icon>
+            登录/注册
+          </NuxtLink>
+          
+          <!-- 已登录状态 -->
+          <div v-else class="user-section">
+              <!-- 购物车图标容器 -->
+              <div class="cart-wrapper" style="position: relative;" ref="cartWrapperRef">
+                <div class="cart-icon" title="购物车" @click.stop="toggleMiniCart" id="cart-icon-ref">
+                  <div class="cart-icon-wrapper">
+                    <el-icon :size="26" color="#E2E8F0"><ShoppingCart /></el-icon>
+                    <!-- 购物车数量badge -->
+                    <span v-if="cartStore.totalCount > 0" class="cart-badge">{{ cartStore.totalCount }}</span>
+                  </div>
+                </div>
+                
+                <MiniCartPopup 
+                  :visible="cartStore.miniCartVisible" 
+                  @close="cartStore.miniCartVisible = false"
+                  class="header-mini-cart"
+                />
+              </div>
+    
+              <!-- Favorites Icon (Dynamic) -->
+              <div 
+                class="favorites-wrapper" 
+                :class="{ 'is-active': isPageFavorited }"
+                @click="navigateToFavorites" 
+                id="favorites-icon-ref" 
+                title="我的收藏"
+              >
+                <el-icon :size="24" class="fav-icon">
+                  <StarFilled v-if="isPageFavorited" />
+                  <Star v-else />
+                </el-icon>
+              </div>
+    
+              <div class="user-info-container">
+                <!-- 加载状态：骨架屏 -->
+                <div v-if="userStore.loading" class="user-info user-info--loading">
+                  <div class="avatar-skeleton"></div>
+                  <div class="name-skeleton"></div>
+                </div>
+                <!-- 已加载：真实头像 -->
+                <div v-else @click="navigateToProfile" class="user-info" title="进入个人中心">
+                  <img 
+                    :src="userStore.user?.avatar || DEFAULT_AVATAR" 
+                    :alt="userStore.user?.nickName || userStore.user?.nickname || '用户头像'"
+                    class="user-avatar"
+                  />
+                  <span class="user-name">{{ userStore.user?.nickName || userStore.user?.nickname || '用户' }}</span>
+                </div>
+              </div>
           </div>
-
-          <div class="user-info-container">
-            <!-- 加载状态：骨架屏 -->
-            <div v-if="userStore.loading" class="user-info user-info--loading">
-              <div class="avatar-skeleton"></div>
-              <div class="name-skeleton"></div>
-            </div>
-            <!-- 已加载：真实头像 -->
-            <div v-else @click="navigateToProfile" class="user-info" title="进入个人中心">
-              <img 
-                :src="userStore.user?.avatar || DEFAULT_AVATAR" 
-                :alt="userStore.user?.nickName || userStore.user?.nickname || '用户头像'"
-                class="user-avatar"
-              />
-              <span class="user-name">{{ userStore.user?.nickName || userStore.user?.nickname || '用户' }}</span>
-            </div>
-          </div>
-        </div>
+        </ClientOnly>
       </div>
     </div>
   </header>
@@ -172,7 +186,11 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
+// Hydration safety
+const isMounted = ref(false)
+
 onMounted(() => {
+  isMounted.value = true
   document.addEventListener('click', handleClickOutside)
 })
 

@@ -1,6 +1,7 @@
 import { http } from '@/utils/request'
 import { getSupabaseClient, callEdgeFunction } from '@/utils/supabase'
 import type { Goods, GoodsCategory, PageParams, PageResponse, ApiResponse } from '@/types/api'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * 商品相关API
@@ -9,6 +10,7 @@ export const goodsApi = {
   /**
    * 获取商品列表 - 使用 Supabase 查询
    * @param params 查询参数
+   * @param supabaseClient 可选的 Supabase 客户端实例 (用于 SSR 上下文传递)
    */
   async getGoodsList(params: PageParams & {
     category?: string
@@ -18,8 +20,8 @@ export const goodsApi = {
     maxPrice?: number
     sortBy?: 'price' | 'sales' | 'createTime'
     sortOrder?: 'asc' | 'desc'
-  }): Promise<ApiResponse<PageResponse<Goods>>> {
-    const client = getSupabaseClient()
+  }, supabaseClient?: SupabaseClient): Promise<ApiResponse<PageResponse<Goods>>> {
+    const client = supabaseClient || getSupabaseClient()
 
     let query = client
       .from('products')

@@ -1,0 +1,1 @@
+import{bS as n,bT as o,p as r}from"./BvUBQt8J.js";import{u as s}from"./DxkdvUPA.js";const u=n(async t=>{let a,i;if(t.path==="/manager_portal/login")return;const e=s();if(e.isInitialized||([a,i]=o(()=>e.init()),await a,i()),!e.isLoggedIn)return r("/manager_portal/login");if(!e.hasPermission(t.path))return r("/manager_portal")});export{u as default};

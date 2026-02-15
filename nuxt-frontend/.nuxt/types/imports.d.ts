@@ -364,7 +364,9 @@ declare global {
   const injectHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').injectHead
   const isAdminLoggedIn: typeof import('../../utils/supabase-admin').isAdminLoggedIn
   const isAssetsPreloaded: typeof import('../../utils/modalAssetPreloader').isAssetsPreloaded
+  const isMobileUserAgent: typeof import('../../utils/device').isMobileUserAgent
   const isNuxtError: typeof import('../../node_modules/nuxt/dist/app/composables/error').isNuxtError
+  const isPC: typeof import('../../utils/device').isPC
   const isPrerendered: typeof import('../../node_modules/nuxt/dist/app/composables/payload').isPrerendered
   const isProxy: typeof import('vue').isProxy
   const isReactive: typeof import('vue').isReactive
@@ -473,7 +475,6 @@ declare global {
   const useFetch: typeof import('../../node_modules/nuxt/dist/app/composables/fetch').useFetch
   const useFlyingAnimation: typeof import('../../composables/client/useFlyingAnimation').useFlyingAnimation
   const useGlobalLoading: typeof import('../../composables/useGlobalLoading').useGlobalLoading
-  const useGoodsDetail: typeof import('../../composables/client/useGoodsDetail').useGoodsDetail
   const useHead: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHead
   const useHeadSafe: typeof import('../../node_modules/nuxt/dist/app/composables/head').useHeadSafe
   const useHomeData: typeof import('../../composables/client/useHomeData').useHomeData
@@ -591,11 +592,8 @@ declare global {
   export type { DetailModule } from '../../composables/admin/useAdminProductForm'
   import('../../composables/admin/useAdminProductForm')
   // @ts-ignore
-  export type { SystemStatus } from '../../composables/admin/useAdminSystemStatus'
+  export type { SystemStatus, ProbeResult } from '../../composables/admin/useAdminSystemStatus'
   import('../../composables/admin/useAdminSystemStatus')
-  // @ts-ignore
-  export type { GoodsData } from '../../composables/client/useGoodsDetail'
-  import('../../composables/client/useGoodsDetail')
   // @ts-ignore
   export type { OrderDetail, CdkItem, SlotItem, FulfillmentField } from '../../composables/client/useOrderDetail'
   import('../../composables/client/useOrderDetail')
@@ -979,7 +977,9 @@ declare module 'vue' {
     readonly injectHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['injectHead']>
     readonly isAdminLoggedIn: UnwrapRef<typeof import('../../utils/supabase-admin')['isAdminLoggedIn']>
     readonly isAssetsPreloaded: UnwrapRef<typeof import('../../utils/modalAssetPreloader')['isAssetsPreloaded']>
+    readonly isMobileUserAgent: UnwrapRef<typeof import('../../utils/device')['isMobileUserAgent']>
     readonly isNuxtError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['isNuxtError']>
+    readonly isPC: UnwrapRef<typeof import('../../utils/device')['isPC']>
     readonly isPrerendered: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/payload')['isPrerendered']>
     readonly isProxy: UnwrapRef<typeof import('vue')['isProxy']>
     readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
@@ -1088,7 +1088,6 @@ declare module 'vue' {
     readonly useFetch: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/fetch')['useFetch']>
     readonly useFlyingAnimation: UnwrapRef<typeof import('../../composables/client/useFlyingAnimation')['useFlyingAnimation']>
     readonly useGlobalLoading: UnwrapRef<typeof import('../../composables/useGlobalLoading')['useGlobalLoading']>
-    readonly useGoodsDetail: UnwrapRef<typeof import('../../composables/client/useGoodsDetail')['useGoodsDetail']>
     readonly useHead: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHead']>
     readonly useHeadSafe: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/head')['useHeadSafe']>
     readonly useHomeData: UnwrapRef<typeof import('../../composables/client/useHomeData')['useHomeData']>

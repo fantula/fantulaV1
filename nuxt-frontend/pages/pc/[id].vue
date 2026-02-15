@@ -371,7 +371,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'pc'
+  layout: 'pc',
+  alias: '/:id(\\d+)'
 })
 
 import { useModalStore } from '@/stores/client/modal'

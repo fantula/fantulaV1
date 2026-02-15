@@ -37,13 +37,29 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
+
 interface Props {
   loading: boolean
   variant?: 'initial' | 'navigation' | 'section'
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   variant: 'initial'
+})
+
+const emit = defineEmits<{
+  (e: 'finish'): void
+}>()
+
+onMounted(() => {
+  if (props.variant === 'initial') {
+    // Animation duration is roughly 2.5s
+    // We emit finish to let parent know animation sequence is done
+    setTimeout(() => {
+      emit('finish')
+    }, 2500)
+  }
 })
 </script>
 
@@ -139,7 +155,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 .rolling-track {
-  animation: roll-up 3.5s cubic-bezier(0.25, 1, 0.5, 1); /* Slower animation (3.5s) */
+  animation: roll-up 2.5s cubic-bezier(0.25, 1, 0.5, 1); /* Faster animation (2.5s) */
   animation-fill-mode: forwards;
 }
 

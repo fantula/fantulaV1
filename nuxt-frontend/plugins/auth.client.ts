@@ -18,10 +18,15 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         // 即使有用户信息，也后台刷新一次，确保数据（如头像、余额）最新
         userStore.fetchUserInfo().catch(e => console.error('[Auth Plugin] Background refresh failed:', e))
     } else {
-        // 如果没有 Token，确保 Store 也是空的
+        // 如果没有 Token，尝试从 Supabase LocalStorage 恢复 (解决微信 Session Cookie 丢失问题)
         if (!token.value) {
-            userStore.logout() // 清理可能残留的状态
+            const restored = await userStore.restoreSessionFromSupabase()
+            if (restored) {
+                console.log('[Auth Plugin] Session recovered from Supabase persistence')
+            } else {
+                userStore.logout() // 确实没有登录，清理状态
+                console.log('[Auth Plugin] No token found or session active.')
+            }
         }
-        console.log('[Auth Plugin] No token found or session active.')
     }
 })

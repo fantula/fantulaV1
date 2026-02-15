@@ -6,54 +6,95 @@ SERVER_USER="root"
 REMOTE_DIR="/opt/fantula"
 LOCAL_DIR="$(pwd)"
 
-echo "🚀 开始部署到 $SERVER_IP ..."
+# 参数处理
+ENV_TYPE=$1
+MODE=$2
 
-# 1. 同步文件 (排除 node_modules, .git 等)
-echo "📂 同步文件..."
-rsync -avz --progress --exclude='node_modules' --exclude='.git' --exclude='.nuxt' --exclude='.output' \
-  --exclude='.DS_Store' --exclude='.env' --exclude='.agent' \
-  "$LOCAL_DIR/nuxt-frontend/" "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/nuxt-frontend/"
+if [ -z "$ENV_TYPE" ]; then
+  echo "Usage: ./deploy.sh [staging|prod] [quick|full]"
+  exit 1
+fi
 
-rsync -avz --progress --exclude='node_modules' \
-  "$LOCAL_DIR/scripts/scheduler/" "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/scripts/scheduler/"
+echo "🚀 开始部署到 $ENV_TYPE ($SERVER_IP) - 模式: ${MODE:-quick} ..."
 
-# 2. 远程构建与重启
-echo "🔄 远程构建与重启..."
+# 1. 本地构建 (Local Build)
+echo "🏗️  执行本地构建 (npm run build)..."
+cd "$LOCAL_DIR/nuxt-frontend"
+npm run build
+
+if [ $? -ne 0 ]; then
+    echo "❌ 构建失败，终止部署。"
+    exit 1
+fi
+cd "$LOCAL_DIR"
+
+# 2. 同步文件 (Sync Artifacts)
+echo "📂 同步文件 (.output + ecosystem.config.js)..."
+
+# 同步 Nuxt 产物
+rsync -avz --progress --delete \
+  "$LOCAL_DIR/nuxt-frontend/.output/" \
+  "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/nuxt-frontend/.output/"
+
+# 同步 Nuxt 配置和 PM2 配置
+scp "$LOCAL_DIR/nuxt-frontend/ecosystem.config.js" "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/nuxt-frontend/"
+scp "$LOCAL_DIR/nuxt-frontend/package.json" "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/nuxt-frontend/"
+
+# 同步 Scheduler (源码)
+rsync -avz --progress --exclude='node_modules' --exclude='.env' \
+  "$LOCAL_DIR/scripts/scheduler/" \
+  "$SERVER_USER@$SERVER_IP:$REMOTE_DIR/scripts/scheduler/"
+
+# 3. 远程命令 (Remote Commands)
+echo "🔄 执行远程更新..."
+
 ssh "$SERVER_USER@$SERVER_IP" "bash -s" << EOF
-  # 环境变量检查
-  if [ ! -f $REMOTE_DIR/nuxt-frontend/.env ]; then
-    echo "⚠️ 警告: 前端 .env 文件不存在"
-  fi
+  set -e
   
-  # 1. 部署 Scheduler
-  echo "--- 部署 Scheduler ---"
+  # --- 1. Scheduler ---
+  echo "--- Deploying Scheduler ---"
   cd $REMOTE_DIR/scripts/scheduler
-  # 确保 node_modules 存在
-  if [ ! -d "node_modules" ]; then
-    npm install --production
+  
+  if [ ! -d "node_modules" ] || [ "$MODE" == "full" ]; then
+    echo "📦 Installing Scheduler Dependencies..."
+    npm install --production --registry=https://registry.npmmirror.com
   fi
   
   if [ ! -f .env ]; then
-     echo "复制 .env 到 Scheduler..."
-     cp ../../nuxt-frontend/.env .
+     echo "⚠️  Scheduler .env missing, copying from frontend if available..."
+     [ -f ../../nuxt-frontend/.env ] && cp ../../nuxt-frontend/.env .
   fi
-  # 清理可能存在的旧服务以防端口冲突
-  pm2 delete fantula 2>/dev/null || true
-  pm2 restart fantula-scheduler || pm2 start index.js --name fantula-scheduler
+  
+  pm2 reload fantula-scheduler || pm2 start index.js --name fantula-scheduler
 
-  # 2. 部署 Frontend
-  echo "--- 部署 Frontend ---"
+  # --- 2. Frontend ---
+  echo "--- Deploying Frontend ---"
   cd $REMOTE_DIR/nuxt-frontend
-  # 只在 package.json 变动时才需要 npm install，这里假设通常不需要，或者您可以手动运行
-  # npm install
-  npm run build
+  
+  # 确保 .env 存在
+  if [ ! -f .env ]; then
+    echo "⚠️  Fatal: Frontend .env missing!"
+    exit 1
+  fi
+
+  # Full 模式下重装依赖 (关键修复：解决 macOS -> Linux 的二进制兼容性问题)
+  if [ "$MODE" == "full" ]; then
+    echo "📦 [Fix] Re-installing Server Dependencies (for Linux binaries)..."
+    cd .output/server
+    rm -rf node_modules
+    rm -f package-lock.json
+    # 移除 macOS 特有的依赖 (Fix: npm install failing on Linux due to darwin packages)
+    sed -i '/darwin/d' package.json
+    npm install --production --registry=https://registry.npmmirror.com
+    cd ../..
+  fi
+  
+  echo "♻️  Reloading PM2..."
   
   if [ -f ecosystem.config.js ]; then
-     echo "Starting with ecosystem.config.js..."
-     pm2 restart ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+     pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
   else
-     echo "Starting directly (No ecosystem config found)..."
-     pm2 restart fantula-frontend || pm2 start .output/server/index.mjs --name fantula-frontend
+     pm2 reload fantula || pm2 start .output/server/index.mjs --name fantula
   fi
 
   echo "✅ 部署完成!"

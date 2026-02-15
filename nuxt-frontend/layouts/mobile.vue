@@ -11,14 +11,14 @@
     <!-- Bottom Navigation -->
     <MobileTabBar v-if="!route.meta.hideTabBar" />
 
-    <!-- Global Toast -->
-    <MobileToast />
-
-    <!-- Global Login Sheet -->
-    <MobileLoginSheet
-      :visible="modalStore.showLogin"
-      @close="modalStore.closeLogin()"
-    />
+    <!-- Global Toast & Login Sheet (Client Only) -->
+    <ClientOnly>
+      <MobileToast />
+      <MobileLoginSheet
+        :visible="modalStore.showLogin"
+        @close="modalStore.closeLogin()"
+      />
+    </ClientOnly>
 
     <!-- 移除粒子背景：移动端性能优先，不需要装饰性背景 -->
   </div>

@@ -264,12 +264,12 @@ const handleSearch = () => loadCdks()
 
 // Actions
 const handleAdd = () => {
-    router.push({ path: '/admin/cdk/post', query: { type: props.type } })
+    router.push({ path: '/manager_portal/cdk/post', query: { type: props.type } })
 }
 
 const handleEdit = (row: AdminCDK) => {
     router.push({
-        path: `/admin/cdk/edit/${row.id}`,
+        path: `/manager_portal/cdk/edit/${row.id}`,
         query: { type: props.type }
     })
 }

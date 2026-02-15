@@ -1,8 +1,0 @@
-const settings_vue_vue_type_style_index_0_scoped_2fa024b5_lang = ".settings-page[data-v-2fa024b5]{max-width:800px}.card-header[data-v-2fa024b5]{align-items:center;display:flex;font-weight:600;justify-content:space-between}.section-title[data-v-2fa024b5]{border-left:3px solid var(--el-color-primary);color:var(--el-text-color-primary);font-size:16px;font-weight:600;margin:10px 0 15px;padding-left:10px}.setting-item[data-v-2fa024b5]{background:var(--el-fill-color-light);border-radius:8px;margin-bottom:20px;padding:15px}.setting-header[data-v-2fa024b5]{align-items:center;display:flex;justify-content:space-between;margin-bottom:10px}.label[data-v-2fa024b5]{color:var(--el-text-color-regular);font-weight:500}.template-area[data-v-2fa024b5]{margin-top:10px}.field-row[data-v-2fa024b5]{margin-bottom:8px}.title-input[data-v-2fa024b5]{max-width:300px}.vars-tip[data-v-2fa024b5]{color:#909399;font-family:monospace;font-size:12px;margin-top:4px}";
-
-const settingsStyles_BadPX7Yd = [
-  settings_vue_vue_type_style_index_0_scoped_2fa024b5_lang
-];
-
-export { settingsStyles_BadPX7Yd as default };
-//# sourceMappingURL=settings-styles.BadPX7Yd.mjs.map

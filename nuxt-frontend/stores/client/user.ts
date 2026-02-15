@@ -46,7 +46,7 @@ export const useUserStore = defineStore('user', () => {
 
   // 状态
   const user = ref<User | null>(null)
-  const token = useCookie('token')
+  const token = useCookie('token', { maxAge: 60 * 60 * 24 * 30 }) // 30 days persistence
   const loading = ref(false) // 加载状态，用于骨架屏显示
   const isLoggedIn = computed(() => !!token.value && !!user.value)
 
@@ -638,6 +638,45 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  /**
+   * 尝试从 Supabase LocalStorage 恢复会话
+   * 用于解决微信/浏览器关闭会导致 Session Cookie 丢失的问题
+   */
+  const restoreSessionFromSupabase = async (): Promise<boolean> => {
+    if (!process.client) return false
+    
+    try {
+      const { getSupabaseClient } = await import('~/utils/supabase')
+      const client = getSupabaseClient()
+      
+      // 1. Check for active session in Supabase SDK (LocalStorage)
+      const { data: { session } } = await client.auth.getSession()
+      
+      if (session?.access_token && session?.user) {
+        console.log('[UserStore] Restoring session from Supabase persistence...')
+        
+        // 2. Refresh token cookie (Critical stepping stone)
+        token.value = session.access_token
+        
+        // 3. Restore user state
+        user.value = {
+           id: session.user.id,
+           email: session.user.email,
+           // Try to recover other fields from localStorage if available, or wait for fetchUserInfo
+           ...((user.value || {}) as any) 
+        } as any
+
+        // 4. Verification & Full Profile Fetch
+        await fetchUserInfo()
+        
+        return true
+      }
+    } catch (e) {
+      console.error('[UserStore] Session restoration failed:', e)
+    }
+    return false
+  }
+
   const setUser = (userInfo: any, tokenValue?: string) => {
     user.value = userInfo
     if (tokenValue) {
@@ -676,6 +715,7 @@ export const useUserStore = defineStore('user', () => {
     resetPassword,
     fetchUserInfo,
     init,
+    restoreSessionFromSupabase, // Export new action
     setUser,
     fetchUnreadMessageCount, // 导出获取方法
 

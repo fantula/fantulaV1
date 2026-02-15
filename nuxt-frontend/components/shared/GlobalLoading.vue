@@ -16,7 +16,20 @@
 <script setup lang="ts">
 import { useGlobalLoading } from '@/composables/useGlobalLoading'
 
-const { visible, text, type } = useGlobalLoading()
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: undefined
+  }
+})
+
+const { visible: globalVisible, text, type } = useGlobalLoading()
+
+// Allow prop to override global state (for Page-Level Entry control)
+const visible = computed(() => {
+  if (props.loading !== undefined) return props.loading
+  return globalVisible.value
+})
 </script>
 
 <style scoped>

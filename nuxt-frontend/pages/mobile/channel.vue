@@ -68,7 +68,7 @@
                 <div v-else-if="state === 'pending'" class="result-warning animate-fade-in">
                    <div class="warning-icon"><el-icon><WarningFilled /></el-icon></div>
                    <div class="warning-text">
-                      <p>频道 <span>{{ resultKey }}</span> 暂未绑定商品</p>
+                      <p>{{ errorMessage || `频道 ${resultKey} 暂未绑定商品` }}</p>
                       <button class="btn-text-reset" @click="reset">重试</button>
                    </div>
                 </div>
@@ -112,6 +112,7 @@ const { showToast } = useToast()
 const inputRef = ref<HTMLInputElement | null>(null)
 
 // State
+// State
 type PageState = 'input' | 'bound' | 'pending'
 const state = ref<PageState>('input')
 const loading = ref(false)
@@ -120,54 +121,80 @@ const resultKey = ref('')
 const boundProductId = ref<string | null>(null)
 const product = ref<any>(null)
 const showDetailSheet = ref(false)
+const errorMessage = ref('')
 
-const isValidInput = computed(() => /^@[a-z0-9_]+$/.test(channelInput.value))
+const isValidInput = computed(() => /^@[a-z]+$/.test(channelInput.value))
 
 const handleInput = (e: Event) => {
   let val = (e.target as HTMLInputElement).value
-  val = val.toLowerCase().replace(/\s+/g, '')
-  if (!val) val = '@'
-  else if (!val.startsWith('@')) val = '@' + val
+  // Strictly allow only lowercase a-z
+  // Remove anything that is NOT a lowercase letter (and not @ at start)
+  // But since we want to force lowercase, we lower it first
   
-  channelInput.value = val
-  if (inputRef.value && inputRef.value.value !== val) {
-    inputRef.value.value = val
+  let raw = val.toLowerCase()
+  let clean = ''
+  
+  // Extract only a-z
+  for (let char of raw) {
+      if (/[a-z]/.test(char)) {
+          clean += char
+      }
+  }
+  
+  // Always prefix with @
+  const final = '@' + clean
+  
+  channelInput.value = final
+  
+  // Force update input value if it differs (e.g. user typed a number)
+  if (inputRef.value && inputRef.value.value !== final) {
+    inputRef.value.value = final
   }
 }
 
 const handleRecognize = async () => {
-  if (!isValidInput.value) return showToast('请输入有效的频道标识', 'warning')
+  if (!isValidInput.value) return showToast('请输入有效的频道标识 (仅限小写字母)', 'warning')
 
   try {
     loading.value = true
     state.value = 'input' // Reset view while loading
     product.value = null
+    errorMessage.value = ''
 
     const { data: channelData, error } = await client.rpc('resolve_channel_key', {
       p_channel_key: channelInput.value
     })
+    
     if (error) throw error
 
-    resultKey.value = channelData.channel_key
-    boundProductId.value = channelData.product_id
+    // Check if we got a valid binding
+    if (channelData && channelData.bound && channelData.product_id) {
+       resultKey.value = channelData.channel_key
+       boundProductId.value = channelData.product_id
 
-    if (channelData.bound && channelData.product_id) {
        // Fetch Product Detail
        const res = await goodsApi.getGoodsDetail(channelData.product_id)
        if (res.success && res.data) {
           product.value = res.data
           state.value = 'bound'
+          // Auto open sheet? Maybe just show preview first as requested.
        } else {
           // Product might be off-shelf or invalid
           state.value = 'pending' 
-          showToast('商品已下架或不存在', 'warning')
+          errorMessage.value = '商品已下架或不存在'
        }
     } else {
+      // Not found or not bound
       state.value = 'pending'
+      resultKey.value = channelInput.value
+      errorMessage.value = '没有入库，请联系客服入库'
     }
   } catch (err) {
     console.error(err)
-    showToast('识别失败', 'error')
+    // RPC error or network error
+    // Treat as found failure for now or show distinct error
+    state.value = 'pending'
+    errorMessage.value = '没有入库，请联系客服入库' // Default fallthrough for "not found" in RPC if it errors on missing key
   } finally {
     loading.value = false
   }

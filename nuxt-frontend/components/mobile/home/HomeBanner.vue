@@ -10,27 +10,29 @@
       <!-- Premium Glow Background (Ported from PC) -->
       <div class="glow-border-effect" v-if="!loading"></div>
       
-      <!-- Skeleton State -->
-      <div v-if="loading" class="banner-skeleton">
-          <div class="skeleton-shimmer"></div>
-      </div>
-      
-       <!-- Content Area -->
-       <div v-else class="banner-content-inner">
-         <!-- 1. Expanded Content: Carousel -->
-         <div class="expanded-view">
-            <div class="banner-carousel" v-if="banners.length > 0">
-               <div 
-                 v-for="banner in banners" 
-                 :key="banner.id" 
-                 class="banner-item"
-               >
-                 <img :src="banner.image" class="banner-img" />
-                 <div class="banner-overlay"></div>
-               </div>
-            </div>
-         </div>
-       </div>
+      <Transition name="fade" mode="out-in">
+          <!-- Skeleton State -->
+          <div v-if="loading" class="banner-skeleton" key="skeleton">
+              <div class="skeleton-shimmer"></div>
+          </div>
+          
+           <!-- Content Area -->
+           <div v-else class="banner-content-inner" key="content">
+             <!-- 1. Expanded Content: Carousel -->
+             <div class="expanded-view">
+                <div class="banner-carousel" v-if="banners.length > 0">
+                   <div 
+                     v-for="banner in banners" 
+                     :key="banner.id" 
+                     class="banner-item"
+                   >
+                     <img :src="banner.image" class="banner-img" />
+                     <div class="banner-overlay"></div>
+                   </div>
+                </div>
+             </div>
+           </div>
+      </Transition>
     </div>
   </div>
 </template>

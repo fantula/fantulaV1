@@ -1,57 +1,48 @@
 <template>
-  <Teleport to="body">
-    <div v-if="visible" class="modal-overlay" @click.self="handleClose">
-      <div class="modal-content aurora-modal-panel">
-        <div class="modal-header">
-          <h3 class="modal-title">修改头像</h3>
-          <button class="close-btn" @click="handleClose">
-            <Close class="w-5 h-5" />
-          </button>
-        </div>
+  <BaseModal
+    :visible="visible"
+    title="修改头像"
+    width="340px"
+    confirm-text="保存修改"
+    :loading="loading"
+    :confirm-disabled="!hasChange"
+    @update:visible="handleClose"
+    @close="handleClose"
+    @confirm="handleConfirm"
+  >
+    <div class="current-avatar-section">
+      <div class="avatar-wrapper">
+          <img :src="currentAvatar || defaultAvatar" class="current-img" @error="handleImageError" />
+      </div>
+      <p class="section-label">当前头像</p>
+    </div>
 
-        <div class="modal-body">
-          <div class="current-avatar-section">
-            <div class="avatar-wrapper">
-                <img :src="currentAvatar || defaultAvatar" class="current-img" @error="handleImageError" />
-            </div>
-            <p class="section-label">当前头像</p>
+    <div class="system-avatars-section">
+      <p class="section-label align-left">系统推荐</p>
+      <div class="avatar-grid">
+          <div 
+              v-for="(url, index) in presetAvatars" 
+              :key="index"
+              class="avatar-item"
+              :class="{ active: selectedAvatar === url }"
+              @click="selectAvatar(url)"
+          >
+              <img :src="url" class="grid-img" loading="lazy" />
+              <div class="active-overlay" v-if="selectedAvatar === url">
+                  <Check class="w-4 h-4" />
+              </div>
           </div>
-
-          <div class="system-avatars-section">
-            <p class="section-label align-left">系统推荐</p>
-            <div class="avatar-grid">
-                <div 
-                    v-for="(url, index) in presetAvatars" 
-                    :key="index"
-                    class="avatar-item"
-                    :class="{ active: selectedAvatar === url }"
-                    @click="selectAvatar(url)"
-                >
-                    <img :src="url" class="grid-img" loading="lazy" />
-                    <div class="active-overlay" v-if="selectedAvatar === url">
-                        <Check class="w-4 h-4" />
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="aurora-btn-primary" @click="handleConfirm" :disabled="loading || !hasChange">
-            <span v-if="loading" class="spinner"></span>
-            <span v-else>保存修改</span>
-          </button>
-        </div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Close, Check } from '@element-plus/icons-vue'
+import { Check } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { useNotify } from '@/composables/useNotify'
+import BaseModal from '@/components/shared/BaseModal.vue'
 
 import { DEFAULT_AVATAR, SYSTEM_AVATARS } from '@/utils/constants'
 
@@ -114,30 +105,6 @@ const handleConfirm = async () => {
 </script>
 
 <style scoped>
-.modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-    z-index: 2000; display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-}
-
-/* Global Aurora Modal */
-.modal-content {
-    /* Styles handled by .aurora-modal-panel */
-}
-
-/* Animation handled by global .aurora-modal-panel */
-
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.modal-title { 
-    font-size: 18px; font-weight: 700; color: #fff; margin: 0; 
-    text-shadow: 0 0 10px rgba(255,255,255,0.2);
-}
-.close-btn { 
-    background: none; border: none; color: #94A3B8; padding: 4px; 
-    cursor: pointer; transition: color 0.2s;
-}
-.close-btn:hover { color: #fff; }
-
 .current-avatar-section {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
     margin-bottom: 24px; padding-bottom: 24px;
@@ -181,19 +148,4 @@ const handleConfirm = async () => {
     display: flex; align-items: center; justify-content: center;
     color: white;
 }
-
-.modal-footer { display: flex; gap: 12px; margin-top: 24px; }
-/* Handled by global aurora classes */
-
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Button layout override to match flex: 1 */
-.aurora-btn-ghost { 
-    flex: 1; height: 48px; border-radius: 12px; font-size: 15px; font-weight: 600; 
-    background: rgba(255,255,255,0.05); color: #94A3B8; border: 1px solid rgba(255,255,255,0.05);
-}
-.aurora-btn-primary { flex: 1; height: 48px; border-radius: 12px; }
 </style>

@@ -27,16 +27,21 @@
             </div>
 
             <div class="action-section" v-if="isBound">
-                <p class="tip-text">如需更换绑定，请在PC端操作或联系客服</p>
+                <p class="tip-text">如需更换绑定，请先解除当前绑定</p>
             </div>
             <div class="action-section" v-else>
-                 <p class="tip-text">请在登录页或PC端进行微信绑定</p>
+                 <p class="tip-text">绑定微信后可使用微信快速登录</p>
             </div>
         </div>
 
         <div class="modal-footer">
-          <button class="submit-btn" @click="handleClose">
-            知道了
+          <div v-if="isBound" class="footer-actions">
+              <button class="submit-btn unbind-btn" :disabled="loading" @click="handleUnbind">
+                {{ loading ? '处理中...' : '解除绑定' }}
+              </button>
+          </div>
+          <button v-else class="submit-btn" @click="handleBind">
+            立即绑定
           </button>
         </div>
       </div>
@@ -45,9 +50,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { Close, ChatDotRound } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
+import { wechatLoginApi } from '@/api/client/wechat-login'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const props = defineProps<{
   visible: boolean
@@ -55,10 +62,65 @@ const props = defineProps<{
 
 const emit = defineEmits(['close'])
 const userStore = useUserStore()
+const loading = ref(false)
 
 const isBound = computed(() => {
     return !!userStore.user?.openId
 })
+
+const handleUnbind = async () => {
+    try {
+        await ElMessageBox.confirm(
+            '解除绑定后将无法通过微信快速登录，确定要解绑吗？',
+            '解除绑定',
+            {
+                confirmButtonText: '确定解绑',
+                cancelButtonText: '取消',
+                type: 'warning',
+                customClass: 'mobile-msg-box',
+                center: true
+            }
+        )
+        
+        loading.value = true
+        const res = await wechatLoginApi.unbindWechat()
+        if (res.success) {
+            ElMessage.success('解除绑定成功')
+            await userStore.fetchUserInfo()
+            // Don't close, allow user to bind new one immediately if they want
+        } else {
+            ElMessage.error(res.msg || '解绑失败')
+        }
+    } catch (e) {
+        // Cancelled or Error
+        if (e !== 'cancel') {
+             console.error(e)
+             ElMessage.error('操作失败')
+        }
+    } finally {
+        loading.value = false
+    }
+}
+
+const handleBind = () => {
+    // Check if in WeChat browser (for Mobile)
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent)
+    if (!isWechat) {
+        ElMessage.warning('请在微信内打开此页面进行绑定')
+        return
+    }
+
+    // Redirect to OAuth
+    // Current path is /mobile/profile/account, callback should be /mobile/wechat-callback
+    const redirectUri = window.location.origin + '/mobile/wechat-callback'
+    // DOCS: State implies login mode. We want 'login' state usually, but let's check oauth-login.ts
+    // If we send state='login', callback parses it.
+    const authUrl = wechatLoginApi.getOAuthUrl(redirectUri, 'login') 
+    
+    // Add return_to to callback so it comes back here
+    const returnTo = encodeURIComponent(window.location.href)
+    window.location.href = authUrl + `&return_to=${returnTo}`
+}
 
 const handleClose = () => {
     emit('close')
@@ -66,6 +128,7 @@ const handleClose = () => {
 </script>
 
 <style scoped>
+/* ... existing styles ... code omitted for brevity in replacement ... */
 .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
     z-index: 2000; display: flex; align-items: center; justify-content: center;
@@ -74,21 +137,19 @@ const handleClose = () => {
 
 /* Global Aurora Modal */
 .modal-content {
-    /* Styles handled by .aurora-modal-panel */
+   /* Handled by global class usually, but scoped here just in case */
+   background: #1E293B; border-radius: 16px; padding: 24px; width: 100%; max-width: 320px;
+   border: 1px solid rgba(255,255,255,0.1);
 }
-
-/* Animation handled by global .aurora-modal-panel */
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { 
     font-size: 18px; font-weight: 700; color: #fff; margin: 0; 
-    text-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 .close-btn { 
     background: none; border: none; color: #94A3B8; padding: 4px; 
     cursor: pointer; transition: color 0.2s;
 }
-.close-btn:hover { color: #fff; }
 
 .bind-status-card {
     background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px;
@@ -99,14 +160,12 @@ const handleClose = () => {
 .bind-status-card.bound {
     background: rgba(16, 185, 129, 0.1);
     border-color: rgba(16, 185, 129, 0.3);
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
 }
 
 .icon-wrapper {
     width: 48px; height: 48px; border-radius: 50%;
-    background: #07C160; /* WeChat Green */
+    background: #07C160;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 10px rgba(7, 193, 96, 0.4);
 }
 .status-info { flex: 1; }
 .status-title { font-size: 16px; font-weight: 600; color: white; margin: 0 0 4px 0; }
@@ -117,10 +176,10 @@ const handleClose = () => {
 .modal-footer { margin-top: 24px; }
 .submit-btn {
     width: 100%; height: 48px; 
-    background: var(--cyber-gradient-btn, linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%));
+    background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
     color: white; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
-    transition: all 0.2s;
 }
-.submit-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2); }
+.unbind-btn {
+    background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #F87171;
+}
 </style>

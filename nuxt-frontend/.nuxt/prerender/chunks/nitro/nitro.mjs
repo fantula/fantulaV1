@@ -654,7 +654,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "fef476ed-a337-408c-b602-650c63d66399",
+    "buildId": "a7b84c16-9400-4da4-91ad-c5702bee13d2",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -664,7 +664,7 @@ const _inlineRuntimeConfig = {
       "/__nuxt_error": {
         "cache": false
       },
-      "/admin/**": {
+      "/manager_portal/**": {
         "ssr": false
       },
       "/api/**": {
@@ -677,24 +677,18 @@ const _inlineRuntimeConfig = {
         }
       },
       "/": {
-        "swr": 3600,
-        "cache": {
-          "swr": true,
-          "maxAge": 3600
+        "headers": {
+          "cache-control": "no-cache"
         }
       },
       "/pc": {
-        "swr": 3600,
-        "cache": {
-          "swr": true,
-          "maxAge": 3600
+        "headers": {
+          "cache-control": "no-cache"
         }
       },
       "/mobile": {
-        "swr": 3600,
-        "cache": {
-          "swr": true,
-          "maxAge": 3600
+        "headers": {
+          "cache-control": "no-cache"
         }
       },
       "/pc/product/**": {
@@ -5138,9 +5132,6 @@ const handlers = [
   { route: '/__sitemap__/style.xsl', handler: _9SHfAi, lazy: false, middleware: false, method: undefined },
   { route: '/sitemap.xml', handler: _zfRIyL, lazy: false, middleware: false, method: undefined },
   { route: '/_ipx/**', handler: _YsYiNJ, lazy: false, middleware: false, method: undefined },
-  { route: '/', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
-  { route: '/pc', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
-  { route: '/mobile', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
   { route: '/pc/product/**', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
   { route: '/mobile/product/**', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },
   { route: '/pc/article/**', handler: _lazy_8EFkQE, lazy: true, middleware: false, method: undefined },

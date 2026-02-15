@@ -46,4 +46,11 @@ const isDev = import.meta.dev
   display: flex;
   flex-direction: column;
 }
+
+/* Logic Guard: Prevent PC layout from painting on Mobile devices (SSR Flash Protection) */
+@media (max-width: 768px) {
+  .app-wrapper {
+    display: none !important;
+  }
+}
 </style>

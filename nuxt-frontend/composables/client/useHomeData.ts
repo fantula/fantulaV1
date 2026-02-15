@@ -1,185 +1,223 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { commonApi } from '@/api/client/common'
 import { goodsApi } from '@/api/client/goods'
-import { useSimpleCache } from '@/composables/shared/useSimpleCache'
 import type { Banner, Goods, GoodsCategory } from '@/types/api'
+import { useAsyncData, useNuxtApp } from '#app'
+import { getSupabaseClient } from '@/utils/supabase'
 
-export const useHomeData = () => {
-  const { getCache, setCache } = useSimpleCache()
+export const useHomeData = async (key: string) => {
+  // Use a unique key for hydration matching provided by the caller (PC vs Mobile)
+  const CACHE_KEY = key
 
-  // State
-  const banners = ref<Banner[]>([])
-  const categories = ref<GoodsCategory[]>([])
-  const currentGoods = ref<Goods[]>([])
-  const activeCategoryId = ref<string | number>('')
+  // --- Core Data Fetching (SSR + Hydration) ---
+  // Await usage ensures data is ready before we initialize local refs
+  const { data, pending, refresh, error } = await useAsyncData(
+    CACHE_KEY,
+    async () => {
+      const supabaseClient = getSupabaseClient()
 
-  // Loading States
-  const bannerLoading = ref(true)
-  const categoryLoading = ref(true)
-  const goodsLoading = ref(false)
-  const isLoadingMore = ref(false)
-  const hasMore = ref(true)
+      try {
+        // Parallel fetch for initial data with error resilience
+        // We use allSettled-like logic or individual catches if we want partial success
+        // But here we want a simple "try all, if one fails, handle gracefully"
+        // To strictly meet "Promise.all failure doesn't affect overall", we catch individual promises or the block.
+        // Let's catch individual critical sections if needed, or the whole block if acceptable.
+        // User asked: "Promise.all 任一失败不影响整体" -> One failure should not break others.
 
-  // Pagination
+        const [bannersResult, categoriesResult] = await Promise.allSettled([
+          commonApi.getBannerList(),
+          goodsApi.getCategories()
+        ])
+
+        const banners = bannersResult.status === 'fulfilled' && bannersResult.value.success
+          ? bannersResult.value.data
+          : []
+
+        if (bannersResult.status === 'rejected') {
+          console.error('Banners fetch failed', bannersResult.reason)
+        }
+
+        const categories = categoriesResult.status === 'fulfilled' && categoriesResult.value.success
+          ? categoriesResult.value.data
+          : []
+
+        if (categoriesResult.status === 'rejected') {
+          console.error('Categories fetch failed', categoriesResult.reason)
+        }
+
+        // Default to first category if available
+        const initialCategoryId = categories.length > 0 ? categories[0].id : ''
+
+        // Fetch initial goods based on first category
+        let initialGoods: Goods[] = []
+        let initialHasMore = false
+
+        if (initialCategoryId) {
+          try {
+            // Pass captured client to avoid context loss after await
+            const goodsRes = await goodsApi.getGoodsList({
+              categoryId: initialCategoryId,
+              page: 1,
+              limit: 10
+            }, supabaseClient)
+
+            if (goodsRes.success && goodsRes.data) {
+              initialGoods = goodsRes.data.list
+              initialHasMore = goodsRes.data.list.length >= 10
+            }
+          } catch (err) {
+            console.error('Initial goods fetch failed', err)
+            // Fail silently for goods, page still loads
+          }
+        }
+
+        return {
+          banners,
+          categories,
+          initialGoods,
+          initialCategoryId,
+          initialHasMore
+        }
+      } catch (e) {
+        console.error('CRITICAL: Home Data Fetch Failed Completely', e)
+        // Return safe empty state so page doesn't crash
+        return {
+          banners: [],
+          categories: [],
+          initialGoods: [],
+          initialCategoryId: '',
+          initialHasMore: false
+        }
+      }
+    },
+    {
+      server: true,
+      lazy: false, // Must wait for hydration
+      immediate: true,
+      watch: [] // No auto-watch
+    }
+  )
+
+  // --- State ---
+  // Reactive state derived from hydration data
+  const banners = computed(() => data.value?.banners || [])
+  const categories = computed(() => data.value?.categories || [])
+
+  // Mutable state for client-side pagination/filtering
+  // We initialize from hydration data immediately
+  // If data is missing (error case), these will be empty defaults defined above
+  const activeCategoryId = ref<string | number>(data.value?.initialCategoryId || '')
+  const currentGoods = ref<Goods[]>(data.value?.initialGoods || [])
+  const hasMore = ref(data.value?.initialHasMore || false)
   const currentPage = ref(1)
-  const PAGE_SIZE = 10
 
-  // Fetch Banners (Non-blocking)
-  const fetchBanners = async () => {
-    bannerLoading.value = true
-    const cached = getCache<Banner[]>('home_banners')
-    if (cached) {
-      banners.value = cached
-      bannerLoading.value = false // Instant show cache
-    }
+  // Loading states for CLIENT interaction
+  const isSwitchingCategory = ref(false)
+  const isLoadingMore = ref(false)
 
-    try {
-      const res = await commonApi.getBannerList()
-      if (res?.success && res.data) {
-        banners.value = res.data
-        setCache('home_banners', res.data)
-      }
-    } catch (e) {
-      console.error('Fetch banners error:', e)
-    } finally {
-      bannerLoading.value = false
-    }
-  }
+  // --- Actions ---
 
-  // Fetch Categories
-  const fetchCategories = async (): Promise<string | number | null> => {
-    categoryLoading.value = true
-    const cached = getCache<GoodsCategory[]>('home_categories')
-    if (cached && cached.length > 0) {
-      categories.value = cached
-      categoryLoading.value = false
-      return cached[0].id
-    }
+  const handleCategoryChange = async (categoryId: string | number) => {
+    if (activeCategoryId.value === categoryId) return
 
-    try {
-      const res = await goodsApi.getCategories()
-      if (res?.success && res.data && res.data.length > 0) {
-        categories.value = res.data
-        setCache('home_categories', res.data)
-        return res.data[0].id
-      }
-    } catch (e) {
-      console.error('Fetch categories error:', e)
-    } finally {
-      categoryLoading.value = false
-    }
-    return null
-  }
-
-  /**
-   * Fetch Goods List
-   * @param categoryId Category ID
-   * @param isLoadMore If true, append to list; otherwise replace list
-   */
-  const fetchGoods = async (categoryId?: string | number, isLoadMore = false) => {
-    if (!categoryId) return
-
-    // Prevent duplicate loading
-    if (isLoadMore && (isLoadingMore.value || !hasMore.value)) return
-
-    if (isLoadMore) {
-      isLoadingMore.value = true
-    } else {
-      goodsLoading.value = true
-      currentPage.value = 1
-      hasMore.value = true
-      // Optional: Clear list for skeleton effect, or keep for transition
-      currentGoods.value = []
-    }
+    activeCategoryId.value = categoryId
+    isSwitchingCategory.value = true
+    currentPage.value = 1
+    currentGoods.value = []
+    hasMore.value = true
 
     try {
       const res = await goodsApi.getGoodsList({
-        categoryId: categoryId,
-        page: currentPage.value,
-        limit: PAGE_SIZE,
+        categoryId,
+        page: 1,
+        limit: 10
       })
 
-      const newList = res?.success && res.data?.list ? res.data.list : []
-
-      if (isLoadMore) {
-        currentGoods.value = [...currentGoods.value, ...newList]
+      if (res.success && res.data) {
+        currentGoods.value = res.data.list
+        hasMore.value = res.data.list.length >= 10
       } else {
-        currentGoods.value = newList
-      }
-
-      if (newList.length < PAGE_SIZE) {
+        currentGoods.value = []
         hasMore.value = false
-      } else {
-        currentPage.value++
-        hasMore.value = true
       }
     } catch (e) {
-      console.error('Fetch goods error:', e)
-      if (!isLoadMore) currentGoods.value = []
+      console.error('Category switch error:', e)
+      currentGoods.value = []
     } finally {
-      goodsLoading.value = false
+      isSwitchingCategory.value = false
+    }
+  }
+
+  const loadMore = async () => {
+    if (isLoadingMore.value || !hasMore.value) return
+
+    isLoadingMore.value = true
+    const nextPage = currentPage.value + 1
+
+    try {
+      const res = await goodsApi.getGoodsList({
+        categoryId: activeCategoryId.value,
+        page: nextPage,
+        limit: 10
+      })
+
+      if (res.success && res.data) {
+        const newGoods = res.data.list
+        if (newGoods.length > 0) {
+          currentGoods.value = [...currentGoods.value, ...newGoods]
+          currentPage.value = nextPage
+          hasMore.value = newGoods.length >= 10
+        } else {
+          hasMore.value = false
+        }
+      }
+    } catch (e) {
+      console.error('Load more error:', e)
+    } finally {
       isLoadingMore.value = false
     }
   }
 
-  // Load More Trigger
-  const loadMore = () => {
-    fetchGoods(activeCategoryId.value, true)
-  }
-
-  // Handle Category Change
-  const handleCategoryChange = async (categoryId: string | number) => {
-    if (activeCategoryId.value === categoryId) return
-    activeCategoryId.value = categoryId
-    await fetchGoods(categoryId)
-  }
-
-  // Initialize Data
-  // Supports optional callback for platform-specific init logic (e.g., parsing URL query)
-  const initData = async (initialCategoryId?: string | number) => {
-    // 1. Fire non-blocking requests
-    fetchBanners() // Parallel, independent
-
-    // 2. Await critical path: Categories -> Goods
-    const firstCategoryId = await fetchCategories()
-
-    // 3. Determine target category
-    // If initialCategoryId is provided (e.g. from URL), use it
-    // Otherwise use the first category from API/Cache
-    let targetId = initialCategoryId || firstCategoryId
-
-    if (categories.value.length > 0 && initialCategoryId) {
-      // Verify if initial ID exists in categories
-      const exists = categories.value.find(c => String(c.id) === String(initialCategoryId))
-      if (!exists && firstCategoryId) targetId = firstCategoryId
-    } else if (!targetId && firstCategoryId) {
-      targetId = firstCategoryId
-    }
-
-    if (targetId) {
-      activeCategoryId.value = targetId
-      await fetchGoods(targetId)
+  // initData is MAINLY for override or recovery. 
+  // SSR data is already there. We do NOT call this by default in onMounted.
+  const initData = async (overrideCatId?: string | number) => {
+    // If override provided (e.g. from URL), switch to it immediately
+    if (overrideCatId && overrideCatId !== activeCategoryId.value) {
+      await handleCategoryChange(overrideCatId)
+    } else if (!data.value && !pending.value && !error.value) {
+      // Only refresh if we have absolutely nothing and no error
+      await refresh()
     }
   }
+
+  // Watch for hydration update to sync refs if they were empty initially (delayed hydration)
+  // This ensures if data arrives late (client-side fallback), refs get updated
+  watch(data, (val) => {
+    if (val && currentGoods.value.length === 0 && val.initialGoods.length > 0) {
+      activeCategoryId.value = val.initialCategoryId
+      currentGoods.value = val.initialGoods
+      hasMore.value = val.initialHasMore
+    }
+  })
 
   return {
-    // State
+    // Data
     banners,
     categories,
     currentGoods,
     activeCategoryId,
 
-    // Loading State
-    bannerLoading,
-    categoryLoading,
-    goodsLoading,
+    // Status
+    pending, // SSR Loading
+    goodsLoading: isSwitchingCategory, // Client Loading (Category switch)
     isLoadingMore,
     hasMore,
+    error,
 
     // Methods
     initData,
-    fetchGoods,
+    handleCategoryChange,
     loadMore,
-    handleCategoryChange
+    refresh // Expose standard refresh
   }
 }

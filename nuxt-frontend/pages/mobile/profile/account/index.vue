@@ -99,6 +99,12 @@
         @success="handleSuccess('昵称已更新')"
     />
 
+    <ChangeEmailModal 
+        :visible="activeModal === 'email'"
+        @close="activeModal = null"
+        @success="handleSuccess('邮箱已修改')"
+    />
+
     <MobileChangePasswordModal 
       :visible="activeModal === 'password'"
       @close="activeModal = null"

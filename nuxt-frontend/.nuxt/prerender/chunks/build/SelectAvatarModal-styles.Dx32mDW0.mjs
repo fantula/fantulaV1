@@ -1,0 +1,8 @@
+const SelectAvatarModal_vue_vue_type_style_index_0_scoped_5c7b9895_lang = ".current-avatar-section[data-v-5c7b9895]{align-items:center;border-bottom:1px solid hsla(0,0%,100%,.1);display:flex;flex-direction:column;gap:12px;margin-bottom:24px;padding-bottom:24px}.avatar-wrapper[data-v-5c7b9895]{border:2px solid rgba(6,182,212,.5);border-radius:50%;box-shadow:0 0 15px #06b6d433;height:80px;padding:2px;width:80px}.current-img[data-v-5c7b9895]{border-radius:50%;height:100%;-o-object-fit:cover;object-fit:cover;width:100%}.section-label[data-v-5c7b9895]{color:#94a3b8;font-size:13px;margin:0}.align-left[data-v-5c7b9895]{margin-bottom:12px;text-align:left;width:100%}.avatar-grid[data-v-5c7b9895]{display:grid;gap:16px;grid-template-columns:repeat(4,1fr)}.avatar-item[data-v-5c7b9895]{aspect-ratio:1;border:2px solid transparent;border-radius:50%;cursor:pointer;padding:2px;position:relative;transition:all .2s}.avatar-item[data-v-5c7b9895]:hover{transform:scale(1.05)}.avatar-item.active[data-v-5c7b9895]{border-color:#06b6d4;box-shadow:0 0 15px #06b6d466;transform:scale(1.1)}.grid-img[data-v-5c7b9895]{border-radius:50%;height:100%;-o-object-fit:cover;object-fit:cover;width:100%}.active-overlay[data-v-5c7b9895]{align-items:center;background:#06b6d44d;border-radius:50%;color:#fff;display:flex;inset:0;justify-content:center;position:absolute}";
+
+const SelectAvatarModalStyles_Dx32mDW0 = [
+  SelectAvatarModal_vue_vue_type_style_index_0_scoped_5c7b9895_lang
+];
+
+export { SelectAvatarModalStyles_Dx32mDW0 as default };
+//# sourceMappingURL=SelectAvatarModal-styles.Dx32mDW0.mjs.map

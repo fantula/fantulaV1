@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (process.server) return
 
     // 登录页无需验证
-    if (to.path === '/admin/login') return
+    if (to.path === '/manager_portal/login') return
 
     const adminStore = useAdminStore()
 
@@ -18,11 +18,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
     // 未登录跳转到登录页
     if (!adminStore.isLoggedIn) {
-        return navigateTo('/admin/login')
+        return navigateTo('/manager_portal/login')
     }
 
     // 细粒度权限检查
     if (!adminStore.hasPermission(to.path)) {
-        return navigateTo('/admin')  // 无权限跳转到仪表盘
+        return navigateTo('/manager_portal')  // 无权限跳转到仪表盘
     }
 })

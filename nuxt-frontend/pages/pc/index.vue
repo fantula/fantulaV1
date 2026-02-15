@@ -1,5 +1,14 @@
 <template>
   <div class="home-page">
+    <!-- PC-Only First Visit Animation -->
+    <ClientOnly>
+      <GlobalLoader 
+        v-if="showLoader" 
+        :loading="showLoader" 
+        @finish="handleLoaderFinish" 
+      />
+    </ClientOnly>
+
     <!-- 页面内容 -->
     
     <!-- 轮播图区域 -->
@@ -50,14 +59,19 @@
 
     <!-- 页脚 -->
 
-    <!-- 登录注册弹窗 -->
-    <LoginRegisterModal v-if="modal.showLogin" :visible="modal.showLogin" @close="modal.closeLogin()" />
+    <!-- 登录注册弹窗 (Hydration Safe) -->
+    <LoginRegisterModal 
+      v-if="isMounted && modal.showLogin" 
+      :visible="modal.showLogin" 
+      @close="modal.closeLogin()" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'pc'
+  layout: 'pc',
+  keepalive: true // Enable state preservation
 })
 
 import { ref, onMounted, defineAsyncComponent } from 'vue'
@@ -89,18 +103,21 @@ useHead({
 })
 
 // 3. 核心业务逻辑 (使用共享 Composable)
+// 3. 核心业务逻辑 (使用共享 Composable)
+// SSR: await ensures data is ready before rendering handling
 const {
   banners,
   categories,
   currentGoods,
   activeCategoryId,
-  goodsLoading,
+  goodsLoading, // Client-side switching loading
+  pending,      // SSR/Initial loading
   isLoadingMore,
   hasMore,
   initData,
   handleCategoryChange: _handleCategoryChange,
   loadMore
-} = useHomeData()
+} = await useHomeData('home-data-pc') // Note: await is critical here for SSR
 
 // 包装 CategoryChange 以同步 URL
 const handleCategoryChange = async (categoryId: string | number) => {
@@ -108,19 +125,59 @@ const handleCategoryChange = async (categoryId: string | number) => {
   router.replace({ query: { ...route.query, category_id: categoryId } })
 }
 
+// Hydration Safety
+const isMounted = ref(false)
+
+// 4. First Visit Animation Logic
+const showLoader = ref(true) // Default to TRUE to prevent FOUC
+const GlobalLoader = defineAsyncComponent(() => import('@/components/shared/GlobalLoader.vue'))
+
 onMounted(() => {
+  // Check if first visit today
+  const today = new Date().toDateString()
+  const lastVisit = localStorage.getItem('fantula_pc_visit')
+
+  // Scenario A: Return Visitor (Visited Today) -> Instant Entry
+  if (lastVisit === today) {
+    showLoader.value = false
+  } 
+  // Scenario B: First Visit -> Keep Loading (Animation plays)
+  else {
+    localStorage.setItem('fantula_pc_visit', today)
+  }
+
   // 预加载弹窗素材（消除闪烁）
   preloadModalAssets()
+  
+  // Hydration Safety
+  isMounted.value = true
+  
   // 初始化页面数据 (传入 URL 中的 classify_id)
+  // Note: Data is already fetched by SSR/Hydration in useHomeData
+  // But we might need to handle specific query param if it differs from default
   const queryCategoryId = route.query.category_id ? String(route.query.category_id) : undefined
-  initData(queryCategoryId)
+  if (queryCategoryId) {
+      initData(queryCategoryId)
+  }
 })
+
+const handleLoaderFinish = () => {
+  // Fade out
+  setTimeout(() => {
+    showLoader.value = false
+  }, 500)
+}
 
 const modal = useModalStore()
 </script>
 
 <style scoped>
 
+
+/* Ensure loader covers everything */
+:deep(.global-loader) {
+  z-index: 10000;
+}
 
 .empty-state {
   padding: 60px 0;

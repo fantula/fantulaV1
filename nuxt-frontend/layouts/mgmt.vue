@@ -176,7 +176,7 @@ const isLoading = ref(true);
 const isDark = ref(false);
 
 // 判断是否在登录页 - 登录页直接渲染，不显示侧边栏
-const isLoginPage = computed(() => route.path === '/admin/login');
+const isLoginPage = computed(() => route.path === '/manager_portal/login');
 
 const currentUser = computed(() => adminStore.adminInfo);
 
@@ -210,7 +210,7 @@ const filteredMenuList = computed(() => {
   // 根据权限过滤菜单
   return menuList.value.filter(item => {
     // 仪表盘始终可见
-    if (item.index === '/admin') return true;
+    if (item.index === '/manager_portal') return true;
     // 检查是否有权限访问该菜单
     return permissions.includes(item.index);
   });
@@ -296,7 +296,7 @@ const waitForAuth = async () => {
 const handleLogout = async () => {
   await adminStore.logout();
   ElMessage.success('已退出登录');
-  await router.push('/admin/login');
+  await router.push('/manager_portal/login');
 };
 
 onMounted(() => {

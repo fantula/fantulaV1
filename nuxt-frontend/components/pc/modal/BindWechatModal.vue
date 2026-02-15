@@ -26,8 +26,9 @@
         </div>
         
         <div class="action-area">
-           <button class="btn-secondary" @click="handleUnbind" disabled>
-             <el-icon><Connection /></el-icon> 解除绑定 (暂未开放)
+           <button class="btn-secondary" @click="handleUnbind" :disabled="loading">
+             <el-icon v-if="loading" class="is-loading"><Loading /></el-icon>
+             <el-icon v-else><Connection /></el-icon> 解除绑定
            </button>
         </div>
       </div>
@@ -70,7 +71,7 @@
 <script setup lang="ts">
 import { ref, watch, onUnmounted } from 'vue'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
-import { ChatDotRound, Connection, Select, Refresh } from '@element-plus/icons-vue'
+import { ChatDotRound, Connection, Select, Refresh, Loading } from '@element-plus/icons-vue'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/client/user'
@@ -193,9 +194,40 @@ const handleClose = () => {
   emit('update:visible', false)
 }
 
-const handleUnbind = () => {
-   // Placeholder
-   ElMessage.info('如需解绑请联系客服')
+const handleUnbind = async () => {
+    try {
+        await ElMessageBox.confirm(
+            '解除绑定后将无法通过微信快速登录，确定要解绑吗？',
+            '解除绑定',
+            {
+                confirmButtonText: '确定解绑',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
+        )
+        
+        loading.value = true
+        const res = await wechatLoginApi.unbindWechat()
+        if (res.success) {
+            ElMessage.success('解除绑定成功')
+            // Refresh user info
+            await userStore.fetchUserInfo()
+            // Reset to bind state? The modal props 'isBound' depends on parent or store? 
+            // In PC modal, isBound is a prop. If we update store, parent might update prop.
+            // But we should also emit success to let parent validation know.
+            emit('success')
+            // Don't close, allow rebind
+        } else {
+            ElMessage.error(res.msg || '解绑失败')
+        }
+    } catch (e) {
+        if (e !== 'cancel') {
+             console.error(e)
+             ElMessage.error('操作失败')
+        }
+    } finally {
+        loading.value = false
+    }
 }
 
 watch(() => props.visible, (val) => {

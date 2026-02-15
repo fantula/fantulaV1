@@ -41,7 +41,7 @@
       <!-- 3. Goods List -->
       <div class="goods-list-section">
         
-        <div v-if="goodsLoading && currentGoods.length === 0" class="loading-state">
+        <div v-if="(pending || goodsLoading) && currentGoods.length === 0" class="loading-state">
            <MobileProductCardSkeleton v-for="i in 6" :key="i" />
         </div>
         
@@ -90,21 +90,23 @@
       </button>
     </transition>
 
-    <!-- Sheets -->
-    <ProductDetailSheet 
-      v-model:visible="showDetailSheet" 
-      :goods-id="selectedGoodsId" 
-    />
-    
-    <MobileLoginSheet 
-      :visible="showLoginSheet" 
-      @close="showLoginSheet = false" 
-    />
+    <!-- Sheets (Hydration Safe: Only render on client) -->
+    <template v-if="isMounted">
+      <ProductDetailSheet 
+        v-model:visible="showDetailSheet" 
+        :goods-id="selectedGoodsId" 
+      />
+      
+      <MobileLoginSheet 
+        :visible="showLoginSheet" 
+        @close="showLoginSheet = false" 
+      />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, defineAsyncComponent, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, defineAsyncComponent, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowUpBold } from '@element-plus/icons-vue'
 import { wechatLoginApi } from '@/api/client/wechat-login'
@@ -129,21 +131,25 @@ const route = useRoute()
 const userStore = useUserStore()
 
 // Shared Logic from Composable
+// SSR: await ensures data is ready before rendering handling
 const { 
   banners, 
   categories, 
   currentGoods, 
   activeCategoryId,
-  bannerLoading,
-  categoryLoading,
-  goodsLoading, 
+  pending,
+  goodsLoading,
   hasMore, 
   isLoadingMore,
   initData,
-  handleCategoryChange: _handleCategoryChange, // Rename to avoid conflict if we need wrapper
+  refresh,
+  handleCategoryChange: _handleCategoryChange, 
   loadMore
-} = useHomeData()
+} = await useHomeData('home-data-mobile')
 
+// Map new pending state to old flags for template compatibility
+const bannerLoading = pending
+const categoryLoading = pending
 
 // UI State (Mobile Specific)
 const isScrolled = ref(false)
@@ -160,6 +166,9 @@ const startY = ref(0)
 const hasVibrated = ref(false)
 const PULL_THRESHOLD = 60
 const MAX_PULL = 120
+
+// Hydration Safety
+const isMounted = ref(false)
 
 const pullText = computed(() => {
   if (isRefreshing.value) return 'Refreshing...'
@@ -283,10 +292,11 @@ const handleTouchEnd = async () => {
     pullDistance.value = 50 // 保持指示器显示
 
     try {
-      await initData(activeCategoryId.value)
+      // Use standard SSR refresh
+      await refresh()
       // 成功后触觉反馈
       if (navigator?.vibrate) {
-        navigator.vibrate([30, 20, 30]) // 成功的节奏感震动
+        navigator.vibrate([30, 20, 30])
       }
     } catch (error) {
       if (import.meta.dev) {
@@ -324,11 +334,11 @@ const handleTouchEnd = async () => {
 
 // Init
 onMounted(async () => {
+    isMounted.value = true
     try {
         // 【关键】处理微信授权回调的 code 参数
         const code = route.query.code as string
-        // const state = route.query.state as string
-
+        
         if (code && !userStore.isLoggedIn) {
             if (import.meta.dev) {
                 console.log('[MobileHome] Processing WeChat OAuth callback...')
@@ -337,14 +347,11 @@ onMounted(async () => {
                 const res = await wechatLoginApi.oauthLogin(code)
                 if (res.success && res.data) {
                     if (res.data.status === 'logged_in' && res.data.actionLink) {
-                        // 有 Magic Link，直接跳转（不显示loading避免双动画）
-                        if (import.meta.dev) {
-                            console.log('[MobileHome] Redirecting to Magic Link...')
-                        }
+                        // 有 Magic Link，直接跳转
                         window.location.href = res.data.actionLink
                         return // 停止后续执行
                     } else if (res.data.status === 'need_bind') {
-                        // 需要绑定邮箱，跳转到 wechat-callback 页面
+                        // 需要绑定邮箱
                         router.replace(`/mobile/wechat-callback?code=${code}`)
                         return
                     }
@@ -358,8 +365,8 @@ onMounted(async () => {
             router.replace({ path: '/mobile', query: {} })
         }
         
-        // Use shared init logic
-        await initData()
+         // Removed explicit initData() as SSR handles it
+         // We only init if we have specific query param that might differ
         
         // 设置滚动加载监听
         setupObserver()

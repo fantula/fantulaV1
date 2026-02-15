@@ -48,33 +48,37 @@ const status_get = defineEventHandler(async (event) => {
     if (adminError || !adminCaller || adminCaller.status !== "enabled") {
       throw createError({ statusCode: 403, statusMessage: "Unauthorized" });
     }
-    const results = {
-      db: { status: "success", message: "Connected", latency: 0 },
-      storage: { status: "success", message: "Connected" }
-    };
-    const start = Date.now();
-    const { error: dbError } = await adminClient.from("admin_users").select("id").limit(1);
-    results.db.latency = Date.now() - start;
-    if (dbError) {
-      results.db.status = "danger";
-      results.db.message = "Error: " + dbError.message;
-    } else {
-      results.db.message = `Connected (Latency: ${results.db.latency}ms)`;
+    const probeUrl = "http://127.0.0.1:8000/functions/v1/system-health";
+    const serviceKey = config.supabaseServiceKey;
+    try {
+      const response = await $fetch(probeUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${serviceKey}`,
+          "Content-Type": "application/json"
+        },
+        timeout: 5e3
+        // 5s timeout
+      });
+      return { success: true, results: response };
+    } catch (probeError) {
+      console.error("Probe Failed:", probeError);
+      return {
+        success: false,
+        error: "Probe unreachable: " + probeError.message,
+        results: {
+          status: "critical",
+          checks: {
+            system: { status: "error", error: probeError.message }
+          }
+        }
+      };
     }
-    const { error: storageError } = await adminClient.storage.listBuckets();
-    if (storageError) {
-      results.storage.status = "danger";
-      results.storage.message = "Error: " + storageError.message;
-    }
-    return { success: true, results };
   } catch (err) {
     return {
       success: false,
       error: err.message,
-      results: {
-        db: { status: "danger", message: "Check Failed" },
-        storage: { status: "danger", message: "Check Failed" }
-      }
+      results: null
     };
   }
 });

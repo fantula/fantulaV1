@@ -1,3 +1,5 @@
+import { isMobileUserAgent } from '@/utils/device'
+
 export default defineNuxtRouteMiddleware((to, from) => {
     // 后台订单管理根路径重定向
     if (to.path === '/admin/orders' || to.path === '/admin/orders/') {
@@ -12,9 +14,9 @@ export default defineNuxtRouteMiddleware((to, from) => {
         if (import.meta.server) {
             const event = useRequestEvent()
             const userAgent = event?.node?.req?.headers?.['user-agent'] || ''
-            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
+            isMobile = isMobileUserAgent(userAgent)
         } else {
-            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            isMobile = isMobileUserAgent(navigator.userAgent)
         }
 
         return navigateTo(isMobile ? '/mobile' : '/pc')
@@ -24,7 +26,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     if (import.meta.server) {
         const event = useRequestEvent()
         const userAgent = event?.node?.req?.headers?.['user-agent'] || ''
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)
+        const isMobile = isMobileUserAgent(userAgent)
 
         // 如果是移动设备访问 /pc 路径，重定向到 /mobile
         if (isMobile && to.path.startsWith('/pc')) {
@@ -32,10 +34,14 @@ export default defineNuxtRouteMiddleware((to, from) => {
             return navigateTo(mobilePath)
         }
 
-        // 如果是PC设备访问 /mobile 路径，重定向到 /pc
+        // REMOVED: Do NOT force PC users off /mobile. 
+        // This allows desktop users to test mobile view by resizing window,
+        // and prevents infinite loops when client-side logic redirects based on width.
+        /*
         if (!isMobile && to.path.startsWith('/mobile')) {
             const pcPath = to.path.replace('/mobile', '/pc')
             return navigateTo(pcPath)
         }
+        */
     }
 })

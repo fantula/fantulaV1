@@ -12,7 +12,8 @@
           <div class="cart-wrapper-rel" ref="cartWrapperRef">
               <button class="icon-btn" @click.stop="toggleMiniCart">
                  <el-icon><ShoppingCart /></el-icon>
-                 <div v-if="cartStore.totalCount > 0" class="badge-dot-header"></div>
+                 <!-- Hydration Safe: Defer badge -->
+                 <div v-if="isMounted && cartStore.totalCount > 0" class="badge-dot-header"></div>
               </button>
               
               <MobileMiniCart 
@@ -27,23 +28,37 @@
           </button>
 
           <!-- 3. User/Login (Last/Right) -->
-          <template v-if="!userStore.isLoggedIn">
+          <!-- 
+            HYDRATION SAFETY: 
+            Use ClientOnly to handle auth state differences.
+            Server renders fallback (Guest). Client updates after mount.
+            This suppresses hydration mismatch warnings.
+          -->
+          <ClientOnly>
+            <template #fallback>
               <button class="icon-btn" @click="$emit('open-login')">
                  <el-icon><User /></el-icon>
               </button>
-          </template>
-          <template v-else>
-             <div class="header-avatar" @click="router.push('/mobile/profile')">
-                <div v-if="userStore.loading" class="avatar-skeleton"></div>
-                <template v-else>
-                    <img 
-                      :src="userStore.user?.avatar || DEFAULT_AVATAR" 
-                      @error="(e) => (e.target as HTMLImageElement).src = DEFAULT_AVATAR"
-                    />
-                    <div class="avatar-ring"></div>
-                </template>
-             </div>
-          </template>
+            </template>
+            
+            <template v-if="!userStore.isLoggedIn">
+                <button class="icon-btn" @click="$emit('open-login')">
+                   <el-icon><User /></el-icon>
+                </button>
+            </template>
+            <template v-else>
+               <div class="header-avatar" @click="router.push('/mobile/profile')">
+                  <div v-if="userStore.loading" class="avatar-skeleton"></div>
+                  <template v-else>
+                      <img 
+                        :src="userStore.user?.avatar || DEFAULT_AVATAR" 
+                        @error="(e) => (e.target as HTMLImageElement).src = DEFAULT_AVATAR"
+                      />
+                      <div class="avatar-ring"></div>
+                  </template>
+               </div>
+            </template>
+          </ClientOnly>
       </div>
     </div>
   </header>
@@ -71,6 +86,9 @@ const cartStore = useCartStore()
 const showMiniCart = ref(false)
 const cartWrapperRef = ref<HTMLElement | null>(null)
 
+// Hydration safety
+const isMounted = ref(false)
+
 const toggleMiniCart = () => {
     showMiniCart.value = !showMiniCart.value
 }
@@ -83,6 +101,7 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 onMounted(() => {
+    isMounted.value = true
     document.addEventListener('click', handleClickOutside)
 })
 

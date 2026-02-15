@@ -75,15 +75,38 @@ const bindWechat_post = defineEventHandler(async (event) => {
       config.public.supabaseUrl,
       config.public.supabaseAnonKey
     );
-    const { data: authData, error: verifyError } = await anonClient.auth.verifyOtp({
+    let authData;
+    let verifyError;
+    const resEmail = await anonClient.auth.verifyOtp({
       email: body.email,
       token: body.code,
       type: "email"
     });
-    if (verifyError) {
+    if (!resEmail.error) {
+      authData = resEmail.data;
+      verifyError = null;
+    } else {
+      console.log("[BindWechat] verifyOtp(type=email) failed:", resEmail.error.message);
+      const resSignup = await anonClient.auth.verifyOtp({
+        email: body.email,
+        token: body.code,
+        type: "signup"
+      });
+      if (!resSignup.error) {
+        console.log("[BindWechat] verifyOtp(type=signup) succeeded");
+        authData = resSignup.data;
+        verifyError = null;
+      } else {
+        verifyError = resEmail.error;
+        if (resSignup.error.message !== resEmail.error.message) {
+          console.log("[BindWechat] verifyOtp(type=signup) failed:", resSignup.error.message);
+        }
+      }
+    }
+    if (verifyError || !(authData == null ? void 0 : authData.user)) {
       throw createError({
         statusCode: 400,
-        message: verifyError.message || "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6216\u5DF2\u8FC7\u671F"
+        message: "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6216\u5DF2\u8FC7\u671F"
       });
     }
     if (!authData.user) {

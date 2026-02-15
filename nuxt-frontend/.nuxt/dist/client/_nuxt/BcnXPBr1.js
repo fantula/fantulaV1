@@ -1,1 +1,0 @@
-import{l as t}from"./BZpGQicP.js";const s=t(!1),o=t(""),a=t("info");let e=null;const c=()=>({isVisible:s,message:o,type:a,showToast:(l,u="info",i=2e3)=>{e&&(clearTimeout(e),s.value=!1),o.value=l,a.value=u,s.value=!0,e=setTimeout(()=>{s.value=!1,e=null},i)},hideToast:()=>{s.value=!1,e&&clearTimeout(e)}});export{c as u};

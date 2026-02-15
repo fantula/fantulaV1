@@ -1,0 +1,5 @@
+const post_vue_vue_type_style_index_0_scoped_216bafc9_lang = ".faq-post-page[data-v-216bafc9]{margin:0 auto;max-width:800px}.page-title[data-v-216bafc9]{font-size:24px;margin:0}.form-card[data-v-216bafc9]{background:var(--el-bg-color);border-radius:8px;box-shadow:var(--el-box-shadow-lighter);padding:40px}.faq-form[data-v-216bafc9]{max-width:100%}.form-tip[data-v-216bafc9]{color:var(--el-text-color-secondary);font-size:13px;line-height:1.5;margin-top:4px}.product-option[data-v-216bafc9]{align-items:center;display:flex;justify-content:space-between}.product-id-sub[data-v-216bafc9]{color:var(--el-text-color-secondary);font-size:12px}";
+export {
+  post_vue_vue_type_style_index_0_scoped_216bafc9_lang as default
+};
+//# sourceMappingURL=post-styles-1.mjs-IfcCtJEO.js.map

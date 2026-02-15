@@ -25,11 +25,18 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
 
   // --- 2. 数据获取 ---
   // PC 端 (Route ID) 默认立即获取; 移动端 (Override ID) 默认不立即获取，由组件控制
-  const shouldAutoFetch = computed(() => !unref(overrideId))
+  const shouldAutoFetch = computed(() => {
+    // If overrideId is provided, we wait for manual init (Mobile Sheet)
+    // If route.params.id is missing (e.g. initial render), we also shouldn't fetch
+    return !unref(overrideId) && !!goodsId.value && goodsId.value !== 'undefined'
+  })
 
   const { data: goodsResponse, error: fetchError, pending, refresh: fetchGoodsData } = useAsyncData(
     () => `goods-detail-${goodsId.value}`,
-    () => goodsApi.getGoodsDetail(goodsId.value),
+    async () => {
+      if (!goodsId.value || goodsId.value === 'undefined') return null
+      return await goodsApi.getGoodsDetail(goodsId.value)
+    },
     {
       watch: [goodsId],
       immediate: shouldAutoFetch.value,
@@ -297,7 +304,10 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
   const initClientState = async () => {
     // 如果需要手动获取 (Mobile)
     if (!shouldAutoFetch.value) {
-      await fetchGoodsData()
+      // Fix: Only fetch if data is missing or invalid to avoid duplicate fetch on hydration
+      if (!goodsData.value || !goodsData.value.success) {
+        await fetchGoodsData()
+      }
     }
 
     // 等待数据加载完成

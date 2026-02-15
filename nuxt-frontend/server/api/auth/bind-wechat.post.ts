@@ -99,6 +99,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // 尝试通过验证码验证邮箱（同时可能创建新用户）
+        // 策略: 先尝试 type='email' (老用户登录/合并)，如果失败再尝试 type='signup' (新用户注册)
         const { createClient } = await import('@supabase/supabase-js')
         const config = useRuntimeConfig()
 
@@ -108,16 +109,49 @@ export default defineEventHandler(async (event) => {
             config.public.supabaseAnonKey as string
         )
 
-        const { data: authData, error: verifyError } = await anonClient.auth.verifyOtp({
+        let authData
+        let verifyError
+
+        // 1. 先试 email (Magic Link/Login)
+        const resEmail = await anonClient.auth.verifyOtp({
             email: body.email,
             token: body.code,
             type: 'email',
         })
 
-        if (verifyError) {
+        if (!resEmail.error) {
+            authData = resEmail.data
+            verifyError = null
+        } else {
+            // 2. 如果失败，且错误提示相关，尝试 signup (Registration)
+            console.log('[BindWechat] verifyOtp(type=email) failed:', resEmail.error.message)
+
+            const resSignup = await anonClient.auth.verifyOtp({
+                email: body.email,
+                token: body.code,
+                type: 'signup',
+            })
+
+            if (!resSignup.error) {
+                console.log('[BindWechat] verifyOtp(type=signup) succeeded')
+                authData = resSignup.data
+                verifyError = null
+            } else {
+                // 两个都失败，以第一个错误为准，或者返回通用错误
+                verifyError = resEmail.error // Prefer original error or specific one?
+                // Actually if signup fails too, it's definitely invalid.
+                // But typically if it was a signup code, verifyOtp(email) says "Token invalid".
+                // If we pass back resSignup.error it might be "Token expired" etc.
+                if (resSignup.error.message !== resEmail.error.message) {
+                    console.log('[BindWechat] verifyOtp(type=signup) failed:', resSignup.error.message)
+                }
+            }
+        }
+
+        if (verifyError || !authData?.user) {
             throw createError({
                 statusCode: 400,
-                message: verifyError.message || '验证码错误或已过期',
+                message: '验证码错误或已过期',
             })
         }
 

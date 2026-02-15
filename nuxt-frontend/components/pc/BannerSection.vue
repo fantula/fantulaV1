@@ -18,7 +18,7 @@
             >
               <template #placeholder>
                 <div class="image-placeholder">
-                  <el-icon class="is-loading"><Loading /></el-icon>
+                  <el-icon class="is-loading"><LoadingIcon /></el-icon>
                 </div>
               </template>
             </el-image>
@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { Loading } from '@element-plus/icons-vue'
+import { Loading as LoadingIcon } from '@element-plus/icons-vue'
 import type { Banner } from '@/types/api'
 
 defineProps<{

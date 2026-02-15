@@ -16,43 +16,47 @@
 
       <form @submit.prevent="onBind" class="bind-form">
         <div class="input-group">
-          <input 
+          <!-- Shared Email Input -->
+          <EmailInput 
             v-model="bindForm.email" 
-            type="email" 
-            placeholder="请输入邮箱" 
-            required 
+            :required="true" 
+            placeholder="请输入邮箱"
           />
         </div>
+        
         <div class="input-group code-row">
           <input 
             v-model="bindForm.code" 
             type="text" 
             placeholder="验证码" 
             required 
+            class="custom-input"
           />
-          <button 
-            type="button" 
-            class="send-code-btn" 
-            :disabled="codeTimer > 0" 
-            @click="sendCode"
-          >
-            {{ codeTimer > 0 ? `${codeTimer}s` : '发送' }}
-          </button>
+          <!-- Shared Send Code Button -->
+          <SendCodeButton 
+            :loading="loading" 
+            :countdown="codeTimer" 
+            @click="sendCode" 
+          />
         </div>
+
         <div class="input-group">
           <input 
             v-model="bindForm.password" 
             type="password" 
             placeholder="设置密码（可选）" 
+            class="custom-input"
           />
         </div>
+
         <div class="form-agreement">
           <label>
             <input type="checkbox" v-model="bindForm.agree" />
             <span>同意 <span class="link">用户协议</span> 和 <span class="link">隐私政策</span></span>
           </label>
         </div>
-        <button class="submit-btn" type="submit" :disabled="loading || !bindForm.agree">
+
+        <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !bindForm.agree">
           {{ loading ? '绑定中...' : '绑定并登录' }}
         </button>
       </form>
@@ -74,23 +78,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { getSupabaseClient } from '~/utils/supabase'
 import { ElMessageBox } from 'element-plus'
-import { useGlobalLoading } from '@/composables/useGlobalLoading' // Import
+import { useGlobalLoading } from '@/composables/useGlobalLoading'
+import { useNotify } from '@/composables/useNotify'
+
+// Components
+import EmailInput from '@/components/shared/EmailInput.vue'
+import SendCodeButton from '@/components/shared/SendCodeButton.vue'
+import { useSendCode } from '@/composables/client/useSendCode'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const { success, error, warning } = useNotify()
 
 const state = ref<'loading' | 'bind' | 'success' | 'error'>('loading')
 const errorMsg = ref('')
 const bindToken = ref('')
-
 
 const bindForm = ref({
   email: '',
@@ -101,8 +111,6 @@ const bindForm = ref({
   avatar: undefined as string | undefined,
 })
 
-import { useSendCode } from '@/composables/client/useSendCode'
-
 const { 
   loading: codeLoading, 
   countdown: codeTimer, 
@@ -110,11 +118,9 @@ const {
 } = useSendCode({ timerKey: 'wechat_bind_timer' })
 
 const baseLoading = ref(false)
-const loading = computed(() => baseLoading.value || codeLoading.value)
-// const codeTimer = ref(0) // Replaced
-let codeInterval: any = null // clear on unmount if any? useSendCode handles it.
+const uniqueLoading = ref(false)
+const loading = computed(() => baseLoading.value || codeLoading.value || uniqueLoading.value)
 
-// Global Loading
 const globalLoading = useGlobalLoading()
 
 onMounted(async () => {
@@ -122,21 +128,24 @@ onMounted(async () => {
   if (route.hash && route.hash.includes('access_token')) {
     console.log('[WechatCallback] Magic Link hash detected')
     // state.value = 'loading' 
-    globalLoading.show('正在验证登录...') // Global Show
+    globalLoading.show('正在验证登录...') 
     
     // 监听 Auth 状态变化 (Supabase 客户端会自动处理 Hash 并恢复 Session)
     const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
+      console.log('登录状态变化:', event, session?.user?.id) // Added log
       if (event === 'SIGNED_IN' && session) {
         console.log('[WechatCallback] Session restored from hash')
         
         // 确保 userStore 同步
         await userStore.setUser(session.user, session.access_token)
+        console.log('[WechatCallback] UserStore updated', userStore.user?.id) // Added log
+
         
         // state.value = 'success'
-        globalLoading.success('登录成功') // Global Success
+        globalLoading.success('登录成功') 
         setTimeout(() => {
             const returnTo = route.query.return_to as string
-            globalLoading.hide() // Ensure hide before nav
+            globalLoading.hide() 
             if (returnTo) {
                 window.location.href = decodeURIComponent(returnTo)
             } else {
@@ -160,7 +169,7 @@ onMounted(async () => {
                 router.replace('/mobile/profile/account')
             }
          }, 800)
-         subscription.unsubscribe() // clean up
+         subscription.unsubscribe() 
          return
     }
     
@@ -258,12 +267,10 @@ onMounted(async () => {
 
     if (res.data.status === 'logged_in') {
       // 已有绑定账号，通过 Magic Link 完成自动登录
-      // 流程: 跳转 Magic Link → GoTrue 验证 → 重定向回 wechat-callback#access_token=xxx
-      //       → onMounted 的 hash 分支处理 → 建立 session → 登录成功
       
       if (res.data.actionLink) {
          // state.value = 'success'
-         globalLoading.show('正在跳转...') // Keep showing or update text
+         globalLoading.show('正在跳转...') 
          console.log('[WechatCallback] Redirecting to Magic Link for auto-login...')
          window.location.href = res.data.actionLink
       } else {
@@ -293,18 +300,19 @@ onMounted(async () => {
 })
 
 const sendCode = async () => {
-  if (codeTimer.value > 0) return
+  if (loading.value || codeTimer.value > 0) return // Debounce & timer check
   if (!bindForm.value.email) {
-    errorMsg.value = '请输入邮箱'
+    warning('请输入邮箱') // Global notify
     return
   }
 
-  baseLoading.value = true
+  // 1. Check if email exists (Pre-flight check)
+  // We do not set global loading here to avoid full screen block, just button loading
+  uniqueLoading.value = true 
   try {
-    // 1. Check if email exists (Pre-flight check)
     const checkRes = await authApi.checkEmailAvailable(bindForm.value.email)
     if (!checkRes.success) {
-       errorMsg.value = checkRes.msg || '检查邮箱失败'
+       error(checkRes.msg || '检查邮箱失败')
        return
     }
 
@@ -320,7 +328,9 @@ const sendCode = async () => {
              confirmButtonText: '确认关联',
              cancelButtonText: '更换邮箱',
              type: 'warning',
-             customClass: 'mobile-msg-box' // Optional class for mobile styling
+             customClass: 'mobile-msg-box', // Custom Style
+             showClose: false,
+             center: true,
            }
          )
        } catch {
@@ -333,21 +343,20 @@ const sendCode = async () => {
     await sendBindCode(bindForm.value.email)
   } catch (err: any) {
     console.error(err)
-    errorMsg.value = '发送失败: ' + (err.message || '网络错误')
+    error('发送失败: ' + (err.message || '网络错误'))
   } finally {
-    baseLoading.value = false
+    uniqueLoading.value = false
   }
 }
 
-// const startTimer = (seconds: number) => { ... } // Removed
-
 const onBind = async () => {
+  if (loading.value) return // Debounce
   if (!bindForm.value.agree) {
-    errorMsg.value = '请同意协议'
+    warning('请同意协议') // Global notify
     return
   }
   if (!bindToken.value) {
-    errorMsg.value = '绑定凭证无效，请重新登录'
+    error('绑定凭证无效，请重新登录')
     return
   }
 
@@ -363,9 +372,8 @@ const onBind = async () => {
     })
 
     if (res.success && res.data) {
-      globalLoading.show('正在完成绑定...') // Show loading again
+      globalLoading.show('正在完成绑定...') 
       // 🔑 关键：在 Supabase JS Client 上建立 session
-      // 否则后续的 auth.getUser() 会返回 null（未登录）
       const client = getSupabaseClient()
       if (res.data.session?.access_token && res.data.session?.refresh_token) {
         await client.auth.setSession({
@@ -377,7 +385,7 @@ const onBind = async () => {
       // 设置 userStore 并刷新完整用户信息（含 openId）
       userStore.setUser(res.data.user, res.data.session?.access_token)
       await userStore.fetchUserInfo()
-      // state.value = 'success' // Use Global
+      
       globalLoading.success('绑定成功')
       setTimeout(() => {
         globalLoading.hide()
@@ -390,9 +398,11 @@ const onBind = async () => {
       }, 1000)
     } else {
       errorMsg.value = res.msg || '绑定失败'
+      error(res.msg || '绑定失败') // Global notify
     }
   } catch (err: any) {
     errorMsg.value = err.message || '绑定失败'
+    error(err.message || '绑定失败') // Global notify
   } finally {
     baseLoading.value = false
   }
@@ -406,7 +416,8 @@ const goHome = () => {
 <style scoped>
 .wechat-callback-page {
   min-height: 100vh;
-  background: #0F172A;
+  background: #0F172A; /* Fallback */
+  background: var(--bg-page);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,7 +473,7 @@ const goHome = () => {
   cursor: pointer;
 }
 
-/* Bind Form */
+/* Bind Form - Authenticated by Aurora Design */
 .callback-bind {
   width: 100%;
   max-width: 360px;
@@ -477,6 +488,7 @@ const goHome = () => {
   color: #fff;
   font-size: 20px;
   margin: 16px 0 8px;
+  font-weight: 700;
 }
 
 .bind-header p {
@@ -484,47 +496,61 @@ const goHome = () => {
   font-size: 14px;
 }
 
-.bind-form .input-group {
-  margin-bottom: 16px;
+.input-group {
+  margin-bottom: 20px;
   position: relative;
 }
 
-.bind-form input[type="email"],
-.bind-form input[type="text"],
-.bind-form input[type="password"] {
+/* Custom Input Style to match EmailInput */
+.custom-input {
   width: 100%;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  height: 54px;
+  background: rgba(0, 0, 0, 0.25);
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
   padding: 0 16px;
   color: #fff;
-  font-size: 15px;
+  font-size: 16px;
   outline: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.code-row {
-  display: flex;
-  gap: 12px;
+.custom-input:focus {
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom-color: var(--color-brand-primary, #178fc6);
+  box-shadow: 0 4px 15px -4px var(--color-brand-glow, rgba(23, 143, 198, 0.3));
 }
 
-.code-row input {
-  flex: 1;
+.code-row .custom-input {
+  padding-right: 120px; /* Space for button */
 }
 
-.send-code-btn {
-  width: 80px;
+/* Submit Button */
+.submit-btn {
+  width: 100%;
   height: 50px;
-  background: #1E293B;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border: none;
+  border-radius: 25px; /* Pill shape */
   color: #fff;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  background: linear-gradient(135deg, var(--color-brand-primary, #178fc6), var(--color-accent, #F97316));
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+  transition: all 0.3s;
 }
 
-.send-code-btn:disabled {
+.submit-btn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: #334155;
+}
+
+.submit-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
 .form-agreement {
@@ -533,31 +559,67 @@ const goHome = () => {
   color: #64748B;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .form-agreement input {
   margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent, #F97316);
 }
 
 .link {
-  color: #3B82F6;
-}
-
-.submit-btn {
-  width: 100%;
-  height: 50px;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
-  border: none;
-  border-radius: 25px;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-brand-primary, #178fc6);
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+</style>
+
+<style>
+/* Global Styles for Mobile Msg Box (Unscoped) */
+.mobile-msg-box {
+  width: 90% !important;
+  max-width: 320px !important;
+  background: rgba(30, 41, 59, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  padding-bottom: 15px !important;
 }
 
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.mobile-msg-box .el-message-box__title {
+  color: #fff !important;
+  font-size: 18px !important;
+}
+
+.mobile-msg-box .el-message-box__message p {
+  color: #CBD5E1 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+.mobile-msg-box .el-message-box__btns {
+  flex-direction: column-reverse; /* Stack buttons */
+  gap: 10px;
+}
+
+.mobile-msg-box .el-button {
+  width: 100% !important;
+  margin: 0 !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+.mobile-msg-box .el-button--primary {
+  background: linear-gradient(90deg, #F59E0B, #EA580C) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.mobile-msg-box .el-button--default {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #94A3B8 !important;
 }
 </style>

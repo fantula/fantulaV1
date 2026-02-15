@@ -1,7 +1,4 @@
 <template>
-  <!-- 全局 Logo 动画 (仅PC端首次访问) -->
-  <GlobalLoader v-if="showGlobalLoader" :loading="showGlobalLoader" @finish="handleLoaderFinish" />
-
   <!-- 顶部进度条 (页面导航时的加载指示) -->
   <NuxtLoadingIndicator color="#3B82F6" :height="3" :throttle="200" />
 
@@ -9,63 +6,36 @@
   <GlobalLoading />
 
   <NuxtLayout>
-    <NuxtPage />
+    <NuxtPage :keepalive="{ max: 10 }" />
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
-const GlobalLoader = defineAsyncComponent(() => import('@/components/shared/GlobalLoader.vue'))
+import { isPC } from '@/utils/device'
 
 const route = useRoute()
-const showGlobalLoader = ref(false)
-
-// 改进的设备检测函数
-const isPC = () => {
-  if (process.server) return false
-
-  // 1. 检查屏幕宽度
-  const isLargeScreen = window.innerWidth >= 768
-
-  // 2. 检查UserAgent（排除移动设备）
-  const ua = navigator.userAgent
-  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)
-
-  // 3. 综合判断：大屏幕 且 不是移动设备UA
-  return isLargeScreen && !isMobileUA
-}
 
 onMounted(() => {
-  // 只在PC端显示动画
-  if (!isPC()) {
+  // --- Client-Side Device Guard (Safety Net) ---
+  const _isPC = isPC()
+  const currentPath = route.path
+
+  // Mobile User on PC Route -> Force Mobile
+  if (!_isPC && (currentPath.startsWith('/pc') || currentPath === '/')) {
+    navigateTo('/mobile', { external: true })
     return
   }
 
-  // 检查当前路由是否为PC路由
-  const isPCRoute = route.path.startsWith('/pc') || route.path === '/'
-
-  if (isPCRoute) {
-    // 使用localStorage替代sessionStorage（更持久）
-    // 但使用日期作为key，每天首次访问都显示
-    const today = new Date().toDateString()
-    const lastVisit = localStorage.getItem('fantula_last_logo_visit')
-
-    if (lastVisit !== today) {
-      showGlobalLoader.value = true
-      localStorage.setItem('fantula_last_logo_visit', today)
-    }
+  // PC User on Mobile Route -> Force PC
+  if (_isPC && currentPath.startsWith('/mobile')) {
+    navigateTo('/pc', { external: true })
+    return
   }
 })
-
-const handleLoaderFinish = () => {
-  // 等待动画完整播放后关闭
-  setTimeout(() => {
-    showGlobalLoader.value = false
-  }, 4000)
-}
 </script>
 
 <style>

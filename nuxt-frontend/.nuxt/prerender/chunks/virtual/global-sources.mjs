@@ -21,30 +21,6 @@ const sources = [
                 "loc": "/pc"
             },
             {
-                "loc": "/admin/cdk/cdks"
-            },
-            {
-                "loc": "/admin/cdk/keys"
-            },
-            {
-                "loc": "/admin/cdk/post"
-            },
-            {
-                "loc": "/admin/cdk/debug"
-            },
-            {
-                "loc": "/admin/cdk"
-            },
-            {
-                "loc": "/admin/cdk/virtual"
-            },
-            {
-                "loc": "/admin/cdk/accounts"
-            },
-            {
-                "loc": "/admin/cdk/channel-recognition"
-            },
-            {
                 "loc": "/pc/policy"
             },
             {
@@ -87,30 +63,6 @@ const sources = [
                 "loc": "/pc/service"
             },
             {
-                "loc": "/admin"
-            },
-            {
-                "loc": "/admin/login"
-            },
-            {
-                "loc": "/admin/media"
-            },
-            {
-                "loc": "/admin/media/images"
-            },
-            {
-                "loc": "/admin/media/banners"
-            },
-            {
-                "loc": "/admin/users"
-            },
-            {
-                "loc": "/admin/users/accounts"
-            },
-            {
-                "loc": "/admin/users/departments"
-            },
-            {
                 "loc": "/mobile/cart"
             },
             {
@@ -120,103 +72,16 @@ const sources = [
                 "loc": "/pc/about-us"
             },
             {
-                "loc": "/admin/orders"
-            },
-            {
-                "loc": "/admin/orders/cdkey"
-            },
-            {
-                "loc": "/admin/orders/share"
-            },
-            {
-                "loc": "/admin/orders/cdkey/detail"
-            },
-            {
-                "loc": "/admin/orders/refund"
-            },
-            {
-                "loc": "/admin/orders/share/detail"
-            },
-            {
-                "loc": "/admin/orders/recharge"
-            },
-            {
-                "loc": "/admin/orders/preorders"
-            },
-            {
-                "loc": "/admin/orders/recharge/detail"
-            },
-            {
-                "loc": "/admin/orders/cancelled-refunds"
-            },
-            {
                 "loc": "/mobile"
             },
             {
                 "loc": "/pc/community"
             },
             {
-                "loc": "/admin/coupons"
-            },
-            {
-                "loc": "/admin/coupons/flat/post"
-            },
-            {
-                "loc": "/admin/coupons/flat"
-            },
-            {
-                "loc": "/admin/coupons/stats"
-            },
-            {
-                "loc": "/admin/coupons/balance/post"
-            },
-            {
-                "loc": "/admin/coupons/product/post"
-            },
-            {
-                "loc": "/admin/coupons/balance"
-            },
-            {
-                "loc": "/admin/coupons/product"
-            },
-            {
                 "loc": "/pc/advantages"
             },
             {
                 "loc": "/pc/disclaimer"
-            },
-            {
-                "loc": "/admin/messages"
-            },
-            {
-                "loc": "/admin/messages/settings"
-            },
-            {
-                "loc": "/admin/messages/batch-send"
-            },
-            {
-                "loc": "/admin/products/edit"
-            },
-            {
-                "loc": "/admin/products/skus"
-            },
-            {
-                "loc": "/admin/products"
-            },
-            {
-                "loc": "/admin/products/categories"
-            },
-            {
-                "loc": "/admin/products/shared-sku"
-            },
-            {
-                "loc": "/admin/recharge"
-            },
-            {
-                "loc": "/admin/recharge/tiers"
-            },
-            {
-                "loc": "/admin/recharge/orders"
             },
             {
                 "loc": "/mobile/channel"
@@ -246,70 +111,205 @@ const sources = [
                 "loc": "/mobile/profile/redemption"
             },
             {
-                "loc": "/admin/help-center"
+                "loc": "/manager_portal/cdk/cdks"
             },
             {
-                "loc": "/admin/help-center/articles"
+                "loc": "/manager_portal/cdk/keys"
             },
             {
-                "loc": "/admin/help-center/articles/post"
+                "loc": "/manager_portal/cdk/post"
             },
             {
-                "loc": "/admin/help-center/faq/post"
+                "loc": "/manager_portal/cdk/debug"
             },
             {
-                "loc": "/admin/help-center/faq"
+                "loc": "/manager_portal/cdk"
             },
             {
-                "loc": "/admin/help-center/faq-categories"
+                "loc": "/manager_portal/cdk/virtual"
             },
             {
-                "loc": "/admin/help-center/article-categories"
+                "loc": "/manager_portal/cdk/accounts"
             },
             {
-                "loc": "/admin/article/post"
+                "loc": "/manager_portal/cdk/channel-recognition"
             },
             {
-                "loc": "/admin/images"
+                "loc": "/manager_portal"
             },
             {
-                "loc": "/admin/article"
+                "loc": "/manager_portal/login"
             },
             {
-                "loc": "/admin/banners"
+                "loc": "/manager_portal/media"
             },
             {
-                "loc": "/admin/refunds"
+                "loc": "/manager_portal/media/images"
             },
             {
-                "loc": "/admin/tickets"
+                "loc": "/manager_portal/media/banners"
             },
             {
-                "loc": "/admin/backend-settings"
+                "loc": "/manager_portal/users"
             },
             {
-                "loc": "/admin/backend-settings/contact"
+                "loc": "/manager_portal/users/accounts"
             },
             {
-                "loc": "/admin/backend-settings/storage"
+                "loc": "/manager_portal/users/departments"
             },
             {
-                "loc": "/admin/backend-settings/scheduler"
+                "loc": "/manager_portal/orders"
             },
             {
-                "loc": "/admin/backend-settings/notification"
+                "loc": "/manager_portal/orders/cdkey"
+            },
+            {
+                "loc": "/manager_portal/orders/share"
+            },
+            {
+                "loc": "/manager_portal/orders/cdkey/detail"
+            },
+            {
+                "loc": "/manager_portal/orders/refund"
+            },
+            {
+                "loc": "/manager_portal/orders/share/detail"
+            },
+            {
+                "loc": "/manager_portal/orders/recharge"
+            },
+            {
+                "loc": "/manager_portal/orders/preorders"
+            },
+            {
+                "loc": "/manager_portal/orders/recharge/detail"
+            },
+            {
+                "loc": "/manager_portal/orders/cancelled-refunds"
+            },
+            {
+                "loc": "/manager_portal/coupons"
+            },
+            {
+                "loc": "/manager_portal/coupons/flat/post"
+            },
+            {
+                "loc": "/manager_portal/coupons/flat"
+            },
+            {
+                "loc": "/manager_portal/coupons/stats"
+            },
+            {
+                "loc": "/manager_portal/coupons/balance/post"
+            },
+            {
+                "loc": "/manager_portal/coupons/product/post"
+            },
+            {
+                "loc": "/manager_portal/coupons/balance"
+            },
+            {
+                "loc": "/manager_portal/coupons/product"
             },
             {
                 "loc": "/mobile/wechat-callback"
             },
             {
-                "loc": "/admin/article/categories"
+                "loc": "/manager_portal/messages"
+            },
+            {
+                "loc": "/manager_portal/messages/settings"
+            },
+            {
+                "loc": "/manager_portal/messages/batch-send"
+            },
+            {
+                "loc": "/manager_portal/products/edit"
+            },
+            {
+                "loc": "/manager_portal/products/skus"
+            },
+            {
+                "loc": "/manager_portal/products"
+            },
+            {
+                "loc": "/manager_portal/products/categories"
+            },
+            {
+                "loc": "/manager_portal/products/shared-sku"
+            },
+            {
+                "loc": "/manager_portal/recharge"
+            },
+            {
+                "loc": "/manager_portal/recharge/tiers"
+            },
+            {
+                "loc": "/manager_portal/recharge/orders"
             },
             {
                 "loc": "/pc/support/refund/create"
             },
             {
-                "loc": "/admin/tickets/components/TicketChatModal"
+                "loc": "/manager_portal/help-center"
+            },
+            {
+                "loc": "/manager_portal/help-center/articles"
+            },
+            {
+                "loc": "/manager_portal/help-center/articles/post"
+            },
+            {
+                "loc": "/manager_portal/help-center/faq/post"
+            },
+            {
+                "loc": "/manager_portal/help-center/faq"
+            },
+            {
+                "loc": "/manager_portal/help-center/faq-categories"
+            },
+            {
+                "loc": "/manager_portal/help-center/article-categories"
+            },
+            {
+                "loc": "/manager_portal/article/post"
+            },
+            {
+                "loc": "/manager_portal/images"
+            },
+            {
+                "loc": "/manager_portal/article"
+            },
+            {
+                "loc": "/manager_portal/banners"
+            },
+            {
+                "loc": "/manager_portal/refunds"
+            },
+            {
+                "loc": "/manager_portal/tickets"
+            },
+            {
+                "loc": "/manager_portal/backend-settings"
+            },
+            {
+                "loc": "/manager_portal/backend-settings/contact"
+            },
+            {
+                "loc": "/manager_portal/backend-settings/storage"
+            },
+            {
+                "loc": "/manager_portal/backend-settings/scheduler"
+            },
+            {
+                "loc": "/manager_portal/backend-settings/notification"
+            },
+            {
+                "loc": "/manager_portal/article/categories"
+            },
+            {
+                "loc": "/manager_portal/tickets/components/TicketChatModal"
             },
             {
                 "loc": "/faq"

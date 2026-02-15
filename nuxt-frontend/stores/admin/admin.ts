@@ -199,7 +199,7 @@ export const useAdminStore = defineStore('admin', () => {
         const deptName = adminInfo.value?.department?.name || ''
         const perms = adminInfo.value?.department?.permissions || []
         if (deptName.includes('超级') || perms.includes('*')) return true
-        if (path === '/admin') return true
+        if (path === '/manager_portal') return true
         if (permissions.value.length === 0) return true
         if (permissions.value.includes(path)) return true
         for (const perm of permissions.value) {

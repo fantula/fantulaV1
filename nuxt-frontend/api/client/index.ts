@@ -6,9 +6,7 @@
  * import { clientProductApi, clientOrderApi } from '@/api/client'
  */
 
-// 商品 API
-export { clientProductApi } from './product'
-export type { ClientProduct, ClientCategory, ClientSku } from './product'
+// 商品 API (Removed: product.ts is dead code)
 
 // 订单 API
 export { clientOrderApi } from './order'
