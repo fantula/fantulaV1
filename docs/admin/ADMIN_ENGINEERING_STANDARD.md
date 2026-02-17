@@ -49,6 +49,7 @@ nuxt-frontend/
 ```
 
 > ⚠️ **路由路径**: 所有导航/跳转必须使用 `adminRoute()` 或 `adminRoutes`（来自 `config/admin-routes.ts`），**禁止硬编码** `/manager_portal/...`。
+> ⚠️ **Tab 布局**: 使用 `AdminModuleLayout` 时，子路由内容必须使用 `<NuxtPage />` 渲染，确保 Tab 状态正确同步。
 
 ---
 

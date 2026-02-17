@@ -152,7 +152,7 @@
                     active-text="上架"
                     inactive-text="下架"
                     inline-prompt
-                    @change="(val: boolean) => handleToggleStatus(row, val)"
+                    @change="(val: any) => handleToggleStatus(row, val as boolean)"
                 />
                 <el-tag v-else :type="getStatusType(row.status)" size="small">{{ getStatusLabel(row.status) }}</el-tag>
             </template>

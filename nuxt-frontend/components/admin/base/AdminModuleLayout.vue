@@ -40,19 +40,42 @@ let mySessionId: string | null = null
 const updateActiveTab = () => {
   const path = route.path
   
-  // 1. Try to find a matching tab by route
-  let found = false
+  // Strategy: Find the best match (Longest Prefix Match)
+  // 1. Exact match has highest priority
+  // 2. Prefix match (must match whole segments) has lower priority
+  // 3. Default tab is fallback
+
+  let bestMatch: string | null = null
+  let bestMatchLength = 0
+
   for (const tab of props.tabs) {
-    if (tab.route && (path === tab.route || (tab.route !== props.tabs[0]?.route && path.startsWith(tab.route)))) {
-      activeTab.value = tab.name
-      headerStore.setActiveTab(tab.name)
-      found = true
-      break
+    if (!tab.route) continue
+
+    // Exact Match
+    if (path === tab.route) {
+      bestMatch = tab.name
+      break // Found exact match, stop
+    }
+
+    // Prefix Match (ensure it's a directory match, e.g. /a/b matches /a/b/c but not /a/bc)
+    // We add a trailing slash to ensure segment matching
+    const tabRouteDir = tab.route.endsWith('/') ? tab.route : `${tab.route}/`
+    const currentPathDir = path.endsWith('/') ? path : `${path}/`
+
+    if (currentPathDir.startsWith(tabRouteDir)) {
+      if (tab.route.length > bestMatchLength) {
+        bestMatch = tab.name
+        bestMatchLength = tab.route.length
+      }
     }
   }
   
-  // 2. Fallback to default if no route match
-  if (!found) {
+  // Set Active Tab
+  if (bestMatch) {
+    activeTab.value = bestMatch
+    headerStore.setActiveTab(bestMatch)
+  } else {
+    // Fallback to default
      const fallback = props.defaultTab || props.tabs[0]?.name || ''
      if (fallback) {
        activeTab.value = fallback

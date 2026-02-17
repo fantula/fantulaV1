@@ -5,7 +5,7 @@
     default-tab="balance"
     :hide-tabs-on="['/post']"
   >
-    <router-view />
+    <NuxtPage />
   </AdminModuleLayout>
 </template>
 
