@@ -269,6 +269,40 @@ const dialog = useAdminDialog(...)
 </script>
 ```
 
+### 5.2 重定向页标准 (`index.vue`)
+所有仅作为路由跳转的 `index.vue` 必须使用以下模式，以兼容 `keep-alive` 缓存机制：
+
+```vue
+<script setup lang="ts">
+import { onMounted, onActivated, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import { adminRoute } from '@/config/admin-routes'
+
+definePageMeta({
+  layout: 'mgmt',
+  middleware: ["mgmt-auth"],
+  ssr: false
+})
+
+const router = useRouter()
+
+const redirect = async () => {
+    await nextTick() // 确保 Hydration 完成
+    router.replace(adminRoute('target/path'))
+}
+
+// 必须同时使用 onMounted 和 onActivated
+onMounted(() => redirect())
+onActivated(() => redirect())
+</script>
+
+<template>
+  <div class="loading-container">
+    <!-- 可选：加载状态 -->
+  </div>
+</template>
+```
+
 ---
 
 ## 六、 代码红线 (Forbidden)

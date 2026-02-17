@@ -7,10 +7,17 @@ definePageMeta({
   ssr: false
 })
 
+import { onMounted, onActivated, nextTick } from 'vue'
+
 const router = useRouter()
-onMounted(() => {
-  router.replace(adminRoute('messages/batch-send'))
-})
+
+const redirect = async () => {
+    await nextTick()
+    router.replace(adminRoute('messages/batch-send'))
+}
+
+onMounted(() => redirect())
+onActivated(() => redirect())
 </script>
 
 <template>

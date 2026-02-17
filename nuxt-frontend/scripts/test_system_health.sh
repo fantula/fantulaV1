@@ -19,12 +19,19 @@ else
     echo "❌ Supabase DB is DOWN"
 fi
 
-# 2. 检测端口连通性 (localhost:54321)
+# 2. 检测端口连通性 (Try 54321 first, then 8000)
 echo "[2] Checking Local Ports..."
+API_PORT=54321
+
 if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
-    echo "✅ Port 54321 (Kong) is Accessible"
+    echo "✅ Port 54321 (Local Supabase) is Accessible"
+    API_PORT=54321
+elif curl -s http://127.0.0.1:8000/rest/v1/ > /dev/null; then
+    echo "✅ Port 8000 (Server Supabase/Kong) is Accessible"
+    API_PORT=8000
 else
-    echo "❌ Port 54321 (Kong) is UNREACHABLE (Connection Refused)"
+    echo "❌ Neither Port 54321 nor 8000 is Accessible"
+    echo "   (Connection Refused on both)"
 fi
 
 # 3. 检测外部网络
@@ -44,7 +51,7 @@ if [ -z "$KEY" ]; then
     echo "⚠️  Could not auto-detect SERVICE_ROLE_KEY from Kong container"
 else
     # 简单的 health check
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:54321/functions/v1/system-health -H "Authorization: Bearer $KEY")
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:$API_PORT/functions/v1/system-health -H "Authorization: Bearer $KEY")
     echo "🔍 Edge Function Returned Code: $HTTP_CODE"
 fi
 

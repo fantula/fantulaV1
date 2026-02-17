@@ -3,7 +3,7 @@
     
     <!-- 1. Premium Member Card (Header) -->
     <div class="header-container">
-        <MobileProfileHeader :user="userInfo" @click="router.push('/mobile/profile/account')" />
+        <MobileProfileHeader :user="userInfo" @click="router.push(mobileRoutes.profile())" />
     </div>
 
     <!-- 2. Wallet / Quota Card -->
@@ -71,33 +71,33 @@
         <MobileMenuLink 
             label="兑换中心" 
             :icon="Ticket" 
-            @click="router.push('/mobile/profile/redemption')" 
+            @click="router.push(mobileRoutes.profileRedemption())" 
         />
 
         <MobileMenuLink 
             label="我的收藏" 
             :icon="Star" 
-            @click="router.push('/mobile/profile/favorites')" 
+            @click="router.push(mobileRoutes.profileFavorites())" 
         />
 
         <MobileMenuLink 
             label="我的工单" 
             :icon="Headset" 
-            @click="router.push('/mobile/profile/tickets')" 
+            @click="router.push(mobileRoutes.profileTickets())" 
         />
 
         <MobileMenuLink 
             label="我的购物车" 
             :icon="ShoppingCart" 
             :badge="cartStore.totalCount > 0"
-            @click="router.push('/mobile/cart')" 
+            @click="router.push(mobileRoutes.cart())" 
         />
 
         <MobileMenuLink 
             label="我的消息" 
             :icon="Bell" 
             :badge="userStore.unreadMessageCount > 0"
-            @click="router.push('/mobile/profile/messages')" 
+            @click="router.push(mobileRoutes.profileMessages())" 
         />
 
         <!-- Settings Link Removed as requested -->
@@ -137,6 +137,7 @@ import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
 import MobileProfileHeader from '@/components/mobile/profile/MobileProfileHeader.vue'
 import MobileMenuLink from '@/components/mobile/profile/MobileMenuLink.vue'
+import { mobileRoutes } from '@/config/client-routes'
 
 definePageMeta({
   layout: 'mobile',
@@ -149,6 +150,7 @@ const cartStore = useCartStore()
 const showSettings = ref(false)
 const showRecharge = ref(false)
 const showContactModal = ref(false)
+
 
 const userInfo = computed(() => {
   const u = userStore.user
@@ -169,11 +171,11 @@ const orderCounts = computed(() => {
 })
 
 const navigateToOrder = (tab: string) => {
-    router.push({ path: '/mobile/profile/order', query: { tab } })
+    router.push({ path: mobileRoutes.profileOrders(), query: { tab } })
 }
 
 const navigateToWallet = () => {
-    router.push('/mobile/profile/wallet')
+    router.push(mobileRoutes.profileWallet())
 }
 
 const handleRecharge = () => {
@@ -188,7 +190,7 @@ const handleContactService = () => {
 
 onMounted(() => {
     if(!userStore.isLoggedIn) {
-        router.push('/mobile')
+        router.push(mobileRoutes.home())
     } else {
         userStore.fetchUserInfo()
         userStore.loadOrders() 

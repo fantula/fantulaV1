@@ -56,7 +56,7 @@ const oauthLogin_post = defineEventHandler(async (event) => {
     }
     const access_token = result.access_token;
     const openid = result.openid;
-    console.log("[OAuthLogin] Got openid:", openid);
+    console.log("\u{1F534} [Stage 3] Backend OpenID:", openid);
     let userInfo = {};
     try {
       const userInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openid}&lang=zh_CN`;

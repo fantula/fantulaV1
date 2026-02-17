@@ -162,31 +162,28 @@ const sources = [
                 "loc": "/manager_portal/orders"
             },
             {
+                "loc": "/manager_portal/orders/cdkey/post"
+            },
+            {
+                "loc": "/manager_portal/orders/share/post"
+            },
+            {
                 "loc": "/manager_portal/orders/cdkey"
             },
             {
                 "loc": "/manager_portal/orders/share"
             },
             {
-                "loc": "/manager_portal/orders/cdkey/detail"
-            },
-            {
                 "loc": "/manager_portal/orders/refund"
             },
             {
-                "loc": "/manager_portal/orders/share/detail"
+                "loc": "/manager_portal/orders/recharge/post"
             },
             {
                 "loc": "/manager_portal/orders/recharge"
             },
             {
                 "loc": "/manager_portal/orders/preorders"
-            },
-            {
-                "loc": "/manager_portal/orders/recharge/detail"
-            },
-            {
-                "loc": "/manager_portal/orders/cancelled-refunds"
             },
             {
                 "loc": "/manager_portal/coupons"
@@ -283,9 +280,6 @@ const sources = [
             },
             {
                 "loc": "/manager_portal/banners"
-            },
-            {
-                "loc": "/manager_portal/refunds"
             },
             {
                 "loc": "/manager_portal/tickets"

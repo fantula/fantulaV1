@@ -127,65 +127,69 @@ onMounted(async () => {
   // 0. 特殊处理：如果是 Magic Link 回调（Hash 中包含 access_token）
   if (route.hash && route.hash.includes('access_token')) {
     console.log('[WechatCallback] Magic Link hash detected')
-    // state.value = 'loading' 
     globalLoading.show('正在验证登录...') 
+    
+    // 防止 onAuthStateChange 和 getSession 双重触发
+    let handled = false
+    
+    const handleSession = async (session: any) => {
+      if (handled) return
+      handled = true
+      
+      console.log('[WechatCallback] Session established, syncing user store...')
+      await userStore.setUser(session.user, session.access_token)
+
+      globalLoading.success('登录成功') 
+      setTimeout(() => {
+          const returnTo = route.query.return_to as string
+          globalLoading.hide() 
+          if (returnTo) {
+              window.location.href = decodeURIComponent(returnTo)
+          } else {
+              router.replace('/mobile/profile/account')
+          }
+      }, 800)
+    }
     
     // 监听 Auth 状态变化 (Supabase 客户端会自动处理 Hash 并恢复 Session)
     const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
-      console.log('🔴 [Stage 4] Auth State Change:', event)
-      if (session) console.log("🔴 [Stage 4] Session Token:", session.access_token ? "Present" : "Missing")
+      console.log('[WechatCallback] Auth State Change:', event)
 
       if (event === 'SIGNED_IN' && session) {
-        console.log('[WechatCallback] Session restored from hash')
-        
-        // 确保 userStore 同步
-        await userStore.setUser(session.user, session.access_token)
-
-
-        
-        // state.value = 'success'
-        globalLoading.success('登录成功') 
-        setTimeout(() => {
-            const returnTo = route.query.return_to as string
-            globalLoading.hide() 
-            if (returnTo) {
-                window.location.href = decodeURIComponent(returnTo)
-            } else {
-                router.replace('/mobile/profile/account')
-            }
-        }, 800)
         subscription.unsubscribe()
+        await handleSession(session)
       }
     })
     
-    // 同时也尝试直接获取 session (如果已经处理完)
+    // Fallback: 如果 session 已经处理完，直接获取
     const { data: { session } } = await getSupabaseClient().auth.getSession()
     if (session) {
-         await userStore.setUser(session.user, session.access_token)
-         state.value = 'success'
-         setTimeout(() => {
-            const returnTo = route.query.return_to as string
-            if (returnTo) {
-                window.location.href = decodeURIComponent(returnTo)
-            } else {
-                router.replace('/mobile/profile/account')
-            }
-         }, 800)
-         subscription.unsubscribe() 
-         return
+      subscription.unsubscribe() 
+      await handleSession(session)
     }
     
-    return // 等待 AuthStateChange
+    // 超时保护：15 秒后如果仍未建立 session，显示错误
+    setTimeout(() => {
+      if (!handled) {
+        handled = true
+        subscription.unsubscribe()
+        globalLoading.hide()
+        state.value = 'error'
+        errorMsg.value = '登录验证超时，请返回重试'
+        console.error('[WechatCallback] Session establishment timed out')
+      }
+    }, 15000)
+    
+    return // 等待 AuthStateChange 或 Timeout
   }
 
   // 从 URL 获取微信授权 code
   const code = route.query.code as string
 
-  console.log("🔴 [Stage 1] Callback Mounted")
-  console.log("🔴 [Stage 1] Code:", code)
+  console.log('[WechatCallback] Processing OAuth code...')
 
   if (!code) {
-    console.error("🔴 [Stage 1] Code Missing! Redirect/Domain Issue.")
+    console.error('[WechatCallback] No code in URL')
     state.value = 'error'
     errorMsg.value = '未获取到授权信息'
     return
@@ -260,11 +264,10 @@ onMounted(async () => {
     const returnTo = route.query.return_to as string
     
     // 用 code 换取 openid 并检查绑定状态
-    console.log("🔴 [Stage 2] API Request: /api/oauth-login")
     const res = await wechatLoginApi.oauthLogin(code, { 
         redirectTo: returnTo ? decodeURIComponent(returnTo) : undefined 
     })
-    console.log("🔴 [Stage 2] API Response:", res.success ? "200 OK" : "Error", res)
+    console.log('[WechatCallback] OAuth response:', res.data?.status || 'error')
 
     if (!res.success || !res.data) {
       globalLoading.hide()

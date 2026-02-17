@@ -10,15 +10,20 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { onMounted } from 'vue'
+import { onMounted, onActivated, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { Loading } from '@element-plus/icons-vue'
 import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
-onMounted(() => {
+
+const redirect = async () => {
+    await nextTick()
     router.replace(adminRoute('media/images'))
-})
+}
+
+onMounted(() => redirect())
+onActivated(() => redirect())
 </script>
 
 <style scoped>

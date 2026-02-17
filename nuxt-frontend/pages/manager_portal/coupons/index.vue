@@ -10,13 +10,17 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { onMounted } from 'vue'
+import { onMounted, onActivated, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
 
-onMounted(() => {
+const redirect = async () => {
+  await nextTick()
   router.replace(adminRoute('coupons/balance'))
-})
+}
+
+onMounted(() => redirect())
+onActivated(() => redirect())
 </script>

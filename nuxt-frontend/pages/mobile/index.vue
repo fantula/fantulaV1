@@ -109,7 +109,7 @@
 import { ref, onMounted, onUnmounted, defineAsyncComponent, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowUpBold } from '@element-plus/icons-vue'
-import { wechatLoginApi } from '@/api/client/wechat-login'
+
 import { useUserStore } from '@/stores/client/user'
 import { useHomeData } from '@/composables/client/useHomeData'
 
@@ -337,32 +337,20 @@ onMounted(async () => {
     isMounted.value = true
     try {
         // 【关键】处理微信授权回调的 code 参数
+        // ⚠️ 微信 OAuth code 是一次性的，不可在此消费！
+        // 统一交给 wechat-callback.vue 处理，避免 code 被双重消费
         const code = route.query.code as string
+        const urlState = route.query.state as string
         
         if (code && !userStore.isLoggedIn) {
-            if (import.meta.dev) {
-                console.log('[MobileHome] Processing WeChat OAuth callback...')
-            }
-            try {
-                const res = await wechatLoginApi.oauthLogin(code)
-                if (res.success && res.data) {
-                    if (res.data.status === 'logged_in' && res.data.actionLink) {
-                        // 有 Magic Link，直接跳转
-                        window.location.href = res.data.actionLink
-                        return // 停止后续执行
-                    } else if (res.data.status === 'need_bind') {
-                        // 需要绑定邮箱
-                        router.replace(`/mobile/wechat-callback?code=${code}`)
-                        return
-                    }
-                }
-            } catch (e) {
-                if (import.meta.dev) {
-                    console.error('[MobileHome] OAuth login failed:', e)
-                }
-            }
-            // 清除 URL 中的 code 参数
-            router.replace({ path: '/mobile', query: {} })
+            console.log('[MobileHome] WeChat code detected, redirecting to callback handler...')
+            // 将所有参数传递给 wechat-callback 统一处理
+            const query: Record<string, string> = { code }
+            if (urlState) query.state = urlState
+            const returnTo = route.query.return_to as string
+            if (returnTo) query.return_to = returnTo
+            router.replace({ path: '/mobile/wechat-callback', query })
+            return
         }
         
          // Removed explicit initData() as SSR handles it

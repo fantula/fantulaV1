@@ -27,7 +27,7 @@ import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/fast-xml-parser/s
 import 'file:///Users/dalin/fantula/nuxt-frontend/node_modules/ipx/dist/index.mjs';
 
 const bindWechat_post = defineEventHandler(async (event) => {
-  var _a, _b, _c;
+  var _a;
   try {
     const body = await readBody(event);
     const supabase = getSupabaseServiceClient();
@@ -88,42 +88,38 @@ const bindWechat_post = defineEventHandler(async (event) => {
     );
     let authData;
     let verifyError;
-    console.log(`[BindWechat] Verifying OTP for ${body.email} (Type: email)...`);
-    let resVerify = await anonClient.auth.verifyOtp({
+    const resEmail = await anonClient.auth.verifyOtp({
       email: body.email,
       token: body.code,
       type: "email"
     });
-    if (resVerify.error) {
-      console.warn(`[BindWechat] verifyOtp(email) failed: ${resVerify.error.message}. Trying type='magiclink'...`);
-      const resMagic = await anonClient.auth.verifyOtp({
+    if (!resEmail.error) {
+      authData = resEmail.data;
+      verifyError = null;
+    } else {
+      console.log("[BindWechat] verifyOtp(type=email) failed:", resEmail.error.message);
+      const resSignup = await anonClient.auth.verifyOtp({
         email: body.email,
         token: body.code,
-        type: "magiclink"
+        type: "signup"
       });
-      if (!resMagic.error) {
-        resVerify = resMagic;
+      if (!resSignup.error) {
+        console.log("[BindWechat] verifyOtp(type=signup) succeeded");
+        authData = resSignup.data;
+        verifyError = null;
       } else {
-        console.warn(`[BindWechat] verifyOtp(magiclink) failed: ${resMagic.error.message}. Trying type='signup'...`);
-        const resSignup = await anonClient.auth.verifyOtp({
-          email: body.email,
-          token: body.code,
-          type: "signup"
-        });
-        if (!resSignup.error) {
-          resVerify = resSignup;
+        verifyError = resEmail.error;
+        if (resSignup.error.message !== resEmail.error.message) {
+          console.log("[BindWechat] verifyOtp(type=signup) failed:", resSignup.error.message);
         }
       }
     }
-    if (resVerify.error || !((_a = resVerify.data) == null ? void 0 : _a.user)) {
-      console.error("[BindWechat] All verify strategies failed.");
+    if (verifyError || !(authData == null ? void 0 : authData.user)) {
       throw createError({
         statusCode: 400,
         message: "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6216\u5DF2\u8FC7\u671F"
       });
     }
-    authData = resVerify.data;
-    console.log("[BindWechat] Verify Success. User:", (_b = authData.user) == null ? void 0 : _b.id);
     if (!authData.user) {
       throw createError({
         statusCode: 500,
@@ -143,7 +139,7 @@ const bindWechat_post = defineEventHandler(async (event) => {
         id: authData.user.id,
         uid,
         email: authData.user.email,
-        nickname: body.nickname || ((_c = authData.user.email) == null ? void 0 : _c.split("@")[0]) || "User",
+        nickname: body.nickname || ((_a = authData.user.email) == null ? void 0 : _a.split("@")[0]) || "User",
         avatar: body.avatar || "",
         status: "active",
         balance: 0,

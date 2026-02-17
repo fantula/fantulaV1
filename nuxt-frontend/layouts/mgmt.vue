@@ -36,39 +36,28 @@
             text-color="var(--el-text-color-regular)"
             active-text-color="var(--el-color-primary)"
           >
-            <!-- Draggable Menu List -->
-            <draggable 
-              :list="filteredMenuList" 
-              item-key="index"
-              :animation="200"
-              ghost-class="ghost-menu-item"
-              @end="saveMenuOrder"
-              handle=".drag-handle" 
-            >
-              <template #item="{ element }">
-                <div class="menu-wrapper">
-                  <el-sub-menu v-if="element.children && element.children.length > 0" :index="element.index">
-                    <template #title>
-                      <el-icon class="drag-handle"><component :is="iconMap[element.icon]" /></el-icon>
-                      <span>{{ element.title }}</span>
-                    </template>
-                    <el-menu-item 
-                      v-for="child in element.children" 
-                      :key="child.index" 
-                      :index="child.index"
-                    >
-                      <el-icon v-if="child.icon"><component :is="iconMap[child.icon]" /></el-icon>
-                      <template #title><span>{{ child.title }}</span></template>
-                    </el-menu-item>
-                  </el-sub-menu>
-                  
-                  <el-menu-item v-else :index="element.index" :class="{ 'menu-item-spacing': element.spacing }">
-                    <el-icon class="drag-handle"><component :is="iconMap[element.icon]" /></el-icon>
-                    <template #title><span>{{ element.title }}</span></template>
+            <!-- Standard Menu List (No Drag & Drop) -->
+            <template v-for="element in filteredMenuList" :key="element.index">
+                <el-sub-menu v-if="element.children && element.children.length > 0" :index="element.index">
+                  <template #title>
+                    <el-icon><component :is="iconMap[element.icon || 'Menu']" /></el-icon>
+                    <span>{{ element.title }}</span>
+                  </template>
+                  <el-menu-item 
+                    v-for="child in element.children" 
+                    :key="child.index" 
+                    :index="child.index"
+                  >
+                    <el-icon v-if="child.icon"><component :is="iconMap[child.icon]" /></el-icon>
+                    <template #title><span>{{ child.title }}</span></template>
                   </el-menu-item>
-                </div>
-              </template>
-            </draggable>
+                </el-sub-menu>
+                
+                <el-menu-item v-else :index="element.index" :class="{ 'menu-item-spacing': element.spacing }">
+                  <el-icon><component :is="iconMap[element.icon || 'Menu']" /></el-icon>
+                  <template #title><span>{{ element.title }}</span></template>
+                </el-menu-item>
+            </template>
           </el-menu>
         </el-scrollbar>
         
@@ -157,12 +146,11 @@ import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useAdminStore } from '@/stores/admin/admin';
 import { useAdminHeaderStore } from '@/stores/admin/header';
-import draggable from 'vuedraggable';
 import { 
   Odometer, List, RefreshLeft, Goods, Files, Key, Ticket, User, 
   Service, Money, Picture, PictureFilled, QuestionFilled, ArrowDown,
   Setting, SwitchButton, Message, Fold, Expand, Document, Collection,
-  Moon, Sunny, Timer, Monitor, UserFilled
+  Moon, Sunny, Timer, Monitor, UserFilled, Menu
 } from '@element-plus/icons-vue';
 // 使用统一菜单配置
 import { ADMIN_MENU_ITEMS } from '@/config/admin-menu';
@@ -173,26 +161,56 @@ const router = useRouter();
 const adminStore = useAdminStore();
 const headerStore = useAdminHeaderStore();
 
+/**
+ * 核心：动态菜单高亮逻辑
+ * 策略：最长前缀匹配 (Longest Prefix Match)
+ * 解决：/manager_portal/orders 错误匹配到 /manager_portal 的问题
+ */
 const activeMenu = computed(() => {
-  const path = route.path
+  const currentPath = route.path.replace(/\/$/, '') // 去除末尾斜杠
   
-  // 1. Get all available menu paths
-  // Sort by length descending to ensure we match the most specific path first
-  // (e.g. match '/admin/products' before '/admin')
-  const validPaths = menuList.value.map(item => item.index).sort((a, b) => b.length - a.length)
-
-  // 2. Find the best match
-  for (const menuPath of validPaths) {
-    // Exact match
-    if (path === menuPath) return menuPath
-    // Prefix match for sub-pages (ensure slash follows to avoid partial string matches)
-    if (path.startsWith(menuPath + '/')) {
-      return menuPath
+  // 1. 找出所有可能的匹配项 (当前路径 以 菜单路径 开头)
+  const candidates = menuList.value.filter(item => {
+    const menuPath = item.index
+    // 精确匹配
+    if (currentPath === menuPath) return true
+    // 前缀匹配 (必须保证是目录级匹配，如 /admin/orders 匹配 /admin/orders/123，但 /admin不应匹配 /admin-settings)
+    if (currentPath.startsWith(menuPath + '/')) return true
+    
+    // 子菜单匹配逻辑 (如有)
+    if (item.children) {
+        return item.children.some(child => currentPath === child.index || currentPath.startsWith(child.index + '/'))
     }
-  }
+    return false
+  })
 
-  return path
+  // 2. 如果没有匹配，尝试找子菜单的具体匹配
+  // (简版逻辑：假设目前只有一级菜单为主，如果有二级菜单需递归展开)
+  // 上面的 filter 只是找出了"包含该路径的父菜单或本身"，还需要具体定位到高亮的 index
+  
+  // 修正策略：直接遍历所有叶子节点路径，找到最长匹配
+  const allLeafPaths: string[] = []
+  const traverse = (items: any[]) => {
+      items.forEach(item => {
+          allLeafPaths.push(item.index)
+          if (item.children) traverse(item.children)
+      })
+  }
+  traverse(menuList.value)
+  
+  // 过滤出所有是当前路径前缀的菜单项
+  const validMatches = allLeafPaths.filter(menuPath => {
+      if (currentPath === menuPath) return true
+      if (currentPath.startsWith(menuPath + '/')) return true
+      return false
+  })
+  
+  // 排序：长度倒序 (最长匹配优先)
+  validMatches.sort((a, b) => b.length - a.length)
+  
+  return validMatches[0] || ''
 })
+
 const isCollapse = ref(false);
 const isLoading = ref(true);
 const isDark = ref(false);
@@ -206,9 +224,8 @@ const currentUser = computed(() => adminStore.adminInfo);
 const iconMap: Record<string, any> = {
   Odometer, List, RefreshLeft, Goods, Files, Key, Ticket, User,
   Service, Money, Picture, PictureFilled, QuestionFilled, Document,
-  Collection, Message, Setting, Timer, Monitor, UserFilled
+  Collection, Message, Setting, Timer, Monitor, UserFilled, Menu
 };
-
 
 const menuList = ref([...ADMIN_MENU_ITEMS]);
 
@@ -234,6 +251,11 @@ const filteredMenuList = computed(() => {
     // 仪表盘始终可见
     if (item.index === adminRoutes.home()) return true;
     // 检查是否有权限访问该菜单
+    // 如果有子菜单，检查子菜单权限
+    if (item.children && item.children.length > 0) {
+        // 只要有一个子菜单有权限，就显示父菜单
+        return item.children.some(child => permissions.includes(child.index))
+    }
     return permissions.includes(item.index);
   });
 });
@@ -259,51 +281,15 @@ const applyTheme = () => {
   }
 };
 
-// Menu Persistence
-const saveMenuOrder = () => {
-  try {
-    localStorage.setItem('admin-menu-order', JSON.stringify(menuList.value));
-  } catch (e) {
-    console.error('Failed to save menu order', e);
-  }
-};
-
-const loadMenuOrder = () => {
-  try {
-    const saved = localStorage.getItem('admin-menu-order');
-    if (saved) {
-      const savedList = JSON.parse(saved);
-      if (Array.isArray(savedList) && savedList.length > 0) {
-        // Create a map of default items for checking updates
-        const defaultMap = new Map(ADMIN_MENU_ITEMS.map(i => [i.index, i]));
-        
-        // 1. Sync properties (title/icon) of saved items with latest defaults
-        // This ensures renamed items (like "Common Questions" -> "Help Center") are updated for the user
-        const syncedList = savedList
-            .filter((item: any) => defaultMap.has(item.index)) // Only keep items that still exist in defaults
-            .map((item: any) => {
-                const defaults = defaultMap.get(item.index);
-                return { ...item, ...defaults }; // Overwrite saved meta with fresh defaults
-            });
-
-        // 2. Find and append any NEW items
-        const savedIndexes = new Set(syncedList.map((item: any) => item.index));
-        const newItems = ADMIN_MENU_ITEMS.filter(item => !savedIndexes.has(item.index));
-        
-        menuList.value = [...syncedList, ...newItems];
-      }
-    }
-    
-    // Load Theme
-    const savedTheme = localStorage.getItem('admin-theme');
-    if (savedTheme === 'dark') {
-      isDark.value = true;
-      applyTheme();
-    }
-  } catch (e) {
-    console.warn('Failed to load local storage settings', e);
-  }
-};
+const loadTheme = () => {
+    try {
+        const savedTheme = localStorage.getItem('admin-theme');
+        if (savedTheme === 'dark') {
+            isDark.value = true;
+            applyTheme();
+        }
+    } catch(e) { console.warn('Theme load failed', e)}
+}
 
 // Handle Header Tab Click
 const handleTabClick = (tabInstance: any) => {
@@ -333,7 +319,7 @@ const handleLogout = async () => {
 
 onMounted(() => {
   waitForAuth();
-  loadMenuOrder();
+  loadTheme();
 });
 </script>
 
@@ -516,13 +502,6 @@ onMounted(() => {
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(64,158,255,0.3);
   font-weight: 600;
-}
-
-/* Ghost class for Drag & Drop */
-.ghost-menu-item {
-  opacity: 0.5;
-  background: var(--admin-hover-bg);
-  border: 1px dashed #409EFF;
 }
 
 /* Sidebar Toggle */

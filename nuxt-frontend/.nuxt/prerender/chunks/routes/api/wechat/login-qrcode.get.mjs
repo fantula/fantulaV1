@@ -30,6 +30,7 @@ const loginQrcode_get = defineEventHandler(async (event) => {
   try {
     const sceneStr = generateLoginScene();
     const qrResult = await createParametricQrCode(sceneStr, 300);
+    console.log("\u{1F534} [PC Stage 1] Ticket Generated:", qrResult.ticket ? "Success" : "Failed");
     const supabase = getSupabaseServiceClient();
     const expiresAt = new Date(Date.now() + 300 * 1e3).toISOString();
     const { error: insertError } = await supabase.from("wechat_login_sessions").insert({

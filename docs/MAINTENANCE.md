@@ -35,8 +35,12 @@ sh /opt/fantula/scripts/test_system_health.sh
 
 **或者手动执行**:
 ```bash
+# Server Port (Standard Docker): 8000
+# Local Port (Supabase CLI): 54321
+PORT=8000 
+
 export $(cat /opt/supabase/docker/.env | grep SERVICE_ROLE_KEY | xargs)
-curl -X POST http://127.0.0.1:8000/functions/v1/system-health \
+curl -X POST http://127.0.0.1:$PORT/functions/v1/system-health \
   -H "Authorization: Bearer $SERVICE_ROLE_KEY"
 ```
 

@@ -1,0 +1,1 @@
+import{d as e,o,c as t,_ as s}from"./BcSvUY-Y.js";const a={class:"root-loading"},c=e({__name:"index",setup(n){return(_,d)=>(o(),t("div",a))}}),p=s(c,[["__scopeId","data-v-34cad796"]]);export{p as default};

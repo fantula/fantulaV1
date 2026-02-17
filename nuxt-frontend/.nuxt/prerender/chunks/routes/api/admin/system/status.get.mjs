@@ -48,7 +48,7 @@ const status_get = defineEventHandler(async (event) => {
     if (adminError || !adminCaller || adminCaller.status !== "enabled") {
       throw createError({ statusCode: 403, statusMessage: "Unauthorized" });
     }
-    const probeUrl = "http://127.0.0.1:8000/functions/v1/system-health";
+    const probeUrl = `${config.public.apiBase}/functions/v1/system-health`;
     const serviceKey = config.supabaseServiceKey;
     try {
       const response = await $fetch(probeUrl, {

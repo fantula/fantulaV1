@@ -102,6 +102,10 @@ const tabs = [
 - CDK 管理: `pages/manager_portal/cdk.vue`
 - 帮助中心: `pages/manager_portal/help-center.vue`
 
+> [!IMPORTANT]
+> **关于 index.vue 重定向**:
+> 如果模块根目录 (`pages/manager_portal/xxx/index.vue`) 仅用于跳转到第一个 Tab，**必须**使用 `onMounted` + `onActivated` + `nextTick` 组合，否则在 `keep-alive` 缓存下跳转会失效。详见工程规范 5.2 节。
+
 ---
 
 ## 三、核心 UI 组件 (Core Components)

@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onActivated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAdminHeaderStore } from '@/stores/admin/header'
 
@@ -41,10 +41,6 @@ const updateActiveTab = () => {
   const path = route.path
   
   // Strategy: Find the best match (Longest Prefix Match)
-  // 1. Exact match has highest priority
-  // 2. Prefix match (must match whole segments) has lower priority
-  // 3. Default tab is fallback
-
   let bestMatch: string | null = null
   let bestMatchLength = 0
 
@@ -57,8 +53,7 @@ const updateActiveTab = () => {
       break // Found exact match, stop
     }
 
-    // Prefix Match (ensure it's a directory match, e.g. /a/b matches /a/b/c but not /a/bc)
-    // We add a trailing slash to ensure segment matching
+    // Prefix Match
     const tabRouteDir = tab.route.endsWith('/') ? tab.route : `${tab.route}/`
     const currentPathDir = path.endsWith('/') ? path : `${path}/`
 
@@ -75,12 +70,16 @@ const updateActiveTab = () => {
     activeTab.value = bestMatch
     headerStore.setActiveTab(bestMatch)
   } else {
-    // Fallback to default
-     const fallback = props.defaultTab || props.tabs[0]?.name || ''
-     if (fallback) {
-       activeTab.value = fallback
-       headerStore.setActiveTab(fallback)
-     }
+    // Fallback strategy:
+    // 1. Check if defaultTab exists in tabs
+    // 2. Or fallback to first tab
+    const fallbackName = props.defaultTab || props.tabs[0]?.name || ''
+    const fallbackTab = props.tabs.find(t => t.name === fallbackName)
+    
+    if (fallbackTab) {
+       activeTab.value = fallbackTab.name
+       headerStore.setActiveTab(fallbackTab.name)
+    }
   }
 }
 
@@ -110,6 +109,11 @@ watch(() => props.defaultTab, (val) => {
 })
 
 onMounted(() => {
+  updateActiveTab()
+  syncHeader()
+})
+
+onActivated(() => {
   updateActiveTab()
   syncHeader()
 })

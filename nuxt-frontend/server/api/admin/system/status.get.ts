@@ -38,8 +38,7 @@ export default defineEventHandler(async (event) => {
 
         // 2. Call System Health Probe (Edge Function)
         // We prefer internal docker network if possible, but fallback to localhost
-        // Since we are running on the host (PM2) or Docker, we try localhost:8000 first
-        const probeUrl = 'http://127.0.0.1:8000/functions/v1/system-health'
+        const probeUrl = `${config.public.apiBase}/functions/v1/system-health`
 
         // Critical: Use Service Key
         const serviceKey = config.supabaseServiceKey

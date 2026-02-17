@@ -1,6 +1,6 @@
 # AI 助理中心调度手册
 
-> **版本**: V3.1 | **更新时间**: 2026-02-17
+> **版本**: V3.2 | **更新时间**: 2026-02-18
 > **你是谁**: 你是被派遣来执行任务的 AI 助理。
 > **本文档的作用**: 你收到任务后，必须阅读本文档。它会告诉你该读哪些文档、按什么步骤做、最后更新哪些文档。
 
@@ -96,10 +96,11 @@
   ③ docs/SHARED_LOGIC_REFERENCE.md               → 共享逻辑（PC/Mobile 复用）
 
 按需读：
-  ④ docs/client/GLOBAL_COMPONENT_GUIDE.md         → 全局组件
-  ⑤ docs/client/STYLE_MAPPING.md / docs/mobile/STYLE_MAPPING.md
-  ⑥ docs/PERFORMANCE_OPTIMIZATION.md              → 性能问题时
-  ⑦ docs/guides/UI_THEME_STANDARD.md              → 样式问题时
+  ④ config/client-routes.ts                → 🆕 客户端路由常量
+  ⑤ docs/client/GLOBAL_COMPONENT_GUIDE.md         → 全局组件
+  ⑥ docs/client/STYLE_MAPPING.md / docs/mobile/STYLE_MAPPING.md
+  ⑦ docs/PERFORMANCE_OPTIMIZATION.md              → 性能问题时
+  ⑧ docs/guides/UI_THEME_STANDARD.md              → 样式问题时
 ```
 
 ### 领域 C：后端与运维
@@ -148,6 +149,7 @@
 
 | 模块关键词 | PC 页面 | 移动端页面 | 共享逻辑 |
 |---|---|---|---|
+| 路由路径 | — | — | `config/client-routes.ts` (🆕) |
 | 首页 | `pages/pc/index.vue` | `pages/mobile/index.vue` | — |
 | 商品详情 | `pages/pc/product/` | `pages/mobile/product/` | `composables/client/useProductDetail.ts` |
 | 订单 | `pages/pc/orders/` | `pages/mobile/orders/` | `composables/client/useOrderDetail.ts` |
@@ -315,7 +317,7 @@
 每次修改完成后，逐条检查：
 
 1. 【路由变更】修改了路由路径？
-   → 更新 config/admin-routes.ts
+   → 更新 config/admin-routes.ts (后台) 或 config/client-routes.ts (客户端)
    → 更新 docs/admin/ADMIN_AUTH_PERMISSION.md（如涉及权限路径）
 
 2. 【组件变更】修改了全局组件（AdminModuleLayout / AdminDataTable 等）？

@@ -10,6 +10,7 @@ export interface AdminMenuItem {
     title: string      // 显示名称
     icon?: string      // 图标名称 (Element Plus Icons)
     spacing?: boolean  // 是否在上方添加分隔线
+    children?: AdminMenuItem[] // 子菜单
 }
 
 /**

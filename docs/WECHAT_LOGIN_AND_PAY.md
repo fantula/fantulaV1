@@ -303,6 +303,28 @@ await supabase.auth.setSession({
 
 **修复**：所有子表改为 `ON DELETE CASCADE`（orders 保留 `SET NULL`）。
 
+### 6.8 mobile/index.vue 双重消费 OAuth Code
+
+**问题**：`pages/mobile/index.vue` 在 `onMounted` 中检测到 `?code=` 时，先调用 `oauthLogin(code)` 消费了微信 code。如果返回 `need_bind`，又把已消费的 code 转发给 `wechat-callback?code=${code}`。微信 OAuth code 是一次性的，第二次使用必定返回 `invalid code` 错误。
+
+**影响**：所有新用户通过微信登录 → 绑定邮箱的流程 100% 失败。
+
+**修复**：`mobile/index.vue` 不再调用 `oauthLogin`，直接将 code 转发给 `wechat-callback.vue` 统一处理。
+
+**教训**：
+```
+❌ 在多个页面中使用同一个 OAuth code
+✅ OAuth code 只能在一个地方消费，建立统一入口
+```
+
+### 6.9 Magic Link 回调竞态条件
+
+**问题**：`wechat-callback.vue` 在处理 Magic Link hash 回调时，同时使用 `onAuthStateChange` 监听和 `getSession()` 直接获取来恢复 session，可能导致 `setUser` 和跳转逻辑被执行两次。且缺少超时保护，如果 session 建立失败，页面会永远停留在 loading 状态。
+
+**修复**：
+- 使用 `handled` 标志防止双重执行
+- 添加 15 秒超时保护
+
 ---
 
 ## 七、排错指南

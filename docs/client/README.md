@@ -22,6 +22,7 @@
 | [CLIENT_TEST_OPTIMIZATION_GUIDE.md](./CLIENT_TEST_OPTIMIZATION_GUIDE.md) | 测试与优化规范 | 必读 |
 | [CLIENT_COMPONENT_ROADMAP.md](./CLIENT_COMPONENT_ROADMAP.md) | 组件标准化路线图 | 必读 |
 | [STYLE_MAPPING.md](./STYLE_MAPPING.md) | 🆕 **全局样式映射** | 必读 |
+| [../../config/client-routes.ts](../../config/client-routes.ts) | 🆕 **客户端路由常量** | 必读 |
 
 ### 重点页面文档 (⭐ 关键)
 

@@ -1,5 +1,0 @@
-const index_vue_vue_type_style_index_0_scoped_99632c8e_lang = ".admin-page[data-v-99632c8e]{padding:0}.search-form[data-v-99632c8e]{margin-bottom:0}.question-text[data-v-99632c8e]{color:var(--el-text-color-primary);font-weight:500}.bound-product[data-v-99632c8e]{align-items:center;color:var(--el-color-primary);display:flex;font-size:13px;gap:6px}";
-export {
-  index_vue_vue_type_style_index_0_scoped_99632c8e_lang as default
-};
-//# sourceMappingURL=index-styles-1.mjs-DyoNhLlu.js.map

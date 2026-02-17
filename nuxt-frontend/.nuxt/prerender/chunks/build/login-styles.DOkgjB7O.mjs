@@ -1,0 +1,8 @@
+const login_vue_vue_type_style_index_0_scoped_07d55e75_lang = ".login-container[data-v-07d55e75]{align-items:center;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;height:100vh;justify-content:center}.login-card[data-v-07d55e75]{width:420px}.card-header[data-v-07d55e75]{font-size:18px;font-weight:700;text-align:center}.login-tabs[data-v-07d55e75]{margin-top:-10px}.login-btn[data-v-07d55e75]{width:100%}.code-input-group[data-v-07d55e75]{display:flex;gap:10px}.code-input-group .el-input[data-v-07d55e75]{flex:1}.code-input-group .el-button[data-v-07d55e75]{width:120px}";
+
+const loginStyles_DOkgjB7O = [
+  login_vue_vue_type_style_index_0_scoped_07d55e75_lang
+];
+
+export { loginStyles_DOkgjB7O as default };
+//# sourceMappingURL=login-styles.DOkgjB7O.mjs.map

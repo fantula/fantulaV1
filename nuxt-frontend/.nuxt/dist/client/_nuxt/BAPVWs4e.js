@@ -1,0 +1,4 @@
+import{bv as a,X as n}from"./BcSvUY-Y.js";const o={async getUsers(){const s=n(),{data:e,error:r}=await s.from("admin_users").select(`
+                *,
+                department:admin_departments(id, name, permissions)
+            `).order("created_at",{ascending:!1});return r?{success:!1,users:[],error:r.message}:{success:!0,users:e||[]}},async createUser(s){try{const e=await a();return e?await $fetch("/api/admin/users/create",{method:"POST",headers:{Authorization:`Bearer ${e}`},body:s}):{success:!1,error:"未登录"}}catch(e){return{success:!1,error:e.message||"请求失败"}}},async updateUser(s,e){const r=n(),{error:t}=await r.from("admin_users").update(e).eq("id",s);return t?{success:!1,error:t.message}:{success:!0}},async deleteUser(s){try{const e=await a();return e?await $fetch("/api/admin/users/delete",{method:"POST",headers:{Authorization:`Bearer ${e}`},body:{id:s}}):{success:!1,error:"未登录"}}catch(e){return{success:!1,error:e.message||"请求失败"}}}};export{o as a};
