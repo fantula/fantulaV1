@@ -391,5 +391,20 @@ export const adminCdkApi = {
         })
 
         return { valid, duplicates, invalid }
+    },
+
+    /**
+     * 获取所有已绑定 Virtual 类型 CDK 的 SKU ID 列表
+     * 用于在创建 Virtual 资源时过滤已存在的 SKU（Virtual 类型通常一个 SKU 对应一个资源配置）
+     */
+    async getVirtualBoundSkuIds(): Promise<string[]> {
+        const client = getSupabaseClient()
+        const { data } = await client
+            .from('cdk_sku_map')
+            .select('sku_id, cdk:cdks!inner(cdk_type)')
+            .eq('cdk.cdk_type', 'virtual')
+        
+        if (!data) return []
+        return [...new Set(data.map(item => item.sku_id))]
     }
 }

@@ -82,7 +82,26 @@
       <el-container class="main-container">
         <el-header class="admin-header">
           <div class="header-content">
-            <div id="header-portal" class="header-portal"></div>
+            <div class="header-portal-area" v-if="headerStore.title">
+               <div class="module-title">{{ headerStore.title }}</div>
+               <el-divider direction="vertical" class="header-divider" v-if="headerStore.tabs.length > 0" />
+               <el-tabs 
+                  v-if="headerStore.tabs.length > 0"
+                  v-model="headerStore.activeTab" 
+                  class="header-tabs" 
+                  @tab-click="handleTabClick"
+               >
+                  <el-tab-pane 
+                    v-for="tab in headerStore.tabs" 
+                    :key="tab.name" 
+                    :label="tab.label" 
+                    :name="tab.name" 
+                  />
+               </el-tabs>
+            </div>
+            <div class="header-portal-area" v-else>
+               <!-- Placeholder or Breadcrumb could go here -->
+            </div>
 
             <div class="header-right-actions">
               <!-- Dark Mode Toggle -->
@@ -137,6 +156,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useAdminStore } from '@/stores/admin/admin';
+import { useAdminHeaderStore } from '@/stores/admin/header';
 import draggable from 'vuedraggable';
 import { 
   Odometer, List, RefreshLeft, Goods, Files, Key, Ticket, User, 
@@ -146,10 +166,12 @@ import {
 } from '@element-plus/icons-vue';
 // 使用统一菜单配置
 import { ADMIN_MENU_ITEMS } from '@/config/admin-menu';
+import { adminRoutes } from '@/config/admin-routes';
 
 const route = useRoute();
 const router = useRouter();
 const adminStore = useAdminStore();
+const headerStore = useAdminHeaderStore();
 
 const activeMenu = computed(() => {
   const path = route.path
@@ -176,7 +198,7 @@ const isLoading = ref(true);
 const isDark = ref(false);
 
 // 判断是否在登录页 - 登录页直接渲染，不显示侧边栏
-const isLoginPage = computed(() => route.path === '/manager_portal/login');
+const isLoginPage = computed(() => route.path === adminRoutes.login());
 
 const currentUser = computed(() => adminStore.adminInfo);
 
@@ -210,7 +232,7 @@ const filteredMenuList = computed(() => {
   // 根据权限过滤菜单
   return menuList.value.filter(item => {
     // 仪表盘始终可见
-    if (item.index === '/manager_portal') return true;
+    if (item.index === adminRoutes.home()) return true;
     // 检查是否有权限访问该菜单
     return permissions.includes(item.index);
   });
@@ -283,6 +305,16 @@ const loadMenuOrder = () => {
   }
 };
 
+// Handle Header Tab Click
+const handleTabClick = (tabInstance: any) => {
+  const name = tabInstance.props.name
+  // Find target tab to get route
+  const targetTab = headerStore.tabs.find(t => t.name === name)
+  if (targetTab && targetTab.route) {
+    router.push(targetTab.route)
+  }
+}
+
 // 等待 middleware 完成初始化后关闭 loading
 // 注意：身份验证由 admin-auth.global.ts 处理，这里只负责 UI 状态
 const waitForAuth = async () => {
@@ -296,7 +328,7 @@ const waitForAuth = async () => {
 const handleLogout = async () => {
   await adminStore.logout();
   ElMessage.success('已退出登录');
-  await router.push('/manager_portal/login');
+  await router.push(adminRoutes.login());
 };
 
 onMounted(() => {
@@ -467,6 +499,7 @@ onMounted(() => {
 .el-menu--collapse .el-icon {
   margin-right: 0 !important;
   padding-right: 0px;
+  display: flex !important;
 }
 .el-menu--collapse span {
   display: none;
@@ -537,11 +570,47 @@ onMounted(() => {
   align-items: center;
 }
 
-.header-portal {
+.header-portal-area {
   flex: 1;
   display: flex;
   align-items: center;
   height: 100%;
+}
+
+.module-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--admin-text-primary);
+    white-space: nowrap;
+    margin-right: 15px;
+}
+
+.header-divider {
+    height: 24px;
+    margin-right: 15px;
+    border-color: var(--admin-border);
+}
+
+.header-tabs {
+    --el-tabs-header-height: 100%;
+}
+.header-tabs :deep(.el-tabs__nav-wrap::after) { display: none; }
+.header-tabs :deep(.el-tabs__header) { margin: 0; border: none; }
+.header-tabs :deep(.el-tabs__item) {
+    font-size: 16px;
+    font-weight: 500;
+    height: 72px;
+    line-height: 72px;
+    color: var(--admin-text-regular);
+}
+.header-tabs :deep(.el-tabs__item.is-active) {
+    color: var(--el-color-primary);
+    font-weight: 600;
+    font-size: 17px;
+}
+.header-tabs :deep(.el-tabs__active-bar) {
+    height: 3px;
+    border-radius: 2px;
 }
 
 .header-right-actions {

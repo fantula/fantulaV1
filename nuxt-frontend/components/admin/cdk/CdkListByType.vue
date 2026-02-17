@@ -71,11 +71,13 @@
 
     <!-- Data Table -->
     <AdminDataTable 
-        :data="paginatedCdkList" 
+        :data="cdkList" 
         :loading="loading"
-        :total="cdkList.length"
+        :total="total"
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
+        @update:current-page="loadCdks"
+        @update:page-size="loadCdks"
         @selection-change="handleSelectionChange"
     >
         <el-table-column type="selection" width="55" />
@@ -157,7 +159,7 @@
         </el-table-column>
 
         <!-- 操作 -->
-        <el-table-column label="操作" width="100" align="center" fixed="right">
+        <el-table-column label="操作" width="100" align="center">
             <template #default="{ row }">
                 <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
             </template>
@@ -174,6 +176,7 @@ import { adminProductApi, adminCdkApi, adminCategoryApi, type AdminProduct, type
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizConfig } from '@/composables/common/useBizConfig'
+import { adminRoute, adminRoutes } from '@/config/admin-routes'
 
 const { getProductTypeLabel, getCdkStatusLabel, getCdkStatusType } = useBizConfig()
 
@@ -196,6 +199,7 @@ const selectedRows = ref<AdminCDK[]>([])
 // Pagination
 const currentPage = ref(1)
 const pageSize = ref(20)
+const total = ref(0) // Server-side total
 
 const filters = reactive({
     categoryId: '',
@@ -207,12 +211,6 @@ const filters = reactive({
 const filteredProducts = computed(() => {
     if (!filters.categoryId) return productOptions.value
     return productOptions.value.filter(p => p.category_id === filters.categoryId)
-})
-
-// Paginated List
-const paginatedCdkList = computed(() => {
-    const start = (currentPage.value - 1) * pageSize.value
-    return cdkList.value.slice(start, start + pageSize.value)
 })
 
 // Load Data
@@ -231,21 +229,17 @@ const loadCdks = async () => {
     try {
         const params: any = {
             cdk_type: props.type,
-            limit: 200
+            limit: pageSize.value,
+            offset: (currentPage.value - 1) * pageSize.value
         }
         if(filters.productId) params.product_id = filters.productId
-        // 'unlinked' is handled client-side, other statuses pass to API
-        if(filters.status && filters.status !== 'unlinked') params.status = filters.status
+        // 'unlinked' is handled client-side if needed, but here we strictly follow type
+        if(filters.status) params.status = filters.status
         
         const res = await adminCdkApi.getCdks(params)
         if(res.success) {
-            let result = res.cdks
-            // Client-side filter for unlinked (no SKU mappings)
-            if(filters.status === 'unlinked') {
-                result = result.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
-            }
-            cdkList.value = result
-            currentPage.value = 1 // Reset pagination
+            cdkList.value = res.cdks
+            total.value = res.total
         }
         else ElMessage.error(res.error)
     } catch(e: any) {
@@ -257,20 +251,29 @@ const loadCdks = async () => {
 
 const handleCategoryChange = () => {
     filters.productId = ''
+    currentPage.value = 1
     loadCdks()
 }
 
-const handleSearch = () => loadCdks()
+const handleSearch = () => {
+    currentPage.value = 1
+    loadCdks()
+}
+
+// Actions
 
 // Actions
 const handleAdd = () => {
-    router.push({ path: '/manager_portal/cdk/post', query: { type: props.type } })
+    router.push({ path: adminRoute('cdk/post'), query: { type: props.type } })
 }
 
 const handleEdit = (row: AdminCDK) => {
     router.push({
-        path: `/manager_portal/cdk/edit/${row.id}`,
+        path: adminRoutes.cdkEdit(row.id),
         query: { type: props.type }
+    }).catch(err => {
+        console.error('Navigation Error:', err)
+        ElMessage.error('跳转失败')
     })
 }
 

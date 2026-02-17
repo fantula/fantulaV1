@@ -1160,14 +1160,14 @@ const _routes = [
     name: "pc-faq",
     path: "/pc/faq",
     meta: __nuxt_page_meta$1V || {},
-    component: () => import('./faq-DMFWXkdG.mjs')
+    component: () => import('./faq-BU5_5vYz.mjs')
   },
   {
     name: "pc-id",
     path: "/pc/:id()",
     meta: __nuxt_page_meta$1U || {},
     alias: ["/:id(\\d+)"],
-    component: () => import('./_id_-BP48iiiO.mjs')
+    component: () => import('./_id_-D2B9t-4q.mjs')
   },
   {
     name: "pc-about",
@@ -1179,19 +1179,19 @@ const _routes = [
     name: "pc",
     path: "/pc",
     meta: __nuxt_page_meta$1S || {},
-    component: () => import('./index-BJ__QQdp.mjs')
+    component: () => import('./index-Ct0UqoSQ.mjs')
   },
   {
     name: "pc-policy",
     path: "/pc/policy",
     meta: __nuxt_page_meta$1R || {},
-    component: () => import('./policy-C7_vPjkX.mjs')
+    component: () => import('./policy-NZzw_A0v.mjs')
   },
   {
     name: "pc-refund",
     path: "/pc/refund",
     meta: __nuxt_page_meta$1Q || {},
-    component: () => import('./refund-C46S_vpj.mjs')
+    component: () => import('./refund-CggGIHgd.mjs')
   },
   {
     name: "pc-company",
@@ -1209,67 +1209,67 @@ const _routes = [
     name: "pc-join-us",
     path: "/pc/join-us",
     meta: __nuxt_page_meta$1N || {},
-    component: () => import('./join-us-DN9w4ev4.mjs')
+    component: () => import('./join-us-5pPt9uJh.mjs')
   },
   {
     name: "pc-privacy",
     path: "/pc/privacy",
     meta: __nuxt_page_meta$1M || {},
-    component: () => import('./privacy-D8sQxJRQ.mjs')
+    component: () => import('./privacy-CpyGCkoa.mjs')
   },
   {
     name: __nuxt_page_meta$1D?.name,
     path: "/pc/profile",
     meta: __nuxt_page_meta$1D || {},
-    component: () => import('./profile-C9fKoJEw.mjs'),
+    component: () => import('./profile-lXLBNBeE.mjs'),
     children: [
       {
         name: "pc-profile",
         path: "",
         meta: __nuxt_page_meta$1L || {},
-        component: () => import('./index-B-gc8sm6.mjs')
+        component: () => import('./index-BtF9I0SP.mjs')
       },
       {
         name: "pc-profile-wallet",
         path: "wallet",
         meta: __nuxt_page_meta$1K || {},
-        component: () => import('./wallet-D2EpyTL0.mjs')
+        component: () => import('./wallet-CqPwNThm.mjs')
       },
       {
         name: "pc-profile-tickets",
         path: "tickets",
         meta: __nuxt_page_meta$1J || {},
-        component: () => import('./tickets-BpQ17RBY.mjs')
+        component: () => import('./tickets-BD-ulKiu.mjs')
       },
       {
         name: "pc-profile-exchange",
         path: "exchange",
         meta: __nuxt_page_meta$1I || {},
-        component: () => import('./exchange-DeNwYUfK.mjs')
+        component: () => import('./exchange-oyD-iFHw.mjs')
       },
       {
         name: "pc-profile-messages",
         path: "messages",
         meta: __nuxt_page_meta$1H || {},
-        component: () => import('./messages-BV4iD0Lj.mjs')
+        component: () => import('./messages-BcbP16Vh.mjs')
       },
       {
         name: "pc-profile-favorites",
         path: "favorites",
         meta: __nuxt_page_meta$1G || {},
-        component: () => import('./favorites-DvxH_VKG.mjs')
+        component: () => import('./favorites-DFYrpJf0.mjs')
       },
       {
         name: "pc-profile-order-id",
         path: "order/:id()",
         meta: __nuxt_page_meta$1F || {},
-        component: () => import('./_id_-BxiMuf0n.mjs')
+        component: () => import('./_id_-KhJ1C_nG.mjs')
       },
       {
         name: "pc-profile-order",
         path: "order",
         meta: __nuxt_page_meta$1E || {},
-        component: () => import('./index-DvyDQLN0.mjs')
+        component: () => import('./index-CKdvXw9M.mjs')
       }
     ]
   },
@@ -1283,13 +1283,13 @@ const _routes = [
     name: "mobile-cart",
     path: "/mobile/cart",
     meta: __nuxt_page_meta$1B || {},
-    component: () => import('./cart-DnqVx-bN.mjs')
+    component: () => import('./cart-CI8yGIun.mjs')
   },
   {
     name: "mobile-help",
     path: "/mobile/help",
     meta: __nuxt_page_meta$1A || {},
-    component: () => import('./help-ME-VHLeS.mjs')
+    component: () => import('./help-BiHRfQc7.mjs')
   },
   {
     name: "pc-about-us",
@@ -1301,37 +1301,37 @@ const _routes = [
     name: "mobile",
     path: "/mobile",
     meta: __nuxt_page_meta$1y || {},
-    component: () => import('./index-BwBTUztx.mjs')
+    component: () => import('./index-CaGRU_Is.mjs')
   },
   {
     name: "pc-community",
     path: "/pc/community",
     meta: __nuxt_page_meta$1x || {},
-    component: () => import('./community-Dt6OWqcF.mjs')
+    component: () => import('./community-dJwbs0HD.mjs')
   },
   {
     name: "pc-advantages",
     path: "/pc/advantages",
     meta: __nuxt_page_meta$1w || {},
-    component: () => import('./advantages-CllYFsI8.mjs')
+    component: () => import('./advantages-CwAq7wwi.mjs')
   },
   {
     name: "pc-disclaimer",
     path: "/pc/disclaimer",
     meta: __nuxt_page_meta$1v || {},
-    component: () => import('./disclaimer-CYaMsuEl.mjs')
+    component: () => import('./disclaimer-BEuCkVao.mjs')
   },
   {
     name: "pc-goods-id",
     path: "/pc/goods/:id()",
     meta: __nuxt_page_meta$1u || {},
-    component: () => import('./_id_-CcwHI08t.mjs')
+    component: () => import('./_id_-BXacf1nu.mjs')
   },
   {
     name: "mobile-channel",
     path: "/mobile/channel",
     meta: __nuxt_page_meta$1t || {},
-    component: () => import('./channel-0Wvqk6yf.mjs')
+    component: () => import('./channel-CITDdJ1I.mjs')
   },
   {
     name: __nuxt_page_meta$1i?.name,
@@ -1342,61 +1342,61 @@ const _routes = [
         name: "mobile-profile",
         path: "",
         meta: { ...__nuxt_page_meta$1s || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-C9VH_y0f.mjs')
+        component: () => import('./index-CaAXoUJe.mjs')
       },
       {
         name: "mobile-profile-wallet",
         path: "wallet",
         meta: { ...__nuxt_page_meta$1r || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./wallet-C1bgBPRq.mjs')
+        component: () => import('./wallet-DAdXUem3.mjs')
       },
       {
         name: "mobile-profile-order-id",
         path: "order/:id()",
         meta: { ...__nuxt_page_meta$1q || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./_id_-DrH73m4s.mjs')
+        component: () => import('./_id_-BhWxuxGz.mjs')
       },
       {
         name: "mobile-profile-order",
         path: "order",
         meta: { ...__nuxt_page_meta$1p || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-BhUY76Yo.mjs')
+        component: () => import('./index-CW30NyI6.mjs')
       },
       {
         name: "mobile-profile-tickets-id",
         path: "tickets/:id()",
         meta: { ...__nuxt_page_meta$1o || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./_id_-BUDvfLlI.mjs')
+        component: () => import('./_id_-DPrhztlY.mjs')
       },
       {
         name: "mobile-profile-account",
         path: "account",
         meta: { ...__nuxt_page_meta$1n || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-DZ2aFNkp.mjs')
+        component: () => import('./index-BONaQCb0.mjs')
       },
       {
         name: "mobile-profile-tickets",
         path: "tickets",
         meta: { ...__nuxt_page_meta$1m || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-Bv5u0TyP.mjs')
+        component: () => import('./index-BYEVlXpD.mjs')
       },
       {
         name: "mobile-profile-messages",
         path: "messages",
         meta: { ...__nuxt_page_meta$1l || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-Dbn9s1rX.mjs')
+        component: () => import('./index-Dm2oFurj.mjs')
       },
       {
         name: "mobile-profile-favorites",
         path: "favorites",
         meta: { ...__nuxt_page_meta$1k || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-OycIR9It.mjs')
+        component: () => import('./index-dUfYT8Kk.mjs')
       },
       {
         name: "mobile-profile-redemption",
         path: "redemption",
         meta: { ...__nuxt_page_meta$1j || {}, ...{ "middleware": "client-auth" } },
-        component: () => import('./index-1nYnKvbt.mjs')
+        component: () => import('./index-Dyfdt73Q.mjs')
       }
     ]
   },
@@ -1404,19 +1404,19 @@ const _routes = [
     name: "pc-article-id",
     path: "/pc/article/:id()",
     meta: __nuxt_page_meta$1h || {},
-    component: () => import('./_id_-W_s4mBGm.mjs')
+    component: () => import('./_id_--i1nWKBk.mjs')
   },
   {
     name: "pc-checkout-id",
     path: "/pc/checkout/:id()",
     meta: __nuxt_page_meta$1g || {},
-    component: () => import('./_id_-c1OiUjXz.mjs')
+    component: () => import('./_id_-BAJahraO.mjs')
   },
   {
     name: "mobile-goods-id",
     path: "/mobile/goods/:id()",
     meta: __nuxt_page_meta$1f || {},
-    component: () => import('./_id_-CHyhZ4Hc.mjs')
+    component: () => import('./_id_-BnTa4MmO.mjs')
   },
   {
     name: __nuxt_page_meta$15?.name,
@@ -1428,19 +1428,19 @@ const _routes = [
         name: "manager_portal-cdk-cdks",
         path: "cdks",
         meta: { ...__nuxt_page_meta$1e || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./cdks-BK7OSikx.mjs')
+        component: () => import('./cdks-DmkQ-ac1.mjs')
       },
       {
         name: "manager_portal-cdk-keys",
         path: "keys",
         meta: { ...__nuxt_page_meta$1d || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./keys-CvDqRmux.mjs')
+        component: () => import('./keys-dmMnXN4R.mjs')
       },
       {
         name: "manager_portal-cdk-post",
         path: "post",
         meta: { ...__nuxt_page_meta$1c || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-CUAk_Vlh.mjs')
+        component: () => import('./post-CI0VoFEy.mjs')
       },
       {
         name: "manager_portal-cdk-debug",
@@ -1458,25 +1458,25 @@ const _routes = [
         name: "manager_portal-cdk-virtual",
         path: "virtual",
         meta: { ...__nuxt_page_meta$19 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./virtual-sUAxGeYg.mjs')
+        component: () => import('./virtual-DM4YjvvL.mjs')
       },
       {
         name: "manager_portal-cdk-accounts",
         path: "accounts",
         meta: { ...__nuxt_page_meta$18 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./accounts-szkGuJk_.mjs')
+        component: () => import('./accounts-CXw4VuxR.mjs')
       },
       {
         name: "manager_portal-cdk-edit-id",
         path: "edit/:id()",
         meta: { ...__nuxt_page_meta$17 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./_id_-DjDLhppd.mjs')
+        component: () => import('./_id_-C_GZMfJm.mjs')
       },
       {
         name: "manager_portal-cdk-channel-recognition",
         path: "channel-recognition",
         meta: { ...__nuxt_page_meta$16 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./channel-recognition-B27pQRlh.mjs')
+        component: () => import('./channel-recognition-DdilNDtX.mjs')
       }
     ]
   },
@@ -1484,13 +1484,13 @@ const _routes = [
     name: "manager_portal",
     path: "/manager_portal",
     meta: { ...__nuxt_page_meta$14 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-HMrZWV_-.mjs')
+    component: () => import('./index-CYV4-UGJ.mjs')
   },
   {
     name: "manager_portal-login",
     path: "/manager_portal/login",
     meta: { ...__nuxt_page_meta$13 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./login-LabpoZQ7.mjs')
+    component: () => import('./login-BuRhjIMt.mjs')
   },
   {
     name: __nuxt_page_meta$$?.name,
@@ -1502,19 +1502,19 @@ const _routes = [
         name: "manager_portal-media",
         path: "",
         meta: { ...__nuxt_page_meta$12 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-b-bkfRzV.mjs')
+        component: () => import('./index-C7_OkFMP.mjs')
       },
       {
         name: "manager_portal-media-images",
         path: "images",
         meta: { ...__nuxt_page_meta$11 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./images-C5jvFIJv.mjs')
+        component: () => import('./images-CGcYKzVr.mjs')
       },
       {
         name: "manager_portal-media-banners",
         path: "banners",
         meta: { ...__nuxt_page_meta$10 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./banners-Dw-rhHPX.mjs')
+        component: () => import('./banners-CzCOkiUD.mjs')
       }
     ]
   },
@@ -1528,19 +1528,19 @@ const _routes = [
         name: "manager_portal-users",
         path: "",
         meta: { ...__nuxt_page_meta$_ || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-B381kL-T.mjs')
+        component: () => import('./index-B_2-5XXH.mjs')
       },
       {
         name: "manager_portal-users-accounts",
         path: "accounts",
         meta: { ...__nuxt_page_meta$Z || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-Dxj0l7_o.mjs')
+        component: () => import('./index-DZk11hlQ.mjs')
       },
       {
         name: "manager_portal-users-departments",
         path: "departments",
         meta: { ...__nuxt_page_meta$Y || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-Bem2OlKg.mjs')
+        component: () => import('./index-Dptq2W_6.mjs')
       }
     ]
   },
@@ -1548,7 +1548,7 @@ const _routes = [
     name: "mobile-checkout-id",
     path: "/mobile/checkout/:id()",
     meta: __nuxt_page_meta$W || {},
-    component: () => import('./_id_-CDMq6hZK.mjs')
+    component: () => import('./_id_-DNqSJDmb.mjs')
   },
   {
     name: "manager_portal-orders",
@@ -1560,55 +1560,55 @@ const _routes = [
         name: "manager_portal-orders-cdkey",
         path: "cdkey",
         meta: { ...__nuxt_page_meta$V || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-Becci5vN.mjs')
+        component: () => import('./index-C4blK5yC.mjs')
       },
       {
         name: "manager_portal-orders-share",
         path: "share",
         meta: { ...__nuxt_page_meta$U || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-j3pqGCIz.mjs')
+        component: () => import('./index-DqaFs7ZB.mjs')
       },
       {
         name: "manager_portal-orders-cdkey-detail",
         path: "cdkey/detail",
         meta: { ...__nuxt_page_meta$T || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./detail-CaGF0vj2.mjs')
+        component: () => import('./detail-CYHgGV-c.mjs')
       },
       {
         name: "manager_portal-orders-refund",
         path: "refund",
         meta: { ...__nuxt_page_meta$S || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-8uSSWluT.mjs')
+        component: () => import('./index-IrLvr0ma.mjs')
       },
       {
         name: "manager_portal-orders-share-detail",
         path: "share/detail",
         meta: { ...__nuxt_page_meta$R || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./detail-BwqoZBG5.mjs')
+        component: () => import('./detail-BoN0gkGe.mjs')
       },
       {
         name: "manager_portal-orders-recharge",
         path: "recharge",
         meta: { ...__nuxt_page_meta$Q || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-gzitNNDi.mjs')
+        component: () => import('./index-DC71lh1a.mjs')
       },
       {
         name: "manager_portal-orders-preorders",
         path: "preorders",
         meta: { ...__nuxt_page_meta$P || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CUl-KPN3.mjs')
+        component: () => import('./index-DbR6v__b.mjs')
       },
       {
         name: "manager_portal-orders-recharge-detail",
         path: "recharge/detail",
         meta: { ...__nuxt_page_meta$O || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./detail-BSloWr2c.mjs')
+        component: () => import('./detail-Cne8OaVW.mjs')
       },
       {
         name: "manager_portal-orders-cancelled-refunds",
         path: "cancelled-refunds",
         meta: { ...__nuxt_page_meta$N || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-D8Vcm60l.mjs')
+        component: () => import('./index-cF3I89PT.mjs')
       }
     ]
   },
@@ -1628,50 +1628,50 @@ const _routes = [
         name: "manager_portal-coupons-flat-post",
         path: "flat/post",
         meta: { ...__nuxt_page_meta$K || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-DofxoOCE.mjs')
+        component: () => import('./post-O4INs4kj.mjs')
       },
       {
         name: "manager_portal-coupons-flat",
         path: "flat",
         meta: { ...__nuxt_page_meta$J || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-CjzRPJXH.mjs')
+        component: () => import('./index-CHrhlcrV.mjs')
       },
       {
         name: "manager_portal-coupons-stats",
         path: "stats",
         meta: { ...__nuxt_page_meta$I || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-B92wfF9x.mjs')
+        component: () => import('./index-CiioEyOq.mjs')
       },
       {
         name: "manager_portal-coupons-balance-post",
         path: "balance/post",
         meta: { ...__nuxt_page_meta$H || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-COTeuTtP.mjs')
+        component: () => import('./post-Dwp7nS8x.mjs')
       },
       {
         name: "manager_portal-coupons-product-post",
         path: "product/post",
         meta: { ...__nuxt_page_meta$G || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-DIPOww4M.mjs')
+        component: () => import('./post-YC6yEXQP.mjs')
       },
       {
         name: "manager_portal-coupons-balance",
         path: "balance",
         meta: { ...__nuxt_page_meta$F || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-BxpiUMrz.mjs')
+        component: () => import('./index-CNrAqYHy.mjs')
       },
       {
         name: "manager_portal-coupons-product",
         path: "product",
         meta: { ...__nuxt_page_meta$E || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-D3wn_K_a.mjs')
+        component: () => import('./index-DqQ102Um.mjs')
       }
     ]
   },
   {
     name: "mobile-wechat-callback",
     path: "/mobile/wechat-callback",
-    component: () => import('./wechat-callback-B6D9JK8D.mjs')
+    component: () => import('./wechat-callback-dXu9hGBg.mjs')
   },
   {
     name: __nuxt_page_meta$z?.name,
@@ -1689,13 +1689,13 @@ const _routes = [
         name: "manager_portal-messages-settings",
         path: "settings",
         meta: { ...__nuxt_page_meta$B || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./settings-BRIE4jNr.mjs')
+        component: () => import('./settings-BqE0Rtr7.mjs')
       },
       {
         name: "manager_portal-messages-batch-send",
         path: "batch-send",
         meta: { ...__nuxt_page_meta$A || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./batch-send-D3XnNkRT.mjs')
+        component: () => import('./batch-send-B5yhMk5P.mjs')
       }
     ]
   },
@@ -1709,37 +1709,37 @@ const _routes = [
         name: "manager_portal-products-edit",
         path: "edit",
         meta: { ...__nuxt_page_meta$y || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./edit-YmGcYvG0.mjs')
+        component: () => import('./edit-BRMOWr2G.mjs')
       },
       {
         name: "manager_portal-products-skus",
         path: "skus",
         meta: { ...__nuxt_page_meta$x || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./skus-Bl39Mnk3.mjs')
+        component: () => import('./skus-Dux5jQ68.mjs')
       },
       {
         name: "manager_portal-products",
         path: "",
         meta: { ...__nuxt_page_meta$w || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-21h4LdIb.mjs')
+        component: () => import('./index-D5oKmg3K.mjs')
       },
       {
         name: "manager_portal-products-categories",
         path: "categories",
         meta: { ...__nuxt_page_meta$v || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./categories-B-tP4Mbn.mjs')
+        component: () => import('./categories-BagV0zSL.mjs')
       },
       {
         name: "manager_portal-products-shared-sku",
         path: "shared-sku",
         meta: { ...__nuxt_page_meta$u || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./shared-sku-X3E6T_AI.mjs')
+        component: () => import('./shared-sku-COQFJTcI.mjs')
       },
       {
         name: "manager_portal-products-specs-id",
         path: "specs/:id()",
         meta: { ...__nuxt_page_meta$t || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./_id_-qkeI0BIA.mjs')
+        component: () => import('./_id_-3vfM0bwB.mjs')
       }
     ]
   },
@@ -1759,13 +1759,13 @@ const _routes = [
         name: "manager_portal-recharge-tiers",
         path: "tiers",
         meta: { ...__nuxt_page_meta$q || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./tiers-BfP-m596.mjs')
+        component: () => import('./tiers-BviJwELg.mjs')
       },
       {
         name: "manager_portal-recharge-orders",
         path: "orders",
         meta: { ...__nuxt_page_meta$p || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./orders-BjKC07k0.mjs')
+        component: () => import('./orders-DLknu7s8.mjs')
       }
     ]
   },
@@ -1773,7 +1773,7 @@ const _routes = [
     name: "pc-support-refund-create",
     path: "/pc/support/refund/create",
     meta: __nuxt_page_meta$n || {},
-    component: () => import('./create-D1PrSEV3.mjs')
+    component: () => import('./create-BMBQmySa.mjs')
   },
   {
     name: __nuxt_page_meta$f?.name,
@@ -1785,19 +1785,19 @@ const _routes = [
         name: "manager_portal-help-center",
         path: "",
         meta: { ...__nuxt_page_meta$m || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DE77newY.mjs')
+        component: () => import('./index-v0Z1O3gN.mjs')
       },
       {
         name: "manager_portal-help-center-articles",
         path: "articles",
         meta: { ...__nuxt_page_meta$k || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./articles-Cu1itozh.mjs'),
+        component: () => import('./articles-DUHBAjMR.mjs'),
         children: [
           {
             name: "manager_portal-help-center-articles-post",
             path: "post",
             meta: { ...__nuxt_page_meta$l || {}, ...{ "middleware": ["mgmt-auth"] } },
-            component: () => import('./post-DEl-lTA8.mjs')
+            component: () => import('./post-BXnD5_u4.mjs')
           }
         ]
       },
@@ -1805,25 +1805,25 @@ const _routes = [
         name: "manager_portal-help-center-faq-post",
         path: "faq/post",
         meta: { ...__nuxt_page_meta$j || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./post-NdylVl7J.mjs')
+        component: () => import('./post-POjkbMru.mjs')
       },
       {
         name: "manager_portal-help-center-faq",
         path: "faq",
         meta: { ...__nuxt_page_meta$i || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-BaNS1A-P.mjs')
+        component: () => import('./index-BZYleTbN.mjs')
       },
       {
         name: "manager_portal-help-center-faq-categories",
         path: "faq-categories",
         meta: { ...__nuxt_page_meta$h || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./faq-categories-CQQYKaQC.mjs')
+        component: () => import('./faq-categories-C7QkP8n7.mjs')
       },
       {
         name: "manager_portal-help-center-article-categories",
         path: "article-categories",
         meta: { ...__nuxt_page_meta$g || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./article-categories-BGFpr9-u.mjs')
+        component: () => import('./article-categories-xsrKBNYG.mjs')
       }
     ]
   },
@@ -1831,37 +1831,37 @@ const _routes = [
     name: "manager_portal-article-post",
     path: "/manager_portal/article/post",
     meta: { ...__nuxt_page_meta$e || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./post-sWoUN52q.mjs')
+    component: () => import('./post-BqMKkiNU.mjs')
   },
   {
     name: "manager_portal-images",
     path: "/manager_portal/images",
     meta: { ...__nuxt_page_meta$d || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-C02jiZeL.mjs')
+    component: () => import('./index-iQoajhvd.mjs')
   },
   {
     name: "manager_portal-article",
     path: "/manager_portal/article",
     meta: { ...__nuxt_page_meta$c || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-DPx0rgct.mjs')
+    component: () => import('./index-CR2T0ms_.mjs')
   },
   {
     name: "manager_portal-banners",
     path: "/manager_portal/banners",
     meta: { ...__nuxt_page_meta$b || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-DBnrWD1Z.mjs')
+    component: () => import('./index-WXzh4Ao9.mjs')
   },
   {
     name: "manager_portal-refunds",
     path: "/manager_portal/refunds",
     meta: { ...__nuxt_page_meta$a || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-Ds1jjP-O.mjs')
+    component: () => import('./index-CtSEjZPj.mjs')
   },
   {
     name: "manager_portal-tickets",
     path: "/manager_portal/tickets",
     meta: { ...__nuxt_page_meta$9 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./index-BQsNjjIW.mjs')
+    component: () => import('./index-DmgFBNfl.mjs')
   },
   {
     name: __nuxt_page_meta$2?.name,
@@ -1873,37 +1873,37 @@ const _routes = [
         name: "manager_portal-backend-settings",
         path: "",
         meta: { ...__nuxt_page_meta$8 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-DKFeTmnW.mjs')
+        component: () => import('./index-CuskrToO.mjs')
       },
       {
         name: "manager_portal-backend-settings-contact",
         path: "contact",
         meta: { ...__nuxt_page_meta$7 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./contact-CH_Wxp5s.mjs')
+        component: () => import('./contact-Dvhsm4aH.mjs')
       },
       {
         name: "manager_portal-backend-settings-storage",
         path: "storage",
         meta: { ...__nuxt_page_meta$6 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./storage-ClklgDD8.mjs')
+        component: () => import('./storage-CtG6TFXj.mjs')
       },
       {
         name: "manager_portal-backend-settings-scheduler",
         path: "scheduler",
         meta: { ...__nuxt_page_meta$5 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./scheduler-DqxJZ5TF.mjs')
+        component: () => import('./scheduler-Ds3cngV2.mjs')
       },
       {
         name: "manager_portal-backend-settings-notification",
         path: "notification",
         meta: { ...__nuxt_page_meta$4 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./index-BnX0olNI.mjs')
+        component: () => import('./index-CT5kFVIc.mjs')
       },
       {
         name: "manager_portal-backend-settings-notification-template-id",
         path: "notification/template/:id()",
         meta: { ...__nuxt_page_meta$3 || {}, ...{ "middleware": ["mgmt-auth"] } },
-        component: () => import('./_id_-1sqZW3fT.mjs')
+        component: () => import('./_id_-DmqH_vcz.mjs')
       }
     ]
   },
@@ -1911,19 +1911,19 @@ const _routes = [
     name: "manager_portal-article-categories",
     path: "/manager_portal/article/categories",
     meta: { ...__nuxt_page_meta$1 || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./categories-vOZRuLpd.mjs')
+    component: () => import('./categories-BeKdTEP2.mjs')
   },
   {
     name: "manager_portal-tickets-components-TicketChatModal",
     path: "/manager_portal/tickets/components/TicketChatModal",
     meta: { ...__nuxt_page_meta || {}, ...{ "middleware": ["mgmt-auth"] } },
-    component: () => import('./TicketChatModal-CQNHf7zW.mjs')
+    component: () => import('./TicketChatModal-B00mgvo3.mjs')
   },
   {
     name: "root-pc-faq",
     path: "/faq",
     meta: __nuxt_page_meta$1V || {},
-    component: () => import('./faq-DMFWXkdG.mjs')
+    component: () => import('./faq-BU5_5vYz.mjs')
   },
   {
     name: "root-pc-about",
@@ -1935,13 +1935,13 @@ const _routes = [
     name: "root-pc-policy",
     path: "/policy",
     meta: __nuxt_page_meta$1R || {},
-    component: () => import('./policy-C7_vPjkX.mjs')
+    component: () => import('./policy-NZzw_A0v.mjs')
   },
   {
     name: "root-pc-refund",
     path: "/refund",
     meta: __nuxt_page_meta$1Q || {},
-    component: () => import('./refund-C46S_vpj.mjs')
+    component: () => import('./refund-CggGIHgd.mjs')
   },
   {
     name: "root-pc-company",
@@ -1959,67 +1959,67 @@ const _routes = [
     name: "root-pc-join-us",
     path: "/join-us",
     meta: __nuxt_page_meta$1N || {},
-    component: () => import('./join-us-DN9w4ev4.mjs')
+    component: () => import('./join-us-5pPt9uJh.mjs')
   },
   {
     name: "root-pc-privacy",
     path: "/privacy",
     meta: __nuxt_page_meta$1M || {},
-    component: () => import('./privacy-D8sQxJRQ.mjs')
+    component: () => import('./privacy-CpyGCkoa.mjs')
   },
   {
     name: __nuxt_page_meta$1D?.name,
     path: "/profile",
     meta: __nuxt_page_meta$1D || {},
-    component: () => import('./profile-C9fKoJEw.mjs'),
+    component: () => import('./profile-lXLBNBeE.mjs'),
     children: [
       {
         name: "pc-profile",
         path: "",
         meta: __nuxt_page_meta$1L || {},
-        component: () => import('./index-B-gc8sm6.mjs')
+        component: () => import('./index-BtF9I0SP.mjs')
       },
       {
         name: "pc-profile-wallet",
         path: "wallet",
         meta: __nuxt_page_meta$1K || {},
-        component: () => import('./wallet-D2EpyTL0.mjs')
+        component: () => import('./wallet-CqPwNThm.mjs')
       },
       {
         name: "pc-profile-tickets",
         path: "tickets",
         meta: __nuxt_page_meta$1J || {},
-        component: () => import('./tickets-BpQ17RBY.mjs')
+        component: () => import('./tickets-BD-ulKiu.mjs')
       },
       {
         name: "pc-profile-exchange",
         path: "exchange",
         meta: __nuxt_page_meta$1I || {},
-        component: () => import('./exchange-DeNwYUfK.mjs')
+        component: () => import('./exchange-oyD-iFHw.mjs')
       },
       {
         name: "pc-profile-messages",
         path: "messages",
         meta: __nuxt_page_meta$1H || {},
-        component: () => import('./messages-BV4iD0Lj.mjs')
+        component: () => import('./messages-BcbP16Vh.mjs')
       },
       {
         name: "pc-profile-favorites",
         path: "favorites",
         meta: __nuxt_page_meta$1G || {},
-        component: () => import('./favorites-DvxH_VKG.mjs')
+        component: () => import('./favorites-DFYrpJf0.mjs')
       },
       {
         name: "pc-profile-order-id",
         path: "order/:id()",
         meta: __nuxt_page_meta$1F || {},
-        component: () => import('./_id_-BxiMuf0n.mjs')
+        component: () => import('./_id_-KhJ1C_nG.mjs')
       },
       {
         name: "pc-profile-order",
         path: "order",
         meta: __nuxt_page_meta$1E || {},
-        component: () => import('./index-DvyDQLN0.mjs')
+        component: () => import('./index-CKdvXw9M.mjs')
       }
     ]
   },
@@ -2039,43 +2039,43 @@ const _routes = [
     name: "root-pc-community",
     path: "/community",
     meta: __nuxt_page_meta$1x || {},
-    component: () => import('./community-Dt6OWqcF.mjs')
+    component: () => import('./community-dJwbs0HD.mjs')
   },
   {
     name: "root-pc-advantages",
     path: "/advantages",
     meta: __nuxt_page_meta$1w || {},
-    component: () => import('./advantages-CllYFsI8.mjs')
+    component: () => import('./advantages-CwAq7wwi.mjs')
   },
   {
     name: "root-pc-disclaimer",
     path: "/disclaimer",
     meta: __nuxt_page_meta$1v || {},
-    component: () => import('./disclaimer-CYaMsuEl.mjs')
+    component: () => import('./disclaimer-BEuCkVao.mjs')
   },
   {
     name: "root-pc-goods-id",
     path: "/goods/:id()",
     meta: __nuxt_page_meta$1u || {},
-    component: () => import('./_id_-CcwHI08t.mjs')
+    component: () => import('./_id_-BXacf1nu.mjs')
   },
   {
     name: "root-pc-article-id",
     path: "/article/:id()",
     meta: __nuxt_page_meta$1h || {},
-    component: () => import('./_id_-W_s4mBGm.mjs')
+    component: () => import('./_id_--i1nWKBk.mjs')
   },
   {
     name: "root-pc-checkout-id",
     path: "/checkout/:id()",
     meta: __nuxt_page_meta$1g || {},
-    component: () => import('./_id_-c1OiUjXz.mjs')
+    component: () => import('./_id_-BAJahraO.mjs')
   },
   {
     name: "root-pc-support-refund-create",
     path: "/support/refund/create",
     meta: __nuxt_page_meta$n || {},
-    component: () => import('./create-D1PrSEV3.mjs')
+    component: () => import('./create-BMBQmySa.mjs')
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -6824,9 +6824,9 @@ _sfc_main$3.setup = (props, ctx) => {
 };
 const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-e15c3435"]]);
 const layouts = {
-  mgmt: defineAsyncComponent(() => import('./mgmt-C9ZZiSpr.mjs').then((m) => m.default || m)),
-  mobile: defineAsyncComponent(() => import('./mobile-54bn6Fhg.mjs').then((m) => m.default || m)),
-  pc: defineAsyncComponent(() => import('./pc-B6v97XVm.mjs').then((m) => m.default || m))
+  mgmt: defineAsyncComponent(() => import('./mgmt-Du53YQIH.mjs').then((m) => m.default || m)),
+  mobile: defineAsyncComponent(() => import('./mobile-CENJu_nK.mjs').then((m) => m.default || m)),
+  pc: defineAsyncComponent(() => import('./pc-BanVpZ-G.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({

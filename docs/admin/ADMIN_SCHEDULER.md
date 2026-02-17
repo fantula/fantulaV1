@@ -10,7 +10,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Frontend (Admin UI)                      │
-│   pages/admin/backend-settings/scheduler.vue                │
+│   pages/manager_portal/backend-settings/scheduler.vue                │
 │   composables/admin/useAdminScheduler.ts                    │
 └────────────────────────┬────────────────────────────────────┘
                          │ HTTP API

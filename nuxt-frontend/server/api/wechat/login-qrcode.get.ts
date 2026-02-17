@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
 
         // 调用微信 API 创建带参二维码
         const qrResult = await createParametricQrCode(sceneStr, 300) // 5分钟有效
+        console.log("🔴 [PC Stage 1] Ticket Generated:", qrResult.ticket ? "Success" : "Failed")
 
         // 保存到数据库，用于后续轮询和事件回调匹配
         const supabase = getSupabaseServiceClient()

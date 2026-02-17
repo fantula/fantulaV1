@@ -2,7 +2,7 @@
   <div class="admin-page-post">
     <StickyFormHeader
       :title="isEdit ? '编辑文章' : '发布文章'"
-      back-path="/manager_portal/help-center/articles"
+      :back-path="adminRoute('help-center/articles')"
       :loading="loading"
       @save="submitForm"
     />
@@ -117,6 +117,7 @@ import { adminCommunityApi, communityApi, type Category } from '@/api/client/com
 // Explicitly import AdminImagePicker
 import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
 const route = useRoute()
@@ -222,7 +223,7 @@ const submitForm = async () => {
           if (error) throw error
           ElMessage.success('发布成功')
         }
-        router.push('/manager_portal/article')
+        router.push(adminRoute('article'))
       } catch (error: any) {
         ElMessage.error('提交失败: ' + error.message)
       } finally {

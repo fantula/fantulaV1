@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="wizard-header">
       <div class="header-left">
-        <el-button link class="back-btn" @click="router.back()">
+        <el-button link class="back-btn" @click="handleBackNavigation">
           <el-icon class="back-icon"><ArrowLeft /></el-icon> 返回列表
         </el-button>
         <div class="header-titles">
@@ -327,6 +327,7 @@ import {
   ArrowLeft, Picture, Delete, Plus, CircleCheckFilled, Minus, Cpu 
 } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
+import { adminRoute } from '@/config/admin-routes';
 import { adminCategoryApi, adminProductApi, adminCdkApi, adminApi, type AdminProduct, type AdminImage, type AdminImageCategory } from '@/api/admin';
 
 
@@ -482,7 +483,7 @@ const getTypeText = (type: string | undefined) => {
     'shared_account': '账号/合租', 
     'one_time_cdk': '激活码' 
   };
-  return map[type] || type || '-';
+  return (type && map[type]) || type || '-';
 };
 
 const addVirtualField = () => formVirtual.fields.push('');
@@ -658,7 +659,7 @@ const handleNext = async () => {
           'one_time': 'keys'
         };
         const targetRoute = typeRouteMap[route.query.type as string] || 'virtual';
-        router.push(`/manager_portal/cdk/${targetRoute}`);
+        router.push(adminRoute(`cdk/${targetRoute}`));
       } else if (errors.length > 0) {
         ElMessage.error(errors[0]);
       }
@@ -672,6 +673,19 @@ const handleNext = async () => {
 
 const prevStep = () => {
   if (activeStep.value > 0) activeStep.value--;
+};
+
+const handleBackNavigation = () => {
+  const type = currentCdkType.value;
+  if (type === 'virtual') {
+    router.push(adminRoute('cdk/virtual'));
+  } else if (type === 'shared_account') {
+    router.push(adminRoute('cdk/accounts'));
+  } else if (type === 'one_time_cdk') {
+    router.push(adminRoute('cdk/keys'));
+  } else {
+    router.push(adminRoute('cdk/cdks'));
+  }
 };
 
 </script>

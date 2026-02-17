@@ -94,16 +94,32 @@
           {{ formatTime(row.end_time || row.expires_at) }}
         </template>
       </el-table-column>
+
+      <!-- 操作 -->
+      <el-table-column label="操作" width="80" fixed="right" align="center">
+        <template #default="{ row }">
+          <el-button 
+            link 
+            type="primary" 
+            @click="openDetail(row)"
+          >
+            详情
+          </el-button>
+        </template>
+      </el-table-column>
     </AdminDataTable>
+
+    <OrderDetailDialog v-model="detailVisible" :order-id="detailId" type="cdk" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import OrderDetailDialog from '@/components/admin/order/OrderDetailDialog.vue'
 import { useAdminOrderList } from '@/composables/admin/useAdminOrderList'
 
 definePageMeta({
@@ -124,6 +140,13 @@ const {
   formatTime,
   formatPrice
 } = useAdminOrderList('one_time_cdk') // Use 'one_time_cdk' type
+
+const detailVisible = ref(false)
+const detailId = ref('')
+const openDetail = (row: any) => {
+    detailId.value = row.id
+    detailVisible.value = true
+}
 
 watch([page, pageSize], () => loadList(), { immediate: true })
 </script>

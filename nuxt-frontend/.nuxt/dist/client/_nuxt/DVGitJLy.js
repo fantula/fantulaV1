@@ -1,0 +1,1 @@
+import{d as o,c as t,b as n,o as _,M as a}from"./SinXHlFz.js";const c={class:"mobile-profile-layout"},m=o({__name:"profile",setup(s){return(r,p)=>{const e=a;return _(),t("div",c,[n(e)])}}});export{m as default};

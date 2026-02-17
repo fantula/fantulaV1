@@ -24,6 +24,9 @@ declare module "nitropack/types" {
     '/api/auth/bind-wechat': {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/bind-wechat.post').default>>>>
     }
+    '/api/auth/unbind-wechat': {
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/auth/unbind-wechat.post').default>>>>
+    }
     '/api/client/config/contact': {
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/client/config/contact.get').default>>>>
     }

@@ -39,8 +39,31 @@ export function useBizFormat() {
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     }
 
+    /**
+     * 计算并格式化剩余时间
+     * @param expiryStr ISO 过期时间字符串
+     */
+    const formatRemainingTime = (expiryStr: string | null | undefined): string | null => {
+        if (!expiryStr) return null
+
+        const expiry = new Date(expiryStr).getTime()
+        const now = new Date().getTime()
+        const diff = expiry - now
+
+        if (diff <= 0) return '已过期'
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+        if (days > 0) return `${days}天 ${hours}小时`
+        if (hours > 0) return `${hours}小时 ${minutes}分`
+        return `${minutes}分钟`
+    }
+
     return {
         formatPrice,
-        formatDate
+        formatDate,
+        formatRemainingTime
     }
 }

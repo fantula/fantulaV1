@@ -12,10 +12,11 @@ definePageMeta({
 
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
 
 onMounted(() => {
-  router.replace('/manager_portal/coupons/balance')
+  router.replace(adminRoute('coupons/balance'))
 })
 </script>

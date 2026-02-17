@@ -132,13 +132,15 @@ onMounted(async () => {
     
     // 监听 Auth 状态变化 (Supabase 客户端会自动处理 Hash 并恢复 Session)
     const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
-      console.log('登录状态变化:', event, session?.user?.id) // Added log
+      console.log('🔴 [Stage 4] Auth State Change:', event)
+      if (session) console.log("🔴 [Stage 4] Session Token:", session.access_token ? "Present" : "Missing")
+
       if (event === 'SIGNED_IN' && session) {
         console.log('[WechatCallback] Session restored from hash')
         
         // 确保 userStore 同步
         await userStore.setUser(session.user, session.access_token)
-        console.log('[WechatCallback] UserStore updated', userStore.user?.id) // Added log
+
 
         
         // state.value = 'success'
@@ -179,7 +181,11 @@ onMounted(async () => {
   // 从 URL 获取微信授权 code
   const code = route.query.code as string
 
+  console.log("🔴 [Stage 1] Callback Mounted")
+  console.log("🔴 [Stage 1] Code:", code)
+
   if (!code) {
+    console.error("🔴 [Stage 1] Code Missing! Redirect/Domain Issue.")
     state.value = 'error'
     errorMsg.value = '未获取到授权信息'
     return
@@ -254,9 +260,11 @@ onMounted(async () => {
     const returnTo = route.query.return_to as string
     
     // 用 code 换取 openid 并检查绑定状态
+    console.log("🔴 [Stage 2] API Request: /api/oauth-login")
     const res = await wechatLoginApi.oauthLogin(code, { 
         redirectTo: returnTo ? decodeURIComponent(returnTo) : undefined 
     })
+    console.log("🔴 [Stage 2] API Response:", res.success ? "200 OK" : "Error", res)
 
     if (!res.success || !res.data) {
       globalLoading.hide()

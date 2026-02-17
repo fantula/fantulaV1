@@ -53,6 +53,10 @@ export interface AdminOrder {
     sku_snapshot?: {
         spec_combination: any
     }
+    // 扩展信息 (用于虚拟充值/合租等)
+    ext_info?: Record<string, any>
+    // 订单标签
+    tags?: string[]
 }
 
 export interface AdminOrderDelivery {
@@ -142,6 +146,35 @@ export const adminOrderApi = {
     },
 
     /**
+     * 获取订单详情 (通用)
+     */
+    async getOrderDetail(id: string): Promise<{ success: boolean; data?: AdminOrder; error?: string }> {
+        const client = getSupabaseClient()
+        const { data, error } = await client
+            .from('orders')
+            .select(`
+                *,
+                profiles(id, uid, avatar, nickname)
+            `)
+            .eq('id', id)
+            .single()
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        const rawProfile = data.profiles || data.profile
+        const profile = Array.isArray(rawProfile) ? rawProfile[0] : (rawProfile || null)
+
+        return { success: true, data: { ...data, _profile: profile } }
+    },
+
+    // Aliases for specific types
+    async getVirtualRechargeDetail(id: string) { return this.getOrderDetail(id) },
+    async getShareOrderDetail(id: string) { return this.getOrderDetail(id) },
+    async getCdkeyOrderDetail(id: string) { return this.getOrderDetail(id) },
+
+    /**
      * 更新订单状态
      */
     async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; error?: string }> {
@@ -149,6 +182,22 @@ export const adminOrderApi = {
         const { error } = await client
             .from('orders')
             .update({ status })
+            .eq('id', id)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+        return { success: true }
+    },
+
+    /**
+     * 更新订单信息 (通用)
+     */
+    async updateOrder(id: string, updates: Partial<AdminOrder>): Promise<{ success: boolean; error?: string }> {
+        const client = getSupabaseClient()
+        const { error } = await client
+            .from('orders')
+            .update(updates)
             .eq('id', id)
 
         if (error) {

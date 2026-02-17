@@ -1,23 +1,6 @@
 <template>
   <div class="admin-module-layout">
-    <!-- Teleport Title and Tabs to Global Header -->
-    <ClientOnly>
-      <Teleport to="#header-portal">
-        <div class="teleported-header" v-if="showTabs">
-           <div class="module-title">{{ title }}</div>
-            <el-divider direction="vertical" class="header-divider" />
-            <el-tabs v-model="activeTab" class="header-tabs" @tab-click="handleTabClick">
-               <el-tab-pane 
-                 v-for="tab in tabs" 
-                 :key="tab.name" 
-                 :label="tab.label" 
-                 :name="tab.name" 
-               />
-            </el-tabs>
-        </div>
-      </Teleport>
-    </ClientOnly>
-
+    <!-- Content only, Header is managed by Store -->
     <div class="module-content">
        <slot></slot>
     </div>
@@ -25,13 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAdminHeaderStore } from '@/stores/admin/header'
 
 interface Tab {
   name: string
   label: string
-  route?: string // Optional now
+  route?: string
 }
 
 const props = withDefaults(defineProps<{
@@ -43,110 +27,78 @@ const props = withDefaults(defineProps<{
   hideTabsOn: () => ['/post', '/edit']
 })
 
-const emit = defineEmits(['tab-change', 'refresh'])
+const emit = defineEmits(['tab-change'])
 
 const route = useRoute()
 const router = useRouter()
+const headerStore = useAdminHeaderStore()
 
 const activeTab = ref(props.defaultTab || props.tabs[0]?.name || '')
+let mySessionId: string | null = null
 
-// Update active tab based on current route (if using routing)
+// Update active tab based on current route
 const updateActiveTab = () => {
   const path = route.path
+  
+  // 1. Try to find a matching tab by route
+  let found = false
   for (const tab of props.tabs) {
     if (tab.route && (path === tab.route || (tab.route !== props.tabs[0]?.route && path.startsWith(tab.route)))) {
       activeTab.value = tab.name
-      return
+      headerStore.setActiveTab(tab.name)
+      found = true
+      break
     }
   }
-  // If no route match, keep current or default
-  if (!activeTab.value) {
-     activeTab.value = props.defaultTab || props.tabs[0]?.name || ''
+  
+  // 2. Fallback to default if no route match
+  if (!found) {
+     const fallback = props.defaultTab || props.tabs[0]?.name || ''
+     if (fallback) {
+       activeTab.value = fallback
+       headerStore.setActiveTab(fallback)
+     }
   }
 }
 
-watch(() => route.path, updateActiveTab, { immediate: true })
-watch(() => props.defaultTab, (val) => { if(val) activeTab.value = val })
+// Sync header state
+const syncHeader = () => {
+  const shouldShowTabs = !props.hideTabsOn.some(keyword => route.path.includes(keyword))
+  
+  // Only pass tabs if we should show them
+  const tabsToShow = shouldShowTabs ? props.tabs : []
+  
+  // Lock the header layout
+  mySessionId = headerStore.setLayout(props.title, tabsToShow, activeTab.value)
+}
 
-// Hide tabs on specified paths
-const showTabs = computed(() => {
-  return !props.hideTabsOn.some(keyword => route.path.includes(keyword))
+// Watchers
+watch(() => route.path, () => {
+  updateActiveTab()
+  // Re-sync header in case hideTabsOn condition changed
+  syncHeader()
 })
 
-// Handle tab click navigation
-const handleTabClick = (tabInstance: any) => {
-  const name = tabInstance.props.name
-  emit('tab-change', name) // EMIT EVENT!
+watch(() => props.defaultTab, (val) => { 
+  if(val) {
+    activeTab.value = val
+    headerStore.setActiveTab(val)
+  } 
+})
 
-  const targetTab = props.tabs.find(t => t.name === name)
-  if (targetTab && targetTab.route) {
-    router.push(targetTab.route)
+onMounted(() => {
+  updateActiveTab()
+  syncHeader()
+})
+
+onUnmounted(() => {
+  if (mySessionId) {
+    headerStore.clearLayout(mySessionId)
   }
-}
+})
 </script>
 
 <style scoped>
 .admin-module-layout { height: 100%; display: flex; flex-direction: column; }
 .module-content { flex: 1; }
-
-/* Styles for Teleported Content */
-.teleported-header {
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-.module-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--el-text-color-primary);
-    white-space: nowrap;
-    margin-right: 15px;
-}
-
-.header-divider {
-    height: 24px;
-    margin-right: 15px;
-    border-color: var(--el-border-color);
-}
-
-.header-actions {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    padding-right: 20px;
-}
-
-/* Customizing Tabs for Header */
-.header-tabs {
-    --el-tabs-header-height: 100%;
-}
-
-.header-tabs :deep(.el-tabs__nav-wrap::after) {
-    display: none;
-}
-
-.header-tabs :deep(.el-tabs__header) {
-    margin: 0;
-    border: none;
-}
-
-.header-tabs :deep(.el-tabs__item) {
-    font-size: 16px;
-    font-weight: 500;
-    height: 72px;
-    line-height: 72px;
-    color: var(--el-text-color-regular);
-}
-
-.header-tabs :deep(.el-tabs__item.is-active) {
-    color: var(--el-color-primary);
-    font-weight: 600;
-    font-size: 17px;
-}
-
-.header-tabs :deep(.el-tabs__active-bar) {
-    height: 3px;
-    border-radius: 2px;
-}
 </style>

@@ -37,7 +37,14 @@
 | [ADMIN_CORE_WORKFLOW.md](./ADMIN_CORE_WORKFLOW.md) | 核心工作流程 |
 | [ADMIN_OPERATION_MANUAL.md](./ADMIN_OPERATION_MANUAL.md) | 操作手册 |
 
----
+
+### 🔐 安全与路由
+- **伪装路径**: `/manager_portal`
+- **实现方式**: Nuxt 文件路由直接映射 (`pages/manager_portal/`)
+- **路由常量化**: 所有路径通过 `config/admin-routes.ts` 集中管理
+  - `adminRoute(path)` — 生成完整路径
+  - `adminRoutes.xxx()` — 常用路径快捷方式
+- **目的**: 隐藏后台入口 + 路径单一数据源，降低被暴力扫描的风险。请勿在代码中硬编码 `/manager_portal/...` 路径。
 
 ## 🏗 架构概览
 
@@ -45,9 +52,9 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Frontend (Nuxt 3)                        │
 ├─────────────────────────────────────────────────────────────────┤
-│  pages/admin/        │  唯一登录入口 + 功能页面                  │
-│  layouts/mgmt.vue    │  唯一后台布局                            │
-│  middleware/mgmt-auth│  统一认证守卫                            │
+│  pages/manager_portal/  │  (伪装路径) 唯一登录入口 + 功能页面         │
+│  layouts/mgmt.vue       │  唯一后台布局                            │
+│  middleware/mgmt-auth   │  统一认证守卫                            │
 ├─────────────────────────────────────────────────────────────────┤
 │  components/admin/   │  全局基础组件                             │
 │  composables/admin/  │  通用逻辑封装                             │
@@ -94,10 +101,15 @@
 4. 硬编码业务状态文案
 5. 提交 console.log 调试代码
 6. 不使用全局组件而重复造轮子
+7. **硬编码 `/manager_portal/...` 路径**（必须使用 `adminRoute()` 或 `adminRoutes`）
 
 ---
 
 ## 📝 更新日志
+
+### v2.2 (2026-02-17)
+- ✅ 路由常量化重构：引入 `config/admin-routes.ts`，消除全部硬编码路径
+- ✅ 40+ 文件迁移至 `adminRoute()` / `adminRoutes` API
 
 ### v2.1 (2026-02-04)
 - ✅ 添加 AI 工作流程主框架

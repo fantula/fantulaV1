@@ -14,9 +14,10 @@ definePageMeta({
 })
 
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const tabs = [
-  { name: 'tiers', label: '充值档位', route: '/manager_portal/recharge/tiers' },
-  { name: 'orders', label: '充值记录', route: '/manager_portal/recharge/orders' }
+  { name: 'tiers', label: '充值档位', route: adminRoute('recharge/tiers') },
+  { name: 'orders', label: '充值记录', route: adminRoute('recharge/orders') }
 ]
 </script>

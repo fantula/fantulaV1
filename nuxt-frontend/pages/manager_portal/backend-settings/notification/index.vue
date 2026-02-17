@@ -31,7 +31,7 @@
           <el-button 
             type="primary" 
             link 
-            @click="router.push(`/manager_portal/backend-settings/notification/template/${row.id}`)"
+            @click="router.push(adminRoute(`backend-settings/notification/template/${row.id}`))"
           >
             编辑模板
           </el-button>
@@ -47,6 +47,7 @@
 import { ref } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 definePageMeta({
   layout: 'mgmt',

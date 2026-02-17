@@ -22,7 +22,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
 ```
 
-### 后台管理页面 (`pages/admin/`)
+### 后台管理页面 (`pages/manager_portal/`)
 ```typescript
 // ✅ 正确
 import { getAdminSupabaseClient } from '@/utils/supabase-admin'
@@ -47,7 +47,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 
 ```bash
 # 检查后台页面是否误用客户端 client
-grep -r "from '@/utils/supabase'" pages/admin/
+grep -r "from '@/utils/supabase'" pages/manager_portal/
 
 # 检查客户端页面是否误用 admin client  
 grep -r "supabase-admin" pages/pc/ pages/mobile/

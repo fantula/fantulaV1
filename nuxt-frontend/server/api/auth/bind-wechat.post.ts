@@ -195,12 +195,35 @@ export default defineEventHandler(async (event) => {
                     wechat_unionid: unionid,
                 })
 
-            if (insertError && !insertError.message.includes('duplicate')) {
-                console.error('[BindWechat] Insert profile failed:', insertError)
-                throw createError({
-                    statusCode: 500,
-                    message: '创建账户失败，请重试',
-                })
+            if (insertError) {
+                // If duplicate (means profile actually exists but verify check failed?), fallback to update
+                if (insertError.message.includes('duplicate')) {
+                    console.warn('[BindWechat] Profile insert failed (duplicate), falling back to update for user:', authData.user.id)
+                    const { error: fallbackUpdateError } = await supabase
+                        .from('profiles')
+                        .update({
+                            wechat_openid: openid,
+                            wechat_unionid: unionid,
+                            nickname: body.nickname || undefined,
+                            avatar: body.avatar || undefined,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', authData.user.id)
+
+                    if (fallbackUpdateError) {
+                        console.error('[BindWechat] Fallback update failed:', fallbackUpdateError)
+                        throw createError({
+                            statusCode: 500,
+                            message: '绑定失败（更新账户时出错）',
+                        })
+                    }
+                } else {
+                    console.error('[BindWechat] Insert profile failed:', insertError)
+                    throw createError({
+                        statusCode: 500,
+                        message: '创建账户失败，请重试',
+                    })
+                }
             }
         } else {
             // Profile 存在，正常更新
@@ -211,6 +234,7 @@ export default defineEventHandler(async (event) => {
                     wechat_unionid: unionid,
                     nickname: body.nickname || undefined,
                     avatar: body.avatar || undefined,
+                    updated_at: new Date().toISOString()
                 })
                 .eq('id', authData.user.id)
 

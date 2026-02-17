@@ -654,7 +654,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "a7b84c16-9400-4da4-91ad-c5702bee13d2",
+    "buildId": "b131b0dd-4e9f-4df6-9bdb-d85c94781e37",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -5090,6 +5090,7 @@ const _lazy_tm9JhC = () => import('../routes/api/admin/system/status.get.mjs');
 const _lazy_xx2F8b = () => import('../routes/api/admin/users/create.post.mjs');
 const _lazy_hlFyYY = () => import('../routes/api/admin/users/delete.post.mjs');
 const _lazy_dcHuVB = () => import('../routes/api/auth/bind-wechat.post.mjs');
+const _lazy_nnday4 = () => import('../routes/api/auth/unbind-wechat.post.mjs');
 const _lazy_hMjmce = () => import('../routes/api/client/config/contact.get.mjs');
 const _lazy_rPysyX = () => import('../routes/api/test.mjs');
 const _lazy_oZR3Aq = () => import('../routes/api/wechat/check-scan.get.mjs');
@@ -5113,6 +5114,7 @@ const handlers = [
   { route: '/api/admin/users/create', handler: _lazy_xx2F8b, lazy: true, middleware: false, method: "post" },
   { route: '/api/admin/users/delete', handler: _lazy_hlFyYY, lazy: true, middleware: false, method: "post" },
   { route: '/api/auth/bind-wechat', handler: _lazy_dcHuVB, lazy: true, middleware: false, method: "post" },
+  { route: '/api/auth/unbind-wechat', handler: _lazy_nnday4, lazy: true, middleware: false, method: "post" },
   { route: '/api/client/config/contact', handler: _lazy_hMjmce, lazy: true, middleware: false, method: "get" },
   { route: '/api/test', handler: _lazy_rPysyX, lazy: true, middleware: false, method: undefined },
   { route: '/api/wechat/check-scan', handler: _lazy_oZR3Aq, lazy: true, middleware: false, method: "get" },

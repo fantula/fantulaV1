@@ -39,7 +39,7 @@
         <el-table-column label="关联订单" width="160">
            <template #default="{ row }">
               <div v-if="row.orders">
-                 <div class="mono-text cursor-pointer hover:text-blue-600" @click="handleCopy(row.orders.order_no)">
+                 <div class="mono-text cursor-pointer hover:text-blue-600" @click="copy(row.orders.order_no)">
                     {{ row.orders.order_no }}
                  </div>
                  <div class="sub-text truncate" :title="row.orders.product_snapshot?.product_name">
@@ -59,31 +59,26 @@
         </el-table-column>
 
         <!-- 3. 提交用户 -->
-        <el-table-column label="用户" width="180">
-           <template #default="{ row }">
-              <div class="user-cell">
-                 <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-xs font-mono text-gray-500">
-                    {{ row.user_id.substring(0,2).toUpperCase() }}
-                 </div>
-                 <div class="flex flex-col min-w-0">
-                    <span class="mono-text text-xs">UID: {{ row.user_id.substring(0,8).toUpperCase() }}</span>
-                    <span class="sub-text truncate" :title="row.profiles?.email">{{ row.profiles?.email || '未知用户' }}</span>
-                 </div>
-              </div>
-           </template>
-        </el-table-column>
+      <el-table-column label="用户" min-width="180">
+        <template #default="{ row }">
+          <AdminUserCell
+    :uid="row.user_id"
+    :email="row.profiles?.email"
+  />
+        </template>
+      </el-table-column>
 
         <!-- 4. 优先级 -->
         <el-table-column label="优先级" width="100" align="center">
            <template #default="{ row }">
-              <el-tag :type="getTicketPriorityType(row.priority)" effect="plain" size="small">{{ getTicketPriorityLabel(row.priority) }}</el-tag>
+              <el-tag :type="getTicketPriorityType(row.priority) as any" effect="plain" size="small">{{ getTicketPriorityLabel(row.priority) }}</el-tag>
            </template>
         </el-table-column>
 
         <!-- 5. 状态 -->
         <el-table-column label="状态" width="100" align="center">
            <template #default="{ row }">
-              <el-tag :type="getTicketStatusType(row.status)" size="small">
+              <el-tag :type="getTicketStatusType(row.status) as any" size="small">
                  {{ getTicketStatusLabel(row.status) }}
               </el-tag>
            </template>
@@ -119,9 +114,12 @@ import { ref, onMounted } from 'vue'
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
 import { useAdminTicketList } from '@/composables/admin/useAdminTicketList'
 import { Delete } from '@element-plus/icons-vue'
 import TicketChatModal from './components/TicketChatModal.vue'
+
+import { useClipboard } from '@vueuse/core'
 
 // Use standard composable + Common Config helpers
 const {
@@ -129,6 +127,8 @@ const {
   loadList, handlePageChange, handleTabChange, handleSelectionChange, handleCleanup,
   formatDate, getTicketPriorityLabel, getTicketPriorityType, getTicketStatusLabel, getTicketStatusType
 } = useAdminTicketList()
+
+const { copy } = useClipboard()
 
 const tabs = [
   { name: 'processing', label: '处理中' },
@@ -158,5 +158,5 @@ onMounted(() => {
 <style scoped>
 .mono-text { font-family: 'Monaco', 'Consolas', monospace; font-weight: 500; }
 .sub-text { font-size: 12px; color: #909399; }
-.user-cell { display: flex; align-items: center; gap: 8px; }
+/* .user-cell removed */
 </style>

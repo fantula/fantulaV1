@@ -42,16 +42,24 @@
 ```
 docs/
 ├── AI_SOP.md                  # AI 协作标准作业程序
-├── SERVER_DEPLOYMENT.md       # 服务器部署核心文档 (含 IP、架构、Docker配置)
-├── MAINTENANCE.md             # 运维与故障排查手册 (含 R2/Edge Function 修复方案)
+├── AI_WORKFLOW.md             # AI 工程师工作流程主框架
+├── AI_TASK_DISPATCH.md        # 🆕 AI 下级助理任务派遣体系
+├── SERVER_DEPLOYMENT.md       # 服务器部署核心文档
+├── MAINTENANCE.md             # 运维与故障排查手册
+├── CHANGE_MANAGEMENT.md       # 变更管理规范
 ├── USAGE_GUIDE.md             # 系统功能使用说明
+├── SHARED_LOGIC_REFERENCE.md  # PC/Mobile 共享逻辑参考
+├── PERFORMANCE_OPTIMIZATION.md # 性能优化
 ├── WECHAT_*.md                # 微信生态相关文档
 ├── admin/                     # 后台管理系统文档
 ├── architecture/              # 架构图与设计文档
 ├── backend/                   # 后端 (Supabase/PostgreSQL/Edge Functions)
+├── business_rules/            # 业务逻辑规则 (订单、支付、会员等)
 ├── client/                    # PC 端前端 (Nuxt)
+├── guides/                    # 开发指南 (部署、弹窗、主题等)
 ├── mobile/                    # 移动端前端 (H5)
-└── business_rules/            # 业务逻辑规则 (订单、支付、会员等)
+├── security/                  # 安全相关
+└── sql/                       # SQL 脚本
 ```
 
 ---

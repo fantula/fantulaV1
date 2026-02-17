@@ -2,7 +2,7 @@
   <div class="admin-page">
     <div class="page-header">
       <h2 class="page-title">社区文章管理</h2>
-      <el-button type="primary" @click="router.push('/manager_portal/article/post')">
+      <el-button type="primary" @click="router.push(adminRoute('article/post'))">
         <el-icon class="mr-1"><Plus /></el-icon> 发布文章
       </el-button>
     </div>
@@ -82,6 +82,7 @@ import { useRouter } from 'vue-router'
 import { adminCommunityApi, type Category } from '@/api/client/community'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
 const loading = ref(false)
@@ -130,7 +131,7 @@ const fetchArticles = async () => {
 
 const handleEdit = (row: any) => {
   router.push({
-    path: '/manager_portal/article/post',
+    path: adminRoute('article/post'),
     query: { id: row.id }
   })
 }

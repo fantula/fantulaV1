@@ -1,0 +1,4 @@
+import{X as n}from"./SinXHlFz.js";const f={async getPreOrders(r){const t=n(),e=r.limit||500;let i=t.from("pre_orders").select(`
+                id, order_no, status, total_amount, quantity, created_at, product_snapshot, user_id,
+                profiles(id, uid, avatar, nickname)
+            `,{count:"exact"}).neq("status","pending").order("created_at",{ascending:!1}).limit(e);const{data:c,error:s,count:l}=await i;return s?(console.error("获取预订单列表失败:",s),{success:!1,orders:[],total:0,error:s.message}):{success:!0,orders:(c||[]).map(a=>{const o=a.profiles||a.profile,u=Array.isArray(o)?o[0]:o||null;return{...a,_profile:u}}),total:l||0}},async deletePreOrders(r){const t=n(),{error:e}=await t.from("pre_orders").delete().in("id",r);return e?{success:!1,error:e.message}:{success:!0}}};export{f as a};

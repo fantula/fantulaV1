@@ -4,6 +4,7 @@
 
     <AdminActionCard>
       <el-button type="primary" :icon="Plus" @click="dialog.openAdd()">新增分类</el-button>
+      <el-button :icon="Sort" @click="openSortDialog">调整排序</el-button>
     </AdminActionCard>
 
     <AdminDataTable
@@ -63,13 +64,53 @@
         </el-form-item>
       </el-form>
     </AdminDataDialog>
+
+    <!-- Sort Dialog -->
+    <el-dialog
+      v-model="sortDialogVisible"
+      title="调整分类顺序"
+      width="500px"
+      append-to-body
+    >
+      <div class="sort-tip text-gray-400 text-sm mb-2">
+        提示：拖拽列表项进行排序，点击保存后生效。
+      </div>
+      <div class="sort-container">
+         <draggable 
+           v-model="sortList" 
+           item-key="id"
+           animation="200"
+           handle=".drag-handle"
+           ghost-class="ghost-item"
+         >
+            <template #item="{ element, index }">
+               <div class="sort-item">
+                  <div class="drag-handle">
+                    <el-icon><Sort /></el-icon>
+                  </div>
+                  <div class="sort-content">
+                     <span class="sort-name">{{ element.name }}</span>
+                     <el-tag size="small" type="info">{{ index * 10 }}</el-tag>
+                  </div>
+               </div>
+            </template>
+         </draggable>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="sortDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveSort" :loading="savingSort">保存排序</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Sort } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import draggable from 'vuedraggable'
 import { adminFaqApi } from '@/api/admin/help-center'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
@@ -95,6 +136,9 @@ interface AdminFaqCategory {
 const loading = ref(false)
 const categories = ref<AdminFaqCategory[]>([])
 const { formatDate } = useBizFormat()
+const sortDialogVisible = ref(false)
+const sortList = ref<AdminFaqCategory[]>([])
+const savingSort = ref(false)
 
 const fetchCategories = async () => {
   loading.value = true
@@ -163,11 +207,80 @@ const handleDelete = async (row: AdminFaqCategory) => {
   )
 }
 
+// Sorting Logic
+const openSortDialog = () => {
+  sortList.value = JSON.parse(JSON.stringify(categories.value))
+  sortDialogVisible.value = true
+}
+
+const saveSort = async () => {
+  savingSort.value = true
+  try {
+    const updates = sortList.value.map((item, index) => {
+      const newOrder = index * 10
+      if (item.sort_order !== newOrder) {
+          return adminFaqApi.updateCategory(item.id, { sort_order: newOrder })
+      }
+      return null
+    }).filter(p => p !== null)
+
+    if (updates.length > 0) {
+      await Promise.all(updates)
+      ElMessage.success(`已更新 ${updates.length} 个分类的顺序`)
+    } else {
+      ElMessage.info('顺序未发生变化')
+    }
+    
+    sortDialogVisible.value = false
+    fetchCategories()
+  } catch (e: any) {
+    ElMessage.error('排序保存失败: ' + e.message)
+  } finally {
+    savingSort.value = false
+  }
+}
+
 onMounted(fetchCategories)
 </script>
 
 <style scoped>
 .admin-page {
   padding: 0;
+}
+.sort-container {
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.sort-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  background: white;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+.sort-item:last-child {
+  border-bottom: none;
+}
+.drag-handle {
+  cursor: move;
+  color: var(--el-text-color-secondary);
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+}
+.sort-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sort-name {
+  font-weight: 500;
+}
+.ghost-item {
+  background: var(--el-color-primary-light-9);
+  opacity: 0.5;
 }
 </style>

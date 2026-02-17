@@ -1,0 +1,1 @@
+import{d as o,f as a,c as n,I as t,o as r}from"./SinXHlFz.js";const s={class:"loading-redirect"},l=o({__name:"index",setup(c){const e=t();return a(()=>{e.replace("/manager_portal/coupons/balance")}),(_,p)=>(r(),n("div",s))}});export{l as default};

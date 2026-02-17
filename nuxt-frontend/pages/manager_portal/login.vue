@@ -85,6 +85,7 @@
 import { ref, reactive } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useAdminStore } from '@/stores/admin/admin'
+import { adminRoutes } from '@/config/admin-routes'
 
 definePageMeta({
   middleware: ["mgmt-auth"],
@@ -150,7 +151,7 @@ const handlePasswordLogin = async () => {
     }
     
     ElMessage.success(`欢迎回来，${adminStore.adminInfo?.name || '管理员'}`)
-    await navigateTo('/manager_portal')
+    await navigateTo(adminRoutes.home())
   } catch (e: any) {
     ElMessage.error(e.message || '登录失败')
   } finally {
@@ -195,7 +196,7 @@ const handleOtpLogin = async () => {
     }
     
     ElMessage.success(`欢迎回来，${adminStore.adminInfo?.name || '管理员'}`)
-    await navigateTo('/manager_portal')
+    await navigateTo(adminRoutes.home())
   } catch (e: any) {
     ElMessage.error(e.message || '登录失败')
   } finally {

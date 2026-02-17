@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { adminRoute } from '@/config/admin-routes'
+
 definePageMeta({
   layout: 'mgmt',
-  middleware: [
-    "mgmt-auth",
-    function (to, from) {
-      return navigateTo('/manager_portal/cdk/virtual')
-    }
-  ]
+  middleware: ["mgmt-auth"],
+  ssr: false
+})
+
+const router = useRouter()
+onMounted(() => {
+  router.replace(adminRoute('cdk/virtual'))
 })
 </script>
 

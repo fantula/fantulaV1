@@ -55,15 +55,12 @@
         
         <el-table-column label="商品信息" min-width="250">
            <template #default="{ row }">
-              <div class="product-cell">
-                 <el-image :src="row.image" class="thumb" fit="cover">
-                    <template #error><div class="no-img">无图</div></template>
-                 </el-image>
-                 <div class="info">
-                    <div class="name" :title="row.product_name">{{ row.product_name }}</div>
-                    <div class="id">ID: {{ row.id.slice(0,8) }}...</div>
-                 </div>
-              </div>
+              <ProductThumbCell 
+                :image="row.image" 
+                :name="row.product_name" 
+                :id="row.id"
+                :truncate-id="true"
+              />
            </template>
         </el-table-column>
 
@@ -135,7 +132,9 @@ import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import CategoryPills from '@/components/admin/base/CategoryPills.vue'
 import BulkActionBar from '@/components/admin/base/BulkActionBar.vue'
+import ProductThumbCell from '@/components/admin/base/ProductThumbCell.vue'
 import { useAdminProductList } from '@/composables/admin/useAdminProductList'
+import { adminRoute } from '@/config/admin-routes'
 
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"],
@@ -163,10 +162,10 @@ const {
 } = useAdminProductList()
 
 // Navigation Logics (still kept in component as they relate to routing)
-const handleAddProduct = () => router.push('/manager_portal/products/edit')
-const handleEdit = (r: any) => router.push(`/manager_portal/products/edit?id=${r.id}`)
-const handleManageConfigs = (r: any) => router.push(`/manager_portal/products/specs/${r.id}`)
-const handleDuplicate = (r: any) => router.push(`/manager_portal/products/edit?copy_from_id=${r.id}`)
+const handleAddProduct = () => router.push(adminRoute('products/edit'))
+const handleEdit = (r: any) => router.push(`${adminRoute('products/edit')}?id=${r.id}`)
+const handleManageConfigs = (r: any) => router.push(adminRoute(`products/specs/${r.id}`))
+const handleDuplicate = (r: any) => router.push(`${adminRoute('products/edit')}?copy_from_id=${r.id}`)
 
 </script>
 
@@ -174,12 +173,5 @@ const handleDuplicate = (r: any) => router.push(`/manager_portal/products/edit?c
 .product-list-page {
     /* Padding handled by parent. */
 }
-
-/* Product Cell */
-.product-cell { display: flex; align-items: center; gap: 12px; }
-.thumb { width: 44px; height: 44px; border-radius: 6px; border: 1px solid #eee; flex-shrink: 0; }
-.no-img { width: 100%; height: 100%; background: #f5f7fa; color: #ccc; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.info { display: flex; flex-direction: column; overflow: hidden; }
-.name { font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-.id { font-size: 11px; color: #999; }
+/* Product Cell styles removed - replaced by component */
 </style>

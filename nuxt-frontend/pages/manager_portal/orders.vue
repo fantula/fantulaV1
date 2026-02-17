@@ -16,13 +16,13 @@ definePageMeta({
 })
 
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const tabs = [
-  { name: 'recharge', label: '虚拟充值',   route: '/manager_portal/orders/recharge' },
-  { name: 'share',    label: '账号合租',   route: '/manager_portal/orders/share' },
-  { name: 'cdkey',    label: '兑换码',     route: '/manager_portal/orders/cdkey' },
-  { name: 'refund',   label: '退款管理',   route: '/manager_portal/orders/refund' },
-  { name: 'cancelled-refunds', label: '退款统计', route: '/manager_portal/orders/cancelled-refunds' },
-  { name: 'preorders', label: '预订单统计', route: '/manager_portal/orders/preorders' }
+  { name: 'recharge', label: '虚拟充值',   route: adminRoute('orders/recharge') },
+  { name: 'share',    label: '账号合租',   route: adminRoute('orders/share') },
+  { name: 'cdkey',    label: '兑换码',     route: adminRoute('orders/cdkey') },
+  { name: 'refund',   label: '退款管理',   route: adminRoute('orders/refund') },
+  { name: 'preorders', label: '预订单统计', route: adminRoute('orders/preorders') }
 ]
 </script>

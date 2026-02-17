@@ -2,7 +2,7 @@
 
 > **定位**: 解析后台安全体系、登录流程与权限控制模型。
 > **适用**: 架构师、后端开发者、安全审计。
-> **最后更新**: 2026-02-03
+> **最后更新**: 2026-02-17
 
 ---
 
@@ -22,13 +22,13 @@
 
 ### 2.1 唯一登录入口
 
-**后台系统只有一个登录页面**: `pages/admin/login.vue`
+**后台系统只有一个登录页面**: `pages/manager_portal/login.vue`
 
-所有未认证的后台访问都会被中间件重定向到此页面。
+所有未认证的后台访问都会被中间件重定向到此页面（路径 `/manager_portal/login`）。
 
 ### 2.2 登录流程
 
-1.  **提交凭证**: 用户在 `pages/admin/login.vue` 输入邮箱/密码或验证码。
+1.  **提交凭证**: 用户在 `pages/manager_portal/login.vue` 输入邮箱/密码或验证码。
 2.  **Auth 验证**: 调用 Supabase `signInWithPassword` 或 `signInWithOtp`。
 3.  **身份核验**:
     *   登录成功后，**立即** 查询 `public.admin_users` 表。
@@ -54,42 +54,61 @@
 ### 3.1 实体关系
 *   **User (管理员)**: 隶属于一个 Department。
 *   **Department (部门)**: 拥有一组 Permissions。
-*   **Permission (权限)**: 对应前端路由路径 (如 `/admin/orders`)。
+*   **Permission (权限)**: 对应前端路由路径 (如 `/manager_portal/orders`)，通过 `config/admin-routes.ts` 统一管理。
 
 ### 3.2 权限判定逻辑
 *   **超级管理员**: `department.name` 包含 "超级" 或 `permissions` 包含 `*`，拥有全部权限。
 *   **普通管理员**: 检查 `useAdminStore.permissions` 数组是否包含当前路由路径。
-    *   支持子路由匹配：访问 `/admin/users/accounts` 时，会检查 `/admin/users` 权限。
+    *   支持子路由匹配：访问 `/manager_portal/users/accounts` 时，会检查 `/manager_portal/users` 权限。
 
 ### 3.3 路由守卫实现
 
 `middleware/mgmt-auth.ts` 核心逻辑：
 
 ```typescript
+// middleware/mgmt-auth.ts
+import { adminRoutes, ADMIN_PREFIX } from '@/config/admin-routes'
+
 export default defineNuxtRouteMiddleware(async (to) => {
-  // 仅在客户端执行，防止 SSR 问题
   if (process.server) return
 
   // 登录页无需验证
-  if (to.path === '/admin/login') return
+  if (to.path === adminRoutes.login()) return
 
   const adminStore = useAdminStore()
 
-  // 如果尚未初始化，执行初始化
   if (!adminStore.isInitialized) {
     await adminStore.init()
   }
 
   // 未登录跳转到登录页
   if (!adminStore.isLoggedIn) {
-    return navigateTo('/admin/login')
+    return navigateTo(adminRoutes.login())
   }
 
   // 细粒度权限检查
   if (!adminStore.hasPermission(to.path)) {
-    return navigateTo('/admin')  // 无权限跳转到仪表盘
+    return navigateTo(adminRoutes.home())  // 无权限跳转到仪表盘
   }
 })
+```
+
+### 3.4 路由常量 (`config/admin-routes.ts`)
+
+所有后台路径通过此文件集中管理，**禁止在代码中硬编码** `/manager_portal/...`：
+
+```typescript
+import { adminRoute, adminRoutes } from '@/config/admin-routes'
+
+// 通用函数
+adminRoute('products/edit')         // → '/manager_portal/products/edit'
+adminRoute(`cdk/edit/${id}`)        // → '/manager_portal/cdk/edit/123'
+
+// 快捷方式
+adminRoutes.home()        // → '/manager_portal'
+adminRoutes.login()       // → '/manager_portal/login'
+adminRoutes.products()    // → '/manager_portal/products'
+adminRoutes.orders()      // → '/manager_portal/orders'
 ```
 
 ---
@@ -111,7 +130,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 |------|------|------|
 | `id` | uuid | PK |
 | `name` | text | 部门名称 (客服组, 运营组, 超级管理员) |
-| `permissions` | jsonb | 允许访问的路由列表 `['/admin/orders', '/admin/users']` |
+| `permissions` | jsonb | 允许访问的路由列表 `['/manager_portal/orders', '/manager_portal/users']` |
 
 ---
 
@@ -126,14 +145,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 *   ❌ 禁止在页面组件中直接调用 Supabase Auth API
 *   ❌ 禁止创建第二个登录页面
 *   ❌ 禁止绕过中间件进行权限检查
+*   ❌ 禁止硬编码 `/manager_portal/...` 路径（必须使用 `adminRoute()` / `adminRoutes`）
 
 ---
 
 ## 六、 Store API 参考
 
 ```typescript
-const adminStore = useAdminStore()
-
 // 状态
 adminStore.isLoggedIn      // 是否已登录
 adminStore.isInitialized   // 是否已初始化

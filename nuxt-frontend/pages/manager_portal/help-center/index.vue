@@ -13,10 +13,11 @@ definePageMeta({
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Loading } from '@element-plus/icons-vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
 onMounted(() => {
-    router.replace('/manager_portal/help-center/faq')
+    router.replace(adminRoute('help-center/faq'))
 })
 </script>
 

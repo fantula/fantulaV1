@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { adminProductApi, adminCategoryApi } from '@/api/admin' // Re-export from index if needed, or import directly
 import { adminProductApi as newProductApi } from '@/api/admin/product' // Alias to new API
 import { ElMessage, type FormInstance } from 'element-plus'
+import { adminRoutes } from '@/config/admin-routes'
 
 export interface DetailModule { type: 'text' | 'image', content: string }
 
@@ -116,14 +117,19 @@ export function useAdminProductForm() {
                 }
 
                 // Call new API
-                const res = form.id
-                    ? await newProductApi.updateProduct(form.id, data as any)
-                    : await newProductApi.createProduct(data as any)
+                let res;
+                if (form.id) {
+                    res = await newProductApi.updateProduct(form.id, data as any)
+                } else {
+                    res = await newProductApi.createProduct(data as any)
+                }
 
                 if (res.success) {
                     // Handle Copy Mode SKU Creation
-                    if (!form.id && form.copySkus.length > 0 && res.product) {
-                        const skuRes = await newProductApi.createProductSkus(res.product.id, form.copySkus)
+                    // Explicitly cast or check to avoid TS error since res is union
+                    const createdProduct = (res as any).product
+                    if (!form.id && form.copySkus.length > 0 && createdProduct) {
+                        const skuRes = await newProductApi.createProductSkus(createdProduct.id, form.copySkus)
                         if (!skuRes.success) ElMessage.warning('商品已创建但SKU复制失败: ' + skuRes.error)
                     }
 
@@ -140,7 +146,7 @@ export function useAdminProductForm() {
         })
     }
 
-    const goBack = () => router.push('/admin/products')
+    const goBack = () => router.push(adminRoutes.products())
 
     // 3. Detail Module Actions
     const addDetailText = () => form.detailModules.push({ type: 'text', content: '' })

@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
         const access_token = result.access_token
         const openid = result.openid
-        console.log('[OAuthLogin] Got openid:', openid)
+        console.log("🔴 [Stage 3] Backend OpenID:", openid) // Diagnosis Log
 
         // 使用 access_token 获取用户头像昵称 (snsapi_userinfo)
         let userInfo: any = {}

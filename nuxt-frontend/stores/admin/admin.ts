@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia'
 import { getSupabaseClient } from '@/utils/supabase'
+import { adminRoutes } from '@/config/admin-routes'
 
 interface AdminUser {
     id: string
@@ -199,7 +200,7 @@ export const useAdminStore = defineStore('admin', () => {
         const deptName = adminInfo.value?.department?.name || ''
         const perms = adminInfo.value?.department?.permissions || []
         if (deptName.includes('超级') || perms.includes('*')) return true
-        if (path === '/manager_portal') return true
+        if (path === adminRoutes.home()) return true
         if (permissions.value.length === 0) return true
         if (permissions.value.includes(path)) return true
         for (const perm of permissions.value) {

@@ -21,8 +21,11 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="name" label="用户名称" min-width="150" />
-      <el-table-column prop="email" label="绑定邮箱" min-width="200" show-overflow-tooltip />
+      <el-table-column label="用户" min-width="240">
+        <template #default="{ row }">
+          <AdminUserCell :user="row" :show-uid="false" />
+        </template>
+      </el-table-column>
       <el-table-column label="所属部门" width="180" align="center">
         <template #default="{ row }">
           <el-tag v-if="row.department" :type="row.department?.name === '超级管理员' ? 'danger' : undefined">
@@ -103,6 +106,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { adminBackendUserApi, adminDepartmentApi, type AdminBackendUser, type AdminDepartment } from '@/api/admin'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import { useAdminDialog } from '@/composables/admin/useAdminDialog'
+import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
 
 defineOptions({
   name: 'UserAccounts'

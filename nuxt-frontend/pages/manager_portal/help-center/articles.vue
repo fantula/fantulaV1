@@ -3,7 +3,7 @@
     <PageTipHeader title="文章管理" description="发布和管理帮助中心的内容文章。" />
 
     <AdminActionCard>
-      <el-button type="primary" :icon="Plus" @click="router.push('/manager_portal/help-center/articles/post')">发布文章</el-button>
+      <el-button type="primary" :icon="Plus" @click="router.push(adminRoute('help-center/articles/post'))">发布文章</el-button>
     </AdminActionCard>
 
     <AdminDataTable
@@ -74,6 +74,7 @@ import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { confirmDelete } from '@/composables/admin/useAdminDialog'
 import { useBizFormat } from '@/composables/admin/useBizFormat'
+import { adminRoute } from '@/config/admin-routes'
 
 definePageMeta({
   layout: 'mgmt',
@@ -131,7 +132,7 @@ const fetchArticles = async () => {
 
 const handleEdit = (row: any) => {
   router.push({
-    path: '/manager_portal/help-center/articles/post',
+    path: adminRoute('help-center/articles/post'),
     query: { id: row.id }
   })
 }

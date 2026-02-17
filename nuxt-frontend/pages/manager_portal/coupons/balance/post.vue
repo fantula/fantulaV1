@@ -6,8 +6,8 @@
       :submit-text="isEdit ? '保存' : '新增'"
       :loading="submitting"
       @submit="handleSubmit"
-      @cancel="router.back()"
-      @back="router.back()"
+      @cancel="handleBack"
+      @back="handleBack"
     />
 
     <div class="form-content">
@@ -122,6 +122,7 @@ import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
 import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
 import { adminApi } from '@/api/admin'
+import { adminRoute } from '@/config/admin-routes'
 
 const route = useRoute()
 const router = useRouter()
@@ -211,7 +212,7 @@ const handleSubmit = async () => {
 
         if (res.success) {
           ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
-          router.back()
+          router.push(adminRoute('coupons/balance'))
         } else {
           ElMessage.error(res.error || '保存失败')
         }
@@ -227,6 +228,11 @@ const handleSubmit = async () => {
 onMounted(() => {
   loadData()
 })
+
+// Explicit back navigation
+const handleBack = () => {
+    router.push(adminRoute('coupons/balance'))
+}
 </script>
 
 <style scoped>

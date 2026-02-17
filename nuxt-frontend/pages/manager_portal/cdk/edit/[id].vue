@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="wizard-header">
       <div class="header-left">
-        <el-button link class="back-btn" @click="router.back()">
+        <el-button link class="back-btn" @click="handleBack">
           <el-icon class="back-icon"><ArrowLeft /></el-icon> 返回列表
         </el-button>
         <div class="header-titles">
@@ -117,7 +117,7 @@
                   <el-input v-model="formVirtual.fields[idx]" placeholder="输入字段名 (如: 游戏账号)" />
                   <el-button type="danger" circle plain @click="removeVirtualField(idx)"><el-icon><Delete /></el-icon></el-button>
                 </div>
-                <el-button type="dashed" class="add-field-btn" @click="addVirtualField">
+                <el-button class="add-field-btn" @click="addVirtualField">
                   <el-icon><Plus /></el-icon> 添加字段
                 </el-button>
               </div>
@@ -142,7 +142,7 @@
                     <el-icon><Minus /></el-icon>
                   </el-button>
                 </div>
-                <el-button type="dashed" size="small" class="add-attr-btn" @click="addSharedAttr">
+                <el-button size="small" class="add-attr-btn" @click="addSharedAttr">
                   + 添加属性
                 </el-button>
               </div>
@@ -177,7 +177,7 @@
 
         <!-- Actions -->
         <div class="form-actions">
-          <el-button @click="router.back()">取消</el-button>
+          <el-button @click="handleBack">取消</el-button>
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
             保存修改
           </el-button>
@@ -246,8 +246,9 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowLeft, Delete, Plus, Minus, Picture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { adminRoute } from '@/config/admin-routes'
 import { adminCdkApi, adminApi, adminProductApi, adminCategoryApi, type AdminProduct } from '@/api/admin'
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 const router = useRouter()
 const route = useRoute()
@@ -317,7 +318,7 @@ const filteredProducts = computed(() => {
 onMounted(async () => {
   if (!cdkId.value) {
     ElMessage.error('无效的 CDK ID')
-    router.back()
+    handleBack()
     return
   }
   
@@ -385,7 +386,7 @@ onMounted(async () => {
       
       // 如果没有快照，通过 SKU 映射找商品
       if (!targetProductId && selectedSkuIds.value.length > 0) {
-        const { data: skuMap } = await getAdminSupabaseClient()
+        const { data: skuMap } = await getSupabaseClient()
           .from('product_sku_map')
           .select('product_id')
           .eq('sku_id', selectedSkuIds.value[0])
@@ -404,7 +405,7 @@ onMounted(async () => {
       }
     } else {
       ElMessage.error(res.error || '获取 CDK 详情失败')
-      router.back()
+      handleBack()
     }
   } finally {
     loading.value = false
@@ -608,17 +609,26 @@ const handleSubmit = async () => {
     }
 
     ElMessage.success('保存成功')
-    // Navigate back to the correct CDK type page
-    const typeRouteMap: Record<string, string> = {
-      'virtual': 'virtual',
-      'shared': 'accounts',
-      'one_time': 'keys'
-    }
-    const targetRoute = typeRouteMap[cdkData.value?.cdk_type || ''] || 'virtual'
-    router.push(`/manager_portal/cdk/${targetRoute}`)
+    handleBack()
   } finally {
     submitting.value = false
   }
+}
+
+// Smart Back Navigation
+const handleBack = () => {
+  const type = currentCdkType.value;
+  let targetRoute = 'virtual';
+  
+  if (type === 'virtual') {
+    targetRoute = 'virtual';
+  } else if (type === 'shared') { // Note: 'shared' maps to 'accounts' page
+    targetRoute = 'accounts';
+  } else if (type === 'one_time') { // Note: 'one_time' maps to 'keys' page
+    targetRoute = 'keys';
+  }
+  
+  router.push(adminRoute(`cdk/${targetRoute}`));
 }
 </script>
 

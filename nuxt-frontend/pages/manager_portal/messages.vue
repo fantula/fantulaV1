@@ -14,9 +14,10 @@ definePageMeta({
 })
 
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const tabs = [
-  { name: 'send', label: '消息发送', route: '/manager_portal/messages/batch-send' },
-  { name: 'settings', label: '客户消息设定', route: '/manager_portal/messages/settings' }
+  { name: 'send', label: '消息发送', route: adminRoute('messages/batch-send') },
+  { name: 'settings', label: '客户消息设定', route: adminRoute('messages/settings') }
 ]
 </script>

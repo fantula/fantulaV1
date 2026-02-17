@@ -38,53 +38,17 @@
               <div class="info-block">
                  <div class="label">提交用户</div>
                  <div class="user-card">
-                    <el-avatar :size="32" class="user-avatar">
-                       {{ ticket?.user_id?.substring(0,2).toUpperCase() }}
-                    </el-avatar>
-                    <div class="user-details">
-                       <div class="uid">UID: {{ ticket?.user_id?.substring(0,8).toUpperCase() }}</div>
-                       <div class="email" v-if="ticket?.profiles?.email">{{ ticket.profiles.email }}</div>
-                    </div>
+                    <AdminUserCell
+                       :uid="ticket?.user_id"
+                       :email="ticket?.profiles?.email"
+                    />
                  </div>
               </div>
 
               <!-- Associated Order Snapshot -->
               <div class="info-block" v-if="ticket?.orders">
                  <div class="label">关联订单快照</div>
-                 <div class="order-card-large">
-                     <img :src="ticket.orders.product_snapshot?.image" class="order-img-large" />
-                     
-                     <div class="order-details-rows">
-                        <div class="detail-row">
-                           <span class="row-label">订单号</span>
-                           <span class="row-value font-mono copyable" @click="copyText(ticket.orders.order_no)">
-                              {{ ticket.orders.order_no }}
-                           </span>
-                        </div>
-                        <div class="detail-row">
-                           <span class="row-label">商品</span>
-                           <span class="row-value" :title="ticket.orders.product_snapshot?.product_name">
-                              {{ ticket.orders.product_snapshot?.product_name }}
-                           </span>
-                        </div>
-                        <div class="detail-row" v-if="ticket.orders.sku_snapshot?.spec_combination">
-                           <span class="row-label">规格</span>
-                           <span class="row-value spec-tag">
-                              {{ Object.values(ticket.orders.sku_snapshot.spec_combination).join(' / ') }}
-                           </span>
-                        </div>
-                        <div class="detail-row">
-                           <span class="row-label">金额</span>
-                           <span class="row-value price">¥{{ ticket.orders.total_amount?.toFixed(2) }}</span>
-                        </div>
-                        
-                        <!-- Time Remaining -->
-                        <div class="detail-row bg-blue-50 p-2 rounded mt-2 border border-blue-100" v-if="timeLeft">
-                           <span class="row-label text-blue-600">剩余时间</span>
-                           <span class="row-value font-bold text-blue-700">{{ timeLeft }}</span>
-                        </div>
-                     </div>
-                 </div>
+                 <OrderSnapshotCard :order="ticket.orders" />
               </div>
               
               <!-- Created Time -->
@@ -215,6 +179,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, CircleCheckFilled, RefreshRight, Picture, Close } from '@element-plus/icons-vue'
 import { uploadImageToStorage } from '@/utils/uploadImage'
 import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
+import OrderSnapshotCard from '@/components/admin/base/OrderSnapshotCard.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -257,24 +223,10 @@ const copyText = (text: string) => {
 }
 
 const timeLeft = computed(() => {
-    if (!ticket.value?.orders) return null
-    const order = ticket.value.orders
-    
-    // Check various expiry fields
-    const expiryStr = order.expires_at || order.end_time
-    if (!expiryStr) return null
-    
-    const expiry = new Date(expiryStr).getTime()
-    const now = new Date().getTime()
-    const diff = expiry - now
-    
-    if (diff <= 0) return '已过期'
-    
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    
-    if (days > 0) return `${days}天 ${hours}小时`
-    return `${hours}小时`
+    // Logic moved to useBizFormat, but OrderSnapshotCard now handles it internally.
+    // Keeping this for compatibility if used elsewhere, or just remove if unused.
+    // It seems only used in the deleted template section.
+    return null 
 })
 
 const formatTime = (isoString: string) => {

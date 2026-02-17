@@ -124,6 +124,7 @@ import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import CouponCodeDrawer from '@/components/admin/coupon/CouponCodeDrawer.vue'
 import CouponCodeGenerator from '@/components/admin/CouponCodeGenerator.vue'
 import CouponCodeEditor from '@/components/admin/coupon/CouponCodeEditor.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()
 const loading = ref(false)
@@ -163,11 +164,11 @@ const loadList = async () => {
 }
 
 const handleCreate = () => {
-  router.push('/manager_portal/coupons/product/post')
+  router.push(adminRoute('coupons/product/post'))
 }
 
 const handleEdit = (row: AdminCoupon) => {
-  router.push(`/manager_portal/coupons/product/post?id=${row.id}`)
+  router.push(`${adminRoute('coupons/product/post')}?id=${row.id}`)
 }
 
 const handleGenerate = (row: AdminCoupon) => {

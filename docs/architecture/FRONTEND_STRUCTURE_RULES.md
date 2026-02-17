@@ -6,7 +6,7 @@
 
 ## 1️⃣ 后台管理端 (Admin Dashboard)
 **定位**：内部运营管理系统
-- **页面 (Pages)**: `/pages/admin`  
+- **页面 (Pages)**: `/pages/manager_portal`  
   *(所有后台页面必须放在此目录下)*
 - **组件 (Components)**: `/components/admin`  
   *(专属业务组件，如下拉菜单、数据表格)*
@@ -78,10 +78,10 @@
 
 | 文件类型 | 后台管理 (Admin) | PC 客户端 (PC) | 移动端 (Mobile) |
 | :--- | :--- | :--- | :--- |
-| **页面** | `pages/admin/points/index.vue` | `pages/pc/points/index.vue` | `pages/mobile/points/index.vue` |
+| **页面** | `pages/manager_portal/points/index.vue` | `pages/pc/points/index.vue` | `pages/mobile/points/index.vue` |
 | **组件** | `components/admin/points/EditModal.vue` | `components/pc/points/GiftCard.vue` | `components/mobile/points/GiftRow.vue` |
 | **API** | `api/admin/points.ts` | `api/client/points.ts` | `api/client/points.ts` (同 PC) |
-| **路由** | 自动生成 `/admin/points` | 自动生成 `/points` (需配置) | 自动生成 `/mobile/points` |
+| **路由** | 自动生成 `/manager_portal/points`（通过 `adminRoute()`） | 自动生成 `/points` (需配置) | 自动生成 `/mobile/points` |
 
 **⚠️ 最终检查**：
 - 新页面是否指定了正确的 Layout (`definePageMeta({ layout: 'xxx' })`)？

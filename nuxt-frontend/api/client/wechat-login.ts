@@ -45,6 +45,7 @@ export const wechatLoginApi = {
             const response = await $fetch<{ success: boolean; data: QrCodeResult }>(
                 `${BASE_URL}/login-qrcode`
             )
+            console.log("🔴 [PC Stage 1] Ticket:", response.data?.ticket ? "Received" : "Empty") // Diagnosis Log
             return {
                 code: 0,
                 success: true,

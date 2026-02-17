@@ -2,12 +2,14 @@
  * 后台管理统一认证守卫
  * 需在页面中明确引用: definePageMeta({ middleware: ['mgmt-auth'] })
  */
+import { adminRoutes } from '@/config/admin-routes'
+
 export default defineNuxtRouteMiddleware(async (to) => {
     // 仅在客户端执行认证检查，防止 SSR 服务端因 LocalStorage 缺失导致无限重定向
     if (process.server) return
 
     // 登录页无需验证
-    if (to.path === '/manager_portal/login') return
+    if (to.path === adminRoutes.login()) return
 
     const adminStore = useAdminStore()
 
@@ -18,11 +20,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
     // 未登录跳转到登录页
     if (!adminStore.isLoggedIn) {
-        return navigateTo('/manager_portal/login')
+        return navigateTo(adminRoutes.login())
     }
 
     // 细粒度权限检查
     if (!adminStore.hasPermission(to.path)) {
-        return navigateTo('/manager_portal')  // 无权限跳转到仪表盘
+        return navigateTo(adminRoutes.home())  // 无权限跳转到仪表盘
     }
 })

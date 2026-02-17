@@ -6,7 +6,7 @@
 
 ```
 nuxt-frontend/
-├── pages/admin/             # 后台页面 (所有后台页面都在此)
+├── pages/manager_portal/             # 后台页面 (所有后台页面都在此)
 │   ├── login.vue            # 登录页
 │   ├── index.vue            # 仪表盘
 │   ├── products/            # 商品管理
@@ -70,7 +70,7 @@ nuxt-frontend/
 { index: '/admin/help-center', path: '/admin/help-center', icon: 'QuestionFilled', title: '帮助中心' }
 ```
 
-**2. 父布局 (pages/admin/help-center.vue)**:
+**2. 父布局 (pages/manager_portal/help-center.vue)**:
 ```vue
 <template>
   <AdminModuleLayout 
@@ -96,11 +96,11 @@ const tabs = [
 </script>
 ```
 
-**3. 子页面**: `pages/admin/help-center/faq.vue`, `pages/admin/help-center/articles.vue` 等
+**3. 子页面**: `pages/manager_portal/help-center/faq.vue`, `pages/manager_portal/help-center/articles.vue` 等
 
 #### 参考模块
-- CDK 管理: `pages/admin/cdk.vue`
-- 帮助中心: `pages/admin/help-center.vue`
+- CDK 管理: `pages/manager_portal/cdk.vue`
+- 帮助中心: `pages/manager_portal/help-center.vue`
 
 ---
 
@@ -164,7 +164,7 @@ const tabs = [
 |------|------|------|
 | **登录层** | 身份验证 + 角色验证 + 权限加载 | `stores/admin.ts` |
 | **路由层** | 权限过滤，无权限跳转仪表盘 | `middleware/admin-auth.global.ts` |
-| **页面层** | 业务展示，信任登录状态 | `pages/admin/*.vue` |
+| **页面层** | 业务展示，信任登录状态 | `pages/manager_portal/*.vue` |
 | **API层** | 数据操作，使用 service_role 绕过 RLS | `utils/supabase-admin.ts` |
 
 ### 4.2 登录流程
@@ -367,7 +367,7 @@ onMounted(() => loadList())
  这里的页面代码是最规范的，开发新功能时请直接参考或复制它们的结构。
  
  ### 10.1 复杂表单 / 编辑页
- **参考对象**: `pages/admin/products/post.vue`
+ **参考对象**: `pages/manager_portal/products/post.vue`
  *   **特点**:
      *   使用 `StickyFormHeader` 吸顶头。
      *   使用 `AdminImageSelector` 图片选择。
@@ -375,7 +375,7 @@ onMounted(() => loadList())
      *   模块化拆分 (基础信息/详情模块)。
  
  ### 10.2 数据列表页
- **参考对象**: `pages/admin/orders/recharge/index.vue`
+ **参考对象**: `pages/manager_portal/orders/recharge/index.vue`
  *   **特点**:
      *   使用 `AdminDataTable` (或标准 Table 结构)。
      *   集成 `useAdminOrderList` Composable。
@@ -383,7 +383,7 @@ onMounted(() => loadList())
      *   支持批量操作。
  
  ### 10.3 弹窗交互
- **参考对象**: `pages/admin/products/categories.vue`
+ **参考对象**: `pages/manager_portal/products/categories.vue`
  *   **特点**:
      *   在列表页直接通过 `el-dialog` 处理轻量级新增/编辑。
  

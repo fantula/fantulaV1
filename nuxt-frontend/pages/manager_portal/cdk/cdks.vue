@@ -21,7 +21,8 @@
              type="danger" 
              :icon="Delete" 
              :disabled="!hasSelection"
-             @click="handleBulkDelete"
+             :loading="isCleaning"
+             @click="() => handleBulkCleanup(selectedIds)"
            >
              批量删除
            </el-button>
@@ -48,15 +49,12 @@
 
         <el-table-column label="绑定商品" min-width="200">
             <template #default="{ row }">
-               <div class="product-cell" style="display: flex; align-items: center;">
-                 <el-image 
-                   v-if="row.product_snapshot?.product_image" 
-                   :src="row.product_snapshot.product_image" 
-                   fit="cover"
-                   style="width: 40px; height: 40px; border-radius: 4px; margin-right: 8px; flex-shrink: 0;"
-                 />
-                 <span class="product-name">{{ row.product_snapshot?.product_name || '未知商品' }}</span>
-               </div>
+                <ProductThumbCell 
+                  :image="row.product_snapshot?.product_image" 
+                  :name="row.product_snapshot?.product_name || '未知商品'" 
+                  :id="undefined"
+                  :truncate-id="false"
+                />
             </template>
         </el-table-column>
 
@@ -109,7 +107,7 @@
                    type="danger" 
                    link 
                    size="small" 
-                   @click="handleDelete(row)"
+                   @click="handleSingleCleanup(row)"
                 >删除</el-button>
             </template>
         </el-table-column>
@@ -132,6 +130,8 @@ import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import { useAdminList } from '@/composables/admin/useAdminList'
+import { useAdminCdkCleanup } from '@/composables/admin/useAdminCdkCleanup'
+import ProductThumbCell from '@/components/admin/base/ProductThumbCell.vue'
 
 const { getProductTypeLabel, getProductTypeTag, getCdkStatusLabel, getCdkStatusType } = useBizConfig()
 const { formatDate } = useBizFormat()
@@ -156,18 +156,31 @@ const {
     defaultFilters: { mode: 'all' },
     defaultPageSize: 50, // CDK 数据较多，默认 50
     fetchFn: async (params) => {
-        // 由于 API 目前只支持 simple filter，这里先获取较多数据然后在前端 filter
-        // 如果数据量大，需要 API 支持 unlinked 只读过滤。目前假设量级可控。
-        const res = await adminCdkApi.getCdks({ limit: 500 }) // 获取 500 条
+        // Mode 'all': Standard Server-Side Pagination
+        if (params.filters.mode === 'all') {
+            const offset = (params.page - 1) * params.pageSize
+            const res = await adminCdkApi.getCdks({ 
+                limit: params.pageSize,
+                offset: offset
+            })
+            if (!res.success) throw new Error(res.error)
+            
+            return {
+                success: true,
+                data: res.cdks,
+                total: res.total
+            }
+        }
+        
+        // Mode 'unlinked': Client-Side Filtering (Temporary Scalability Fix)
+        // Limitation: Can only find orphans within the first 1000 records.
+        // TODO: Implement backend filter for 'unlinked'
+        const res = await adminCdkApi.getCdks({ limit: 1000 }) 
         if (!res.success) throw new Error(res.error)
 
         let data = res.cdks || []
-        // Client-side filter
-        if (params.filters.mode === 'unlinked') {
-            data = data.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
-        }
+        data = data.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
         
-        // Manual pagination since we are doing client-side filtering on a fetched set
         const total = data.length
         const start = (params.page - 1) * params.pageSize
         const end = start + params.pageSize
@@ -195,36 +208,11 @@ const formatSkuSpec = (spec: any) => {
 // Selection - only unlinked can be selected
 const canSelectRow = (row: AdminCDK) => !row.sku_mappings || row.sku_mappings.length === 0
 
-// Actions
-const handleDelete = (row: AdminCDK) => {
-    ElMessageBox.confirm('确认删除此未绑定的孤儿 CDK 吗？此操作无法恢复。', '警告', { type: 'warning' })
-    .then(async () => {
-        const res = await adminCdkApi.deleteCdk(row.id)
-        if(res.success) { 
-            ElMessage.success('删除成功')
-            removeRow(row.id)
-        } else {
-            ElMessage.error(res.error)
-        }
-    })
-}
-
-const handleBulkDelete = () => {
-    if(!selectedIds.value.length) return
-    ElMessageBox.confirm(`确认批量删除 ${selectedIds.value.length} 个孤儿 CDK？`, '高风险操作', { 
-        type: 'error',
-        confirmButtonText: '确定删除',
-        cancelButtonText: '取消'
-    }).then(async () => {
-        const res = await adminCdkApi.deleteCdks(selectedIds.value)
-        if(res.success) { 
-            ElMessage.success('批量删除成功')
-            removeRows(selectedIds.value)
-        } else {
-            ElMessage.error(res.error)
-        }
-    })
-}
+// Cleanup Logic
+const { isCleaning, handleSingleCleanup, handleBulkCleanup } = useAdminCdkCleanup({
+    onDeleteSuccess: (id) => removeRow(id),
+    onBulkDeleteSuccess: (ids) => removeRows(ids)
+})
 </script>
 
 <style scoped>
@@ -233,7 +221,7 @@ const handleBulkDelete = () => {
 
 .filter-group { display: flex; align-items: center; gap: 10px; }
 
-.product-name { font-size: 14px; font-weight: 500; }
+/* .product-name removed */
 .linked-skus { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .more-tag { font-size: 12px; color: #909399; }
 .code-text { font-family: monospace; font-size: 13px; color: #333; }

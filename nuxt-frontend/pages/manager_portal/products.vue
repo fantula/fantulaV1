@@ -16,11 +16,12 @@ definePageMeta({
 })
 
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const tabs = [
-  { name: 'list', label: '商品列表', route: '/manager_portal/products' },
-  { name: 'categories', label: '分类管理', route: '/manager_portal/products/categories' },
-  { name: 'shared-sku', label: '共享规格库', route: '/manager_portal/products/shared-sku' },
-  { name: 'skus', label: 'SKU 管理', route: '/manager_portal/products/skus' }
+  { name: 'list', label: '商品列表', route: adminRoute('products') },
+  { name: 'categories', label: '分类管理', route: adminRoute('products/categories') },
+  { name: 'shared-sku', label: '共享规格库', route: adminRoute('products/shared-sku') },
+  { name: 'skus', label: 'SKU 管理', route: adminRoute('products/skus') }
 ]
 </script>

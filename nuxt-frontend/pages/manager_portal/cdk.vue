@@ -16,12 +16,13 @@ definePageMeta({
 })
 
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
+import { adminRoute } from '@/config/admin-routes'
 
 const tabs = [
-  { name: 'virtual', label: '虚拟充值', route: '/manager_portal/cdk/virtual' },
-  { name: 'accounts', label: '账号合租', route: '/manager_portal/cdk/accounts' },
-  { name: 'keys', label: '激活码', route: '/manager_portal/cdk/keys' },
-  { name: 'cdks', label: 'CDK 管理', route: '/manager_portal/cdk/cdks' },
-  { name: 'channel-recognition', label: '频道识别', route: '/manager_portal/cdk/channel-recognition' }
+  { name: 'virtual', label: '虚拟充值', route: adminRoute('cdk/virtual') },
+  { name: 'accounts', label: '账号合租', route: adminRoute('cdk/accounts') },
+  { name: 'keys', label: '激活码', route: adminRoute('cdk/keys') },
+  { name: 'cdks', label: 'CDK 管理', route: adminRoute('cdk/cdks') },
+  { name: 'channel-recognition', label: '频道识别', route: adminRoute('cdk/channel-recognition') }
 ]
 </script>

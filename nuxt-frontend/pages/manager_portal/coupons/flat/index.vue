@@ -107,6 +107,7 @@ import { Plus, Refresh } from '@element-plus/icons-vue'
 import { type AdminCoupon } from '@/api/admin'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import { useAdminCouponList } from '@/composables/admin/useAdminCouponList'
+import { adminRoute } from '@/config/admin-routes'
 
 const { formatDate, formatPrice } = useBizFormat()
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
@@ -150,12 +151,12 @@ const {
 } = useAdminCouponList('flat')
 
 const handleCreate = () => {
-  router.push('/manager_portal/coupons/flat/post')
+  router.push(adminRoute('coupons/flat/post'))
 }
 
 const handleEdit = (row: AdminCoupon) => {
   router.push({
-    path: '/manager_portal/coupons/flat/post',
+    path: adminRoute('coupons/flat/post'),
     query: { id: row.id }
   })
 }

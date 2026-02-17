@@ -76,6 +76,16 @@
 ### 文档位置
 `docs/admin/`
 
+### 🔐 路径说明
+- **伪装路径**: `/manager_portal` (代码实际路径 `pages/manager_portal/`)
+- **路由常量**: 所有路径通过 `config/admin-routes.ts` 集中管理，**禁止硬编码** `/manager_portal/...`
+  ```ts
+  import { adminRoute } from '@/config/admin-routes'
+  router.push(adminRoute('products/edit'))  // ✅
+  router.push('/manager_portal/products/edit')  // ❌
+  ```
+- **文档约定**: 下文提及 `pages/admin/xxxx.vue` 时，实际对应 `pages/manager_portal/xxxx.vue`。
+
 ### 必读文档
 | 文档 | 用途 |
 |------|------|

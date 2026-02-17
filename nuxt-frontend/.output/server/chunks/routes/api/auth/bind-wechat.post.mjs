@@ -16,7 +16,7 @@ import 'fast-xml-parser';
 import 'ipx';
 
 const bindWechat_post = defineEventHandler(async (event) => {
-  var _a;
+  var _a, _b, _c;
   try {
     const body = await readBody(event);
     const supabase = getSupabaseServiceClient();
@@ -77,38 +77,42 @@ const bindWechat_post = defineEventHandler(async (event) => {
     );
     let authData;
     let verifyError;
-    const resEmail = await anonClient.auth.verifyOtp({
+    console.log(`[BindWechat] Verifying OTP for ${body.email} (Type: email)...`);
+    let resVerify = await anonClient.auth.verifyOtp({
       email: body.email,
       token: body.code,
       type: "email"
     });
-    if (!resEmail.error) {
-      authData = resEmail.data;
-      verifyError = null;
-    } else {
-      console.log("[BindWechat] verifyOtp(type=email) failed:", resEmail.error.message);
-      const resSignup = await anonClient.auth.verifyOtp({
+    if (resVerify.error) {
+      console.warn(`[BindWechat] verifyOtp(email) failed: ${resVerify.error.message}. Trying type='magiclink'...`);
+      const resMagic = await anonClient.auth.verifyOtp({
         email: body.email,
         token: body.code,
-        type: "signup"
+        type: "magiclink"
       });
-      if (!resSignup.error) {
-        console.log("[BindWechat] verifyOtp(type=signup) succeeded");
-        authData = resSignup.data;
-        verifyError = null;
+      if (!resMagic.error) {
+        resVerify = resMagic;
       } else {
-        verifyError = resEmail.error;
-        if (resSignup.error.message !== resEmail.error.message) {
-          console.log("[BindWechat] verifyOtp(type=signup) failed:", resSignup.error.message);
+        console.warn(`[BindWechat] verifyOtp(magiclink) failed: ${resMagic.error.message}. Trying type='signup'...`);
+        const resSignup = await anonClient.auth.verifyOtp({
+          email: body.email,
+          token: body.code,
+          type: "signup"
+        });
+        if (!resSignup.error) {
+          resVerify = resSignup;
         }
       }
     }
-    if (verifyError || !(authData == null ? void 0 : authData.user)) {
+    if (resVerify.error || !((_a = resVerify.data) == null ? void 0 : _a.user)) {
+      console.error("[BindWechat] All verify strategies failed.");
       throw createError({
         statusCode: 400,
         message: "\u9A8C\u8BC1\u7801\u9519\u8BEF\u6216\u5DF2\u8FC7\u671F"
       });
     }
+    authData = resVerify.data;
+    console.log("[BindWechat] Verify Success. User:", (_b = authData.user) == null ? void 0 : _b.id);
     if (!authData.user) {
       throw createError({
         statusCode: 500,
@@ -128,26 +132,45 @@ const bindWechat_post = defineEventHandler(async (event) => {
         id: authData.user.id,
         uid,
         email: authData.user.email,
-        nickname: body.nickname || ((_a = authData.user.email) == null ? void 0 : _a.split("@")[0]) || "User",
+        nickname: body.nickname || ((_c = authData.user.email) == null ? void 0 : _c.split("@")[0]) || "User",
         avatar: body.avatar || "",
         status: "active",
         balance: 0,
         wechat_openid: openid,
         wechat_unionid: unionid
       });
-      if (insertError && !insertError.message.includes("duplicate")) {
-        console.error("[BindWechat] Insert profile failed:", insertError);
-        throw createError({
-          statusCode: 500,
-          message: "\u521B\u5EFA\u8D26\u6237\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
-        });
+      if (insertError) {
+        if (insertError.message.includes("duplicate")) {
+          console.warn("[BindWechat] Profile insert failed (duplicate), falling back to update for user:", authData.user.id);
+          const { error: fallbackUpdateError } = await supabase.from("profiles").update({
+            wechat_openid: openid,
+            wechat_unionid: unionid,
+            nickname: body.nickname || void 0,
+            avatar: body.avatar || void 0,
+            updated_at: (/* @__PURE__ */ new Date()).toISOString()
+          }).eq("id", authData.user.id);
+          if (fallbackUpdateError) {
+            console.error("[BindWechat] Fallback update failed:", fallbackUpdateError);
+            throw createError({
+              statusCode: 500,
+              message: "\u7ED1\u5B9A\u5931\u8D25\uFF08\u66F4\u65B0\u8D26\u6237\u65F6\u51FA\u9519\uFF09"
+            });
+          }
+        } else {
+          console.error("[BindWechat] Insert profile failed:", insertError);
+          throw createError({
+            statusCode: 500,
+            message: "\u521B\u5EFA\u8D26\u6237\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5"
+          });
+        }
       }
     } else {
       const { error: updateError } = await supabase.from("profiles").update({
         wechat_openid: openid,
         wechat_unionid: unionid,
         nickname: body.nickname || void 0,
-        avatar: body.avatar || void 0
+        avatar: body.avatar || void 0,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
       }).eq("id", authData.user.id);
       if (updateError) {
         console.error("[BindWechat] Update profile failed:", updateError);

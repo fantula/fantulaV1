@@ -78,19 +78,11 @@
               </div>
             </template>
             <div class="chart-container">
-              <!-- 简单SVG折线图: 订单 -->
-              <div class="chart-wrapper">
-                 <!-- 这里使用简单的 CSS 柱状图代替复杂 SVG，因为 SVG 需要计算路径 -->
-                 <div class="simple-bar-chart">
-                    <div v-for="(item, index) in stats.order_trend" :key="index" class="bar-group">
-                       <div class="bar-col">
-                           <div class="bar-val">{{ item.count }}</div>
-                           <div class="bar-fill" :style="{ height: `${calculatePercent(item.count, maxOrderCount)}%` }"></div>
-                       </div>
-                       <div class="bar-label">{{ formatDate(item.date) }}</div>
-                    </div>
-                 </div>
-              </div>
+                 <AdminSimpleChart 
+                    :data="stats.order_trend" 
+                    value-key="count" 
+                    label-key="date" 
+                 />
             </div>
           </el-card>
         </el-col>
@@ -102,17 +94,13 @@
               </div>
             </template>
             <div class="chart-container">
-               <div class="chart-wrapper">
-                 <div class="simple-bar-chart sales">
-                    <div v-for="(item, index) in stats.sales_trend" :key="index" class="bar-group">
-                       <div class="bar-col">
-                           <div class="bar-val">¥{{ item.amount }}</div>
-                           <div class="bar-fill" :style="{ height: `${calculatePercent(item.amount, maxSalesAmount)}%` }"></div>
-                       </div>
-                       <div class="bar-label">{{ formatDate(item.date) }}</div>
-                    </div>
-                 </div>
-              </div>
+                 <AdminSimpleChart 
+                    :data="stats.sales_trend" 
+                    value-key="amount" 
+                    label-key="date" 
+                    value-prefix="¥"
+                    is-sales
+                 />
             </div>
           </el-card>
         </el-col>
@@ -132,9 +120,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Top, Money, Goods, User } from '@element-plus/icons-vue'
 import AdminPageSkeleton from '@/components/admin/base/AdminPageSkeleton.vue'
+import AdminSimpleChart from '@/components/admin/base/AdminSimpleChart.vue'
 import { adminDashboardApi, type DashboardStats } from '@/api/admin/dashboard'
 
 definePageMeta({
@@ -166,26 +155,7 @@ const loadStats = async () => {
     }
 }
 
-// Helpers for Chart
-const maxOrderCount = computed(() => {
-    if (!stats.value.order_trend.length) return 10
-    return Math.max(...stats.value.order_trend.map(i => i.count)) || 10
-})
-
-const maxSalesAmount = computed(() => {
-    if (!stats.value.sales_trend.length) return 100
-    return Math.max(...stats.value.sales_trend.map(i => i.amount)) || 100
-})
-
-const calculatePercent = (val: number, max: number) => {
-    if (max === 0) return 0
-    return Math.min(100, (val / max) * 100)
-}
-
-const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr)
-    return `${d.getMonth() + 1}-${d.getDate()}`
-}
+// Helpers for Chart removed (moved to component)
 
 onMounted(() => {
   loadStats()
@@ -261,31 +231,8 @@ onMounted(() => {
   flex-direction: column;
 }
 
-/* Simple Bar Chart Styles */
+/* Simple Bar Chart Styles Removed - see AdminSimpleChart */
 .chart-wrapper { width: 100%; height: 100%; padding-top: 20px; }
-.simple-bar-chart {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  height: 100%; width: 100%; padding-bottom: 20px;
-}
-.bar-group {
-    display: flex; flex-direction: column; align-items: center;
-    flex: 1; height: 100%; justify-content: flex-end; gap: 8px;
-}
-.bar-col {
-    width: 20px; background: rgba(64, 158, 255, 0.1);
-    border-radius: 4px; position: relative;
-    display: flex; align-items: flex-end;
-    height: 80%; /* leave space for label */
-}
-.bar-fill {
-    width: 100%; background: #409EFF; border-radius: 4px;
-    min-height: 4px; transition: height 0.5s ease;
-}
-.sales .bar-fill { background: #67C23A; }
-.sales .bar-col { background: rgba(103, 194, 58, 0.1); }
-
-.bar-val { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
-.bar-label { font-size: 12px; color: var(--text-secondary); }
 
 .chart-labels {
   display: flex;

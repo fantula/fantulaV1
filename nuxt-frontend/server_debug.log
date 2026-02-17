@@ -1,0 +1,146 @@
+
+> fantula-frontend@1.0.0 dev
+> nuxt dev
+
+│
+●  Nuxt 3.21.1 (with Nitro 2.13.1, Vite 7.3.1 and Vue 3.5.28)
+
+  ➜ Local:    http://localhost:3000/
+  ➜ Network:  use --host to expose
+
+  ➜ DevTools: press Shift + Option + D in the browser (v3.2.1)
+
+
+ WARN  Duplicated imports "useBizFormat", the one from "/Users/dalin/fantula/nuxt-frontend/composables/admin/useBizFormat.ts" has been ignored and "/Users/dalin/fantula/nuxt-frontend/composables/common/useBizFormat.ts" is used
+
+✔ Vite client built in 31ms
+
+ WARN  Duplicated imports "useBizFormat", the one from "/Users/dalin/fantula/nuxt-frontend/composables/admin/useBizFormat.ts" has been ignored and "/Users/dalin/fantula/nuxt-frontend/composables/common/useBizFormat.ts" is used
+
+✔ Vite server built in 702ms
+[nitro] ✔ Nuxt Nitro server built in 854ms
+ℹ Vite server warmed up in 1ms
+ℹ Vite client warmed up in 1ms
+ℹ ✨ new dependencies optimized: @element-plus/icons-vue
+ℹ ✨ optimized dependencies changed. reloading
+🔴 [Diag-Backend] Receive Code: MOCK_CODE_12345
+🔴 [Diag-Backend] Calling WeChat API: https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxc2042fae927b28b8&secret=***&code=MOCK_CODE_12345&grant_type=authorization_code
+🔴 [Diag-Backend] WeChat API Response: {"errcode":40029,"errmsg":"invalid code, rid: 69929435-4f5a7e32-138a1e11"}
+ERROR  🔴 [Diag-Backend] WeChat API Error: { errcode: 40029, errmsg: 'invalid code, rid: 69929435-4f5a7e32-138a1e11' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 69929435-4f5a7e32-138a1e11
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8582:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 69929435-4f5a7e32-138a1e11
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs, /pages/mobile/wechat-callback.vue?macro=true
+ℹ hmr update /pages/mobile/wechat-callback.vue, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=0&scoped=af6b5212&lang.css, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=1&lang.css, /pages/mobile/wechat-callback.vue?macro=true, /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs
+🔴 [Diag-Backend] Receive Code: MOCK_CODE_12345
+🔴 [Diag-Backend] Calling WeChat API: https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxc2042fae927b28b8&secret=***&code=MOCK_CODE_12345&grant_type=authorization_code
+🔴 [Diag-Backend] WeChat API Response: {"errcode":40029,"errmsg":"invalid code, rid: 6992946a-28d7b108-09a1e1c6"}
+ERROR  🔴 [Diag-Backend] WeChat API Error: { errcode: 40029, errmsg: 'invalid code, rid: 6992946a-28d7b108-09a1e1c6' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 6992946a-28d7b108-09a1e1c6
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8582:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 6992946a-28d7b108-09a1e1c6
+ℹ hmr update /pages/mobile/wechat-callback.vue, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=0&scoped=af6b5212&lang.css, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=1&lang.css, /pages/mobile/wechat-callback.vue?macro=true, /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs (x2)
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs, /pages/mobile/wechat-callback.vue?macro=true
+🔴 [Diag-Backend] Receive Code: MOCK_CODE_12345
+🔴 [Diag-Backend] Calling WeChat API: https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxc2042fae927b28b8&secret=***&code=MOCK_CODE_12345&grant_type=authorization_code
+🔴 [Diag-Backend] WeChat API Response: {"errcode":40029,"errmsg":"invalid code, rid: 6992946c-00b48413-2e0a8df3"}
+ERROR  🔴 [Diag-Backend] WeChat API Error: { errcode: 40029, errmsg: 'invalid code, rid: 6992946c-00b48413-2e0a8df3' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 6992946c-00b48413-2e0a8df3
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8582:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 6992946c-00b48413-2e0a8df3
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs, /pages/mobile/wechat-callback.vue?macro=true (x2)
+ℹ hmr update /pages/mobile/wechat-callback.vue, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=0&scoped=af6b5212&lang.css, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=1&lang.css, /pages/mobile/wechat-callback.vue?macro=true, /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs
+🔴 [Diag-Backend] Receive Code: MOCK_CODE_12345
+🔴 [Diag-Backend] Calling WeChat API: https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxc2042fae927b28b8&secret=***&code=MOCK_CODE_12345&grant_type=authorization_code
+🔴 [Diag-Backend] WeChat API Response: {"errcode":40029,"errmsg":"invalid code, rid: 6992946e-376c505e-5b192ad3"}
+ERROR  🔴 [Diag-Backend] WeChat API Error: { errcode: 40029, errmsg: 'invalid code, rid: 6992946e-376c505e-5b192ad3' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 6992946e-376c505e-5b192ad3
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8582:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 6992946e-376c505e-5b192ad3
+[nitro] ✔ Nuxt Nitro server built in 402ms
+[nitro] ✔ Nuxt Nitro server built in 674ms
+[nuxt] ℹ Compiled types/plugins.d.ts in 629.78ms
+[nitro] ✔ Nuxt Nitro server built in 338ms
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs, /pages/mobile/wechat-callback.vue?macro=true
+ℹ hmr update /pages/mobile/wechat-callback.vue, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=0&scoped=af6b5212&lang.css, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=1&lang.css, /pages/mobile/wechat-callback.vue?macro=true, /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs
+ERROR  [OAuthLogin] WeChat API error: { errcode: 40029, errmsg: 'invalid code, rid: 69929787-622ae586-788c1b49' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 69929787-622ae586-788c1b49
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8594:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 69929787-622ae586-788c1b49
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs, /pages/mobile/wechat-callback.vue?macro=true
+ℹ hmr update /pages/mobile/wechat-callback.vue, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=0&scoped=af6b5212&lang.css, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=1&lang.css, /pages/mobile/wechat-callback.vue?macro=true, /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs
+ERROR  [OAuthLogin] WeChat API error: { errcode: 40029, errmsg: 'invalid code, rid: 69929789-51423493-30c29850' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 69929789-51423493-30c29850
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8594:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 69929789-51423493-30c29850
+ℹ hmr update /pages/mobile/wechat-callback.vue, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=0&scoped=af6b5212&lang.css, /pages/mobile/wechat-callback.vue?direct&vue&type=style&index=1&lang.css, /pages/mobile/wechat-callback.vue?macro=true, /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs (x2)
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs, /pages/mobile/wechat-callback.vue?macro=true
+ERROR  [OAuthLogin] WeChat API error: { errcode: 40029, errmsg: 'invalid code, rid: 69929796-165e7a03-57769456' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 69929796-165e7a03-57769456
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8594:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 69929796-165e7a03-57769456
+[nitro] ✔ Nuxt Nitro server built in 327ms
+ℹ hmr update /@id/virtual:nuxt:%2FUsers%2Fdalin%2Ffantula%2Fnuxt-frontend%2F.nuxt%2Froutes.mjs
+ℹ hmr update /pages/mobile/index.vue, /components/mobile/auth/MobileLoginSheet.vue, /pages/mobile/wechat-callback.vue
+ERROR  [OAuthLogin] WeChat API error: { errcode: 40029, errmsg: 'invalid code, rid: 69929799-57e4b3de-43265c38' }
+ERROR  [OAuthLogin] Error: invalid code, rid: 69929799-57e4b3de-43265c38
+
+    at createError (node_modules/h3/dist/index.mjs:71:15)
+    at Object.handler (.nuxt/dev/index.mjs:8594:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async node_modules/h3/dist/index.mjs:2011:19
+    at async Object.callAsync (node_modules/unctx/dist/index.mjs:72:16)
+    at async Server.toNodeHandle (node_modules/h3/dist/index.mjs:2303:7)
+
+  [cause]: invalid code, rid: 69929799-57e4b3de-43265c38
+[nitro] ✔ Nuxt Nitro server built in 333ms
+[nitro] ✔ Nuxt Nitro server built in 261ms

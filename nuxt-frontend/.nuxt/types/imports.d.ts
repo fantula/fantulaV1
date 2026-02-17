@@ -439,12 +439,14 @@ declare global {
   const updateAppConfig: typeof import('../../node_modules/nuxt/dist/app/config').updateAppConfig
   const updateSiteConfig: typeof import('../../node_modules/nuxt-site-config/dist/runtime/app/composables/updateSiteConfig').updateSiteConfig
   const uploadImageToStorage: typeof import('../../utils/uploadImage').uploadImageToStorage
+  const useAdminCdkCleanup: typeof import('../../composables/admin/useAdminCdkCleanup').useAdminCdkCleanup
   const useAdminCdkList: typeof import('../../composables/admin/useAdminCdkList').useAdminCdkList
   const useAdminContactConfig: typeof import('../../composables/admin/useAdminContactConfig').useAdminContactConfig
   const useAdminCouponList: typeof import('../../composables/admin/useAdminCouponList').useAdminCouponList
   const useAdminCouponStats: typeof import('../../composables/admin/useAdminCouponStats').useAdminCouponStats
   const useAdminDialog: typeof import('../../composables/admin/useAdminDialog').default
   const useAdminGlobalSkuList: typeof import('../../composables/admin/useAdminGlobalSkuList').useAdminGlobalSkuList
+  const useAdminHeaderStore: typeof import('../../stores/admin/header').useAdminHeaderStore
   const useAdminList: typeof import('../../composables/admin/useAdminList').default
   const useAdminOrderList: typeof import('../../composables/admin/useAdminOrderList').useAdminOrderList
   const useAdminPreOrderList: typeof import('../../composables/admin/useAdminPreOrderList').useAdminPreOrderList
@@ -606,6 +608,9 @@ declare global {
   // @ts-ignore
   export type { ToastType } from '../../composables/mobile/useToast'
   import('../../composables/mobile/useToast')
+  // @ts-ignore
+  export type { Tab } from '../../stores/admin/header'
+  import('../../stores/admin/header')
   // @ts-ignore
   export type { CartItem } from '../../stores/client/cart'
   import('../../stores/client/cart')
@@ -1052,12 +1057,14 @@ declare module 'vue' {
     readonly updateAppConfig: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/config')['updateAppConfig']>
     readonly updateSiteConfig: UnwrapRef<typeof import('../../node_modules/nuxt-site-config/dist/runtime/app/composables/updateSiteConfig')['updateSiteConfig']>
     readonly uploadImageToStorage: UnwrapRef<typeof import('../../utils/uploadImage')['uploadImageToStorage']>
+    readonly useAdminCdkCleanup: UnwrapRef<typeof import('../../composables/admin/useAdminCdkCleanup')['useAdminCdkCleanup']>
     readonly useAdminCdkList: UnwrapRef<typeof import('../../composables/admin/useAdminCdkList')['useAdminCdkList']>
     readonly useAdminContactConfig: UnwrapRef<typeof import('../../composables/admin/useAdminContactConfig')['useAdminContactConfig']>
     readonly useAdminCouponList: UnwrapRef<typeof import('../../composables/admin/useAdminCouponList')['useAdminCouponList']>
     readonly useAdminCouponStats: UnwrapRef<typeof import('../../composables/admin/useAdminCouponStats')['useAdminCouponStats']>
     readonly useAdminDialog: UnwrapRef<typeof import('../../composables/admin/useAdminDialog')['default']>
     readonly useAdminGlobalSkuList: UnwrapRef<typeof import('../../composables/admin/useAdminGlobalSkuList')['useAdminGlobalSkuList']>
+    readonly useAdminHeaderStore: UnwrapRef<typeof import('../../stores/admin/header')['useAdminHeaderStore']>
     readonly useAdminList: UnwrapRef<typeof import('../../composables/admin/useAdminList')['default']>
     readonly useAdminOrderList: UnwrapRef<typeof import('../../composables/admin/useAdminOrderList')['useAdminOrderList']>
     readonly useAdminPreOrderList: UnwrapRef<typeof import('../../composables/admin/useAdminPreOrderList')['useAdminPreOrderList']>

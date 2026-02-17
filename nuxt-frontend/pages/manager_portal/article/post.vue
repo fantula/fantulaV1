@@ -2,7 +2,7 @@
   <div class="admin-page-post">
     <div class="page-header">
       <h2 class="page-title">{{ isEdit ? '编辑文章' : '发布文章' }}</h2>
-      <el-button @click="router.back()">返回列表</el-button>
+      <el-button @click="handleBack">返回列表</el-button>
     </div>
 
     <div class="form-container">
@@ -94,7 +94,7 @@
 
         <el-form-item>
           <el-button type="primary" @click="submitForm">保存提交</el-button>
-          <el-button @click="router.back()">取消</el-button>
+          <el-button @click="handleBack">取消</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -114,6 +114,7 @@ import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Plus, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { adminRoute } from '@/config/admin-routes'
 import { adminCommunityApi, communityApi, type Category } from '@/api/client/community'
 // Explicitly import AdminImagePicker
 import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
@@ -222,7 +223,7 @@ const submitForm = async () => {
           if (error) throw error
           ElMessage.success('发布成功')
         }
-        router.push('/manager_portal/article')
+        router.push(adminRoute('article'))
       } catch (error: any) {
         ElMessage.error('提交失败: ' + error.message)
       } finally {
@@ -236,6 +237,11 @@ onMounted(() => {
   fetchCategories()
   fetchDetail()
 })
+
+// Explicit back navigation
+const handleBack = () => {
+    router.push(adminRoute('article'))
+}
 </script>
 
 <style scoped>

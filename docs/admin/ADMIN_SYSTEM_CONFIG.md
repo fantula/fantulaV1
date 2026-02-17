@@ -33,7 +33,7 @@ Document, Collection, Message, Setting, Timer, Monitor, UserFilled
 
 ### 新增菜单步骤
 1. 修改 `config/admin-menu.ts` 添加配置
-2. 确保 `pages/admin/` 下存在对应的 `.vue` 文件
+2. 确保 `pages/manager_portal/` 下存在对应的 `.vue` 文件
 3. 在【用户管理 -> 部门管理】中为非超管部门分配权限
 
 ---
@@ -190,14 +190,14 @@ definePageMeta({
 
 ### 新建列表页
 ```bash
-1. 创建 pages/admin/xxx/index.vue
+1. 创建 pages/manager_portal/xxx/index.vue
 2. 使用 useAdminList + AdminDataTable
 3. 添加菜单到 config/admin-menu.ts
 ```
 
 ### 新建编辑页
 ```bash
-1. 创建 pages/admin/xxx/edit.vue
+1. 创建 pages/manager_portal/xxx/edit.vue
 2. 使用 StickyFormHeader + el-form
 3. 路由: /admin/xxx/edit?id=xxx
 ```

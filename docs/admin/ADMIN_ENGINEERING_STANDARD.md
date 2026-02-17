@@ -2,7 +2,7 @@
 
 > **定位**: 定义后台代码结构、开发流程与编码标准。
 > **适用**: 所有后台开发者。
-> **最后更新**: 2026-02-03
+> **最后更新**: 2026-02-17
 
 ---
 
@@ -12,12 +12,16 @@
 
 ```
 nuxt-frontend/
-├── pages/admin/             # 页面层 (Page Layer)
+├── pages/manager_portal/    # 页面层 (Page Layer) - 伪装路径
 │   ├── login.vue            # 登录页 (唯一入口)
 │   ├── index.vue            # 仪表盘
 │   ├── products/            # 商品模块
 │   ├── orders/              # 订单模块
 │   └── ...
+│
+├── config/
+│   ├── admin-menu.ts        # 菜单配置
+│   └── admin-routes.ts      # ⭐ 路由常量 (路径唯一真理源)
 │
 ├── api/admin/               # 接口层 (API Layer)
 │   ├── product.ts
@@ -40,12 +44,11 @@ nuxt-frontend/
 ├── layouts/
 │   └── mgmt.vue             # 唯一后台布局
 │
-├── middleware/
-│   └── mgmt-auth.ts         # 后台认证守卫
-│
-└── config/
-    └── admin-menu.ts        # 菜单配置
+└── middleware/
+    └── mgmt-auth.ts         # 后台认证守卫
 ```
+
+> ⚠️ **路由路径**: 所有导航/跳转必须使用 `adminRoute()` 或 `adminRoutes`（来自 `config/admin-routes.ts`），**禁止硬编码** `/manager_portal/...`。
 
 ---
 
@@ -179,7 +182,7 @@ const {
 
 ### 4.1 位置与命名
 *   **位置**: `api/admin/xxx.ts`
-*   **客户端**: 必须使用 `getAdminSupabaseClient` (Service Role)
+*   **客户端**: 必须使用 `getSupabaseClient` (遵守 RLS)
 *   **返回格式**: `{ success: boolean, data?: T, error?: string }`
 *   **导出**: 必须在 `api/admin/index.ts` 统一导出
 
@@ -187,11 +190,11 @@ const {
 
 ```typescript
 // api/admin/demo.ts
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { getSupabaseClient } from '@/utils/supabase'
 
 export const adminDemoApi = {
   async getList(params: { page: number; pageSize: number }) {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { data, error, count } = await client
       .from('table_name')
       .select('*', { count: 'exact' })
@@ -202,21 +205,21 @@ export const adminDemoApi = {
   },
 
   async create(payload: CreatePayload) {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { data, error } = await client.from('table_name').insert(payload).select().single()
     if (error) return { success: false, error: error.message }
     return { success: true, data }
   },
 
   async update(id: string, payload: UpdatePayload) {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { error } = await client.from('table_name').update(payload).eq('id', id)
     if (error) return { success: false, error: error.message }
     return { success: true }
   },
 
   async delete(id: string) {
-    const client = getAdminSupabaseClient()
+    const client = getSupabaseClient()
     const { error } = await client.from('table_name').delete().eq('id', id)
     if (error) return { success: false, error: error.message }
     return { success: true }
@@ -285,7 +288,7 @@ const dialog = useAdminDialog(...)
 - [ ] **API**: 创建 `api/admin/xxx.ts` 并在 `index.ts` 导出
 - [ ] **Type**: 定义完整的 TypeScript 接口
 - [ ] **Composable**: 使用 `useAdminList` / `useAdminDialog` 或创建业务 Composable
-- [ ] **Page**: 创建 `pages/admin/xxx.vue`，指定 `layout: 'mgmt'` + `middleware: ['mgmt-auth']`
+- [ ] **Page**: 创建 `pages/manager_portal/xxx.vue`，指定 `layout: 'mgmt'` + `middleware: ['mgmt-auth']`
 - [ ] **Components**: 优先使用 `base/` 下的全局组件
 - [ ] **Permission**: 在部门管理中确认权限可配置
 - [ ] **Menu**: 如需菜单，更新 `config/admin-menu.ts`

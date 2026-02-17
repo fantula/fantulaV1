@@ -244,6 +244,32 @@ export const adminProductApi = {
     },
 
     /**
+     * 根据 ID 批量获取 SKU 详情 (用于优惠券等回显)
+     */
+    async getSkusByIds(ids: string[]): Promise<{ success: boolean; skus?: any[]; error?: string }> {
+        const client = getSupabaseClient()
+
+        // Use product_sku_map to get both SKU details and Product Info
+        const { data, error } = await client
+            .from('product_sku_map')
+            .select('sku:product_skus(*), product:products(product_name)')
+            .in('sku_id', ids)
+
+        if (error) return { success: false, error: error.message }
+
+        // Flatten result
+        const skus = data.map((item: any) => ({
+            ...item.sku,
+            productName: item.product?.product_name
+        })).filter(s => s.id) // Filter out any null skus if join failed
+
+        // Remove duplicates (in case a SKU is mapped multiple times - logical edge case)
+        const uniqueSkus = Array.from(new Map(skus.map(s => [s.id, s])).values())
+
+        return { success: true, skus: uniqueSkus }
+    },
+
+    /**
      * 创建商品 SKU (用于复制商品时)
      * 注意：这是创建新的 ProductSKU 记录
      */

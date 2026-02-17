@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { adminRoute } from '@/config/admin-routes'
+
 // Redirect to default tab (accounts)
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"], ssr: false })
@@ -6,7 +8,7 @@ definePageMeta({
 const router = useRouter()
 
 onMounted(() => {
-  router.replace('/manager_portal/users/accounts')
+  router.replace(adminRoute('users/accounts'))
 })
 </script>
 

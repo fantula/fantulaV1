@@ -25,22 +25,21 @@
       </el-table-column>
 
       <!-- 用户ID+头像 -->
-      <el-table-column label="用户" min-width="140">
+      <el-table-column label="用户" min-width="180">
         <template #default="{ row }">
-          <div class="user-cell">
-            <el-avatar :size="28" :src="row._profile?.avatar || DEFAULT_AVATAR" />
-            <span class="uid-text">{{ row._profile?.uid || '无UID' }}</span>
-          </div>
+          <AdminUserCell :user="row._profile" :uid="row._profile?.uid" />
         </template>
       </el-table-column>
 
       <!-- 商品名称+头图 -->
       <el-table-column label="商品" min-width="200">
         <template #default="{ row }">
-          <div class="product-cell">
-            <img v-if="row.product_snapshot?.image" :src="row.product_snapshot.image" class="product-thumb" />
-            <span>{{ row.product_snapshot?.product_name || '未知商品' }}</span>
-          </div>
+          <ProductThumbCell 
+            :image="row.product_snapshot?.image" 
+            :name="row.product_snapshot?.product_name || '未知商品'" 
+            :id="row.product_id"
+            :truncate-id="true"
+          />
         </template>
       </el-table-column>
 
@@ -106,6 +105,13 @@
           >
             {{ row.status === 'pending_delivery' ? '审核回执' : '查看回执' }}
           </el-button>
+          <el-button 
+            link 
+            type="primary" 
+            @click="openDetail(row)"
+          >
+            详情
+          </el-button>
         </template>
       </el-table-column>
     </AdminDataTable>
@@ -150,7 +156,16 @@
           
           <template v-for="(value, key) in currentReceipt.payload" :key="key">
             <el-descriptions-item :label="key" label-class-name="bold-label">
-              <span class="payload-value">{{ value }}</span>
+              <div class="payload-row">
+                <span class="payload-value">{{ value }}</span>
+                <el-icon 
+                  v-if="value" 
+                  class="copy-icon" 
+                  @click="handleCopy(String(value))"
+                >
+                  <CopyDocument />
+                </el-icon>
+              </div>
             </el-descriptions-item>
           </template>
         </el-descriptions>
@@ -200,17 +215,27 @@
         </template>
       </template>
     </AdminDataDialog>
+
+    <!-- Detail Dialog -->
+    <OrderDetailDialog 
+      v-model="detailVisible" 
+      :order-id="detailId" 
+      type="virtual" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Refresh, Loading, Check } from '@element-plus/icons-vue'
+import { Refresh, Loading, Check, CopyDocument } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
+import ProductThumbCell from '@/components/admin/base/ProductThumbCell.vue'
+import OrderDetailDialog from '@/components/admin/order/OrderDetailDialog.vue'
 import { useAdminOrderList } from '@/composables/admin/useAdminOrderList'
 import { adminFulfillmentApi } from '@/api/admin/fulfillment'
 import type { OrderFulfillment } from '@/types/order'
@@ -233,6 +258,15 @@ const {
   formatTime,
   formatPrice
 } = useAdminOrderList('virtual')
+
+// --- Detail Dialog ---
+const detailVisible = ref(false)
+const detailId = ref('')
+
+const openDetail = (row: any) => {
+    detailId.value = row.id
+    detailVisible.value = true
+}
 
 // --- Receipt Review State ---
 const receiptDialogVisible = ref(false)
@@ -340,10 +374,7 @@ watch([page, pageSize], () => loadList(), { immediate: true })
 .page-container { display: flex; flex-direction: column; gap: 16px; }
 .mono-text { font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; color: #94a3b8; cursor: pointer; }
 .mono-text:hover { color: #60a5fa; }
-.user-cell { display: flex; align-items: center; gap: 8px; }
-.uid-text { font-size: 12px; color: #94a3b8; font-family: 'Monaco', monospace; }
-.product-cell { display: flex; align-items: center; gap: 8px; }
-.product-thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; background: #1e293b; }
+/* .user-cell, .uid-text, .product-cell .product-thumb removed - replaced by components */
 .spec-text { font-size: 12px; color: #94a3b8; }
 .amount { font-weight: 600; color: #22c55e; }
 .discount { font-size: 12px; color: #f59e0b; }
@@ -353,7 +384,10 @@ watch([page, pageSize], () => loadList(), { immediate: true })
 .loading-state, .empty-receipt { padding: 40px; text-align: center; color: var(--el-text-color-secondary); }
 .receipt-descriptions :deep(.el-descriptions__label) { width: 100px; color: var(--el-text-color-secondary); }
 .bold-label { font-weight: 600 !important; }
-.payload-value { font-family: 'Roboto Mono', monospace; color: var(--el-text-color-primary); font-weight: 500; }
+.payload-row { display: flex; align-items: center; gap: 8px; }
+.payload-value { font-family: 'Roboto Mono', monospace; color: var(--el-text-color-primary); font-weight: 500; word-break: break-all; }
+.copy-icon { cursor: pointer; color: var(--el-color-primary); font-size: 14px; }
+.copy-icon:hover { opacity: 0.8; }
 
 .mb-4 { margin-bottom: 20px; }
 

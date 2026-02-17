@@ -30,9 +30,8 @@ export function getAdminSupabaseClient(): SupabaseClient {
         const config = useRuntimeConfig()
 
         // 仅从 Server RuntimeConfig 获取
-        // HOTFIX: Hardcode correct key to bypass env loading truncation issue
-        const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzA2MTA3NTMsImV4cCI6MzMzMDY2MTA3NTN9.BTj9UDuBTBV_8eQJ6FjJc2XijmtJpvncsekPN-dhiXg'
-        // const SUPABASE_SERVICE_ROLE_KEY = config.supabaseServiceKey
+        // 仅从 Server RuntimeConfig 获取
+        const SUPABASE_SERVICE_ROLE_KEY = config.supabaseServiceKey
         const SUPABASE_URL = config.public.supabaseUrl
 
         if (!SUPABASE_SERVICE_ROLE_KEY) {

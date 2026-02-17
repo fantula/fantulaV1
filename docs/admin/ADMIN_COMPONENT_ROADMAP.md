@@ -52,7 +52,7 @@
 
 ```bash
 # 需要检查的页面目录
-pages/admin/
+pages/manager_portal/
 ├── index.vue              # 仪表盘
 ├── products/              # 商品管理
 ├── orders/                # 订单管理
@@ -63,7 +63,8 @@ pages/admin/
 ├── media/                 # 媒体中心
 ├── messages/              # 消息管理
 ├── tickets/               # 工单管理
-└── settings/              # 系统设置
+├── recharge/              # 充值管理
+└── backend-settings/      # 系统设置
 ```
 
 **输出**: 组件覆盖率报告

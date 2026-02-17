@@ -31,7 +31,7 @@
 
 ```
 ❌ 绕过 useAdminDialog/useAdminList 自己写弹窗/列表逻辑
-❌ 在 admin 中使用 anon key 客户端
+❌ ❌ 严禁持有 SERVICE_ROLE_KEY
 ❌ 改变任何按钮的最终业务效果
 ❌ 修改表单字段的验证规则（除非明确要求）
 ❌ 删除现有功能
@@ -88,7 +88,7 @@
 
 ```markdown
 ## 页面: [页面名称]
-路径: `pages/admin/xxx/index.vue`
+路径: `pages/manager_portal/xxx/index.vue`
 
 ### 1. 功能验证
 - [ ] 列表正常加载

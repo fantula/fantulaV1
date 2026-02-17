@@ -5,12 +5,12 @@
       <template #default>
         <div class="filter-group">
           <el-input
-            v-model="searchQuery"
+            v-model="filters.query"
             placeholder="搜索频道标识..."
             style="width: 240px"
             clearable
-            @clear="fetchData"
-            @keyup.enter="fetchData"
+            @clear="handleFilterChange"
+            @keyup.enter="handleFilterChange"
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
@@ -18,17 +18,17 @@
           </el-input>
           
           <el-select 
-            v-model="filterStatus" 
+            v-model="filters.status" 
             placeholder="状态筛选" 
             style="width: 140px" 
-            @change="fetchData"
+            @change="handleFilterChange"
           >
             <el-option label="全部" value="all" />
             <el-option label="待处理 (未绑定)" value="unbound" />
             <el-option label="已完成 (已绑定)" value="bound" />
           </el-select>
           
-          <el-button type="primary" @click="fetchData">查询</el-button>
+          <el-button type="primary" @click="refresh">查询</el-button>
         </div>
       </template>
 
@@ -37,7 +37,7 @@
           <el-icon class="el-icon--left"><Plus /></el-icon>
           批量添加
         </el-button>
-        <el-button @click="fetchData">
+        <el-button @click="refresh">
           <el-icon><Refresh /></el-icon>
         </el-button>
       </template>
@@ -45,13 +45,11 @@
 
     <!-- Data Table -->
     <AdminDataTable
-      :data="tableData"
+      :data="list"
       :loading="loading"
       :total="total"
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      @update:current-page="fetchData"
-      @update:page-size="fetchData"
+      v-model:page="currentPage"
+      v-model:pageSize="pageSize"
     >
       <el-table-column prop="channel_key" label="频道标识" min-width="180">
         <template #default="{ row }">
@@ -92,7 +90,7 @@
             title="确定要彻底删除该记录吗？下次用户搜索将重新生成。"
             confirm-button-text="删除"
             cancel-button-text="取消"
-            @confirm="handleDelete(row)"
+            @confirm="removeRow(row.id)"
           >
             <template #reference>
               <el-button link type="danger">删除</el-button>
@@ -183,23 +181,65 @@ definePageMeta({
 
 import { ref, onMounted } from 'vue'
 import { Search, Plus, Refresh } from '@element-plus/icons-vue'
-import dayjs from 'dayjs'
-import { getAdminSupabaseClient } from '@/utils/supabase-admin'
+import { ElMessage } from 'element-plus'
+import { getSupabaseClient } from '@/utils/supabase' // SECURITY FIX: Use standard client
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import { useAdminList } from '@/composables/admin/useAdminList'
+import { useBizFormat } from '@/composables/common/useBizFormat'
 
-const client = getAdminSupabaseClient()
+const client = getSupabaseClient()
+const { formatDate } = useBizFormat()
 
-// --- State ---
-const loading = ref(false)
-const tableData = ref<any[]>([])
-const searchQuery = ref('')
-const filterStatus = ref('unbound') // Default: Unbound
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
+// --- useAdminList Integration ---
+const {
+  loading,
+  list,
+  total,
+  currentPage,
+  pageSize,
+  filters,
+  refresh,
+  handleFilterChange,
+  removeRow
+} = useAdminList<any>({
+  defaultFilters: { status: 'unbound', query: '' },
+  fetchFn: async (params) => {
+    let query = client
+      .from('channel_recognitions')
+      .select('*, products(id, product_name)', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range((params.page - 1) * params.pageSize, params.page * params.pageSize - 1)
 
-// Bind Modal State
+    // Search
+    if (params.filters.query) {
+      query = query.ilike('channel_key', `%${params.filters.query}%`)
+    }
+
+    // Filter
+    if (params.filters.status === 'unbound') {
+      query = query.is('product_id', null)
+    } else if (params.filters.status === 'bound') {
+      query = query.not('product_id', 'is', null)
+    }
+
+    const { data, count, error } = await query
+    if (error) throw new Error(error.message)
+
+    return {
+      success: true,
+      data: data || [],
+      total: count || 0
+    }
+  },
+  deleteFn: async (id) => {
+    const { error } = await client.from('channel_recognitions').delete().eq('id', id)
+    if (error) throw new Error(error.message)
+    return { success: true }
+  }
+})
+
+// --- Bind Modal State ---
 const bindModalVisible = ref(false)
 const currentRow = ref<any>(null)
 const selectedCategoryId = ref<string | null>(null)
@@ -208,51 +248,15 @@ const categoryList = ref<any[]>([])
 const productList = ref<any[]>([])
 const saving = ref(false)
 
-// Batch Modal State
+// --- Batch Modal State ---
 const batchModalVisible = ref(false)
 const batchInput = ref('')
 const batchAdding = ref(false)
 
 // --- Init ---
 onMounted(() => {
-  fetchData()
   fetchCategories()
 })
-
-// --- Data Fetching ---
-const fetchData = async () => {
-  loading.value = true
-  try {
-    let query = client
-      .from('channel_recognitions')
-      .select('*, products(id, product_name)', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value - 1)
-
-    // Search
-    if (searchQuery.value) {
-      query = query.ilike('channel_key', `%${searchQuery.value}%`)
-    }
-
-    // Filter
-    if (filterStatus.value === 'unbound') {
-      query = query.is('product_id', null)
-    } else if (filterStatus.value === 'bound') {
-      query = query.not('product_id', 'is', null)
-    }
-
-    const { data, count, error } = await query
-
-    if (error) throw error
-
-    tableData.value = data || []
-    total.value = count || 0
-  } catch (err: any) {
-    ElMessage.error('加载失败: ' + err.message)
-  } finally {
-    loading.value = false
-  }
-}
 
 const fetchCategories = async () => {
   const { data } = await client
@@ -261,23 +265,6 @@ const fetchCategories = async () => {
     .eq('status', 'on')
     .order('sort_order', { ascending: true })
   categoryList.value = data || []
-}
-
-// --- Actions ---
-
-const formatDate = (date: string) => {
-  return dayjs(date).format('YYYY-MM-DD HH:mm')
-}
-
-const handleDelete = async (row: any) => {
-  try {
-    const { error } = await client.from('channel_recognitions').delete().eq('id', row.id)
-    if (error) throw error
-    ElMessage.success('删除成功')
-    fetchData()
-  } catch (err: any) {
-    ElMessage.error('删除失败: ' + err.message)
-  }
 }
 
 // --- Bind Logic ---
@@ -291,10 +278,6 @@ const openBindModal = (row: any) => {
   
   // Try to restore if already bound
   if (row.product_id && row.products) {
-    // If we knew the category_id of the product, we could auto-select.
-    // However, channel_recognitions doesn't store category_id.
-    // It's acceptable to make user re-select for modification, OR we could fetch product details.
-    // Let's try to fetch product details to get category_id.
     fetchProductDetails(row.product_id)
   }
   
@@ -346,7 +329,7 @@ const handleSaveBind = async () => {
 
     ElMessage.success('绑定成功')
     bindModalVisible.value = false
-    fetchData()
+    refresh()
   } catch (err: any) {
     ElMessage.error('保存失败: ' + err.message)
   } finally {
@@ -396,7 +379,7 @@ const handleBatchAdd = async () => {
     ElMessage.success(`操作完成：处理 ${payload.length} 条记录`)
     batchModalVisible.value = false
     batchInput.value = ''
-    fetchData()
+    refresh()
   } catch (err: any) {
     ElMessage.error('批量生成失败: ' + err.message)
   } finally {
@@ -407,9 +390,9 @@ const handleBatchAdd = async () => {
 
 <style scoped>
 .channel-recognition-page {
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .filter-group {
@@ -417,4 +400,8 @@ const handleBatchAdd = async () => {
     align-items: center;
     gap: 10px;
 }
+
+.channel-key { font-weight: bold; color: var(--el-color-primary); }
+.product-name { margin-left: 8px; font-size: 13px; }
+.bound-product { display: flex; align-items: center; }
 </style>
