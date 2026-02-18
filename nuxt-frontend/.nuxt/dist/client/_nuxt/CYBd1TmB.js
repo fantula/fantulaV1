@@ -1,0 +1,1 @@
+import{a}from"./DM5f3RQ4.js";import{d as o,y as r,f as n,bz as s,c,s as i,o as d}from"./DzJfV88A.js";const l=o({__name:"index",setup(m){const t=r(),e=async()=>{await i(),t.replace(a("recharge/tiers"))};return n(()=>e()),s(()=>e()),(p,u)=>(d(),c("div"))}});export{l as default};

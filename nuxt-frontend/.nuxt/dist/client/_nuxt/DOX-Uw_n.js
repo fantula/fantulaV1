@@ -1,0 +1,1 @@
+import{d as t,f as a,bz as n,c as s,s as c,I as r,o as i}from"./DzJfV88A.js";import{a as d}from"./DM5f3RQ4.js";const p={class:"loading-redirect"},x=t({__name:"index",setup(u){const o=r(),e=async()=>{await c(),o.replace(d("coupons/balance"))};return a(()=>e()),n(()=>e()),(_,m)=>(i(),s("div",p))}});export{x as default};

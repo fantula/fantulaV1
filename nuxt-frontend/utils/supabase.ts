@@ -65,11 +65,22 @@ export const EDGE_FUNCTIONS_URL = '' // Deprecated: Use getEdgeFunctionsUrl()
 
 /**
  * 获取当前用户的 JWT Token
+ * 如果 session 已过期，会自动尝试刷新
  */
 export async function getAuthToken(): Promise<string | null> {
     const client = getSupabaseClient()
     const { data: { session } } = await client.auth.getSession()
-    return session?.access_token || null
+
+    if (!session) return null
+
+    // 检查 token 是否即将过期（60 秒内），如果是则刷新
+    const expiresAt = session.expires_at
+    if (expiresAt && expiresAt - Math.floor(Date.now() / 1000) < 60) {
+        const { data: { session: refreshed } } = await client.auth.refreshSession()
+        return refreshed?.access_token || session.access_token
+    }
+
+    return session.access_token
 }
 
 /**

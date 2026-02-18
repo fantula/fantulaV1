@@ -1,1 +1,0 @@
-import{a}from"./DM5f3RQ4.js";import{d as s,y as o,f as n,bz as c,c as r,s as i,o as d}from"./BcSvUY-Y.js";const l=s({__name:"index",setup(m){const t=o(),e=async()=>{await i(),t.replace(a("messages/batch-send"))};return n(()=>e()),c(()=>e()),(p,u)=>(d(),r("div"))}});export{l as default};

@@ -1,1 +1,0 @@
-import{X as e}from"./BcSvUY-Y.js";const o={async getStats(){const a=e(),{data:t,error:s}=await a.rpc("admin_get_dashboard_stats");return s?(console.error("Failed to fetch dashboard stats:",s),{success:!1,error:s.message}):{success:!0,data:t}}};export{o as a};

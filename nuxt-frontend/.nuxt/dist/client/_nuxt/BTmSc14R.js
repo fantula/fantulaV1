@@ -1,1 +1,0 @@
-import{a}from"./DM5f3RQ4.js";import{d as o,y as n,f as r,bz as s,c,s as i,o as d}from"./BcSvUY-Y.js";const l=o({__name:"index",setup(u){const t=n(),e=async()=>{await i(),t.replace(a("cdk/virtual"))};return r(()=>e()),s(()=>e()),(m,p)=>(d(),c("div"))}});export{l as default};

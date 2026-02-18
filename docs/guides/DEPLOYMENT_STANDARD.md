@@ -92,7 +92,61 @@
 
 ---
 
-## 5. 数据库变更规范 (Database Migration)
+## 5. 环境变量与 NUXT_ 前缀映射 (Critical)
+
+### 问题背景
+
+由于采用"本地构建 + 远程运行"策略，Nuxt 3 的 `npm run build` 会将本地 `.env` 中的值（如 `SUPABASE_URL=http://127.0.0.1:54321`）**烘焙**进 `.output` 产物的 runtimeConfig 默认值中。
+
+服务器上即使有正确的 `.env`，普通环境变量名（如 `SUPABASE_URL`）**无法覆盖**构建时烘焙的 runtimeConfig。Nuxt 3 运行时**只识别 `NUXT_` 前缀**的环境变量来覆盖 runtimeConfig。
+
+### 解决方案：两层防御
+
+**第一层：`ecosystem.config.js` 自动映射**
+
+PM2 配置文件读取服务器 `.env`，自动将原始变量名映射到 `NUXT_` 前缀：
+
+```javascript
+env: {
+    ...envConfig,                    // 原始变量（SUPABASE_URL 等）
+    NUXT_PUBLIC_API_BASE: envConfig.SUPABASE_URL,    // → runtimeConfig.public.apiBase
+    NUXT_SUPABASE_KEY: envConfig.SUPABASE_KEY,       // → runtimeConfig.supabaseKey
+    NUXT_SUPABASE_SERVICE_KEY: envConfig.SUPABASE_SERVICE_KEY,
+    // 微信配置同理...
+}
+```
+
+**第二层：`server/utils/supabase.ts` process.env 优先**
+
+服务端 Supabase 工具函数直接从 `process.env` 读取配置，优先级：
+```
+NUXT_PUBLIC_API_BASE > SUPABASE_URL > runtimeConfig.public.apiBase > fallback
+```
+
+这确保即使 runtimeConfig 覆盖机制失效，服务端代码仍能读到正确的值。
+
+### 映射对照表
+
+| 服务器 `.env` 变量 | ecosystem.config.js 映射 | 对应 runtimeConfig |
+|---|---|---|
+| `SUPABASE_URL` | `NUXT_PUBLIC_API_BASE` | `public.apiBase` |
+| `SUPABASE_URL` | `NUXT_PUBLIC_SUPABASE_URL` | `public.supabaseUrl` |
+| `SUPABASE_KEY` | `NUXT_PUBLIC_SUPABASE_ANON_KEY` | `public.supabaseAnonKey` |
+| `SUPABASE_KEY` | `NUXT_SUPABASE_KEY` | `supabaseKey` |
+| `SUPABASE_SERVICE_KEY` | `NUXT_SUPABASE_SERVICE_KEY` | `supabaseServiceKey` |
+| `WECHAT_PAY_MCHID` | `NUXT_WECHAT_PAY_MCHID` | `wechatPayMchid` |
+| `WECHAT_PAY_APPID` | `NUXT_WECHAT_PAY_APPID` | `wechatPayAppid` |
+| `WECHAT_APP_SECRET` | `NUXT_WECHAT_APP_SECRET` | `wechatAppSecret` |
+
+### 维护规则
+
+1. **添加新的 runtimeConfig 变量时**，必须同步在 `ecosystem.config.js` 中添加 `NUXT_` 前缀映射
+2. **服务器 `.env` 只需维护原始变量名**（如 `SUPABASE_URL`），`NUXT_` 前缀由 `ecosystem.config.js` 自动生成
+3. **部署后验证**：`pm2 logs fantula --lines 20 --nostream | grep '\[Supabase\]'` 确认 `Resolved URL` 正确
+
+---
+
+## 6. 数据库变更规范 (Database Migration)
 
 **严禁**在部署脚本中包含数据库变更命令。数据库变更必须先行：
 
@@ -103,7 +157,7 @@
 
 ---
 
-## 6. 回滚方案 (Rollback)
+## 7. 回滚方案 (Rollback)
 
 如果部署失败，采用“重新部署旧版本”策略（因本地构建只有一份 .output，即时回滚需依赖 Git）：
 

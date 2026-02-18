@@ -325,6 +325,86 @@ await supabase.auth.setSession({
 - 使用 `handled` 标志防止双重执行
 - 添加 15 秒超时保护
 
+### 6.10 部署环境 Service Key 失效 (Invalid Credentials)
+
+**问题**：部署后绑定微信时报错 `Invalid authentication credentials`，导致 Profile 创建失败。本地开发一切正常。
+
+**根本原因**：
+1. Nuxt 3 `npm run build` 会将本地开发机 `.env` 中的值（如 `SUPABASE_SERVICE_KEY=sb_secret_...`）打包进 `.output`。
+2. 服务器虽然在 `.env` 中配置了正确的 JWT Key，但变量名仅为 `SUPABASE_SERVICE_KEY`。
+3. **Nuxt 3 运行时只允许 `NUXT_` 前缀的环境变量覆盖构建时的默认值**。
+4. 结果：服务器运行的代码依然使用打包进去的错误的本地 Key。
+
+**临时修复**：在服务器 `.env` 中手动添加 `NUXT_SUPABASE_SERVICE_KEY=...`
+
+**根治方案**：见 6.11。
+
+### 6.11 本地构建烘焙错误配置导致微信支付"未登录" (系统性修复) 🔴
+
+**问题**：微信支付（充值）在 PC 和移动端都提示"未登录"(401)。
+
+**根本原因**：
+`deploy.sh` 在本地执行 `npm run build`，本地 `.env` 的 `SUPABASE_URL=http://127.0.0.1:54321` 和本地 anon key 被烘焙进构建产物。服务器 `.env` 中虽然有正确的 `SUPABASE_URL=https://www.fantula.com`，但普通环境变量名无法覆盖 Nuxt runtimeConfig —— 必须用 `NUXT_` 前缀。
+
+结果：`getCurrentUser()` 创建的 Supabase 客户端连接的是错误的实例（`127.0.0.1:54321`），无法验证浏览器端发来的 JWT → 401 未登录。
+
+> 微信登录不受影响，因为它使用 `getSupabaseServiceClient()`（service role），不依赖用户 JWT 验证。
+
+**修复（三处，缺一不可）**：
+
+**1. `server/utils/supabase.ts` — 服务端配置优先级**
+
+让 `getSupabaseClient()` / `getSupabaseServiceClient()` 优先从 `process.env` 读取，不仅仅依赖可能被烘焙了错误值的 runtimeConfig：
+
+```typescript
+// 优先级: process.env.NUXT_PUBLIC_API_BASE > process.env.SUPABASE_URL > runtimeConfig > fallback
+function resolveSupabaseUrl(): string {
+    const config = useRuntimeConfig()
+    return process.env.NUXT_PUBLIC_API_BASE
+        || process.env.SUPABASE_URL
+        || config.public.apiBase
+        || 'http://127.0.0.1:54321'
+}
+```
+
+Key 的解析同理（`NUXT_SUPABASE_KEY` > `SUPABASE_KEY` > runtimeConfig）。
+
+**2. `ecosystem.config.js` — PM2 自动映射 NUXT_ 前缀**
+
+在 `env` 对象中自动从 `.env` 的原始变量名映射到 `NUXT_` 前缀，不再需要手动维护双份变量：
+
+```javascript
+env: {
+    ...envConfig,
+    // 自动映射到 NUXT_ 前缀
+    NUXT_PUBLIC_API_BASE: envConfig.SUPABASE_URL || '',
+    NUXT_SUPABASE_KEY: envConfig.SUPABASE_KEY || '',
+    NUXT_SUPABASE_SERVICE_KEY: envConfig.SUPABASE_SERVICE_KEY || '',
+    NUXT_WECHAT_PAY_MCHID: envConfig.WECHAT_PAY_MCHID || '',
+    // ... 所有微信配置同理
+}
+```
+
+**3. `utils/supabase.ts` — 客户端 token 刷新**
+
+`getAuthToken()` 增加 token 过期检测，即将过期时主动调用 `refreshSession()`，避免发送过期 JWT 到服务端。
+
+**验证方式**：
+```bash
+# 部署后检查启动日志，确认 URL 正确
+pm2 logs fantula --lines 20 --nostream | grep '\[Supabase\]'
+# 应看到:
+# [Supabase] Resolved URL: https://www.fantula.com
+# [Supabase] URL source: NUXT_PUBLIC_API_BASE
+```
+
+**教训**：
+```
+⚠️ "本地构建 + 远程运行"模式下，所有敏感配置都可能被烘焙成错误值。
+⚠️ 服务端代码不能只依赖 runtimeConfig，必须 fallback 到 process.env 直接读取。
+⚠️ ecosystem.config.js 是连接服务器 .env 和 Nuxt runtimeConfig 的桥梁。
+```
+
 ---
 
 ## 七、排错指南
@@ -334,7 +414,7 @@ await supabase.auth.setSession({
 | 错误信息 | 原因 | 排查方法 |
 |---------|------|---------|
 | `invalid appsecret` | AppSecret 不匹配 | 检查 `NUXT_WECHAT_APP_SECRET` 环境变量 |
-| `未登录` (401) | Supabase session 未建立 | 检查 setSession() 是否调用 |
+| `未登录` (401) | Supabase session 未建立，或服务端连接了错误的 Supabase 实例 | 1. 检查 setSession() 是否调用；2. 查日志 `[Supabase] Resolved URL:` 确认非 127.0.0.1 |
 | `缺少绑定凭证` | 充值 code 被当作绑定处理 | 检查 state 参数是否为 recharge |
 | `此微信已绑定其他账号` | openid 已被其它 profile 占用 | 查 `profiles.wechat_openid` |
 | 支付成功但余额不变 | update profiles 静默失败 | 查日志中的 `[Notify] Failed to update balance` |

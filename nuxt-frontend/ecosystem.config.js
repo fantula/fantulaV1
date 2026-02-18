@@ -40,7 +40,23 @@ module.exports = {
                 NODE_ENV: 'production',
                 PORT: 3000,
                 NITRO_PORT: 3000,
-                NITRO_HOST: '127.0.0.1'
+                NITRO_HOST: '127.0.0.1',
+                // NUXT_ 前缀映射，确保 runtimeConfig 在运行时被正确覆盖
+                // （即使构建时烘焙了错误的本地值）
+                NUXT_PUBLIC_API_BASE: envConfig.SUPABASE_URL || '',
+                NUXT_PUBLIC_SUPABASE_URL: envConfig.SUPABASE_URL || '',
+                NUXT_PUBLIC_SUPABASE_ANON_KEY: envConfig.SUPABASE_KEY || '',
+                NUXT_SUPABASE_KEY: envConfig.SUPABASE_KEY || '',
+                NUXT_SUPABASE_SERVICE_KEY: envConfig.SUPABASE_SERVICE_KEY || '',
+                // 微信支付配置
+                NUXT_WECHAT_PAY_MCHID: envConfig.WECHAT_PAY_MCHID || '',
+                NUXT_WECHAT_PAY_APPID: envConfig.WECHAT_PAY_APPID || '',
+                NUXT_WECHAT_PAY_API_V3_KEY: envConfig.WECHAT_PAY_API_V3_KEY || '',
+                NUXT_WECHAT_PAY_SERIAL_NO: envConfig.WECHAT_PAY_SERIAL_NO || '',
+                NUXT_WECHAT_PAY_PRIVATE_KEY: envConfig.WECHAT_PAY_PRIVATE_KEY || '',
+                NUXT_WECHAT_PAY_NOTIFY_URL: envConfig.WECHAT_PAY_NOTIFY_URL || '',
+                NUXT_WECHAT_APP_SECRET: envConfig.WECHAT_APP_SECRET || '',
+                NUXT_PUBLIC_WECHAT_APPID: envConfig.WECHAT_PAY_APPID || '',
             }
         }
     ]

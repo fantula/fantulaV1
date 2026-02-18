@@ -1,1 +1,0 @@
-import{c7 as n,c8 as s,p as r}from"./BcSvUY-Y.js";import{b as t}from"./DM5f3RQ4.js";import{u as m}from"./BYG9t4Dl.js";const p=n(async i=>{let a,o;if(i.path===t.login())return;const e=m();if(e.isInitialized||([a,o]=s(()=>e.init()),await a,o()),!e.isLoggedIn)return r(t.login());if(!e.hasPermission(i.path))return r(t.home())});export{p as default};
