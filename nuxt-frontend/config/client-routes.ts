@@ -26,7 +26,8 @@ export const mobileRoutes = {
 
     // 个人中心
     profile: () => mobileRoute('profile'),
-    profileOrders: () => mobileRoute('profile/orders'),
+    profileAccount: () => mobileRoute('profile/account'),
+    profileOrders: () => mobileRoute('profile/order'),
     profileTickets: () => mobileRoute('profile/tickets'),
     profileFavorites: () => mobileRoute('profile/favorites'),
     profileWallet: () => mobileRoute('profile/wallet'),
@@ -37,5 +38,5 @@ export const mobileRoutes = {
     cart: () => mobileRoute('cart'),
 
     // 商品
-    product: (id: string) => mobileRoute(`product/${id}`),
+    product: (id: string) => mobileRoute(`goods/${id}`),
 } as const

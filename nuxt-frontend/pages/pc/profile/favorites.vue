@@ -191,7 +191,7 @@ const switchTab = (tab: string) => {
 // === Actions ===
 
 const goToProduct = (id: string) => {
-  router.push(`/goods/${id}`)
+  router.push(`/pc/goods/${id}`)
 }
 
 const removeFavorite = async (favoriteId: string) => {

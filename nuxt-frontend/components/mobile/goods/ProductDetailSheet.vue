@@ -136,19 +136,19 @@
               </div>
               
               <div class="main-btns">
-                  <button 
-                    class="btn-mobile-base btn-mobile-ghost btn-cart" 
-                    @click="addToCart" 
-                    :disabled="!hasStock || pending"
+                  <button
+                    class="btn-mobile-base btn-mobile-ghost btn-cart"
+                    @click="addToCart"
+                    :disabled="!hasStock || pending || actionLoading"
                   >
-                     加入购物车
+                     {{ actionLoading ? '处理中...' : '加入购物车' }}
                   </button>
-                  <button 
-                    class="aurora-btn-accent btn-buy-now" 
-                    @click="buyNow" 
-                    :disabled="!hasStock || pending"
+                  <button
+                    class="aurora-btn-accent btn-buy-now"
+                    @click="buyNow"
+                    :disabled="!hasStock || pending || actionLoading"
                   >
-                     立即购买
+                     {{ actionLoading ? '处理中...' : '立即购买' }}
                   </button>
               </div>
           </div>
@@ -217,26 +217,28 @@ const {
   faqs,      // Computed from fallback + fetch
   detailModules,
   allowAddon,
-  
+
   // Interactive State
   qty,
   stock,
   selectedSpecs,
   selectedSkuImage,
   isFavorited,
-  
+
   // Computed
   currentPrice,
   hasStock,
   matchedSku,
   skuAvailable, // used for stock check
-  
+
   // Methods
   formatPrice,
   handleSpecSelect,
   initClientState,
   modal
 } = useProductDetail(toRef(props, 'goodsId'))
+
+const actionLoading = ref(false)
 
 // --- Mobile Specific UI State ---
 const showDetailViewer = ref(false)
@@ -286,38 +288,47 @@ const handleClose = () => emit('update:visible', false)
 // Methods
 const addToCart = async () => {
     if (!userStore.isLoggedIn) return warning('请登录')
-    // Safe check if SKUs exist but none matched
     if (!matchedSku.value && skus.value.length > 0) return warning('请选择规格')
-    
-    // Fallback ID if no SKUs (some products might not have SKUs)
-    const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id 
+    if (actionLoading.value) return
+
+    const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
     if (!skuId) return error('商品信息异常')
-    
-    // Direct call to cart store (same as composable but handling UI here)
-    const res = await cartStore.addToCart(skuId, qty.value)
-    if (res.success) {
-        success('已加入购物车')
-        handleClose()
-    } else {
-        error(res.msg || '失败')
+
+    actionLoading.value = true
+    try {
+        const res = await cartStore.addToCart(skuId, qty.value)
+        if (res.success) {
+            success('已加入购物车')
+            handleClose()
+        } else {
+            error(res.msg || '失败')
+        }
+    } finally {
+        actionLoading.value = false
     }
 }
 
 const buyNow = async () => {
-     if (!userStore.isLoggedIn) return warning('请登录')
-     if (!matchedSku.value && skus.value.length > 0) return warning('请选择规格')
-     
-     const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
-     if (!skuId) return error('商品信息异常')
+    if (!userStore.isLoggedIn) return warning('请登录')
+    if (!matchedSku.value && skus.value.length > 0) return warning('请选择规格')
+    if (actionLoading.value) return
 
-     const { supabasePreOrderApi } = await import('@/api/client/supabase')
-     const res = await supabasePreOrderApi.createPreOrder(skuId, qty.value, 'buy_now')
-     if (res.success) {
-         handleClose()
-         router.push(`/mobile/checkout/${res.pre_order_id}`)
-     } else {
-         error(res.error || '失败')
-     }
+    const skuId = matchedSku.value ? matchedSku.value.id : goodsInfo.value.id
+    if (!skuId) return error('商品信息异常')
+
+    actionLoading.value = true
+    try {
+        const { supabasePreOrderApi } = await import('@/api/client/supabase')
+        const res = await supabasePreOrderApi.createPreOrder(skuId, qty.value, 'buy_now')
+        if (res.success) {
+            handleClose()
+            router.push(`/mobile/checkout/${res.pre_order_id}`)
+        } else {
+            error(res.error || '失败')
+        }
+    } finally {
+        actionLoading.value = false
+    }
 }
 
 const handleToggleFavorite = async () => {

@@ -222,7 +222,7 @@ const getStatusText = (status: string) => getOrderStatusLabel(status)
 const handleItemClick = (item: any) => {
   // 1. 待支付 -> 结账页
   if (item.status === 'pending' || item.isPending) {
-    router.push(`/checkout/${item.id}`)
+    router.push(`/pc/checkout/${item.id}`)
     return
   }
 
@@ -234,7 +234,7 @@ const handleItemClick = (item: any) => {
   }
 
   // 3. 有效订单 -> 详情页
-  router.push(`/profile/order/${item.id}`)
+  router.push(`/pc/profile/order/${item.id}`)
 }
 
 // --- Modal Logic ---

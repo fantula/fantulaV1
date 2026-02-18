@@ -64,7 +64,7 @@ definePageMeta({
   layout: 'pc'
 })
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { supabaseFaqApi } from '@/api/client/supabase'
 import FaqAccordionItem from '@/components/pc/faq/FaqAccordionItem.vue'
 import SupportContactCard from '@/components/pc/support/SupportContactCard.vue'
@@ -168,13 +168,13 @@ onMounted(async () => {
         // Expand the item
         expandedId.value = qId
         
-        // Scroll to item after a short delay for DOM update
-        setTimeout(() => {
+        // Scroll to item after DOM update
+        nextTick(() => {
             const el = document.getElementById(`faq-${qId}`)
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' })
             }
-        }, 100)
+        })
       }
   }
 })

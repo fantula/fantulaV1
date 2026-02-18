@@ -51,7 +51,7 @@
                   <div class="info-row-bottom">
                       <div class="price-wrap">
                          <span class="symbol">¥</span>
-                         <span class="amount">{{ item.price }}</span>
+                         <span class="amount">{{ Number(item.price).toFixed(2) }}</span>
                       </div>
                       
                       <!-- Cancel Collection Toggle -->

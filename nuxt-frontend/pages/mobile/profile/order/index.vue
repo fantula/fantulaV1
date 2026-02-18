@@ -77,9 +77,9 @@
                     {{ confirmModalMessage }}
                 </div>
                 <div class="modal-footer">
-                    <button class="modal-btn cancel" @click="confirmModalVisible = false">我不取消</button>
+                    <button class="modal-btn cancel" @click="confirmModalVisible = false">{{ confirmModalType === 'pending' ? '我不取消' : '我再想想' }}</button>
                     <button class="modal-btn confirm" @click="handleConfirmDelete" :disabled="confirmLoading">
-                        {{ confirmLoading ? '处理中...' : '确认取消' }}
+                        {{ confirmLoading ? '处理中...' : (confirmModalType === 'pending' ? '确认取消' : '确认删除') }}
                     </button>
                 </div>
             </div>
@@ -106,7 +106,7 @@ const route = useRoute()
 
 const {
   filteredList, currentTab, tabs, loadList, changeTab,
-  deletePreOrder
+  deletePreOrder, deleteOrder
 } = useOrderList()
 
 const { displayList, loading, finished, loadMore, reset } = useInfiniteScroll<any>({
@@ -167,12 +167,11 @@ const handleConfirmDelete = async () => {
                 confirmModalVisible.value = false
             } else showToast('操作失败', 'error')
         } else {
-            // Mock cleanup
-            setTimeout(() => {
+            const success = await deleteOrder(confirmTargetItem.value.id, false)
+            if (success) {
                 showToast('记录已清理', 'success')
                 confirmModalVisible.value = false
-                loadList()
-            }, 500)
+            } else showToast('操作失败', 'error')
         }
     } catch(e) { console.error(e) }
     finally { confirmLoading.value = false }
@@ -183,13 +182,7 @@ const handleConfirmDelete = async () => {
 .mobile-order-page {
     min-height: 100vh;
     display: flex; flex-direction: column;
-    background: #0F172A; /* Global BG */
-}
-
-.mobile-order-page {
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    background: #020617; /* Very Dark BG */
+    background: #020617;
     padding-bottom: 40px;
 }
 

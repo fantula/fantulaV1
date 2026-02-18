@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ProductDetailSheet from '@/components/mobile/goods/ProductDetailSheet.vue'
 import { useProductDetail } from '@/composables/client/useProductDetail' // Import composable
@@ -52,10 +52,10 @@ useHead({
 })
 
 onMounted(() => {
-    // Open sheet immediately on enter
-    setTimeout(() => {
+    // Open sheet immediately after DOM is ready
+    nextTick(() => {
         sheetVisible.value = true
-    }, 100)
+    })
 })
 
 // If user closes sheet (visible -> false), we should navigate back

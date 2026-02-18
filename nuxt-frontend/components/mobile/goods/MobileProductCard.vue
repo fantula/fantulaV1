@@ -48,12 +48,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Goods } from '@/types/api'
+import { useBizFormat } from '@/composables/common/useBizFormat'
 
 const props = defineProps<{
   goods: Goods
 }>()
 
 defineEmits(['click'])
+
+const { formatPrice, formatSales } = useBizFormat()
 
 // Helpers
 const tags = computed(() => {
@@ -63,19 +66,6 @@ const tags = computed(() => {
     if (typeof t === 'string' && t.includes(',')) return t.split(',')
     return [t as string]
 })
-
-const formatPrice = (price: number | string | undefined) => {
-  if (price === undefined || price === null) return '0.00'
-  const num = typeof price === 'string' ? parseFloat(price) : price
-  return num.toFixed(2)
-}
-
-const formatSales = (val: number | string) => {
-  const num = Number(val)
-  if (num >= 10000) return (num / 10000).toFixed(1) + 'w'
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
-  return num
-}
 
 const getBadgeClass = (label: string) => {
   const map: Record<string, string> = {

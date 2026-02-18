@@ -75,7 +75,7 @@ const fetchWallet = async () => {
         transactions.value = res.data.transactions || []
     }
   } finally {
-    setTimeout(() => { loading.value = false }, 300) // Small delay for smooth transition
+    loading.value = false
   }
 }
 

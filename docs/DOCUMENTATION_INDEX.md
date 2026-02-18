@@ -44,6 +44,7 @@ docs/
 ├── AI_SOP.md                  # AI 协作标准作业程序
 ├── AI_WORKFLOW.md             # AI 工程师工作流程主框架
 ├── AI_TASK_DISPATCH.md        # 🆕 AI 下级助理任务派遣体系
+├── SCAN_AUDIT_LOG.md          # 🆕 系统扫描审计日志（历史 SCAN 记录，后续扫描先读此文档）
 ├── SERVER_DEPLOYMENT.md       # 服务器部署核心文档
 ├── MAINTENANCE.md             # 运维与故障排查手册
 ├── CHANGE_MANAGEMENT.md       # 变更管理规范
@@ -55,6 +56,7 @@ docs/
 ├── architecture/              # 架构图与设计文档
 ├── backend/                   # 后端 (Supabase/PostgreSQL/Edge Functions)
 ├── business_rules/            # 业务逻辑规则 (订单、支付、会员等)
+│   ├── ORDER_DELETE_RULES.md  # 🆕 订单删除/隐藏业务规则 (软删除原则)
 ├── client/                    # PC 端前端 (Nuxt)
 ├── guides/                    # 开发指南 (部署、弹窗、主题等)
 ├── mobile/                    # 移动端前端 (H5)

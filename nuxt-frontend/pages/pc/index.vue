@@ -129,32 +129,23 @@ const handleCategoryChange = async (categoryId: string | number) => {
 const isMounted = ref(false)
 
 // 4. First Visit Animation Logic
-const showLoader = ref(true) // Default to TRUE to prevent FOUC
+// The inline script in nuxt.config.ts already set localStorage and added body class
+// synchronously before Vue hydrates. We just need to read the result of that.
+// This eliminates the "content flash before loader appears" completely.
+const showLoader = ref(import.meta.client
+  ? document.body.classList.contains('show-pc-loader')
+  : false
+)
 const GlobalLoader = defineAsyncComponent(() => import('@/components/shared/GlobalLoader.vue'))
 
 onMounted(() => {
-  // Check if first visit today
-  const today = new Date().toDateString()
-  const lastVisit = localStorage.getItem('fantula_pc_visit')
-
-  // Scenario A: Return Visitor (Visited Today) -> Instant Entry
-  if (lastVisit === today) {
-    showLoader.value = false
-  } 
-  // Scenario B: First Visit -> Keep Loading (Animation plays)
-  else {
-    localStorage.setItem('fantula_pc_visit', today)
-  }
-
   // 预加载弹窗素材（消除闪烁）
   preloadModalAssets()
-  
+
   // Hydration Safety
   isMounted.value = true
-  
+
   // 初始化页面数据 (传入 URL 中的 classify_id)
-  // Note: Data is already fetched by SSR/Hydration in useHomeData
-  // But we might need to handle specific query param if it differs from default
   const queryCategoryId = route.query.category_id ? String(route.query.category_id) : undefined
   if (queryCategoryId) {
       initData(queryCategoryId)
@@ -162,10 +153,9 @@ onMounted(() => {
 })
 
 const handleLoaderFinish = () => {
-  // Fade out
-  setTimeout(() => {
-    showLoader.value = false
-  }, 500)
+  showLoader.value = false
+  // Remove the static CSS overlay class now that Vue's GlobalLoader takes over
+  document.body.classList.remove('show-pc-loader')
 }
 
 const modal = useModalStore()

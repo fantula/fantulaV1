@@ -74,7 +74,55 @@ export default defineNuxtConfig({
       style: [
         { innerHTML: 'html, body { background-color: #020617 !important; }' },
         // Nuclear Guard: Force hide PC layout on mobile (CSS > JS execution time)
-        { innerHTML: '@media (max-width: 768px) { .app-wrapper { display: none !important; } }' }
+        { innerHTML: '@media (max-width: 768px) { .app-wrapper { display: none !important; } }' },
+        // PC Loader: Static CSS overlay shown immediately before Vue hydrates
+        // Prevents "content flash before loader appears" on first daily visit
+        {
+          innerHTML: `
+body.show-pc-loader::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background-color: #020617;
+  background-image: radial-gradient(circle at center, #1e293b 0%, #020617 70%);
+}
+body.show-pc-loader::after {
+  content: '凡图拉';
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255,255,255,0.3);
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+}`.trim()
+        }
+      ],
+      // Inject inline script BEFORE Vue bundle: check localStorage and set body class
+      // This runs synchronously during HTML parsing, eliminating the loader flash
+      script: [
+        {
+          innerHTML: `(function(){
+  try {
+    var p = window.location.pathname;
+    if (p === '/' || p === '/pc' || p.startsWith('/pc/') || p === '/pc/index') {
+      var today = new Date().toDateString();
+      var last = localStorage.getItem('fantula_pc_visit');
+      if (last !== today) {
+        localStorage.setItem('fantula_pc_visit', today);
+        document.body.classList.add('show-pc-loader');
+      }
+    }
+  } catch(e) {}
+})();`,
+          type: 'text/javascript'
+        }
       ]
     }
   },

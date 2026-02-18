@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { Search, Plus, Service } from '@element-plus/icons-vue'
 import { supabaseFaqApi } from '@/api/client/supabase'
@@ -154,10 +154,10 @@ const checkUrlQuery = () => {
         if (target) {
             if (target.category_id) activeCategoryId.value = target.category_id
             expandedId.value = qId
-            setTimeout(() => {
+            nextTick(() => {
                 const el = document.getElementById(`faq-${qId}`)
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            }, 300)
+            })
         }
     }
 }

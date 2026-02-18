@@ -40,13 +40,13 @@ pm2 flush
 
 ## 二、部署与更新流程 (Deployment Workflows)
 
-所有部署必须使用 standardized script: `./scripts/deploy.sh`。
+所有部署必须使用 standardized script: `./deploy.sh`。
 
 ### 场景 A：快速修复 (Quick Fix)
 **适用**：前端文案、样式、JS 逻辑修改（不涉及依赖变更）。
 **操作**：
 ```bash
-./scripts/deploy.sh staging quick
+./deploy.sh staging quick
 ```
 **原理**：
 - 仅同步代码文件 (`.output` 目录，排除 node_modules)
@@ -57,7 +57,7 @@ pm2 flush
 **适用**：`package.json` 变更、升级依赖、增加新功能模块。
 **操作**：
 ```bash
-./scripts/deploy.sh staging full
+./deploy.sh staging full
 ```
 **原理**：
 - 同步代码
@@ -90,7 +90,7 @@ chown -R root:root /opt/fantula
 ### 3.2 首次部署
 在本地执行完整发布：
 ```bash
-./scripts/deploy.sh staging full
+./deploy.sh staging full
 ```
 
 ### 3.3 环境变量恢复
@@ -104,7 +104,7 @@ chown -R root:root /opt/fantula
 **原因**：二进制文件架构不兼容 (Mac ARM64 上传到了 Linux x64)。
 **解决**：
 1. 不要上传 `node_modules` (deploy.sh 默认已排除)。
-2. 执行一次完整部署：`./scripts/deploy.sh staging full` 强制重装依赖。
+2. 执行一次完整部署：`./deploy.sh staging full` 强制重装依赖。
 
 ### Q: 部署卡在 `npm install`
 **原因**：国内网络连接 GitHub/NPM 官方源超时。

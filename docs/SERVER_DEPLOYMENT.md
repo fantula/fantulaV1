@@ -1,6 +1,6 @@
 # 服务器部署文档
 
-> 最后更新: 2026-02-13
+> 最后更新: 2026-02-18
 
 ---
 
@@ -44,7 +44,7 @@
 
 ## 三、标准化部署流程 (Standard Deployment)
 
-> **唯一操作入口**：`./scripts/deploy.sh`
+> **唯一操作入口**：`./deploy.sh`（项目根目录）
 > 详情参考：`docs/guides/DEPLOYMENT_STANDARD.md`
 
 ### 3.1 常用命令
@@ -52,18 +52,33 @@
 ```bash
 # === 场景 A: 快速更新 (Quick Fix) ===
 # 仅同步代码，重启服务 (不重装依赖)
-./scripts/deploy.sh staging quick
+./deploy.sh prod quick
 
 # === 场景 B: 完整发布 (Full Release) ===
 # 同步代码 + 清理/重装依赖 (自动使用国内镜像)
-./scripts/deploy.sh staging full
+./deploy.sh prod full
+
+# === 场景 C: 仅更新 Nginx 配置 ===
+./deploy.sh prod nginx-only
 ```
 
 ### 3.2 部署原理
-1.  **Local Build**: 本地构建 `.output`。
-2.  **Rsync**: 增量同步 (排除 `node_modules` 以节省带宽和保护环境)。
-3.  **Remote Install** (Full模式): 服务器端使用国内镜像 (`npmmirror`) 重装 Linux 依赖。
-4.  **Restart**: `pm2 reload` 实现零停机重启。
+1.  **Pre-flight**: SSH 连通性检查，生产环境二次确认。
+2.  **Local Build**: 本地构建 `.output`。
+3.  **Rsync**: 增量同步 (排除 `node_modules` 以节省带宽和保护环境)。
+4.  **Nginx Sync**: 自动将 `config/nginx-prod.conf` 同步到服务器并重载。
+5.  **Remote Install** (Full模式): 服务器端使用国内镜像 (`npmmirror`) 重装 Linux 依赖。
+6.  **Restart**: `pm2 reload` 实现零停机重启。
+7.  **Health Check**: 部署后自动 curl 验证返回 200。
+8.  **Version Tag**: 成功后自动 `git tag deploy-YYYYMMDD-HHMMSS`。
+
+### 3.3 Nginx 配置管理
+
+Nginx 配置的 **唯一真理源** 是 `config/nginx-prod.conf`。
+
+- 修改 Nginx 配置 → 编辑 `config/nginx-prod.conf` → 提交 → 部署
+- **禁止** 直接在服务器上编辑 Nginx 配置
+- 部署时 deploy.sh 会自动将配置同步到 `/etc/nginx/sites-available/fantula.conf`
 
 ---
 

@@ -193,6 +193,7 @@ const loadData = async () => {
     if (prodRes.success) allProductList.value = prodRes.products || []
   } catch (e) {
     console.error('Failed to load dependency data')
+    ElMessage.error('加载基础数据失败，请刷新重试')
   }
 
   if (!id) return

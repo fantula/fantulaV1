@@ -97,7 +97,7 @@ const emit = defineEmits<{
   (e: 'click', id: string | number): void
 }>()
 
-const { formatPrice } = useBizFormat()
+const { formatPrice, formatSales } = useBizFormat()
 
 // Helper Functions
 const getBadgeClass = (label: string) => {
@@ -109,12 +109,6 @@ const getBadgeClass = (label: string) => {
     '优惠': 'bg-promo'
   }
   return map[label] || ''
-}
-
-const formatSales = (val: number) => {
-  if (val >= 10000) return (val / 10000).toFixed(1) + 'w+'
-  if (val >= 1000) return (val / 1000).toFixed(1) + 'k+'
-  return val
 }
 
 const tagsList = computed(() => {

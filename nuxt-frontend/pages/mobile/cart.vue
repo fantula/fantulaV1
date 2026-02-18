@@ -50,7 +50,7 @@
                 </div>
                 
                 <div class="ci-bottom">
-                   <div class="ci-price">¥<span class="price-val">{{ item.price }}</span></div>
+                   <div class="ci-price">¥<span class="price-val">{{ Number(item.price).toFixed(2) }}</span></div>
                    
                    <!-- Stepper -->
                    <div class="stepper" @click.stop>
@@ -82,12 +82,13 @@
              <span class="t-label">合计:</span>
              <span class="t-price">¥{{ totalPrice }}</span>
           </div>
-          <button 
-             class="btn-checkout" 
+          <button
+             class="btn-checkout"
              @click="handleCheckout"
-             :disabled="selectedIds.size === 0"
+             :disabled="selectedIds.size === 0 || checkoutLoading"
           >
-             去结算({{ totalCount }})
+             <span v-if="checkoutLoading" class="checkout-spinner"></span>
+             <span v-else>去结算({{ totalCount }})</span>
           </button>
        </div>
 
@@ -122,6 +123,7 @@ const cartStore = useCartStore()
 const { success, warning, error } = useNotify()
 
 const loading = ref(false)
+const checkoutLoading = ref(false)
 const isEditMode = ref(false)
 const selectedIds = ref<Set<string>>(new Set())
 
@@ -184,22 +186,28 @@ const handleDelete = async () => {
 
 const handleCheckout = async () => {
     if (selectedIds.value.size === 0) return warning('请选择商品')
-    
+    if (checkoutLoading.value) return
+
     const items = selectedItems.value
     const firstSku = items[0].skuId
     const isConsistent = items.every(i => i.skuId === firstSku)
-    
+
     if (!isConsistent) {
         return warning('暂不支持多规格同时结算')
     }
-    
+
     const totalQty = items.reduce((sum, i) => sum + i.quantity, 0)
-    
-    const res = await supabasePreOrderApi.createPreOrder(firstSku, totalQty, 'cart')
-    if (res.success && res.pre_order_id) {
-        router.push(`/mobile/checkout/${res.pre_order_id}`)
-    } else {
-        error(res.error || '结算失败')
+
+    checkoutLoading.value = true
+    try {
+        const res = await supabasePreOrderApi.createPreOrder(firstSku, totalQty, 'cart')
+        if (res.success && res.pre_order_id) {
+            router.push(`/mobile/checkout/${res.pre_order_id}`)
+        } else {
+            error(res.error || '结算失败')
+        }
+    } finally {
+        checkoutLoading.value = false
     }
 }
 </script>
@@ -375,10 +383,20 @@ const handleCheckout = async () => {
 }
 .btn-checkout:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3); }
 
-.btn-checkout:disabled { 
+.btn-checkout:disabled {
     opacity: 0.5; filter: grayscale(1); box-shadow: none; transform: none;
     background: #475569;
 }
+
+.checkout-spinner {
+   width: 16px; height: 16px;
+   border: 2px solid rgba(255,255,255,0.3);
+   border-top-color: #fff;
+   border-radius: 50%;
+   animation: checkout-spin 0.7s linear infinite;
+   display: inline-block;
+}
+@keyframes checkout-spin { to { transform: rotate(360deg); } }
 
 .btn-delete {
    background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);
