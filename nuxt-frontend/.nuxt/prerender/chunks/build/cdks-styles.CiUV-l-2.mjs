@@ -1,8 +1,0 @@
-const cdks_vue_vue_type_style_index_0_scoped_4846a93f_lang = ".page-tip-header[data-v-4846a93f]{display:flex;justify-content:center;margin-bottom:20px}.cdks-page[data-v-4846a93f]{display:flex;flex-direction:column;height:100%}.filter-group[data-v-4846a93f]{gap:10px}.filter-group[data-v-4846a93f],.linked-skus[data-v-4846a93f]{align-items:center;display:flex}.linked-skus[data-v-4846a93f]{flex-wrap:wrap;gap:4px}.more-tag[data-v-4846a93f]{color:#909399;font-size:12px}.code-text[data-v-4846a93f]{color:#333;font-family:monospace;font-size:13px}.time-text[data-v-4846a93f]{color:#666;font-size:12px}";
-
-const cdksStyles_CiUVL2 = [
-  cdks_vue_vue_type_style_index_0_scoped_4846a93f_lang
-];
-
-export { cdksStyles_CiUVL2 as default };
-//# sourceMappingURL=cdks-styles.CiUV-l-2.mjs.map

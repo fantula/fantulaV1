@@ -1,8 +1,0 @@
-const RedemptionCard_vue_vue_type_style_index_0_scoped_b06bbd07_lang = ".redemption-card[data-v-b06bbd07]{background:linear-gradient(135deg,#f973161a,#3b82f61a);border:1px solid rgba(249,115,22,.2);border-radius:20px;flex-shrink:0;margin:24px 32px;overflow:hidden}.redemption-header[data-v-b06bbd07]{align-items:center;border-bottom:1px solid hsla(0,0%,100%,.05);display:flex;gap:12px;padding:20px 24px}.redemption-icon[data-v-b06bbd07]{color:#f97316;font-size:24px}.redemption-title[data-v-b06bbd07]{color:#fff;font-size:16px;font-weight:600}.redemption-body[data-v-b06bbd07]{padding:24px}.input-group[data-v-b06bbd07]{display:flex;gap:12px;margin-bottom:12px}.redemption-input[data-v-b06bbd07]{background:#0000004d;border:1px solid hsla(0,0%,100%,.1);border-radius:12px;color:#fff;flex:1;font-size:15px;height:48px;outline:none;padding:0 20px;transition:all .3s}.redemption-input[data-v-b06bbd07]:focus{border-color:#f97316;box-shadow:0 0 0 3px #f973161a}.redemption-input[data-v-b06bbd07]::-moz-placeholder{color:#64748b}.redemption-input[data-v-b06bbd07]::placeholder{color:#64748b}.redemption-btn-wrapper[data-v-b06bbd07]{height:48px}.redemption-tips[data-v-b06bbd07]{color:#64748b;font-size:12px;margin:0}";
-
-const RedemptionCardStyles__05w2SE = [
-  RedemptionCard_vue_vue_type_style_index_0_scoped_b06bbd07_lang
-];
-
-export { RedemptionCardStyles__05w2SE as default };
-//# sourceMappingURL=RedemptionCard-styles.-_05w2SE.mjs.map

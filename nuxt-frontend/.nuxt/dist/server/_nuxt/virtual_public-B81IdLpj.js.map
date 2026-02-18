@@ -1,1 +1,0 @@
-{"version":3,"file":"virtual_public-B81IdLpj.js","sources":["../../../../virtual:public?%2Fimages%2Fshared%2Flogo_v3.png"],"sourcesContent":["import { publicAssetsURL } from '#internal/nuxt/paths';export default publicAssetsURL(\"/images/shared/logo_v3.png\")"],"names":[],"mappings":";AAAuD,MAAA,aAAe,gBAAgB,4BAA4B;"}

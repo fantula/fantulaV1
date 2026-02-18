@@ -1,1 +1,0 @@
-import{f as i,O as u,X as c,j as r}from"./DzJfV88A.js";const p=()=>{const n=r(null),a=async()=>{const s=c(),{data:e}=await s.auth.getSession();return n.value=e.session,s};let t=null;return i(async()=>{{const s=await a(),{data:e}=s.auth.onAuthStateChange((l,o)=>{n.value=o});t=e.subscription}}),u(()=>{t&&t.unsubscribe()}),n};export{p as u};

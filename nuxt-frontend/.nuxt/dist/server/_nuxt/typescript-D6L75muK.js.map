@@ -1,1 +1,0 @@
-{"version":3,"file":"typescript-D6L75muK.js","sources":["../../../../node_modules/element-plus/es/utils/typescript.mjs"],"sourcesContent":["const mutable = (val) => val;\n\nexport { mutable };\n//# sourceMappingURL=typescript.mjs.map\n"],"names":[],"mappings":"AAAK,MAAC,UAAU,CAAC,QAAQ;","x_google_ignoreList":[0]}

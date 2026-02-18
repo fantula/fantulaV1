@@ -1,1 +1,0 @@
-{"file":"typescript-D6L75muK.js","mappings":"AAAK,MAAC,UAAU,CAAC,QAAQ;","names":[],"sources":["../../../../node_modules/element-plus/es/utils/typescript.mjs"],"sourcesContent":["const mutable = (val) => val;\n\nexport { mutable };\n//# sourceMappingURL=typescript.mjs.map\n"],"version":3}
