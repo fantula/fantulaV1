@@ -17,6 +17,11 @@ const express = require('express')
 const cron = require('node-cron')
 const { createClient } = require('@supabase/supabase-js')
 
+// 全局错误兜底：防止未捕获的 Promise 错误导致进程崩溃
+process.on('unhandledRejection', (reason) => {
+  console.error(`[Scheduler] Unhandled rejection:`, reason)
+})
+
 const app = express()
 app.use(express.json())
 
@@ -268,9 +273,15 @@ function startScheduler() {
 
       for (const taskName of group.tasks) {
         if (tasks[taskName]) {
-          const result = await tasks[taskName]()
-          schedulerState.lastRun = new Date().toISOString()
-          schedulerState.lastResult = result
+          try {
+            const result = await tasks[taskName]()
+            schedulerState.lastRun = new Date().toISOString()
+            schedulerState.lastResult = result
+          } catch (err) {
+            console.error(`[Scheduler] Task ${taskName} failed:`, err.message)
+            schedulerState.lastRun = new Date().toISOString()
+            schedulerState.lastResult = { task: taskName, error: err.message }
+          }
         }
       }
     })

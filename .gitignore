@@ -15,4 +15,19 @@ npm-debug.log
 # Supabase
 supabase/.temp/
 supabase/functions/*/deno.d/
-node_modules/
+
+# Build output
+.output/
+.nuxt/
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+
+# Debug / diagnostic artifacts
+supabase_status.txt
+script-usage.txt
+nuxt-frontend/supabase_status.txt
+nuxt-frontend/script-usage.txt

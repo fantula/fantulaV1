@@ -47,13 +47,14 @@
 
 ### 使用方式
 ```bash
-# 部署到测试环境 (Staging)
-./deploy.sh staging quick   # 快速更新 (仅代码)
-./deploy.sh staging full    # 完整发布 (含依赖重装)
-
-# 部署到生产环境 (Prod) - *需二次确认*
+# 快速更新 (仅代码，不重装依赖)
 ./deploy.sh prod quick
+
+# 完整发布 (含依赖重装)
 ./deploy.sh prod full
+
+# 仅更新 Nginx 配置 (不重新构建)
+./deploy.sh prod nginx-only
 ```
 
 ### 脚本规范 (`deploy.sh`)
@@ -103,13 +104,25 @@
 
 ---
 
-## 6. 回滚方案 (Rollback)
+## 6. Nginx 配置管理
 
-如果部署失败，采用“重新部署旧版本”策略（因本地构建只有一份 .output，即时回滚需依赖 Git）：
+Nginx 配置通过 `config/nginx-prod.conf` 版本控制，部署时自动同步。
 
-1.  本地 `git checkout v1.0.0` (上一个稳定 tag)。
-2.  本地 `npm run build`。
-3.  执行 `./deploy.sh staging full`。
+- **配置源**: `config/nginx-prod.conf`（唯一真理源）
+- **服务器位置**: `/etc/nginx/sites-available/fantula.conf`
+- **修改流程**: 编辑本地文件 → 提交 → `./deploy.sh prod quick` 或 `./deploy.sh prod nginx-only`
+- **禁止** 直接在服务器上修改 Nginx 配置
+
+---
+
+## 7. 回滚方案 (Rollback)
+
+部署成功后会自动打 `deploy-YYYYMMDD-HHMMSS` 标签。回滚流程：
+
+1.  `git tag` 查看可用标签。
+2.  `git checkout deploy-YYYYMMDD-HHMMSS`（上一个稳定标签）。
+3.  `npm run build`。
+4.  `./deploy.sh prod full`。
 
 ---
 
