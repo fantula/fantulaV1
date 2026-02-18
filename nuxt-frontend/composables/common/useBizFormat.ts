@@ -61,9 +61,23 @@ export function useBizFormat() {
         return `${minutes}分钟`
     }
 
+    /**
+     * 格式化销量
+     * 规则: >= 10000 显示 Xw+，>= 1000 显示 Xk+，其余显示原数字
+     * @param val 销量数值或字符串
+     */
+    const formatSales = (val: number | string | null | undefined): string => {
+        const num = Number(val)
+        if (isNaN(num)) return '0'
+        if (num >= 10000) return (num / 10000).toFixed(1) + 'w+'
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'k+'
+        return String(num)
+    }
+
     return {
         formatPrice,
         formatDate,
-        formatRemainingTime
+        formatRemainingTime,
+        formatSales
     }
 }

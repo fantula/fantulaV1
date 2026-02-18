@@ -129,22 +129,19 @@ const handleCategoryChange = async (categoryId: string | number) => {
 const isMounted = ref(false)
 
 // 4. First Visit Animation Logic
-const showLoader = ref(true) // Default to TRUE to prevent FOUC
+// Synchronously check localStorage on client to avoid loader flash for return visitors
+const isFirstVisitToday = (): boolean => {
+  if (!import.meta.client) return false
+  const today = new Date().toDateString()
+  const lastVisit = localStorage.getItem('fantula_pc_visit')
+  if (lastVisit === today) return false
+  localStorage.setItem('fantula_pc_visit', today)
+  return true
+}
+const showLoader = ref(import.meta.client ? isFirstVisitToday() : false)
 const GlobalLoader = defineAsyncComponent(() => import('@/components/shared/GlobalLoader.vue'))
 
 onMounted(() => {
-  // Check if first visit today
-  const today = new Date().toDateString()
-  const lastVisit = localStorage.getItem('fantula_pc_visit')
-
-  // Scenario A: Return Visitor (Visited Today) -> Instant Entry
-  if (lastVisit === today) {
-    showLoader.value = false
-  } 
-  // Scenario B: First Visit -> Keep Loading (Animation plays)
-  else {
-    localStorage.setItem('fantula_pc_visit', today)
-  }
 
   // 预加载弹窗素材（消除闪烁）
   preloadModalAssets()
@@ -162,10 +159,7 @@ onMounted(() => {
 })
 
 const handleLoaderFinish = () => {
-  // Fade out
-  setTimeout(() => {
-    showLoader.value = false
-  }, 500)
+  showLoader.value = false
 }
 
 const modal = useModalStore()

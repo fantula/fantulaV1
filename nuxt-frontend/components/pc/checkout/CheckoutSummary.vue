@@ -62,7 +62,8 @@
         :theme-id="isBalanceInsufficient ? 'secondary' : 'marketing-buy'"
         @click="handlePayClick"
       >
-        <span v-if="isBalanceInsufficient">额度不足，去充值</span>
+        <span v-if="countdownSeconds <= 0">订单已超时，请重新下单</span>
+        <span v-else-if="isBalanceInsufficient">额度不足，去充值</span>
         <span v-else>立即支付 {{ amountDetails.final.toFixed(2) }} 点</span>
       </BaseButton>
 

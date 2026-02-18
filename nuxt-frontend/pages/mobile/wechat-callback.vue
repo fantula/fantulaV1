@@ -52,7 +52,7 @@
         <div class="form-agreement">
           <label>
             <input type="checkbox" v-model="bindForm.agree" />
-            <span>同意 <span class="link">用户协议</span> 和 <span class="link">隐私政策</span></span>
+            <span>同意 <NuxtLink to="/policy" target="_blank" class="link">用户协议</NuxtLink> 和 <NuxtLink to="/privacy" target="_blank" class="link">隐私政策</NuxtLink></span>
           </label>
         </div>
 

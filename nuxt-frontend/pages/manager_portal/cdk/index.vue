@@ -7,17 +7,17 @@ definePageMeta({
   ssr: false
 })
 
-import { onMounted, onActivated, nextTick } from 'vue'
+import { onMounted, nextTick } from 'vue'
 
 const router = useRouter()
 
-const redirect = async () => {
+onMounted(async () => {
     await nextTick()
-    router.replace(adminRoute('cdk/virtual'))
-}
-
-onMounted(() => redirect())
-onActivated(() => redirect())
+    const target = adminRoute('cdk/virtual')
+    if (router.currentRoute.value.path !== target) {
+        router.replace(target).catch(() => {})
+    }
+})
 </script>
 
 <template>

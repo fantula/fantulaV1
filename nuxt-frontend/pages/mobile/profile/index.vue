@@ -3,7 +3,7 @@
     
     <!-- 1. Premium Member Card (Header) -->
     <div class="header-container">
-        <MobileProfileHeader :user="userInfo" @click="router.push(mobileRoutes.profile())" />
+        <MobileProfileHeader :user="userInfo" @click="router.push(mobileRoutes.profileAccount())" />
     </div>
 
     <!-- 2. Wallet / Quota Card -->
@@ -100,7 +100,6 @@
             @click="router.push(mobileRoutes.profileMessages())" 
         />
 
-        <!-- Settings Link Removed as requested -->
 
     </div>
 
@@ -128,7 +127,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   ArrowRight, Wallet, Box,
-  Ticket, Star, Headset, Bell, Monitor, RefreshRight, ShoppingCart // Import ShoppingCart Icon
+  Ticket, Star, Headset, Bell, Monitor, RefreshRight, ShoppingCart
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart' // Import Cart Store

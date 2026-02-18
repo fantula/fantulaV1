@@ -1,6 +1,6 @@
 # AI 助理中心调度手册
 
-> **版本**: V3.2 | **更新时间**: 2026-02-18
+> **版本**: V3.5 | **更新时间**: 2026-02-18
 > **你是谁**: 你是被派遣来执行任务的 AI 助理。
 > **本文档的作用**: 你收到任务后，必须阅读本文档。它会告诉你该读哪些文档、按什么步骤做、最后更新哪些文档。
 
@@ -96,11 +96,12 @@
   ③ docs/SHARED_LOGIC_REFERENCE.md               → 共享逻辑（PC/Mobile 复用）
 
 按需读：
-  ④ config/client-routes.ts                → 🆕 客户端路由常量
+  ④ config/client-routes.ts                → 🆕 客户端路由常量（唯一真理源，禁止硬编码路由字符串）
   ⑤ docs/client/GLOBAL_COMPONENT_GUIDE.md         → 全局组件
   ⑥ docs/client/STYLE_MAPPING.md / docs/mobile/STYLE_MAPPING.md
-  ⑦ docs/PERFORMANCE_OPTIMIZATION.md              → 性能问题时
+  ⑦ docs/PERFORMANCE_OPTIMIZATION.md              → 性能/加载状态问题时（含骨架屏规范、Loading 标准）
   ⑧ docs/guides/UI_THEME_STANDARD.md              → 样式问题时
+  ⑨ docs/business_rules/ORDER_DELETE_RULES.md     → 订单删除/隐藏问题时
 ```
 
 ### 领域 C：后端与运维
@@ -149,12 +150,24 @@
 
 | 模块关键词 | PC 页面 | 移动端页面 | 共享逻辑 |
 |---|---|---|---|
-| 路由路径 | — | — | `config/client-routes.ts` (🆕) |
-| 首页 | `pages/pc/index.vue` | `pages/mobile/index.vue` | — |
-| 商品详情 | `pages/pc/product/` | `pages/mobile/product/` | `composables/client/useProductDetail.ts` |
-| 订单 | `pages/pc/orders/` | `pages/mobile/orders/` | `composables/client/useOrderDetail.ts` |
-| 购物车 | — | — | `stores/client/cart.ts` |
-| 个人中心 | `pages/pc/profile/` | `pages/mobile/profile/` | `stores/client/user.ts` |
+| 路由路径 | — | — | `config/client-routes.ts` (🆕 唯一真理源) |
+| 首页 | `pages/pc/index.vue` | `pages/mobile/index.vue` | `composables/client/useHomeData.ts` |
+| 商品详情 | `pages/pc/product/[id].vue` | `components/mobile/goods/ProductDetailSheet.vue` | `composables/client/useProductDetail.ts` |
+| 购物车 | — | `pages/mobile/cart.vue` | `stores/client/cart.ts` |
+| 结算/支付 | `pages/pc/checkout/[id].vue` | `pages/mobile/checkout/[id].vue` | `composables/client/useCheckout.ts` |
+| 订单列表 | `pages/pc/profile/order/index.vue` | `pages/mobile/profile/order/index.vue` | `composables/client/useOrderList.ts` |
+| 订单详情 | `pages/pc/profile/order/[id].vue` | `pages/mobile/profile/order/[id].vue` | `composables/client/useOrderDetail.ts` |
+| 个人中心首页 | `pages/pc/profile/index.vue` | `pages/mobile/profile/index.vue` | `stores/client/user.ts` |
+| 账号设置 | `pages/pc/profile/index.vue` (ProfilePersonalInfo) | `pages/mobile/profile/account/index.vue` | — |
+| 钱包流水 | `pages/pc/profile/wallet.vue` | `pages/mobile/profile/wallet/index.vue` | — |
+| 工单 | `pages/pc/profile/tickets/index.vue` | `pages/mobile/profile/tickets/index.vue` | — |
+| 消息 | `pages/pc/profile/messages/index.vue` | `pages/mobile/profile/messages/index.vue` | — |
+| 收藏 | `pages/pc/profile/favorites.vue` | `pages/mobile/profile/favorites.vue` | — |
+| 兑换中心 | `pages/pc/profile/redemption/index.vue` | `pages/mobile/profile/redemption/index.vue` | — |
+| 商品频道 | `pages/pc/channel.vue` | `pages/mobile/channel.vue` | — |
+| 帮助/FAQ | `pages/pc/faq.vue` | `pages/mobile/help.vue` | — |
+| 微信登录 | — | `components/mobile/auth/MobileLoginSheet.vue` | `pages/mobile/wechat-callback.vue` |
+| 全局动画 | `pages/pc/index.vue` (showLoader) | — | `components/shared/GlobalLoader.vue` |
 
 ---
 
@@ -181,11 +194,12 @@
 4. 【诊断根因】
    按优先级排查：
    a. 事件绑定问题（@click 缺失/绑错函数）
-   b. 路由问题（路径拼错/没用 adminRoute/路由不存在）
+   b. 路由问题（路径拼错/没用 adminRoute 或 mobileRoutes/路由不存在）
    c. 组件通信问题（props/emit 断裂）
    d. 状态管理问题（loading 卡住/visible 没切换）
    e. API 问题（调用失败/错误被吞）
    f. 布局问题（Tab 匹配逻辑/NuxtPage vs router-view）
+   g. UX 反馈缺失（按钮无 disabled/spinner/文字切换 → 参见 PERFORMANCE_OPTIMIZATION.md §3）
 
 5. 【输出诊断报告】格式：
    ## 诊断报告: [问题描述]
@@ -200,13 +214,14 @@
 
 ### SCAN 流程（扫描检查）
 
+#### 后台管理端 SCAN 清单
 ```
 1. 打开目标模块的所有 .vue 和 .ts 文件
 2. 逐文件检查以下清单：
    - [ ] 使用 AdminDataTable（列表页）
    - [ ] 使用 AdminDataDialog / useAdminDialog（弹窗页）
    - [ ] 使用 PageTipHeader（所有页面）
-   - [ ] 使用 adminRoute()（所有路由跳转）
+   - [ ] 使用 adminRoute()（所有路由跳转，禁止硬编码字符串路径）
    - [ ] 使用 useBizFormat（格式化）
    - [ ] 使用 useBizConfig（状态标签）
    - [ ] 使用 <NuxtPage /> 而非 <router-view />（父布局页）
@@ -215,8 +230,30 @@
    - [ ] 所有异步操作有 loading 状态
    - [ ] 所有 API 调用有 try/catch + ElMessage 错误提示
    - [ ] 空状态有展示
+```
+
+#### 客户端（PC/移动端）SCAN 清单
+```
+逐文件检查：
+   - [ ] 使用 mobileRoutes.xxx() 或 pcRoutes.xxx()（禁止硬编码路由字符串）
+   - [ ] 价格展示调用 Number(price).toFixed(2)（不可直接渲染原始数字）
+   - [ ] 关键操作按钮：异步期间设置 loading ref + disabled + 文字/spinner 反馈
+         标准：loading ? '处理中...' : '立即购买'
+         参考：PERFORMANCE_OPTIMIZATION.md §3
+   - [ ] 无 setTimeout 伪造 API 延迟（应替换为真实调用）
+   - [ ] 无 console.log / console.error（开发调试代码已清除）
+   - [ ] 所有 API 调用包裹 try/finally，loading 在 finally 中重置
+   - [ ] 页面数据加载有骨架屏或 spinner（参考 PERFORMANCE_OPTIMIZATION.md §3）
+   - [ ] 微信登录/支付按钮：点击后立即 disabled + 显示 spinner
+   - [ ] 路由跳转使用 config/client-routes.ts 中的 mobileRoutes/pcRoutes（单一真理源）
+   - [ ] 页面切换使用 page-slide 过渡（nuxt.config.ts 已配置，不重复配置）
+```
+
+```
 3. 输出扫描报告，问题按严重度标注：
-   🔴 必须修复  🟡 建议修复  🟢 可选优化
+   🔴 必须修复（用户可见 Bug）
+   🟡 建议修复（潜在风险）
+   🟢 可选优化（代码质量）
 4. 标注：需更新的文档（如发现文档描述与实际代码不符）
 
    ⛔ 等用户确认后才能修改
@@ -367,8 +404,22 @@
 |---|---|
 | 请阅读本文档，修复 CDK 编辑按钮无法点击 | 领域A → FIX → cdk/ → 诊断 → 报告 → 确认 → 修 → 验证 → 更新文档 |
 | 上次没修好，请重新阅读本文档，重新诊断 CDK 问题 | 领域A → **RETRY** → 回顾上次 → 扩大排查 → 深层诊断 → 二次报告 |
-| 请阅读本文档，扫描订单模块 | 领域A → SCAN → orders/ → 全量检查 → 报告 |
+| 请阅读本文档，扫描订单模块 | 领域A → SCAN → orders/ → 后台SCAN清单 → 报告 |
 | 请阅读本文档，优化帮助中心代码 | 领域A → OPTIMIZE → help-center/ → 优化方案 |
-| 请阅读本文档，修复移动端首页加载慢 | 领域B → FIX → mobile/ → 性能诊断 |
+| 请阅读本文档，修复移动端首页加载慢 | 领域B → FIX → mobile/ → PERFORMANCE_OPTIMIZATION.md → 性能诊断 |
 | 请阅读本文档，排查系统 500 错误 | 领域C → FIX → GEMINI.md 场景A |
 | 请阅读本文档，检查优惠券模块样式一致性 | 领域A → SCAN → coupons/ → 样式检查 |
+| 请阅读本文档，检查移动端支付按钮有没有 loading | 领域B → SCAN → checkout/ → 客户端SCAN清单 → 报告 |
+| 请阅读本文档，修复移动端跳转到无效页面 | 领域B → FIX → config/client-routes.ts → 路由诊断 |
+| 请阅读本文档，扫描 PC 端和移动端全量检查 | 领域B → SCAN → 客户端SCAN清单 → 全页面扫描 → 报告 |
+| 请阅读本文档，扫描管理后台全量检查 | 领域A → SCAN → 后台SCAN清单 → 全页面扫描 → 报告 |
+
+---
+
+## 📝 扫描记录
+
+> 所有历史扫描记录已迁移至独立文档 → **[SCAN_AUDIT_LOG.md](SCAN_AUDIT_LOG.md)**
+>
+> - 执行 SCAN 任务后，请将结果追加到该文档
+> - 后续扫描前，先阅读该文档了解已检查范围，避免重复扫描
+> - 当前最新记录: **V3.5 专项修复 (2026-02-18)**

@@ -171,8 +171,8 @@ const MAX_PULL = 120
 const isMounted = ref(false)
 
 const pullText = computed(() => {
-  if (isRefreshing.value) return 'Refreshing...'
-  return pullDistance.value > PULL_THRESHOLD ? 'Release to Refresh' : 'Pull to Refresh'
+  if (isRefreshing.value) return '刷新中...'
+  return pullDistance.value > PULL_THRESHOLD ? '释放立即刷新' : '下拉刷新'
 })
 
 // RAF optimization for pull to refresh

@@ -57,7 +57,7 @@
                       <div class="pc-info">
                          <div class="pc-name">{{ product.name || product.title }}</div>
                          <div class="pc-price">
-                            ¥<span class="val">{{ product.price }}</span>
+                            ¥<span class="val">{{ Number(product.display_price || product.price).toFixed(2) }}</span>
                          </div>
                       </div>
                       <button class="pc-btn">购买</button>

@@ -150,6 +150,7 @@ const loadStats = async () => {
         }
     } catch (e) {
         console.error(e)
+        ElMessage.error('加载统计数据失败，请刷新重试')
     } finally {
         loading.value = false
     }

@@ -213,7 +213,7 @@ onMounted(() => {
 
 const handlePaySuccessClose = () => {
   showPaySuccess.value = false
-  router.push('/profile/orders')
+  router.push('/pc/profile/order')
 }
 </script>
 

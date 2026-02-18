@@ -54,11 +54,10 @@ const emit = defineEmits<{
 
 onMounted(() => {
   if (props.variant === 'initial') {
-    // Animation duration is roughly 2.5s
-    // We emit finish to let parent know animation sequence is done
+    // Animation duration is 1.8s, emit finish when done
     setTimeout(() => {
       emit('finish')
-    }, 2500)
+    }, 1800)
   }
 })
 </script>
@@ -155,7 +154,7 @@ onMounted(() => {
 }
 
 .rolling-track {
-  animation: roll-up 2.5s cubic-bezier(0.25, 1, 0.5, 1); /* Faster animation (2.5s) */
+  animation: roll-up 1.8s cubic-bezier(0.25, 1, 0.5, 1);
   animation-fill-mode: forwards;
 }
 

@@ -43,8 +43,7 @@ const targetType = computed(() => route.query.type ? typeMap[route.query.type] :
 
 onMounted(async () => {
     const res = await adminProductApi.getProducts()
-    // Dump raw data to see if product_type exists
-    console.log('Raw Products:', res.products)
+    if (import.meta.dev) console.log('Raw Products:', res.products)
     products.value = res.products
     loading.value = false
 })

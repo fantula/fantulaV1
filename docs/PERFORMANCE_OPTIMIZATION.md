@@ -29,6 +29,7 @@
 | 骨架屏 | GoodsSection 组件 | ✅ 部分实现 |
 | 弹窗资源预加载 | `utils/modalAssetPreloader.ts` | ✅ 已实现 |
 | 简单缓存 | `useSimpleCache` | ✅ 已实现 |
+| PC 首屏入场动画 | `components/shared/GlobalLoader.vue` | ✅ 已优化 (1.8s) |
 
 ### 1.2 使用 InfiniteScroll 的页面
 
@@ -377,6 +378,7 @@ npx nuxi devtools enable
 
 ### 优先级 P0 (紧急)
 
+- [x] PC 首屏入场动画优化 (GlobalLoader 1.8s, 移除额外延迟, 回访者零闪烁)
 - [ ] 创建 `ProductCardSkeleton.vue` 商品骨架屏组件
 - [ ] 确保所有列表页使用 `useInfiniteScroll`
 - [ ] 首页 AboutSection 改为懒加载

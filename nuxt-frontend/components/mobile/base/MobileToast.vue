@@ -1,17 +1,19 @@
 <template>
-  <Transition name="toast-slide">
-    <div v-if="isVisible" class="mobile-toast-wrapper" :class="type">
-      <div class="toast-glass-box">
-        <div class="icon-glow">
-           <el-icon v-if="type === 'success'"><CircleCheckFilled /></el-icon>
-           <el-icon v-else-if="type === 'error'"><CircleCloseFilled /></el-icon>
-           <el-icon v-else-if="type === 'warning'"><WarningFilled /></el-icon>
-           <el-icon v-else><InfoFilled /></el-icon>
+  <Teleport to="body">
+    <Transition name="toast-slide">
+      <div v-if="isVisible" class="mobile-toast-wrapper" :class="type">
+        <div class="toast-glass-box">
+          <div class="icon-glow">
+             <el-icon v-if="type === 'success'"><CircleCheckFilled /></el-icon>
+             <el-icon v-else-if="type === 'error'"><CircleCloseFilled /></el-icon>
+             <el-icon v-else-if="type === 'warning'"><WarningFilled /></el-icon>
+             <el-icon v-else><InfoFilled /></el-icon>
+          </div>
+          <span class="toast-text">{{ message }}</span>
         </div>
-        <span class="toast-text">{{ message }}</span>
       </div>
-    </div>
-  </Transition>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -27,7 +29,7 @@ const { isVisible, message, type } = useToast()
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%); /* Centered by default */
-  z-index: 9999;
+  z-index: 10002;
   pointer-events: none;
   width: auto;
   max-width: 80vw;
