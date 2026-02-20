@@ -12,8 +12,6 @@
           <div class="sub-title">EDIT RESOURCE</div>
         </div>
       </div>
-      <div class="header-center"></div>
-      <div class="header-right"></div>
     </div>
 
     <!-- Loading State -->

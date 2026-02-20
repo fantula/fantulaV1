@@ -108,7 +108,7 @@ const fetchFaqs = async () => {
       faqs.value = faqRes.faqs
     }
   } catch (e) {
-    console.error('Failed to fetch FAQs', e)
+    if (import.meta.dev) console.error('Failed to fetch FAQs', e)
   } finally {
     loading.value = false
   }

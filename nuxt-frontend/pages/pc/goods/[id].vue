@@ -199,6 +199,7 @@ import {
 } from '@element-plus/icons-vue'
 import { onMounted, onUnmounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { useProductDetail } from '@/composables/client/useProductDetail'
 import ProductGallery from '@/components/pc/goods/ProductGallery.vue'
 // FaqTicker is below fold mostly, can be async
@@ -208,7 +209,10 @@ import ProductDetailSkeleton from '@/components/pc/goods/ProductDetailSkeleton.v
 
 const LoginRegisterModal = defineAsyncComponent(() => import('@/components/pc/modal/LoginRegisterModal.vue'))
 
+import { useModalStore } from '@/stores/client/modal'
+
 const router = useRouter()
+const modal = useModalStore()
 const {
   goodsId,
   goodsData,
@@ -267,9 +271,9 @@ const { startAnimation: startFavAnimation } = useFlyingAnimation()
 
 const goToFaq = (faq: any) => {
   if (faq.id) {
-    router.push(`/faq?q=${faq.id}`)
+    router.push(`${pcRoutes.faq()}?q=${faq.id}`)
   } else {
-    router.push('/faq')
+    router.push(pcRoutes.faq())
   }
 }
 

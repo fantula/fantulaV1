@@ -158,6 +158,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { ElMessage } from 'element-plus'
 import { 
   ZoomIn, Guide
@@ -260,7 +261,7 @@ const handleAction = async (type: string) => {
   } 
   else if (type === 'view_ticket') {
     if (activeTicketId.value) {
-       router.push('/profile/tickets')
+       router.push(pcRoutes.profileTickets())
     }
   }
   else if (type === 'renew') {

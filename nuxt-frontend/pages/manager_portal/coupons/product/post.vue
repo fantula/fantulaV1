@@ -192,7 +192,7 @@ const loadData = async () => {
     if (catRes.success) categoryList.value = catRes.categories || []
     if (prodRes.success) allProductList.value = prodRes.products || []
   } catch (e) {
-    console.error('Failed to load dependency data')
+    if (import.meta.dev) console.error('Failed to load dependency data')
     ElMessage.error('加载基础数据失败，请刷新重试')
   }
 

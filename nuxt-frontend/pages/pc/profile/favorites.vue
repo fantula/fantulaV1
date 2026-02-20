@@ -127,6 +127,7 @@ definePageMeta({
  */
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { favoriteApi } from '@/api/client/common'
 import { clientOrderApi } from '@/api/client'
 import { useUserStore } from '@/stores/client/user'
@@ -213,7 +214,7 @@ const removeFavorite = async (favoriteId: string) => {
 
 
 const goShopping = () => {
-  router.push('/')
+  router.push(pcRoutes.home())
 }
 </script>
 

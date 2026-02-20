@@ -61,7 +61,7 @@
     <div v-else class="error-state">
       <el-icon><Warning /></el-icon>
       <p>文章不存在或已被删除</p>
-      <button class="back-link" @click="router.push('/community')">返回社区</button>
+      <button class="back-link" @click="router.push(pcRoutes.community())">返回社区</button>
     </div>
   </div>
 </template>
@@ -71,6 +71,7 @@ definePageMeta({
   layout: 'pc'
 })
 
+import { pcRoutes } from '@/config/client-routes'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Loading, ArrowLeft, Warning } from '@element-plus/icons-vue' // Star removed temporarily

@@ -30,7 +30,7 @@ async function uploadToR2(
     const method = 'PUT'
 
     const now = new Date()
-    const amzDate = now.toISOString().replace(/[:-]|\.\\d{3}/g, '')
+    const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '')
     const dateStamp = amzDate.slice(0, 8)
 
     const canonicalUri = `/${bucketName}/${fileName}`

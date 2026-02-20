@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <!-- 客服中心内容预留 -->
 </template>
 
 <script setup lang="ts">

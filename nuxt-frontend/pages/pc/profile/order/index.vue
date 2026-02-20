@@ -45,7 +45,7 @@
               <el-icon class="empty-icon"><Box /></el-icon>
             </div>
             <div class="empty-text">暂无{{ getCurrentTabLabel() }}记录</div>
-            <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
+            <button class="go-shopping-btn" @click="router.push(pcRoutes.home())">前往选购</button>
           </div>
           
           <!-- List -->
@@ -167,6 +167,7 @@
  */
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { Box, Picture, Delete, ArrowRight, Warning } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useOrderList } from '@/composables/client/useOrderList'
@@ -274,7 +275,7 @@ const handleConfirmDelete = async () => {
         ElMessage.error('操作失败')
     }
   } catch (e) {
-    console.error(e)
+    if (import.meta.dev) console.error(e)
     ElMessage.error('操作发生错误')
   } finally {
     confirmLoading.value = false

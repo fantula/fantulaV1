@@ -19,7 +19,6 @@
           <el-step title="确认添加" />
         </el-steps>
       </div>
-      <div class="header-right"></div>
     </div>
 
     <!-- Body -->

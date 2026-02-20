@@ -3,6 +3,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 export interface AdminImageCategory {
     id: string
     name: string
+    slug: string
     sort_order: number
     created_at: string
 }
@@ -44,8 +45,10 @@ export const adminImageCategoryApi = {
 
     /**
      * 创建图片分类
+     * @param name 显示名称（中文）
+     * @param slug URL 安全路径名（英文，用作 R2 文件夹名）
      */
-    async createCategory(name: string): Promise<{ success: boolean; category?: AdminImageCategory; error?: string }> {
+    async createCategory(name: string, slug?: string): Promise<{ success: boolean; category?: AdminImageCategory; error?: string }> {
         const client = getSupabaseClient()
         // 获取当前最大排序
         const { data: maxOrder } = await client
@@ -57,9 +60,18 @@ export const adminImageCategoryApi = {
 
         const nextOrder = (maxOrder?.sort_order || 0) + 1
 
+        // 自动生成 slug：将名称转为小写英文，替换非字母数字为连字符
+        const finalSlug = slug ||
+            name.toLowerCase()
+                .replace(/[\s_]+/g, '-')
+                .replace(/[^a-z0-9-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '') ||
+            `cat-${Date.now()}`
+
         const { data: category, error } = await client
             .from('image_categories')
-            .insert({ name, sort_order: nextOrder })
+            .insert({ name, slug: finalSlug, sort_order: nextOrder })
             .select()
             .single()
 

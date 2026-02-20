@@ -40,6 +40,7 @@ definePageMeta({
 import { useUserStore } from '@/stores/client/user'
 import { onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
 import ProfileHeader from '@/components/pc/profile/ProfileHeader.vue'
 
@@ -59,7 +60,7 @@ const router = useRouter()
 onMounted(() => {
   if (!userStore.isLoggedIn) {
      // 未登录则踢回首页
-     router.push('/')
+     router.push(pcRoutes.home())
      return
   }
   userStore.fetchUserInfo()
@@ -68,7 +69,7 @@ onMounted(() => {
 // 监听登录状态，防止在页面中登出
 watch(() => userStore.isLoggedIn, (loggedIn) => {
     if (!loggedIn) {
-        router.push('/')
+        router.push(pcRoutes.home())
     }
 })
 </script>

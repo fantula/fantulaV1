@@ -21,5 +21,4 @@ onActivated(() => redirect())
 </script>
 
 <template>
-  <div></div>
 </template>

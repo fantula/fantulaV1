@@ -19,7 +19,7 @@
       <div class="checkout-error" v-else-if="error">
         <div class="error-icon">⚠️</div>
         <p>{{ error }}</p>
-        <BaseButton themeId="secondary" @click="router.push('/')">返回首页</BaseButton>
+        <BaseButton themeId="secondary" @click="router.push(pcRoutes.home())">返回首页</BaseButton>
       </div>
 
       <!-- 正常结算 -->
@@ -122,6 +122,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { ArrowLeft, Timer, InfoFilled, QuestionFilled, ArrowDown } from '@element-plus/icons-vue'
 import { useCheckout } from '@/composables/client/useCheckout'
 // BalanceNotEnoughModal import removed
@@ -213,7 +214,7 @@ onMounted(() => {
 
 const handlePaySuccessClose = () => {
   showPaySuccess.value = false
-  router.push('/pc/profile/order')
+  router.push(pcRoutes.profileOrders())
 }
 </script>
 

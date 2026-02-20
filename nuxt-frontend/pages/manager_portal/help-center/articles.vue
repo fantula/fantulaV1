@@ -112,7 +112,7 @@ const fetchCategories = async () => {
     const { data } = await adminArticleApi.getCategories()
     categories.value = data || []
   } catch (error) {
-    console.error('Failed to fetch categories', error)
+    if (import.meta.dev) console.error('Failed to fetch categories', error)
     ElMessage.error('加载分类失败，请刷新重试')
   }
 }

@@ -136,7 +136,7 @@ const fetchMessages = async () => {
             messages.value = res.data.messages || []
         }
     } catch (e) {
-        console.error('Fetch messages failed', e)
+        if (import.meta.dev) console.error('Fetch messages failed', e)
         error.value = true
     } finally {
         loading.value = false

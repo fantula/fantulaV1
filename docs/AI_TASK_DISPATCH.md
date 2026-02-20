@@ -1,8 +1,9 @@
 # AI 助理中心调度手册
 
-> **版本**: V3.5 | **更新时间**: 2026-02-18
-> **你是谁**: 你是被派遣来执行任务的 AI 助理。
+> **版本**: V4.0 | **更新时间**: 2026-02-20
+> **你是谁**: 你是被项目经理（PM）派遣来执行特定任务的 AI 执行助手。你不是项目经理，你是执行者。
 > **本文档的作用**: 你收到任务后，必须阅读本文档。它会告诉你该读哪些文档、按什么步骤做、最后更新哪些文档。
+> **核心原则**: 只做被要求的事，不做没被要求的事。宁可少改一行，不可多改一行。
 
 ---
 
@@ -16,6 +17,10 @@
 │  4. 任务完成后，必须检查并更新受影响的文档                        │
 │  5. 修改一个文件时，不能破坏其他文件的功能                        │
 │  6. 严禁直接修改服务器代码（GEMINI.md 铁律）                     │
+│  7. console 语句用 if (import.meta.dev) 守卫，禁止直接删除       │
+│  8. 修改共享布局/父组件时，必须审计所有依赖的子页面              │
+│  9. import + 声明 ≠ 功能生效，必须验证模板中实际渲染了组件       │
+│ 10. composable 状态复用时，init 函数开头必须显式清空旧状态       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -159,7 +164,7 @@
 | 订单详情 | `pages/pc/profile/order/[id].vue` | `pages/mobile/profile/order/[id].vue` | `composables/client/useOrderDetail.ts` |
 | 个人中心首页 | `pages/pc/profile/index.vue` | `pages/mobile/profile/index.vue` | `stores/client/user.ts` |
 | 账号设置 | `pages/pc/profile/index.vue` (ProfilePersonalInfo) | `pages/mobile/profile/account/index.vue` | — |
-| 钱包流水 | `pages/pc/profile/wallet.vue` | `pages/mobile/profile/wallet/index.vue` | — |
+| 钱包/额度 | `pages/pc/profile/wallet.vue` | `pages/mobile/profile/wallet.vue` | `components/pc/modal/business/WalletRechargeModal.vue`、`components/mobile/profile/modals/RechargeModal.vue` |
 | 工单 | `pages/pc/profile/tickets/index.vue` | `pages/mobile/profile/tickets/index.vue` | — |
 | 消息 | `pages/pc/profile/messages/index.vue` | `pages/mobile/profile/messages/index.vue` | — |
 | 收藏 | `pages/pc/profile/favorites.vue` | `pages/mobile/profile/favorites.vue` | — |
@@ -168,6 +173,98 @@
 | 帮助/FAQ | `pages/pc/faq.vue` | `pages/mobile/help.vue` | — |
 | 微信登录 | — | `components/mobile/auth/MobileLoginSheet.vue` | `pages/mobile/wechat-callback.vue` |
 | 全局动画 | `pages/pc/index.vue` (showLoader) | — | `components/shared/GlobalLoader.vue` |
+
+---
+
+## 🔧 已知模式与修复规范（铁律补充，必须遵守）
+
+> 以下模式来自真实 Bug 修复经验，AI 执行助手必须在 SCAN / FIX / OPTIMIZE 时检查这些模式。
+
+### 模式 1: 移动端滚动容器
+
+**背景**: `layouts/mobile.vue` 的 `.mobile-content` 使用 `overflow: hidden`，因此每个移动端页面必须自带滚动容器。
+
+**规范**:
+```css
+.mobile-xxx-page {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* 禁止使用 min-height: 100vh 代替，会导致无法滚动 */
+}
+```
+
+**检查点**: 任何移动端页面如果只有 `min-height: 100vh` 而没有 `overflow-y: auto`，即为 Bug。
+
+### 模式 2: Console 守卫
+
+**背景**: 生产环境不应暴露 console 输出，但开发环境需要保留调试能力。
+
+**规范**:
+```typescript
+// ✅ 正确 — 生产环境被 tree-shaking 移除
+if (import.meta.dev) console.log('调试信息', data)
+
+// ✅ 正确 — 多条语句用 block
+if (import.meta.dev) {
+    console.log('请求参数:', params)
+    console.error('错误详情:', err)
+}
+
+// ❌ 错误 — 直接删除（丢失调试信息）
+// ❌ 错误 — 保留裸 console.log（泄露到生产环境）
+```
+
+### 模式 3: 组件渲染验证
+
+**背景**: Import 组件 + 声明响应式状态 + 绑定按钮事件 ≠ 功能生效。组件必须在 `<template>` 中实际渲染。
+
+**检查流程**:
+```
+发现 import XxxModal from '...'
+    → 检查 script 中是否有 visible/show 状态声明
+    → 检查 template 中是否有 <XxxModal :visible="..." />
+    → 三者缺一则为 Bug
+```
+
+**真实案例**: `wallet.vue` 中 `RechargeModal` 有 import 和 state，但模板中未渲染，导致按钮点击无反应。
+
+### 模式 4: Composable 状态重置
+
+**背景**: 当同一个 composable 被复用于不同数据（如切换商品），旧状态不会自动清除。
+
+**规范**:
+```typescript
+// ✅ 正确 — init 开头显式清空
+const _initConfig = async () => {
+    selectedSpecs.value = {}          // 清空上次选择
+    selectedSkuImage.value = ''       // 清空上次图片
+    // ... 然后设置新值
+}
+
+// ❌ 错误 — 条件赋值（旧值不会被覆盖）
+if (!selectedSpecs.value[key]) selectedSpecs.value[key] = newValue
+```
+
+### 模式 5: 布局变更影响审计
+
+**背景**: 修改 `layouts/mobile.vue` 的 overflow 属性，导致 11 个子页面丧失滚动能力。
+
+**规则**: 修改以下文件时，必须列出所有受影响页面并逐一验证：
+- `layouts/mobile.vue` → 所有 `pages/mobile/**/*.vue`
+- `layouts/pc.vue` → 所有 `pages/pc/**/*.vue`
+- `layouts/mgmt.vue` → 所有 `pages/manager_portal/**/*.vue`
+- `components/shared/BaseModal.vue` → 所有使用 BaseModal 的弹窗
+- `components/admin/base/AdminModuleLayout.vue` → 所有后台页面
+
+### 模式 6: CSS 残留清理
+
+**背景**: 设计迭代中产生的空 div、占位 CSS 留存在代码中。
+
+**SCAN 检查点**:
+- 空 `<div class="xxx"></div>`（无子内容、无功能）
+- CSS 规则中 `width: Xpx` 的空白占位块
+- 注释掉的旧样式代码块
 
 ---
 
@@ -230,6 +327,9 @@
    - [ ] 所有异步操作有 loading 状态
    - [ ] 所有 API 调用有 try/catch + ElMessage 错误提示
    - [ ] 空状态有展示
+   - [ ] console 语句已用 if (import.meta.dev) 守卫 → 参见 §模式2
+   - [ ] 已 import 的组件在 <template> 中实际渲染 → 参见 §模式3
+   - [ ] 无空 div 占位残留 → 参见 §模式6
 ```
 
 #### 客户端（PC/移动端）SCAN 清单
@@ -247,6 +347,12 @@
    - [ ] 微信登录/支付按钮：点击后立即 disabled + 显示 spinner
    - [ ] 路由跳转使用 config/client-routes.ts 中的 mobileRoutes/pcRoutes（单一真理源）
    - [ ] 页面切换使用 page-slide 过渡（nuxt.config.ts 已配置，不重复配置）
+   - [ ] 移动端页面有自己的滚动容器（height:100% + overflow-y:auto，不可只有 min-height:100vh）→ 参见 §模式1
+   - [ ] 已 import 的组件在 <template> 中实际渲染（特别是 Modal/Sheet 类组件）→ 参见 §模式3
+   - [ ] console 语句已用 if (import.meta.dev) 守卫（不是直接删除）→ 参见 §模式2
+   - [ ] composable init 函数开头是否清空上次状态（切换数据场景）→ 参见 §模式4
+   - [ ] 无空 div 占位残留（设计迭代遗留的空白块）→ 参见 §模式6
+   - [ ] 弹窗/Sheet 的宽度与内容匹配（无多余空白区域）
 ```
 
 ```
@@ -263,13 +369,23 @@
 
 ```
 1. 额外阅读 docs/admin/ADMIN_TEST_OPTIMIZATION_GUIDE.md 了解红线
-2. 识别优化点：
+2. 阅读上方 §已知模式与修复规范，了解已确认的修复模式
+3. 识别优化点：
    a. 可用全局组件替代的重复代码
    b. 可提取为 Composable 的重复逻辑
-   c. 无用代码（console.log、注释代码、未使用变量）
+   c. 无用代码（裸 console.log、注释死代码、未使用变量）
    d. 硬编码的颜色/路径/状态文案
-3. 输出优化方案
-   ⛔ 红线：不改变按钮业务效果、不改变 API 格式、不删除功能
+   e. 空 div 占位块、CSS 残留样式（§模式6）
+   f. 移动端缺失滚动容器的页面（§模式1）
+   g. import 了但未在 template 渲染的组件（§模式3）
+4. 输出优化方案
+   ⛔ 红线（违反任何一条视为任务失败）：
+   - 不改变按钮业务效果
+   - 不改变 API 调用格式
+   - 不删除功能
+   - 不改变现有页面的滚动行为（除非是修复缺失的滚动容器）
+   - 不删除 import.meta.dev 守卫下的 console 语句
+   - 不修改共享布局文件（layouts/*.vue）的 overflow/height/position
    ⛔ 等用户确认
 ```
 
@@ -383,6 +499,10 @@
 8. 【新增规则】发现了应该加入规范的新模式？
    → 更新对应的规范文档
    → 在 docs/admin/README.md 更新日志中记录
+
+9. 【模式发现】修复过程中发现了可复用的模式？
+   → 更新 AI_TASK_DISPATCH.md §已知模式与修复规范
+   → 在 SCAN_AUDIT_LOG.md 追加记录
 ```
 
 ### 文档更新格式
@@ -413,6 +533,10 @@
 | 请阅读本文档，修复移动端跳转到无效页面 | 领域B → FIX → config/client-routes.ts → 路由诊断 |
 | 请阅读本文档，扫描 PC 端和移动端全量检查 | 领域B → SCAN → 客户端SCAN清单 → 全页面扫描 → 报告 |
 | 请阅读本文档，扫描管理后台全量检查 | 领域A → SCAN → 后台SCAN清单 → 全页面扫描 → 报告 |
+| 请阅读本文档，扫描移动端所有页面的滚动容器 | 领域B → SCAN → pages/mobile/ → §模式1检查 → 报告 |
+| 请阅读本文档，扫描客户端所有 console 语句 | 领域B → SCAN → 全量 grep console → §模式2检查 → 报告 |
+| 请阅读本文档，检查所有弹窗组件是否在模板中渲染 | 领域B → SCAN → grep import.*Modal → §模式3检查 → 报告 |
+| 请阅读本文档，扫描并优化后台管理界面 | 领域A → SCAN+OPTIMIZE → 后台SCAN清单+已知模式 → 报告 → 确认后优化 |
 
 ---
 
@@ -422,4 +546,4 @@
 >
 > - 执行 SCAN 任务后，请将结果追加到该文档
 > - 后续扫描前，先阅读该文档了解已检查范围，避免重复扫描
-> - 当前最新记录: **V3.5 专项修复 (2026-02-18)**
+> - 当前最新记录: **V4.0 已知模式规范化 (2026-02-20)**

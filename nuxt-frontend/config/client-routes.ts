@@ -40,3 +40,38 @@ export const mobileRoutes = {
     // 商品
     product: (id: string) => mobileRoute(`goods/${id}`),
 } as const
+
+/**
+ * 生成PC端路由路径
+ */
+export const pcRoute = (path: string = ''): string => {
+    if (!path) return PC_PREFIX
+    // 如果 path 以 / 开头，去除之
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path
+    return `${PC_PREFIX}/${cleanPath}`
+}
+
+/**
+ * PC端路由常量
+ */
+export const pcRoutes = {
+    home: () => pcRoute(),
+    login: () => pcRoute('login'),
+    faq: () => pcRoute('faq'),
+    community: () => pcRoute('community'),
+
+    // 个人中心
+    profile: () => pcRoute('profile'),
+    profileAccount: () => pcRoute('profile/account'),
+    profileOrders: () => pcRoute('profile/order'),
+    profileTickets: () => pcRoute('profile/tickets'),
+    profileFavorites: () => pcRoute('profile/favorites'),
+    profileWallet: () => pcRoute('profile/wallet'),
+    profileMessages: () => pcRoute('profile/messages'),
+    profileRedemption: () => pcRoute('profile/redemption'),
+
+    // 商品与结算
+    cart: () => pcRoute('cart'),
+    product: (id: string) => pcRoute(`goods/${id}`),
+    checkout: (id: string) => pcRoute(`checkout/${id}`),
+} as const

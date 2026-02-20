@@ -149,7 +149,7 @@ const loadStats = async () => {
             stats.value = res.data
         }
     } catch (e) {
-        console.error(e)
+        if (import.meta.dev) console.error(e)
         ElMessage.error('加载统计数据失败，请刷新重试')
     } finally {
         loading.value = false

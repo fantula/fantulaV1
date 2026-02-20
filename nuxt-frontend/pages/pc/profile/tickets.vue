@@ -204,7 +204,7 @@ const fetchTickets = async () => {
       }))
     }
   } catch (e) {
-    console.error('Fetch tickets failed', e)
+    if (import.meta.dev) console.error('Fetch tickets failed', e)
     error.value = true
   } finally {
     loading.value = false

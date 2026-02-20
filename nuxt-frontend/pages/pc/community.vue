@@ -134,7 +134,7 @@ const fetchCategories = async () => {
       categories.value = data
     }
   } catch (e) {
-    console.error('Failed to load categories', e)
+    if (import.meta.dev) console.error('Failed to load categories', e)
   }
 }
 
@@ -156,7 +156,7 @@ const fetchArticles = async (isLoadMore = false) => {
       hasMore.value = articles.value.length < res.total
     }
   } catch (e) {
-    console.error('Failed to load articles', e)
+    if (import.meta.dev) console.error('Failed to load articles', e)
   } finally {
     loading.value = false
   }
