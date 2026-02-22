@@ -87,6 +87,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { useUserStore } from '@/stores/client/user'
 import { authApi } from '@/api/client/auth'
 import PcLogoutModal from '@/components/pc/modal/PcLogoutModal.vue'
@@ -127,13 +128,13 @@ const menuGroups: MenuGroup[] = [
     key: 'main',
     label: '', //留空不显示标题
     items: [
-      { key: 'profile', label: '个人中心', icon: User, to: '/profile' },
-      { key: 'wallet', label: '我的额度', icon: Wallet, to: '/profile/wallet' },
-      { key: 'orders', label: '我的订单', icon: List, to: '/profile/order' },
-      { key: 'exchange', label: '兑换中心', icon: Ticket, to: '/profile/exchange' },
-      { key: 'favorites', label: '我的收藏', icon: Star, to: '/profile/favorites' },
-      { key: 'tickets', label: '我的工单', icon: Service, to: '/profile/tickets' },
-      { key: 'messages', label: '我的消息', icon: Bell, to: '/profile/messages' },
+      { key: 'profile', label: '个人中心', icon: User, to: pcRoutes.profile() },
+      { key: 'wallet', label: '我的额度', icon: Wallet, to: pcRoutes.profileWallet() },
+      { key: 'orders', label: '我的订单', icon: List, to: pcRoutes.profileOrders() },
+      { key: 'exchange', label: '兑换中心', icon: Ticket, to: pcRoutes.profileExchange() },
+      { key: 'favorites', label: '我的收藏', icon: Star, to: pcRoutes.profileFavorites() },
+      { key: 'tickets', label: '我的工单', icon: Service, to: pcRoutes.profileTickets() },
+      { key: 'messages', label: '我的消息', icon: Bell, to: pcRoutes.profileMessages() },
     ]
   }
 ]
@@ -144,12 +145,12 @@ const isMenuItemActive = (item: MenuItem) => {
     
     // 1. 个人中心首页 (精确匹配)
     if (item.key === 'profile') {
-        return path === '/profile'
+        return path === pcRoutes.profile() || path === '/profile'
     } 
     
-    // 2. 订单特殊处理: 订单列表(/profile/order) 和 订单详情(/profile/order/xxx)
+    // 2. 订单特殊处理: 订单列表(/pc/profile/order) 和 订单详情(/pc/profile/order/xxx)
     if (item.key === 'orders') {
-        return path.startsWith('/profile/order')
+        return path.startsWith(pcRoutes.profileOrders()) || path.startsWith('/profile/order')
     }
 
     // 3. 其他默认前缀匹配
@@ -158,7 +159,7 @@ const isMenuItemActive = (item: MenuItem) => {
 
 const handleMenuClick = (item: MenuItem) => {
     // Smart Refresh Logic
-    if (route.path === item.to || (item.key === 'profile' && route.path === '/profile')) {
+    if (route.path === item.to || (item.key === 'profile' && (route.path === pcRoutes.profile() || route.path === '/profile'))) {
         // Already on page: Force Refresh
         const query = { ...route.query, refresh: Date.now() }
         router.push({ path: item.to, query })
@@ -169,7 +170,7 @@ const handleMenuClick = (item: MenuItem) => {
 }
 
 const handleBackHome = () => {
-    router.push('/')
+    router.push(pcRoutes.home())
 }
 
 const showLogoutModal = ref(false)
@@ -182,7 +183,7 @@ const handleConfirmLogout = async () => {
     showLogoutModal.value = false
     await authApi.logout()
     userStore.logout()
-    router.push('/')
+    router.push(pcRoutes.home())
 }
 </script>
 

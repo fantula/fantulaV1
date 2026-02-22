@@ -1,21 +1,27 @@
 <template>
   <div class="wallet-page">
-    <!-- 1. Aurora Hero Card: The Asset Core (Extract: AssetHeroCard) -->
-    <AssetHeroCard
-        :balance="balance"
-        @recharge="showRechargeModal = true"
-    />
+    <!-- 顶部固定区域 (Header) -->
+    <div class="wallet-header">
+      <!-- 1. Aurora Hero Card: The Asset Core (Extract: AssetHeroCard) -->
+      <AssetHeroCard
+          :balance="balance"
+          @recharge="showRechargeModal = true"
+      />
+    </div>
 
-    <!-- 2. Transaction Stream: The Glass Ledger (Extract: WalletLedger) -->
-    <WalletLedger
-        :displayList="displayList"
-        :loading="listLoading"
-        :finished="finished"
-        :error="error"
-        :activeTab="activeTab"
-        @switchTab="switchTab"
-        @loadMore="loadMore"
-    />
+    <!-- 滚动区域 (Internal Scroll) -->
+    <div class="wallet-scroll-area">
+      <!-- 2. Transaction Stream: The Glass Ledger (Extract: WalletLedger) -->
+      <WalletLedger
+          :displayList="displayList"
+          :loading="listLoading"
+          :finished="finished"
+          :error="error"
+          :activeTab="activeTab"
+          @switchTab="switchTab"
+          @loadMore="loadMore"
+      />
+    </div>
 
     <!-- Recharge Modal -->
     <WalletRechargeModal 
@@ -98,12 +104,25 @@ const handleModalClose = () => {
 </script>
 
 <style scoped>
-/* Page Layout */
+/* Page Layout - Container Lockdown */
 .wallet-page {
+  flex: 1; min-height: 0; width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  height: 100%;
-  padding-bottom: 20px;
+  overflow: hidden; /* 配合外层，锁定整体溢出 */
+}
+
+/* 顶部无需滚动的部分，四周增加内边距 */
+.wallet-header {
+  flex-shrink: 0;
+  padding: 24px 32px 16px; /* 统一左右 padding */
+}
+
+/* 内部滚动区 */
+.wallet-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 32px 32px 32px; /* 底部预留空间 */
+  min-height: 0; /* Webkit flex bug fix */
 }
 </style>

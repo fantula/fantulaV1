@@ -56,7 +56,26 @@
           <span class="channel-key">{{ row.channel_key }}</span>
         </template>
       </el-table-column>
-      
+
+      <el-table-column prop="channel_name" label="频道名称" min-width="180">
+        <template #default="{ row }">
+          <div v-if="editingRowId === row.id" class="inline-edit-wrapper">
+            <el-input
+              v-model="editingName"
+              size="small"
+              @keyup.enter="saveChannelName(row)"
+              @blur="saveChannelName(row)"
+              placeholder="输入名称回车保存"
+            />
+          </div>
+          <div v-else class="inline-editable-cell" @click="startEdit(row)">
+            <span v-if="row.channel_name">{{ row.channel_name }}</span>
+            <span v-else class="empty-placeholder">[点击设置名称]</span>
+            <el-icon class="edit-icon"><Edit /></el-icon>
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column label="绑定商品" min-width="250">
         <template #default="{ row }">
           <div v-if="row.products" class="bound-product">
@@ -101,12 +120,12 @@
     </AdminDataTable>
 
     <!-- Bind Product Modal -->
-    <el-dialog v-model="bindModalVisible" title="绑定商品" width="500px" destroy-on-close>
+    <el-dialog v-model="bindModalVisible" title="绑定/修改商品" width="500px" destroy-on-close>
       <el-form label-position="top">
         <el-form-item label="当前频道">
           <el-input :model-value="currentRow?.channel_key" disabled />
         </el-form-item>
-        
+
         <!-- Step 1: Category Select -->
         <el-form-item label="选择分类">
           <el-select 
@@ -146,7 +165,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="bindModalVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSaveBind" :loading="saving" :disabled="!selectedProductId">保存</el-button>
+          <el-button type="primary" @click="handleSaveBind" :loading="saving" :disabled="!selectedProductId && !currentRow?.product_id">保存</el-button>
         </span>
       </template>
     </el-dialog>
@@ -179,8 +198,8 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { ref, onMounted } from 'vue'
-import { Search, Plus, Refresh } from '@element-plus/icons-vue'
+import { ref, onMounted, nextTick } from 'vue'
+import { Search, Plus, Refresh, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getSupabaseClient } from '@/utils/supabase' // SECURITY FIX: Use standard client
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
@@ -253,6 +272,52 @@ const batchModalVisible = ref(false)
 const batchInput = ref('')
 const batchAdding = ref(false)
 
+// --- Inline Edit State ---
+const editingRowId = ref('')
+const editingName = ref('')
+
+const startEdit = async (row: any) => {
+  editingRowId.value = row.id
+  editingName.value = row.channel_name || ''
+  await nextTick()
+  const inputs = document.querySelectorAll('.inline-edit-wrapper input')
+  if (inputs.length > 0) {
+    ;(inputs[0] as HTMLElement).focus()
+  }
+}
+
+const saveChannelName = async (row: any) => {
+  if (!editingRowId.value || editingRowId.value !== row.id) return
+  
+  const newName = editingName.value.trim()
+  const oldName = row.channel_name || ''
+  
+  if (newName === oldName) {
+    editingRowId.value = ''
+    return
+  }
+
+  // Reset ID immediately to prevent blur double-submit
+  editingRowId.value = ''
+
+  try {
+    const { error } = await client
+      .from('channel_recognitions')
+      .update({
+        channel_name: newName || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', row.id)
+    
+    if (error) throw error
+    
+    ElMessage.success('名称已更新')
+    row.channel_name = newName || null // Optimistic UI update
+  } catch (err: any) {
+    ElMessage.error('更新失败: ' + err.message)
+  }
+}
+
 // --- Init ---
 onMounted(() => {
   fetchCategories()
@@ -275,12 +340,12 @@ const openBindModal = (row: any) => {
   selectedCategoryId.value = null
   selectedProductId.value = null
   productList.value = []
-  
+
   // Try to restore if already bound
   if (row.product_id && row.products) {
     fetchProductDetails(row.product_id)
   }
-  
+
   bindModalVisible.value = true
 }
 
@@ -313,14 +378,15 @@ const handleCategoryChange = async (catId: string) => {
 }
 
 const handleSaveBind = async () => {
-  if (!selectedProductId.value) return
+  const productId = selectedProductId.value ?? currentRow.value?.product_id
+  if (!productId) return
 
   saving.value = true
   try {
     const { error } = await client
       .from('channel_recognitions')
-      .update({ 
-        product_id: selectedProductId.value,
+      .update({
+        product_id: productId,
         updated_at: new Date().toISOString()
       })
       .eq('id', currentRow.value.id)
@@ -369,10 +435,10 @@ const handleBatchAdd = async () => {
       // product_id is null by default
     }))
 
-    // 3. Upsert (Ignore conflicts means do nothing if exists, which is perfect)
+    // 3. Upsert (on conflict do update channel_key = channel_key, effectively a no-op for existing records)
     const { error } = await client
       .from('channel_recognitions')
-      .upsert(payload, { onConflict: 'channel_key', ignoreDuplicates: true })
+      .upsert(payload, { onConflict: 'channel_key' })
 
     if (error) throw error
 
@@ -404,4 +470,16 @@ const handleBatchAdd = async () => {
 .channel-key { font-weight: bold; color: var(--el-color-primary); }
 .product-name { margin-left: 8px; font-size: 13px; }
 .bound-product { display: flex; align-items: center; }
+
+/* Inline Edit Styles */
+.inline-editable-cell {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px; 
+  cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;
+  min-height: 28px;
+}
+.inline-editable-cell:hover { background: var(--el-fill-color-light); }
+.inline-editable-cell .edit-icon { opacity: 0; color: var(--el-color-primary); transition: opacity 0.2s; }
+.inline-editable-cell:hover .edit-icon { opacity: 1; }
+.empty-placeholder { color: #909399; font-size: 13px; font-style: italic; }
+.inline-edit-wrapper { width: 100%; display: flex; }
 </style>

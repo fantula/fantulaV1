@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { adminRoute } from '@/config/admin-routes'
 import { adminProductApi } from '@/api/admin/product'
 import { adminSkuApi, adminSharedSkuApi, type SharedSkuGroup } from '@/api/admin'
 
@@ -58,12 +59,20 @@ export function useAdminSkuEditor() {
                         sharedSkuTag.value = firstTag
                     } else {
                         specMode.value = 'custom'
-                        // Map Specs
-                        currentSpecs.value = res.specs ? res.specs.map(s => ({
-                            name: s.name,
-                            values: s.values.map(v => v.value),
-                            inputVisible: false, inputValue: ''
-                        })) : []
+                        // Map Specs (Prioritize spec_definition if it exists to preserve order)
+                        if (res.product?.spec_definition && Array.isArray(res.product.spec_definition)) {
+                            currentSpecs.value = res.product.spec_definition.map((s: any) => ({
+                                name: s.name,
+                                values: [...s.values],
+                                inputVisible: false, inputValue: ''
+                            }))
+                        } else {
+                            currentSpecs.value = res.specs ? res.specs.map(s => ({
+                                name: s.name,
+                                values: s.values.map(v => v.value),
+                                inputVisible: false, inputValue: ''
+                            })) : []
+                        }
 
                         // Map SKUs
                         currentSkus.value = res.skus.map(s => ({
@@ -133,14 +142,20 @@ export function useAdminSkuEditor() {
     const saveSkus = async (editorInstance: any) => {
         // Collect Data
         let payload: any[] = []
+        let specsPayload: any[] = []
 
         if (specMode.value === 'custom') {
             if (!editorInstance) return
             const rawSkus = editorInstance.getSkus()
+            const rawSpecs = editorInstance.getSpecs()
             if (rawSkus.length === 0) {
                 ElMessage.warning('请至少配置一种规格')
                 return
             }
+            specsPayload = rawSpecs.map((s: any) => ({
+                name: s.name,
+                values: [...s.values]
+            }))
             payload = rawSkus.map((s: any, i: number) => ({
                 id: s.id,
                 spec_combination: s.specValues,
@@ -158,12 +173,13 @@ export function useAdminSkuEditor() {
             const res = await adminProductApi.updateProductSkus(productId, {
                 mode: specMode.value,
                 sharedTag: sharedSkuTag.value || undefined,
-                skus: payload
+                skus: payload,
+                specs: specsPayload
             })
 
             if (res.success) {
                 ElMessage.success('配置已保存')
-                router.push('/admin/products')
+                router.push(adminRoute('products'))
             } else {
                 ElMessage.error(res.error)
             }

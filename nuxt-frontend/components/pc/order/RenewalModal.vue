@@ -139,6 +139,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import BaseModal from '@/components/shared/BaseModal.vue'
@@ -424,7 +425,7 @@ const handlePay = async () => {
     emit('success', confirmRes.orderId)
     
     // Redirect to new order
-    router.push(`/profile/order/${confirmRes.orderId}`)
+    router.push(pcRoutes.orderDetail(confirmRes.orderId as string))
     
   } catch (e: any) {
     ElMessage.error(e.message || '系统异常')

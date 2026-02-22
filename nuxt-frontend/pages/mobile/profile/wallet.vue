@@ -77,6 +77,13 @@
         </div>
     </Teleport>
 
+    <!-- Recharge Modal -->
+    <RechargeModal
+        :visible="showRecharge"
+        @close="showRecharge = false"
+        @success="refreshData"
+    />
+
   </div>
 </template>
 
@@ -84,6 +91,7 @@
 import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, InfoFilled, Lightning } from '@element-plus/icons-vue'
+import { mobileRoutes } from '~/config/client-routes'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
@@ -158,7 +166,7 @@ const getAmountClass = (amt: number) => {
 
 onMounted(() => {
     if (!userStore.isLoggedIn) {
-        router.push('/mobile')
+        router.push(mobileRoutes.home())
         return
     }
     fetchData()
@@ -177,7 +185,9 @@ watch(currentTab, () => {
 
 <style scoped>
 .mobile-wallet-page {
-    min-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding-bottom: 40px;
     background: #020617; /* Very Dark BG */
     color: #fff;

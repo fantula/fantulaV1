@@ -30,11 +30,11 @@
             class="el-menu-vertical"
             :collapse="isCollapse"
             :collapse-transition="false"
-            router
             unique-opened
             background-color="transparent"
             text-color="var(--el-text-color-regular)"
             active-text-color="var(--el-color-primary)"
+            @select="(index: string) => router.push(index)"
           >
             <!-- Standard Menu List (No Drag & Drop) -->
             <template v-for="element in filteredMenuList" :key="element.index">

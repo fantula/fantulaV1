@@ -305,9 +305,9 @@ const isExpired = (coupon: UserCoupon) => {
 
 <style scoped>
 .exchange-section {
+  flex: 1; min-height: 0; width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 0;
   overflow: hidden;
 }
@@ -348,7 +348,7 @@ const isExpired = (coupon: UserCoupon) => {
 
 /* Coupon List */
 .coupon-list-container {
-  flex: 1; overflow-y: auto; padding: 24px 32px 0; /* Let BaseInfiniteList handle bottom spacing */
+  flex: 1; overflow-y: auto; padding: 24px 32px 32px 32px;
   min-height: 0;
 }
 .coupon-list { display: flex; flex-direction: column; gap: 16px; }

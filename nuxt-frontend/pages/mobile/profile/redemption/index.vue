@@ -116,6 +116,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Ticket, List } from '@element-plus/icons-vue'
+import { mobileRoutes } from '@/config/client-routes'
 import { couponApi, type UserCoupon } from '@/api/client/coupon'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
@@ -227,7 +228,7 @@ const handleCouponClick = (item: UserCoupon) => {
 
     // Case 3: Unused Product/Flat -> Navigate
     if (item.status === 'unused') {
-        router.push('/mobile')
+        router.push(mobileRoutes.home())
     }
 }
 
@@ -270,7 +271,9 @@ const getExpiryText = (dateStr?: string) => {
 
 <style scoped>
 .mobile-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: 40px;
   color: #fff;
   display: flex; flex-direction: column;

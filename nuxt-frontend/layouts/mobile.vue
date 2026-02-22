@@ -67,11 +67,9 @@ useHead({
 
 .mobile-content {
   flex: 1;
-  padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* Default space */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-  /* Ensure content is above background */
-  position: relative; 
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  overflow: hidden; /* Pages manage their own scroll containers */
+  position: relative;
   z-index: 1;
 }
 </style>

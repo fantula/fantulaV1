@@ -17,6 +17,7 @@ export interface AdminProduct {
     rating: number               // 好评度
     allow_addon: boolean         // 是否支持加购
     detail_modules: any[]        // 详情页内容模块 (JSONB)
+    spec_definition?: any[]      // 规格组顺序定义 (JSONB)
     created_at: string
     stock?: number
     category?: ProductCategory
@@ -317,6 +318,7 @@ export const adminProductApi = {
     async updateProductSkus(productId: string, options: {
         mode: 'custom' | 'shared'
         skus?: any[]
+        specs?: any[]
         sharedTag?: number
     }): Promise<{ success: boolean; error?: string }> {
         const client = getSupabaseClient()
@@ -342,7 +344,12 @@ export const adminProductApi = {
             }))
 
             const { error } = await client.from('product_sku_map').insert(mappings)
-            return error ? { success: false, error: error.message } : { success: true }
+            if (error) return { success: false, error: error.message }
+
+            // Also update the product spec_definition to null since it's shared
+            await client.from('products').update({ spec_definition: null }).eq('id', productId)
+
+            return { success: true }
         }
 
         // 2. 自定义模式：智能更新 (Diff Update)
@@ -409,6 +416,12 @@ export const adminProductApi = {
                 }))
                 await client.from('product_sku_map').insert(newMappings)
             }
+        }
+
+        // D. Updating spec_definition in products
+        if (options.specs) {
+            const { error: specError } = await client.from('products').update({ spec_definition: options.specs }).eq('id', productId)
+            if (specError) return { success: false, error: '更新规格展示定义失败: ' + specError.message }
         }
 
         return { success: true }

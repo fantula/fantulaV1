@@ -153,31 +153,41 @@ const getBadgeClass = (label: string) => {
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 10px;
-  font-weight: 500;
-  color: #fff;
+  font-weight: 600;
   white-space: nowrap;
+  /* Colors and borders are handled by specific sub-classes */
 }
 
 .aurora-tag-default {
-  background-color: var(--primary);
+  background-color: rgba(56, 189, 248, 0.2);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .aurora-tag-hot {
-  background: linear-gradient(90deg, #FF6B6B 0%, #EE4D2D 100%);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.3) 0%, rgba(2, 132, 199, 0.3) 100%);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
 }
 
 .aurora-tag-new {
-  background: linear-gradient(90deg, #6DD5ED 0%, #2193B0 100%);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.2) 0%, rgba(2, 132, 199, 0.2) 100%);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .aurora-tag-recommend {
-  background: linear-gradient(90deg, #FDC830 0%, #F37335 100%);
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.4) 0%, rgba(2, 132, 199, 0.4) 100%);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.5);
 }
 
 .aurora-tag-benefit {
-  background: linear-gradient(90deg, #8360c3 0%, #2ebf91 100%);
+  background: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .goods-meta-row {

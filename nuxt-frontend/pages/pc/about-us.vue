@@ -1,19 +1,19 @@
 <template>
-  <div class="about-us-page">
+  <div class="pc-glass-page">
 
     <!-- 页面内容区域 -->
-    <div class="page-content">
-              <div class="content-container">
-          <div class="header-section">
-            <h1 class="main-title">关于我们</h1>
-            <h2 class="sub-title">我们的使命</h2>
+    <div class="pc-glass-content-a">
+              <div class="pc-glass-container">
+          <div class="pc-glass-header-a">
+            <h1 class="pc-glass-title">关于我们</h1>
+            <h2 class="pc-glass-desc-a">我们的使命</h2>
           </div>
           
           <div class="content-section">
             <div class="mission-section">
-              <h3 class="section-title">我们的使命</h3>
+              <h3 class="pc-glass-section-title">我们的使命</h3>
               <div class="section-content">
-                <p class="content-paragraph">
+                <p class="pc-glass-paragraph">
                   在全球数字化浪潮推动下，人们对跨境数字权益与订阅服务的需求日益增长，而服务渠道、平台限制、地域门槛却仍然存在。凡图拉的使命，就是要打破这些壁垒，让数字服务权益触手可及、轻松获取。我们致力于打造一个安全、灵活、无需实名即可使用的数字化服务平台，帮助用户轻松获取海外订阅、虚拟会员权益、礼品卡与数字化技术支持。无论你身处何地，只需注册邮箱账户，即可进入一个稳定高效的虚拟服务生态。未来，我们希望成为华语用户首选的全球数字权益服务平台，让每一次服务订阅、每一张礼品卡、每一次权益兑换，都变得简单可靠、有温度。
                 </p>
               </div>
@@ -108,65 +108,7 @@ useHead({
 </script>
 
 <style scoped>
-/* Dark Aurora Theme Styles */
-.about-us-page {
-  min-height: 100vh;
-  /* Transparent background to reveal global particle sky */
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-content {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 60px 20px;
-}
-
-/* Glassmorphism Container */
-.content-container {
-  width: 100%;
-  max-width: 1200px;
-  background: rgba(30, 41, 59, 0.7); /* Dark Slate Glass */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 60px 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  margin: 0 auto;
-}
-
-.header-section {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.main-title {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 42px;
-  /* Blue-Orange Gradient Text */
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 15px;
-  letter-spacing: 1px;
-  text-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
-}
-
-.sub-title {
-  font-family: 'Noto Sans SC', sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  color: #94A3B8; /* Slate-400 */
-  margin: 0;
-  letter-spacing: 0.5px;
-}
-
+/* Specific Styles */
 .content-section {
   display: flex;
   flex-direction: column;
@@ -189,41 +131,8 @@ useHead({
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.section-title {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 600;
-  font-size: 24px;
-  color: #E2E8F0; /* Slate-200 */
-  margin-bottom: 25px;
-  padding-bottom: 0;
-  border-bottom: none;
-  display: flex;
-  align-items: center;
-}
-
-.section-title::before {
-  content: '';
-  display: block;
-  width: 4px;
-  height: 24px;
-  background: linear-gradient(to bottom, #60A5FA, #F97316);
-  margin-right: 12px;
-  border-radius: 2px;
-}
-
 .section-content {
   margin-top: 20px;
-}
-
-.content-paragraph {
-  font-family: 'Noto Sans SC', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  color: #CBD5E1; /* Slate-300 */
-  line-height: 1.8;
-  margin: 0;
-  text-align: justify;
-  text-justify: inter-ideograph;
 }
 
 .advantages-list {

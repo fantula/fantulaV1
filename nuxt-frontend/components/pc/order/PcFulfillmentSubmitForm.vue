@@ -70,11 +70,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Loading, CircleCheck, CircleClose, EditPen, Edit, RefreshRight, DocumentAdd } from '@element-plus/icons-vue' // Import icons
-import { getSupabaseClient } from '@/utils/supabase'
-import type { OrderFulfillment, FulfillmentField } from '@/types/order'
+import { Loading, CircleCheck, CircleClose, EditPen, Edit, RefreshRight, DocumentAdd } from '@element-plus/icons-vue' 
+import { useFulfillmentSubmit } from '@/composables/client/useFulfillmentSubmit'
+import type { FulfillmentField } from '@/types/order'
 
 const props = defineProps<{
   orderId: string
@@ -85,154 +85,23 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit-success'])
 
-// 状态
-const latestFulfillment = ref<OrderFulfillment | null>(null)
-const isSubmitting = ref(false)
-const formData = reactive<Record<string, string>>({})
-
-// 动态字段列表
-const fields = computed(() => props.cdkFields || [])
-
-// 最新回执状态
-const latestStatus = computed(() => latestFulfillment.value?.status)
-const latestRejectReason = computed(() => latestFulfillment.value?.reject_reason || '未填写原因')
-
-// 初始化表单数据
-const initFormData = () => {
-  // 先清空所有字段
-  fields.value.forEach(f => {
-    formData[f.key] = ''
-  })
-  
-  // submitted 或 rejected 状态：填充上次提交的内容
-  if (latestFulfillment.value?.payload && 
-      (latestStatus.value === 'submitted' || latestStatus.value === 'rejected')) {
-    Object.entries(latestFulfillment.value.payload).forEach(([k, v]) => {
-      // 排除内部字段
-      if (k === '_cdk_id') return
-      
-      if (k in formData) {
-        formData[k] = v
-      }
-    })
-  }
-}
-
-// 获取最新回执
-const fetchLatestFulfillment = async () => {
-  if (!props.orderId) return
-  
-  try {
-    const client = getSupabaseClient()
-    let query = client
-      .from('order_fulfillments')
-      .select('*')
-      .eq('order_id', props.orderId)
-      .order('submitted_at', { ascending: false })
-      
-    // 如果指定了 cdkId，则过滤 payload
-    if (props.cdkId) {
-       query = query.contains('payload', { _cdk_id: props.cdkId })
-    }
-
-    const { data, error } = await query.limit(1).maybeSingle()
-    
-    if (!error && data) {
-      latestFulfillment.value = data as OrderFulfillment
-      initFormData()
-    } else {
-      latestFulfillment.value = null
-      initFormData() // Reset if no data found
-    }
-  } catch (err) {
-    console.error('获取回执失败:', err)
-  }
-}
-
-// 提交回执（新建记录 - INSERT）
-const handleInsert = async () => {
-  isSubmitting.value = true
-  try {
-    const client = getSupabaseClient()
-    const payload: Record<string, string> = {}
-    fields.value.forEach(f => {
-      payload[f.key] = formData[f.key] || ''
-    })
-    
-    // 注入 CDK 标识 (使用 ID 确保唯一)
-    if (props.cdkId) {
-        payload['_cdk_id'] = props.cdkId
-    }
-    
-    const { data, error } = await client
-      .from('order_fulfillments')
-      .insert({
-        order_id: props.orderId,
-        status: 'submitted',
-        payload,
-        submitted_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      ElMessage.error('提交失败: ' + error.message)
-      return
-    }
-    
-    latestFulfillment.value = data as OrderFulfillment
-    ElMessage.success('回执提交成功，请等待审核')
-    emit('submit-success')
-  } catch (err: any) {
-    ElMessage.error(err.message || '提交失败')
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// 修改回执（更新当前 submitted 记录 - UPDATE）
-const handleUpdate = async () => {
-  if (!latestFulfillment.value) return
-  
-  isSubmitting.value = true
-  try {
-    const client = getSupabaseClient()
-    const payload: Record<string, string> = {}
-    fields.value.forEach(f => {
-      payload[f.key] = formData[f.key] || ''
-    })
-    
-    if (props.cdkId) {
-        payload['_cdk_id'] = props.cdkId
-    }
-    
-    const { error } = await client
-      .from('order_fulfillments')
-      .update({
-        payload,
-        submitted_at: new Date().toISOString()
-      })
-      .eq('id', latestFulfillment.value.id)
-    
-    if (error) {
-      ElMessage.error('修改失败: ' + error.message)
-      return
-    }
-    
-    ElMessage.success('回执修改成功')
-    await fetchLatestFulfillment()
-    emit('submit-success')
-  } catch (err: any) {
-    ElMessage.error(err.message || '修改失败')
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// 监听字段变化
-watch(() => props.cdkFields, () => {
-  initFormData()
-}, { immediate: true })
+const {
+  formData,
+  latestStatus,
+  latestRejectReason,
+  isSubmitting,
+  fields,
+  fetchLatestFulfillment,
+  handleInsert,
+  handleUpdate
+} = useFulfillmentSubmit({
+  orderId: () => props.orderId,
+  cdkId: () => props.cdkId,
+  cdkFields: () => props.cdkFields,
+  onSuccess: (msg) => ElMessage.success(msg),
+  onError: (msg) => ElMessage.error(msg),
+  onCallback: () => emit('submit-success')
+})
 
 onMounted(() => {
   fetchLatestFulfillment()

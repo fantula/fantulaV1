@@ -326,9 +326,13 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
   const _initConfig = async () => {
     if (!goodsData.value?.success) return
 
+    // 重置选择状态，确保每次打开新商品都从第一个规格开始
+    selectedSpecs.value = {}
+    selectedSkuImage.value = ''
+
     if (specGroups.value && specGroups.value.length > 0) {
       specGroups.value.forEach((g: any) => {
-        if (!selectedSpecs.value[g.name]) selectedSpecs.value[g.name] = g.values[0]
+        selectedSpecs.value[g.name] = g.values[0]
       })
     }
 

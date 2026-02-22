@@ -61,6 +61,7 @@ import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
+import { mobileRoutes } from '@/config/client-routes'
 
 definePageMeta({
   layout: 'mobile',
@@ -113,7 +114,7 @@ const { displayList, loading, finished, error, loadMore } = useInfiniteScroll<an
 })
 
 const goToDetail = (id: string) => {
-    router.push(`/mobile/profile/tickets/${id}`)
+    router.push(mobileRoutes.profileTicketDetail(id))
 }
 
 onMounted(fetchTickets)
@@ -122,8 +123,9 @@ onMounted(fetchTickets)
 
 <style scoped>
 .mobile-page {
-  min-height: 100vh;
-  background: #0F172A;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: 40px;
   color: #fff;
   display: flex; flex-direction: column;

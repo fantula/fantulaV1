@@ -96,3 +96,22 @@ ssh root@<IP> "docker restart supabase-edge-functions"
 
 如果开发新的文件上传功能，**请直接复用 `upload-r2` 函数**，不要重复造轮子。
 前端调用：`POST /functions/v1/upload-r2` (FormData: file, folder)。
+
+### ⚠️ R2 AWS SigV4 签名 Regex 踩坑（已修复，禁止回退）
+
+三个 R2 函数（`upload-r2`, `delete-r2`, `test-r2-connection`）使用 AWS SigV4 手动签名。
+其中 `amzDate` 计算有一个极易写错的 TypeScript regex：
+
+```typescript
+// ❌ 错误 - \\d 是字面量反斜杠+d，不是数字类 \d
+const amzDate = now.toISOString().replace(/[:-]|\.\\d{3}/g, '')
+// 结果：20260220T123456.789Z  ← 毫秒未删除 → AWS 签名不匹配 → 403
+
+// ✅ 正确
+const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '')
+// 结果：20260220T123456Z  ← 符合 SigV4 格式
+```
+
+**症状**：R2 上传/删除返回 403 `SignatureDoesNotMatch`。
+**受影响文件**：`supabase/functions/upload-r2/index.ts:33`, `delete-r2/index.ts:31`, `test-r2-connection/index.ts:29`。
+**修复时间**：2026-02-20（已部署并验证）。

@@ -34,26 +34,31 @@ export const messageApi = {
     const offset = (page - 1) * limit
 
     // Get messages with count
-    const { data, error, count } = await client
-      .from('messages')
-      .select('*', { count: 'exact' })
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+    try {
+      const { data, error, count } = await client
+        .from('messages')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
 
-    if (error) {
-      console.error('getMessages error:', error)
-      return { code: 500, msg: error.message, success: false }
-    }
-
-    return {
-      code: 0,
-      msg: 'success',
-      success: true,
-      data: {
-        messages: data || [],
-        total: count || 0
+      if (error) {
+        if (import.meta.dev) console.error('getMessages error:', error)
+        return { code: 500, msg: error.message, success: false }
       }
+
+      return {
+        code: 0,
+        msg: 'success',
+        success: true,
+        data: {
+          messages: data || [],
+          total: count || 0
+        }
+      }
+    } catch (error: any) {
+      if (import.meta.dev) console.error('getMessages error:', error)
+      return { code: 500, msg: error.message || '获取消息失败', success: false }
     }
   },
 
@@ -68,18 +73,23 @@ export const messageApi = {
       return { code: 401, msg: '未登录', success: false }
     }
 
-    const { count, error } = await client
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('is_read', false)
+    try {
+      const { count, error } = await client
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false)
 
-    if (error) {
-      console.error('getUnreadCount error:', error)
-      return { code: 500, msg: error.message, success: false }
+      if (error) {
+        if (import.meta.dev) console.error('getUnreadCount error:', error)
+        return { code: 500, msg: error.message, success: false }
+      }
+
+      return { code: 0, msg: 'success', success: true, data: count || 0 }
+    } catch (error: any) {
+      if (import.meta.dev) console.error('getUnreadCount error:', error)
+      return { code: 500, msg: error.message || '获取未读消息数量失败', success: false }
     }
-
-    return { code: 0, msg: 'success', success: true, data: count || 0 }
   },
 
   /**
@@ -88,17 +98,22 @@ export const messageApi = {
   async markAsRead(messageId: string): Promise<ApiResponse<null>> {
     const client = getSupabaseClient()
 
-    const { error } = await client
-      .from('messages')
-      .update({ is_read: true })
-      .eq('id', messageId)
+    try {
+      const { error } = await client
+        .from('messages')
+        .update({ is_read: true })
+        .eq('id', messageId)
 
-    if (error) {
-      console.error('markAsRead error:', error)
-      return { code: 500, msg: error.message, success: false }
+      if (error) {
+        if (import.meta.dev) console.error('markAsRead error:', error)
+        return { code: 500, msg: error.message, success: false }
+      }
+
+      return { code: 0, msg: 'success', success: true }
+    } catch (error: any) {
+      if (import.meta.dev) console.error('markAsRead error:', error)
+      return { code: 500, msg: error.message || '更新消息状态失败', success: false }
     }
-
-    return { code: 0, msg: 'success', success: true }
   },
 
   /**
@@ -112,17 +127,22 @@ export const messageApi = {
       return { code: 401, msg: '未登录', success: false }
     }
 
-    const { error } = await client
-      .from('messages')
-      .update({ is_read: true })
-      .eq('user_id', user.id)
-      .eq('is_read', false)
+    try {
+      const { error } = await client
+        .from('messages')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false)
 
-    if (error) {
-      console.error('markAllAsRead error:', error)
-      return { code: 500, msg: error.message, success: false }
+      if (error) {
+        if (import.meta.dev) console.error('markAllAsRead error:', error)
+        return { code: 500, msg: error.message, success: false }
+      }
+
+      return { code: 0, msg: 'success', success: true }
+    } catch (error: any) {
+      if (import.meta.dev) console.error('markAllAsRead error:', error)
+      return { code: 500, msg: error.message || '更新所有消息状态失败', success: false }
     }
-
-    return { code: 0, msg: 'success', success: true }
   }
 }

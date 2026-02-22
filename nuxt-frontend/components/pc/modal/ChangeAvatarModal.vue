@@ -55,7 +55,6 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { Check, UserFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-// import { getSupabaseClient } from '@/utils/supabase'
 import { authApi } from '@/api/client/auth'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
 import { DEFAULT_AVATAR, SYSTEM_AVATARS } from '@/utils/constants'

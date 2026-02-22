@@ -200,8 +200,10 @@ onMounted(() => {
 
 <style scoped>
 .mobile-profile-minimal {
-  padding-bottom: 90px; 
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 90px;
   padding-top: 20px;
 }
 

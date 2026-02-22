@@ -24,7 +24,7 @@ export function useBizFormat() {
      * 规则: YYYY-MM-DD HH:mm:ss
      * @param dateStr ISO 日期字符串
      */
-    const formatDate = (dateStr: string | null | undefined): string => {
+    const formatDate = (dateStr: string | number | Date | null | undefined): string => {
         if (!dateStr) return '-'
         const date = new Date(dateStr)
         if (isNaN(date.getTime())) return '-'

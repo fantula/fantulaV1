@@ -170,7 +170,7 @@ const copyAll = () => {
 }
 .batch-copy-btn:hover { text-decoration: underline; }
 
-.stack-list { }
+
 
 .stack-item {
    display: flex; align-items: center; gap: 12px;

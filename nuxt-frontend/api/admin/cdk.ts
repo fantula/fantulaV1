@@ -130,7 +130,7 @@ export const adminCdkApi = {
         if (mappings.length > 0) {
             const { error: mapError } = await client.from('cdk_sku_map').insert(mappings)
             if (mapError) {
-                console.error('CDK SKU 映射创建失败:', mapError)
+                if (import.meta.dev) console.error('CDK SKU 映射创建失败:', mapError)
                 return { success: true, count: createdCdks?.length || 0, error: `CDK 已创建但 SKU 映射失败: ${mapError.message}` }
             }
         }
@@ -149,7 +149,7 @@ export const adminCdkApi = {
             if (slotRecords.length > 0) {
                 const { error: slotError } = await client.from('slot_occupancies').insert(slotRecords)
                 if (slotError) {
-                    console.error('槽位记录创建失败:', slotError)
+                    if (import.meta.dev) console.error('槽位记录创建失败:', slotError)
                     return { success: true, count: createdCdks?.length || 0, error: `CDK 已创建但槽位创建失败: ${slotError.message}` }
                 }
             }
@@ -321,18 +321,18 @@ export const adminCdkApi = {
      */
     async addCdkSkuMapping(cdkId: string, skuId: string): Promise<{ success: boolean; error?: string }> {
         const client = getSupabaseClient()
-        console.log('[addCdkSkuMapping] params:', { cdkId, skuId })
+        if (import.meta.dev) console.log('[addCdkSkuMapping] params:', { cdkId, skuId })
 
         const { data: existing } = await client
             .from('cdk_sku_map').select('id').eq('cdk_id', cdkId).eq('sku_id', skuId).maybeSingle()
 
         if (existing) {
-            console.log('[addCdkSkuMapping] Already exists, skipping')
+            if (import.meta.dev) console.log('[addCdkSkuMapping] Already exists, skipping')
             return { success: true }
         }
 
         const { error: insertError } = await client.from('cdk_sku_map').insert({ cdk_id: cdkId, sku_id: skuId })
-        console.log('[addCdkSkuMapping] Insert result:', { insertError })
+        if (import.meta.dev) console.log('[addCdkSkuMapping] Insert result:', { insertError })
 
         if (insertError) return { success: false, error: insertError.message }
         return { success: true }
@@ -403,7 +403,7 @@ export const adminCdkApi = {
             .from('cdk_sku_map')
             .select('sku_id, cdk:cdks!inner(cdk_type)')
             .eq('cdk.cdk_type', 'virtual')
-        
+
         if (!data) return []
         return [...new Set(data.map(item => item.sku_id))]
     }

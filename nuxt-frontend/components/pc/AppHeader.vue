@@ -18,10 +18,10 @@
       
       <!-- 菜单区 - 居中显示 -->
       <nav class="nav-menu">
-        <NuxtLink to="/" class="nav-btn">首页</NuxtLink>
+        <NuxtLink :to="pcRoutes.home()" class="nav-btn">首页</NuxtLink>
         <button class="nav-btn" @click="showChannelModal = true">频道识别</button>
         <button @click="handleOrderClick" class="nav-btn">订单</button>
-        <NuxtLink to="/faq" class="nav-btn">常见问题</NuxtLink>
+        <NuxtLink :to="pcRoutes.faq()" class="nav-btn">常见问题</NuxtLink>
         <button class="nav-btn" @click="showServiceModal = true">联系图拉</button>
       </nav>
       
@@ -119,6 +119,7 @@ import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
 import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
 import ChannelRecognitionModal from '@/components/pc/modal/ChannelRecognitionModal.vue'
 import MiniCartPopup from '@/components/pc/cart/MiniCartPopup.vue'
+import { pcRoutes } from '@/config/client-routes'
 import { ShoppingCart, Star, StarFilled } from '@element-plus/icons-vue'
 import { DEFAULT_AVATAR } from '@/utils/constants'
 
@@ -139,7 +140,7 @@ const showLoginModal = ref(false)
 const handleOrderClick = () => {
   if (userStore.isLoggedIn) {
     // 已登录，直接跳转
-    navigateTo('/profile/order')
+    navigateTo(pcRoutes.profileOrders())
   } else {
     // 未登录，显示登录弹窗
     showLoginModal.value = true
@@ -153,17 +154,17 @@ const closeLoginModal = () => {
 
 // 菜单导航方法
 const navigateToProfile = () => {
-  if (route.path === '/profile') {
+  if (route.path === pcRoutes.profile() || route.path === '/profile') {
     // Smart Refresh: If already on profile, force reload via query params
     const query = { ...route.query, refresh: Date.now() }
-    navigateTo({ path: '/profile', query })
+    navigateTo({ path: pcRoutes.profile(), query })
   } else {
-    navigateTo('/profile')
+    navigateTo(pcRoutes.profile())
   }
 }
 
 const navigateToFavorites = () => {
-    navigateTo('/profile/favorites')
+    navigateTo(pcRoutes.profileFavorites())
 }
 
 // 监听登录成功: 关闭弹窗

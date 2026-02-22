@@ -1,0 +1,1 @@
+SELECT id, name, slug, sort_order FROM image_categories ORDER BY sort_order;

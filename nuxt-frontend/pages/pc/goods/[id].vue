@@ -1,9 +1,8 @@
 <template>
-  <div class="goods-detail-page">
+  <div class="goods-detail-page" style="padding-top: 20px;">
 
     
     <!-- 顶部占位 -->
-    <div style="height: 20px;"></div>
 
     <!-- 异常提示 -->
     <div v-if="goodsError" class="api-warning-bar">

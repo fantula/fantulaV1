@@ -2,7 +2,7 @@
   <BaseModal
     :visible="true"
     title="购置额度"
-    width="860px"
+    width="660px"
     :show-footer="false"
     theme-id="suit-002"
     @close="handleClose"
@@ -63,20 +63,22 @@
               <div class="section-container">
                 <div class="section-label">支付方式</div>
                 <div class="pay-methods">
-                  <div :class="['pay-method', 'disabled']" title="支付宝暂未开通">
-                    <div class="icon-container alipay">
-                      <img class="pay-icon" src="/images/client/pc/zhifu2.png" alt="支付宝" />
-                    </div>
-                    <span>支付宝</span>
-                    <span class="coming-soon">即将开通</span>
-                  </div>
-                  
+                  <!-- 微信支付（默认选中） -->
                   <div :class="['pay-method', payType==='wechat' ? 'active' : '']" @click="payType='wechat'">
                     <div class="icon-container wechat">
                       <img class="pay-icon" src="/images/client/pc/weixin.png" alt="微信" />
                     </div>
                     <span>微信</span>
                     <div v-if="payType==='wechat'" class="pay-check"><el-icon><Select /></el-icon></div>
+                  </div>
+
+                  <!-- 支付宝（即将开通） -->
+                  <div :class="['pay-method', 'disabled']" title="支付宝暂未开通">
+                    <div class="icon-container alipay">
+                      <img class="pay-icon" src="/images/client/pc/zhifu2.png" alt="支付宝" />
+                    </div>
+                    <span>支付宝</span>
+                    <span class="coming-soon">即将开通</span>
                   </div>
                 </div>
               </div>
@@ -113,8 +115,6 @@
               </div>
             </div>
             
-            <!-- Right Spacer for Phantom Visuals -->
-            <div class="right-spacer"></div>
           </div>
         </template>
 
@@ -128,13 +128,19 @@
             
             <div class="qrcode-wrapper">
               <img v-if="qrcodeDataUrl" :src="qrcodeDataUrl" alt="Payment QR Code" class="qrcode-img" />
-              <div v-if="paymentStatus === 'checking'" class="qrcode-overlay">
-                <div class="checking-spinner"></div>
-                <span>正在检查支付状态...</span>
-              </div>
-              <div v-if="paymentStatus === 'success'" class="qrcode-overlay success">
-                <el-icon class="success-icon"><CircleCheck /></el-icon>
-                <span>支付成功!</span>
+              <!-- 状态条：显示在二维码下方，不遮盖 -->
+              <div class="qrcode-status-bar" :class="paymentStatus">
+                <template v-if="paymentStatus === 'checking'">
+                  <div class="checking-spinner"></div>
+                  <span>正在检查支付状态...</span>
+                </template>
+                <template v-else-if="paymentStatus === 'success'">
+                  <el-icon class="success-icon"><CircleCheck /></el-icon>
+                  <span>支付成功！</span>
+                </template>
+                <template v-else>
+                  <span class="pending-hint">请使用微信扫码支付</span>
+                </template>
               </div>
             </div>
             
@@ -269,7 +275,7 @@ async function handleRecharge() {
       })
       qrcodeDataUrl.value = url
     } catch (qrErr) {
-      console.error('QR Code generation failed:', qrErr)
+      if (import.meta.dev) console.error('QR Code generation failed:', qrErr)
     }
     
     // 开始轮询支付状态
@@ -293,7 +299,7 @@ function startPolling() {
     
     try {
       const res = await wechatPayApi.queryOrder(currentOrderNo.value)
-      console.log('[Polling] Response:', JSON.stringify(res))
+      if (import.meta.dev) console.log('[Polling] Response:', JSON.stringify(res))
       
       if (res.success && res.data?.paid) {
         // 支付成功
@@ -317,7 +323,7 @@ function startPolling() {
       paymentStatus.value = 'pending'
       
     } catch (err) {
-      console.error('Query order error:', err)
+      if (import.meta.dev) console.error('Query order error:', err)
       paymentStatus.value = 'pending'
     }
   }, 3000)  // 每3秒查询一次
@@ -354,7 +360,7 @@ onMounted(async () => {
       }))
     }
   } catch (e) {
-    console.error('加载充值档位失败', e)
+    if (import.meta.dev) console.error('加载充值档位失败', e)
   } finally {
     loading.value = false
   }
@@ -396,11 +402,6 @@ onUnmounted(() => {
 .left-panel {
   flex: 1;
   display: flex; flex-direction: column; gap: 20px; /* Reduced gap */
-}
-
-.right-spacer {
-  width: 200px; /* Reduced slightly */
-  flex-shrink: 0;
 }
 
 /* Section Labels */
@@ -528,22 +529,47 @@ onUnmounted(() => {
 .qrcode-header .wechat-icon { width: 28px; height: 28px; }
 
 .qrcode-wrapper {
-  position: relative; background: #fff; padding: 16px; border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  gap: 10px;
 }
 
 .qrcode-img {
   display: block;
   width: 200px;
   height: 200px;
+  flex-shrink: 0;
 }
 
-.qrcode-overlay {
-  position: absolute; inset: 0; background: rgba(255,255,255,0.95);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-  border-radius: 12px; color: #64748B; font-size: 14px;
+/* 状态条：显示在二维码正下方，不遮盖 */
+.qrcode-status-bar {
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #f5f7fa;
+  color: #64748B;
+  transition: all 0.3s;
+  min-height: 32px;
 }
-.qrcode-overlay.success { background: rgba(16, 185, 129, 0.1); color: #10B981; }
-.success-icon { font-size: 48px; color: #10B981; }
+.qrcode-status-bar.checking {
+  background: rgba(249, 115, 22, 0.08);
+  color: #F97316;
+}
+.qrcode-status-bar.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  font-weight: 600;
+}
+.pending-hint { color: #94A3B8; font-size: 12px; }
 
 .checking-spinner {
   width: 32px; height: 32px; border: 3px solid #E2E8F0;

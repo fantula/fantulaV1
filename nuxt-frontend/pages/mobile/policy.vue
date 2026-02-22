@@ -10,11 +10,20 @@
           <span class="policy-brand">凡图拉</span>
         </div>
         <div class="policy-main-title">用户协议</div>
-        <div class="policy-desc">欢迎使用凡图拉平台服务，请您仔细阅读并充分理解本用户协议的各项条款</div>
+        <div class="policy-desc" v-if="currentLang === 'cn'">欢迎使用凡图拉平台服务，请您仔细阅读并充分理解本用户协议的各项条款</div>
+        <div class="policy-desc" v-else>Welcome to Ventura Platform! Before using platform services, please carefully read all contents of this agreement.</div>
       </div>
 
-      <!-- 服务说明 -->
-      <div class="policy-card">
+      <!-- 双语切换 Tab -->
+      <div class="lang-tabs-wrapper">
+        <div class="lang-tabs">
+          <div class="lang-tab" :class="{ active: currentLang === 'cn' }" @click="currentLang = 'cn'">中文版 (CN)</div>
+          <div class="lang-tab" :class="{ active: currentLang === 'en' }" @click="currentLang = 'en'">English (EN)</div>
+        </div>
+      </div>
+
+      <!-- 中文版内容 -->
+      <div class="policy-card" v-show="currentLang === 'cn'">
         <div class="policy-overview-box">
           <div class="overview-title">服务说明</div>
           <div class="overview-text">
@@ -24,7 +33,6 @@
           </div>
         </div>
 
-        <!-- 一、服务说明 -->
         <div class="section-title">一、服务说明</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -33,7 +41,6 @@
           <div class="section-item"><strong>1.3</strong> 本平台不保证某一权益长期有效或目标服务商政策始终保持不变，如因政策调整导致权益无法使用、价格波动、服务中断等，平台将尽合理范围内协助处理，但不承担由此产生的法律责任。</div>
         </div>
 
-        <!-- 二、用户注册与使用 -->
         <div class="section-title">二、用户注册与使用</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -43,7 +50,6 @@
           <div class="section-item"><strong>2.4</strong> 用户不得使用平台进行任何违法违规活动，包括但不限于：倒卖账号、洗钱、网络诈骗、传播违法内容等。一经发现，平台有权立即封禁账号并配合司法机关处理。</div>
         </div>
 
-        <!-- 三、服务额度与售后规则 -->
         <div class="section-title">三、服务额度与售后规则</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -52,7 +58,6 @@
           <div class="section-item"><strong>3.3</strong> 平台有权依据权益类型、交付状态决定是否支持返还或部分返还额度。</div>
         </div>
 
-        <!-- 四、售后服务与责任范围 -->
         <div class="section-title">四、售后服务与责任范围</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -61,7 +66,6 @@
           <div class="section-item"><strong>4.3</strong> 虚拟商品一经发货即无法退货，若用户提供错误信息导致问题，平台不承担责任。</div>
         </div>
 
-        <!-- 五、知识产权与免责声明 -->
         <div class="section-title">五、知识产权与免责声明</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -70,7 +74,6 @@
           <div class="section-item"><strong>5.3</strong> 用户下单即视为同意平台为第三方中介，并承担因服务变动带来的使用风险。</div>
         </div>
 
-        <!-- 六、法律适用与争议解决 -->
         <div class="section-title">六、法律适用与争议解决</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -79,7 +82,6 @@
           <div class="section-item"><strong>6.3</strong> 凡图拉保留本协议最终解释权及修改权。</div>
         </div>
 
-        <!-- 七、附则 -->
         <div class="section-title">七、附则</div>
         <div class="section-divider"></div>
         <div class="section-highlight-box">
@@ -87,44 +89,99 @@
         </div>
       </div>
 
-      <!-- 底部法律声明 -->
-      <div class="policy-legal-card">
-        <div class="legal-title">法律声明与附则</div>
-
-        <div class="legal-section">
-          <div class="legal-section-title">五、知识产权与免责声明</div>
-          <div class="legal-item">5.1 商标、品牌标识归属原品牌方所有，平台仅作功能识别之用。</div>
-          <div class="legal-item">5.2 平台展示内容不代表授权或官方合作，若权利方认为展示不当，平台将配合处理。</div>
-          <div class="legal-item">5.3 用户下单即视为同意平台为第三方中介，并承担因服务变动带来的使用风险。</div>
+      <!-- 英文版内容 -->
+      <div class="policy-card" v-show="currentLang === 'en'">
+        <div class="policy-overview-box">
+          <div class="overview-title">Terms of Service</div>
+          <div class="overview-text">
+            Welcome to Ventura Platform! Before registering as a user or using platform services, please carefully read and fully understand all contents of this agreement, especially the disclaimer, limitation of liability, and user obligation clauses marked in bold. If you do not agree with the contents of this agreement or cannot accurately understand relevant clauses, please stop using Ventura Platform.
+            <br /><br />
+            Once you register, log in or use Ventura Platform, you are deemed to have read, understood and accepted all contents of this agreement.
+          </div>
         </div>
 
-        <div class="legal-section">
-          <div class="legal-section-title">六、法律适用与争议解决</div>
-          <div class="legal-item">6.1 本协议适用中华人民共和国法律。</div>
-          <div class="legal-item">6.2 如发生争议，双方应协商解决，协商不成的，由平台所在地人民法院管辖。</div>
-          <div class="legal-item">6.3 凡图拉保留本协议最终解释权及修改权。</div>
+        <div class="section-title">1. Service Description</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>1.1</strong> Ventura Platform provides users with digital equity subscription and redemption services, including but not limited to membership subscription redemption, gift card redemption, virtual equity forwarding, etc. The platform displays services in the form of "gift cards/equity packages", and the actual service content is digital equity service assistance.</div>
+          <div class="section-item"><strong>1.2</strong> The services provided by this platform are not official channels of target service providers. Ventura is a third-party service platform, and the services provided are completed based on users' autonomous entrustment behavior.</div>
+          <div class="section-item"><strong>1.3</strong> This platform does not guarantee that a certain equity will be valid for a long time or that the target service provider's policies will remain unchanged. If equities cannot be used, prices fluctuate, services are interrupted, etc. due to policy adjustments, the platform will assist in handling within a reasonable scope, but will not bear legal responsibility arising therefrom.</div>
         </div>
 
-        <div class="legal-section">
-          <div class="legal-section-title">七、附则</div>
-          <div class="legal-item">7.1 协议自注册日起生效，平台将通过公告形式更新协议内容。</div>
+        <div class="section-title">2. User Registration and Usage</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>2.1</strong> Users can complete the registration process through email, and registration is deemed as agreement to the contents of this agreement.</div>
+          <div class="section-item"><strong>2.2</strong> The platform will not collect sensitive information such as ID cards, mobile phone numbers, residential addresses, nor provide real-name verification functions.</div>
+          <div class="section-item"><strong>2.3</strong> User accounts are limited to personal use only. If losses are caused by users' own disclosure of login information, misoperations, etc., the platform will not bear responsibility.</div>
+          <div class="section-item"><strong>2.4</strong> Users shall not use the platform for any illegal activities, including but not limited to: reselling accounts, money laundering, online fraud, spreading illegal content, etc. Once discovered, the platform has the right to immediately ban the account and cooperate with judicial authorities.</div>
         </div>
 
-        <div class="legal-contact">
-          <div class="contact-label">联系我们</div>
-          <div class="contact-email">support@fantura.com</div>
+        <div class="section-title">3. Service Quota & After-Sales Rules</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>3.1</strong> If an after-sales application is approved by the platform, the amount will be returned to the user's service quota on the platform.</div>
+          <div class="section-item"><strong>3.2</strong> The platform service quota can be used to redeem other platform service rights, but cannot be exchanged for cash or transferred to other accounts.</div>
+          <div class="section-item"><strong>3.3</strong> The platform has the right to determine whether to support a full or partial quota return based on the type of equity and delivery status.</div>
+        </div>
+
+        <div class="section-title">4. Responsibility Scope</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>4.1</strong> Ventura provides domestic WeChat customer service, and international support will be provided through Telegram or WhatsApp.</div>
+          <div class="section-item"><strong>4.2</strong> The platform assists in handling issues such as failed top-up, but does not bear responsibility for changes in the target platform's policy itself.</div>
+          <div class="section-item"><strong>4.3</strong> Virtual goods cannot be returned once shipped. If the user provides incorrect information causing issues, the platform will not bear responsibility.</div>
+        </div>
+
+        <div class="section-title">5. Intellectual Property & Disclaimer</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>5.1</strong> The trademarks and brand identifiers belong to the original brand owners, and the platform is used for functional recognition only.</div>
+          <div class="section-item"><strong>5.2</strong> The platform content does not represent authorization or official cooperation. If the rights holder believes that the display is inappropriate, the platform will cooperate with processing.</div>
+          <div class="section-item"><strong>5.3</strong> Users' placing orders is deemed as agreeing to the platform as a third-party intermediary and accepting the usage risks brought by service changes.</div>
+        </div>
+
+        <div class="section-title">6. Law Applicable & Dispute Resolution</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>6.1</strong> This agreement applies to the laws of the People's Republic of China.</div>
+          <div class="section-item"><strong>6.2</strong> If disputes arise, both parties should resolve them through consultation. If consultation fails, the court where the platform is located shall have jurisdiction.</div>
+          <div class="section-item"><strong>6.3</strong> Ventura reserves the final interpretation and modification rights of this agreement.</div>
+        </div>
+
+        <div class="section-title">7. Final Provisions</div>
+        <div class="section-divider"></div>
+        <div class="section-highlight-box">
+          <div class="section-item"><strong>7.1</strong> This agreement takes effect from the date of registration, and the platform will update the agreement content through announcements.</div>
         </div>
       </div>
+
+      <!-- 底部共同区域 -->
+      <div class="policy-legal-card">
+        <div class="legal-title">法律声明与附则<br /><span>Legal Notice & Appendix</span></div>
+        <div class="legal-contact">
+          <div class="contact-label">联系我们 Contact Us</div>
+          <div class="contact-email">support@fantura.com</div>
+        </div>
+        <div class="legal-disclaimer">
+          本用户协议提供英文翻译版本供参考，若中英文版本存在理解歧义，应以中文版表述为准。<br />
+          In case of any discrepancy between the Chinese and English versions, the Chinese version shall prevail.
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 definePageMeta({
   layout: 'mobile'
 })
+
+const currentLang = ref<'cn' | 'en'>('cn')
 </script>
 
 <style scoped>
@@ -187,6 +244,36 @@ definePageMeta({
   font-size: 13px;
   color: var(--text-muted, #64748B);
   line-height: 1.6;
+}
+
+/* 语言切换 Tab */
+.lang-tabs-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.lang-tabs {
+  display: flex;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 20px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lang-tab {
+  padding: 8px 24px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #94A3B8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lang-tab.active {
+  background: var(--color-brand-highlight, #3B82F6);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
 /* 主内容卡片 */
@@ -269,45 +356,29 @@ definePageMeta({
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 16px;
+  text-align: center;
 }
 
 .legal-title {
   font-size: 16px;
   font-weight: 700;
   color: #60A5FA;
-  text-align: center;
-  margin-bottom: 16px;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
 
-.legal-section {
-  margin-bottom: 16px;
-  background: rgba(30, 41, 59, 0.4);
-  border-radius: 10px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.legal-section-title {
+.legal-title span {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary, #E2E8F0);
-  margin-bottom: 8px;
-  text-align: center;
-}
-
-.legal-item {
-  font-size: 13px;
-  color: var(--text-muted, #94A3B8);
-  line-height: 1.7;
-  margin-bottom: 4px;
-  text-align: center;
+  font-weight: normal;
+  color: #94A3B8;
 }
 
 .legal-contact {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  text-align: center;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 16px;
 }
 
 .contact-label {
@@ -317,8 +388,17 @@ definePageMeta({
 }
 
 .contact-email {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #60A5FA;
+}
+
+.legal-disclaimer {
+  font-size: 12px;
+  color: #64748B;
+  line-height: 1.6;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-style: italic;
 }
 </style>

@@ -72,6 +72,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/client/cart'
 import { supabasePreOrderApi } from '@/api/client/supabase'
+import { pcRoutes } from '@/config/client-routes'
 import { ElMessage } from 'element-plus'
 import { Delete } from '@element-plus/icons-vue'
 import BaseButton from '@/components/shared/BaseButton.vue'
@@ -120,7 +121,7 @@ const handleCheckout = async () => {
        cartStore.clearCart()
        
        emit('close')
-       router.push(`/checkout/${result.pre_order_id}`)
+       router.push(pcRoutes.checkout(result.pre_order_id))
     } else {
        ElMessage.error(result.error || '创建订单失败')
     }

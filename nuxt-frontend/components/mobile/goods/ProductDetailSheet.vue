@@ -78,7 +78,7 @@
               <!-- FAQ Ticker -->
               <!-- FAQ Ticker (Re-inserted) -->
               <!-- FAQ Ticker (Vertical Pill) -->
-              <div class="faq-sticker-pill" v-if="faqs.length > 0" @click="showDetailViewer = true">
+              <div class="faq-sticker-pill" v-if="faqs.length > 0" @click="goToHelp">
                  <div class="faq-pill-text-wrap">
                     <div class="faq-pill-track" :style="trackStyle">
                        <div v-for="(f,i) in displayFaqs" :key="i" class="faq-pill-item">
@@ -108,7 +108,7 @@
               
               <!-- SKU Intro -->
               <div class="sku-intro-box" v-if="matchedSku && matchedSku.intro">
-                 <InfoFilled class="info-icon" />
+                 <el-icon class="info-icon"><InfoFilled /></el-icon>
                  <span>{{ matchedSku.intro }}</span>
               </div>
 
@@ -124,58 +124,51 @@
               </template>
           </div>
 
-          <!-- Footer Actions -->
+          <!-- Footer Actions (Scheme 1: Suspended Unified Capsule) -->
           <div class="sheet-footer">
-              <div class="icon-btns">
-                 <div class="ib-item" @click="handleToggleFavorite">
-                    <el-icon :class="['action-icon', { active: isFavorited }]">
-                        <component :is="isFavorited ? StarFilled : Star" />
-                    </el-icon>
-                    <span>收藏</span>
-                 </div>
-              </div>
-              
-              <div class="main-btns">
-                  <button
-                    class="btn-mobile-base btn-mobile-ghost btn-cart"
-                    @click="addToCart"
-                    :disabled="!hasStock || pending || actionLoading"
-                  >
-                     {{ actionLoading ? '处理中...' : '加入购物车' }}
-                  </button>
-                  <button
-                    class="aurora-btn-accent btn-buy-now"
-                    @click="buyNow"
-                    :disabled="!hasStock || pending || actionLoading"
-                  >
-                     {{ actionLoading ? '处理中...' : '立即购买' }}
-                  </button>
-              </div>
+             <div class="action-capsule">
+                 <!-- Favorite (20%) -->
+                 <button class="cap-btn cap-favorite" @click="handleToggleFavorite" :class="{ active: isFavorited }">
+                    {{ isFavorited ? '已收藏' : '收藏' }}
+                 </button>
+                 
+                 <!-- Add to Cart (40%) -->
+                 <button class="cap-btn cap-cart" @click="addToCart" :disabled="!hasStock || pending || actionLoading">
+                    {{ actionLoading ? '处理中' : '加入购物车' }}
+                 </button>
+                 
+                 <!-- Buy Now (40%) -->
+                 <button class="cap-btn cap-buy" @click="buyNow" :disabled="!hasStock || pending || actionLoading">
+                    {{ actionLoading ? '处理中' : '立即购买' }}
+                 </button>
+             </div>
           </div>
 
         </div>
       </transition>
       
-      <!-- Centered Detail Viewer Modal (Custom Popup) -->
-      <transition name="pop-scale">
+      <!-- Help/Detail Viewer Modal (Refined Centered Popup) -->
+      <transition name="fade">
          <div v-if="showDetailViewer" class="detail-modal-mask" @click="showDetailViewer = false">
-            <div class="detail-modal simple-popup" @click.stop>
-               <!-- Close Button Only (Overlay) -->
-               <div class="simple-close" @click="showDetailViewer = false">
-                  <Close class="close-icon" />
-               </div>
-               
-               <div class="dm-content no-header">
-                  <div v-if="detailModules.length === 0" class="empty-detail">
-                     <div class="empty-icon">📦</div>
-                     <span>暂无详情</span>
+            <transition name="pop-scale">
+               <div v-if="showDetailViewer" class="detail-modal image-popup" @click.stop>
+                  <!-- Floating Close Button -->
+                  <div class="glass-close" @click="showDetailViewer = false">
+                     <Close class="close-icon" />
                   </div>
-                  <div v-else v-for="(mod, idx) in detailModules" :key="idx" class="dm-mod">
-                     <img v-if="mod.type === 'image'" :src="mod.content" loading="lazy" decoding="async" />
-                     <div v-else-if="mod.type === 'text'" class="dm-text">{{ mod.content }}</div>
+                  
+                  <div class="dm-content">
+                     <div v-if="detailModules.length === 0" class="empty-detail">
+                        <div class="empty-icon">📦</div>
+                        <span>暂无图片详情</span>
+                     </div>
+                     <div v-else v-for="(mod, idx) in detailModules" :key="idx" class="dm-mod">
+                        <img v-if="mod.type === 'image'" :src="mod.content" loading="lazy" decoding="async" />
+                        <div v-else-if="mod.type === 'text'" class="dm-text">{{ mod.content }}</div>
+                     </div>
                   </div>
                </div>
-            </div>
+            </transition>
          </div>
       </transition>
     </div>
@@ -186,14 +179,15 @@
 import { ref, computed, watch, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
-  Picture, CircleCheckFilled, Star, StarFilled, Service, Close, 
-  Lightning, Umbrella, Document, InfoFilled, ArrowRight, QuestionFilled
+  CircleCheckFilled, Star, StarFilled, Close, 
+  Lightning, Umbrella, InfoFilled, ArrowRight, QuestionFilled
 } from '@element-plus/icons-vue'
 import { useCartStore } from '@/stores/client/cart'
 import { useUserStore } from '@/stores/client/user'
 import { useNotify } from '@/composables/useNotify'
 import { useProductDetail } from '@/composables/client/useProductDetail'
-import { favoriteApi } from '@/api/client/common' // Direct API use for custom UI feedback
+import { mobileRoutes } from '@/config/client-routes'  // Use route constants
+import { favoriteApi } from '@/api/client/common'
 
 const props = defineProps<{
   visible: boolean
@@ -285,6 +279,11 @@ watch(() => faqs.value, () => startFaqTicker())
 // --- Methods (Mobile Specific Action Wrappers) ---
 const handleClose = () => emit('update:visible', false)
 
+const goToHelp = () => {
+    handleClose()
+    router.push(mobileRoutes.help())
+}
+
 // Methods
 const addToCart = async () => {
     if (!userStore.isLoggedIn) return warning('请登录')
@@ -296,7 +295,7 @@ const addToCart = async () => {
 
     actionLoading.value = true
     try {
-        const res = await cartStore.addToCart(skuId, qty.value)
+        const res = await cartStore.addToCart(String(skuId), qty.value)
         if (res.success) {
             success('已加入购物车')
             handleClose()
@@ -319,10 +318,10 @@ const buyNow = async () => {
     actionLoading.value = true
     try {
         const { supabasePreOrderApi } = await import('@/api/client/supabase')
-        const res = await supabasePreOrderApi.createPreOrder(skuId, qty.value, 'buy_now')
-        if (res.success) {
+        const res = await supabasePreOrderApi.createPreOrder(String(skuId), qty.value, 'buy_now')
+        if (res.success && res.pre_order_id) {
             handleClose()
-            router.push(`/mobile/checkout/${res.pre_order_id}`)
+            router.push(mobileRoutes.checkout(res.pre_order_id))
         } else {
             error(res.error || '失败')
         }
@@ -435,7 +434,7 @@ watch(() => props.visible, async (val) => {
 .help-btn span { color: #38BDF8; font-size: 11px; font-weight: 500; }
 
 /* Body */
-.sheet-body { flex: 1; overflow-y: auto; padding: 10px 16px 20px; }
+.sheet-body { flex: 1; overflow-y: auto; padding: 10px 16px 120px; } /* Increased bottom padding for floating footer */
 
 /* FAQ Ticker (Vertical Pill Style) */
 .faq-sticker-pill {
@@ -460,10 +459,10 @@ watch(() => props.visible, async (val) => {
 .faq-pill-item {
     height: 100%; flex-shrink: 0;
     display: flex; align-items: center;
-    font-size: 13px; color: #E2E8F0; /* Brighter text */
+    font-size: 13px; color: #38BDF8; /* Matches "显示帮助" color */
     font-weight: 500;
 }
-.faq-arrow { color: #64748B; font-size: 14px; margin-left: 8px; }
+.faq-arrow { color: var(--text-regular, #94A3B8); font-size: 14px; margin-left: 8px; }
 
 /* Specs */
 .specs-area { margin-bottom: 20px; }
@@ -482,7 +481,7 @@ watch(() => props.visible, async (val) => {
 
 /* SKU Intro */
 .sku-intro-box {
-   background: #3B82F615; border: 1px solid #3B82F630;
+   background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);
    border-radius: 8px; padding: 10px; 
    display: flex; gap: 8px; align-items: flex-start; 
    margin-bottom: 20px;
@@ -504,83 +503,126 @@ watch(() => props.visible, async (val) => {
 /* Icon sizes */
 .info-icon { width: 14px; height: 14px; margin-top: 2px; color: #3B82F6; }
 
-/* Footer */
+/* Footer (Scheme 1: Suspended Capsule) */
 .sheet-footer {
   padding: 12px 16px;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 30px); /* Extra lift */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 20px); /* Suspended 20px above safe area */
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 60%, rgba(15, 23, 42, 0)); /* Fade-out gradient top */
+  position: absolute; bottom: 0; left: 0; width: 100%; z-index: 10;
+  pointer-events: none; /* Let clicks pass through gradient area */
+}
+
+.action-capsule {
+  pointer-events: auto; /* Re-enable clicks for the capsule */
+  display: flex; align-items: stretch;
+  height: 54px;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255,255,255,0.05); /* Lighter border */
-  display: flex; gap: 16px; align-items: center;
-}
-.icon-btns { display: flex; gap: 16px; }
-.icon-btns { display: flex; gap: 16px; }
-.ib-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94A3B8; font-size: 10px; cursor: pointer; }
-.action-icon { width: 20px; height: 20px; color: #94A3B8; }
-.action-icon.active { color: #F59E0B; }
-
-.main-btns { flex: 1; display: flex; gap: 12px; }
-
-.btn-cart { 
-    flex: 1; 
-    height: 50px; /* Taller */
-    border-radius: 14px; /* Squircle, not pill */
-    font-size: 15px; 
-    font-weight: 600;
-    color: #fff !important;
-    background: rgba(255,255,255,0.08) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-}
-.btn-buy-now { 
-    flex: 1.5; 
-    /* Handled by .aurora-btn-accent globally */
+  border-radius: 27px; /* Perfect pill */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden; /* Keep buttons inside pill */
+  width: 100%;
 }
 
-.btn-cart:disabled, .btn-buy-now:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; filter: grayscale(100%); }
+.cap-btn {
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.cap-btn:active { opacity: 0.8; }
+.cap-btn:disabled { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; }
 
-/* Centered Pop Modal */
+/* Favorite: 20% width */
+.cap-favorite {
+  flex: 0 0 22%;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94A3B8;
+  font-size: 12px;
+}
+.cap-favorite.active { color: #F59E0B; }
+
+/* Add to Cart: 39% width */
+.cap-cart {
+  flex: 1;
+  background: rgba(56, 189, 248, 0.1);
+  color: #E2E8F0;
+  border-left: 1px solid rgba(255,255,255,0.05); /* subtle divider */
+}
+
+/* Buy Now: 39% width */
+.cap-buy {
+  flex: 1;
+  background: linear-gradient(135deg, var(--primary) 0%, #0c6a96 100%);
+  color: #ffffff;
+}
+
+/* Detail Viewer Image Popup */
 .detail-modal-mask {
-   position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3100;
+   position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 3100;
+   backdrop-filter: blur(8px);
    display: flex; align-items: center; justify-content: center;
-   backdrop-filter: blur(5px);
 }
-.detail-modal {
-   width: 85%; max-height: 70vh; 
-   background: #1E293B; border-radius: 16px;
+
+.detail-modal.image-popup {
+   position: relative;
+   width: 88%; max-height: 80vh;
+   background: rgba(30, 41, 59, 0.4); /* Glassmorphism base */
+   border-radius: 20px;
    display: flex; flex-direction: column; overflow: hidden;
-   box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-   border: 1px solid rgba(255,255,255,0.1);
+   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+   border: 1px solid rgba(255, 255, 255, 0.15);
 }
-/* Simple Popup Style */
-.detail-modal.simple-popup {
-   width: 80%; max-height: 60vh;
-   background: #1E293B; border-radius: 12px;
-   overflow: hidden; position: relative;
-   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.simple-close {
-   position: absolute; top: 10px; right: 10px; z-index: 10;
-   width: 24px; height: 24px;
-   background: rgba(0,0,0,0.3); border-radius: 50%;
+
+.glass-close {
+   position: absolute; top: 12px; right: 12px; z-index: 3102;
+   width: 32px; height: 32px;
+   background: rgba(0, 0, 0, 0.5); border-radius: 50%;
    display: flex; align-items: center; justify-content: center;
-   color: #fff; cursor: pointer; backdrop-filter: blur(4px);
+   color: #fff; cursor: pointer; transition: all 0.2s;
+   backdrop-filter: blur(8px);
+   border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.dm-content.no-header { padding-top: 0; background: #000; }
-.close-icon { width: 12px; height: 12px; }
+.glass-close:active { transform: scale(0.9); background: rgba(0,0,0,0.7); }
+.close-icon { width: 14px; height: 14px; }
 
 /* Empty Detail */
-.empty-detail { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: #64748B; gap: 10px; }
-.empty-icon { font-size: 32px; opacity: 0.5; }
-.dm-content { flex: 1; overflow-y: auto; background: #000; padding-bottom: 20px; }
-.dm-mod img { width: 100%; display: block; }
-.dm-text { color: #ccc; padding: 16px; font-size: 14px; line-height: 1.6; }
+.empty-detail { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: #94A3B8; gap: 12px; }
+.empty-icon { font-size: 48px; opacity: 0.8; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+
+/* Content body */
+.dm-content { 
+    flex: 1; overflow-y: auto; 
+    padding: 0; 
+    -webkit-overflow-scrolling: touch; 
+    border-radius: inherit; /* inherit roundness */
+}
+/* Hide scrollbar for cleaner image look */
+.dm-content::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.dm-content { -ms-overflow-style: none; scrollbar-width: none; }
+
+.dm-mod { display: flex; flex-direction: column; }
+.dm-mod img { 
+    width: 100%; display: block; object-fit: cover; 
+}
+/* Ensure the first and last images conform to the popup's border radius */
+.dm-mod:first-child img { border-top-left-radius: 20px; border-top-right-radius: 20px; }
+.dm-mod:last-child img { border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+
+.dm-text { color: #E2E8F0; padding: 24px; font-size: 15px; line-height: 1.6; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); }
 
 /* Transitions */
-.sheet-fade-enter-active, .sheet-fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-active, .fade-leave-active,
+.sheet-fade-enter-active, .sheet-fade-leave-active { transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.fade-enter-from, .fade-leave-to,
 .sheet-fade-enter-from, .sheet-fade-leave-to { opacity: 0; }
-.sheet-slide-enter-active, .sheet-slide-leave-active { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-.sheet-slide-enter-from, .sheet-slide-leave-to { transform: translateY(100%); }
 
-.pop-scale-enter-active, .pop-scale-leave-active { transition: all 0.2s ease; }
-.pop-scale-enter-from, .pop-scale-leave-to { opacity: 0; transform: scale(0.9); }
+.pop-scale-enter-active, .pop-scale-leave-active { transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.pop-scale-enter-from, .pop-scale-leave-to { opacity: 0; transform: scale(0.8) translateY(10px); }
+
+.sheet-slide-enter-active, .sheet-slide-leave-active { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.sheet-slide-enter-from, .sheet-slide-leave-to { transform: translateY(100%); }
 </style>

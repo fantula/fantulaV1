@@ -1,12 +1,12 @@
 <template>
-  <div class="join-us-page">
-    <div class="page-content">
-      <div class="content-container">
+  <div class="pc-glass-page">
+    <div class="pc-glass-content-a">
+      <div class="pc-glass-container" style="max-width: 1100px; padding: 60px 50px;">
         
         <!-- Header -->
-        <div class="header-section">
-          <h1 class="main-title">招贤纳士</h1>
-          <h2 class="sub-title">加入凡图拉，共同构建全球化的数字权益服务生态</h2>
+        <div class="pc-glass-header-a">
+          <h1 class="pc-glass-title">招贤纳士</h1>
+          <h2 class="pc-glass-desc-a">加入凡图拉，共同构建全球化的数字权益服务生态</h2>
         </div>
 
         <!-- Intro -->
@@ -136,61 +136,7 @@ useHead({
 </script>
 
 <style scoped>
-/* Dark Aurora Theme Consistency */
-.join-us-page {
-  min-height: 100vh;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-content {
-  flex: 1;
-  width: 100%;
-  padding: 60px 20px;
-  display: flex;
-  justify-content: center;
-}
-
-.content-container {
-  width: 100%;
-  max-width: 1100px; /* Slightly narrower for reading */
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 60px 50px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-}
-
-.header-section {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.main-title {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 42px;
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-}
-
-.sub-title {
-  font-family: 'Noto Sans SC', sans-serif;
-  font-size: 18px;
-  color: #94A3B8;
-  font-weight: 400;
-  margin: 0;
-}
-
+/* Specific Styles */
 .intro-section {
   text-align: center;
   margin-bottom: 60px;
@@ -382,8 +328,8 @@ useHead({
 }
 
 @media (max-width: 768px) {
-  .content-container {
-    padding: 30px 20px;
+  .pc-glass-container {
+    padding: 30px 20px !important;
   }
 }
 </style>

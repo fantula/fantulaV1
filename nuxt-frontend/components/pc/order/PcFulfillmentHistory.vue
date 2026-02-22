@@ -34,7 +34,7 @@
 
         <!-- Payload (Compact) -->
         <div class="card-payload">
-             <div v-for="(value, key) in record.payload" :key="key" class="payload-field" v-show="key !== '_cdk_id'">
+             <div v-for="(value, key) in record.payload" :key="key" class="payload-field" v-show="String(key) !== '_cdk_id'">
                <span class="field-label">{{ key }}:</span>
                <span class="field-value">{{ maskValue(value) }}</span>
              </div>
@@ -52,78 +52,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { ArrowDown, CircleCheck, CircleClose, Loading, Warning } from '@element-plus/icons-vue'
-import { getSupabaseClient } from '@/utils/supabase'
-import type { OrderFulfillment } from '@/types/order'
+import { useFulfillmentHistory } from '@/composables/client/useFulfillmentHistory'
 
 const props = defineProps<{
   orderId: string
   filterCdkId?: string
 }>()
 
-const records = ref<OrderFulfillment[]>([])
-const isExpanded = ref(false)
-
-const displayRecords = computed(() => {
-    if (isExpanded.value) return records.value
-    // Default: Show only the newest one (index 0)
-    return records.value.slice(0, 1)
+const {
+  records,
+  isExpanded,
+  displayRecords,
+  toggleExpand,
+  fetchHistory,
+  statusText,
+  formatTime,
+  maskValue
+} = useFulfillmentHistory({
+  orderId: () => props.orderId,
+  filterCdkId: () => props.filterCdkId
 })
-
-const toggleExpand = () => isExpanded.value = !isExpanded.value
-
-const fetchHistory = async () => {
-  if (!props.orderId) return
-  
-  try {
-    const client = getSupabaseClient()
-    let query = client
-      .from('order_fulfillments')
-      .select('*')
-      .eq('order_id', props.orderId)
-      .order('submitted_at', { ascending: false })
-
-    // 过滤特定 CDK
-    if (props.filterCdkId) {
-        query = query.contains('payload', { _cdk_id: props.filterCdkId })
-    }
-
-    const { data, error } = await query
-
-    if (!error && data) {
-      records.value = data as OrderFulfillment[]
-    }
-  } catch (err) {
-    console.error('获取回执历史失败:', err)
-  }
-}
-
-const statusText = (status: string) => {
-  const map: Record<string, string> = {
-    submitted: '审核中',
-    approved: '已通过',
-    rejected: '已驳回'
-  }
-  return map[status] || status
-}
-
-const formatTime = (time: string) => {
-  // Simple compact time
-  const date = new Date(time)
-  const m = (date.getMonth()+1).toString().padStart(2, '0')
-  const d = date.getDate().toString().padStart(2, '0')
-  const h = date.getHours().toString().padStart(2, '0')
-  const min = date.getMinutes().toString().padStart(2, '0')
-  return `${m}-${d} ${h}:${min}`
-}
-
-const maskValue = (value: string) => {
-  if (!value || value.length <= 4) return value
-  // Simple mask logic, user mentions show/hide functionality in plan 
-  // but to keep compact, let's stick to default mask first as requested
-  return value.slice(0, 2) + '****' + value.slice(-2)
-}
 
 onMounted(() => {
   fetchHistory()

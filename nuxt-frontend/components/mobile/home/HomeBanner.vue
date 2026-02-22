@@ -26,7 +26,7 @@
                      :key="banner.id" 
                      class="banner-item"
                    >
-                     <img :src="banner.image" class="banner-img" />
+                     <img :src="banner.image" class="banner-img" loading="lazy" decoding="async" />
                      <div class="banner-overlay"></div>
                    </div>
                 </div>

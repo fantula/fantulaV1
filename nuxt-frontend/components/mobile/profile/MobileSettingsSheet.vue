@@ -92,6 +92,7 @@ import {
     ArrowRight, User, Message, Lock, Delete, SwitchButton 
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
+import { mobileRoutes } from '@/config/client-routes'
 
 // Import Modals
 import EditNicknameModal from './modals/EditNicknameModal.vue'
@@ -120,7 +121,7 @@ const openModal = (name: string) => {
 const handleLogout = () => {
     if (confirm('确定要退出登录吗?')) {
         userStore.logout()
-        router.push('/mobile')
+        router.push(mobileRoutes.home())
         close()
     }
 }

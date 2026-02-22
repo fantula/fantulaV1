@@ -1,16 +1,16 @@
 <template>
-  <div class="disclaimer-page">
+  <div class="pc-glass-page">
 
     <!-- 页面内容 -->
     
-    <div class="disclaimer-content">
-      <div class="disclaimer-header">
-        <div class="disclaimer-header-title">凡图拉免责声明</div>
-        <div class="disclaimer-header-desc">本声明明确了凡图拉平台的服务性质、责任范围及用户权益，请在使用服务前仔细阅读</div>
+    <div class="pc-glass-content-b">
+      <div class="pc-glass-header-b">
+        <div class="pc-glass-title">凡图拉免责声明</div>
+        <div class="pc-glass-desc-b">本声明明确了凡图拉平台的服务性质、责任范围及用户权益，请在使用服务前仔细阅读</div>
       </div>
       
-      <div class="disclaimer-body">
-        <div class="disclaimer-panel">
+      <div class="pc-glass-body-b">
+        <div class="pc-glass-panel" style="max-width: 800px; width: 90%;">
           <div class="disclaimer-container">
             <div class="panel-content">
 
@@ -112,74 +112,7 @@ useHead({
 </script>
 
 <style scoped>
-/* Dark Aurora Theme Styles */
-.disclaimer-page {
-  min-height: 100vh;
-  /* Transparent to reveal global particle sky */
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.disclaimer-content {
-  flex: 1;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.disclaimer-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 40px 0;
-}
-
-.disclaimer-header-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  /* Blue-Orange Gradient */
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.disclaimer-header-desc {
-  font-size: 16px;
-  color: #94A3B8; /* Slate-400 */
-  text-align: center;
-  line-height: 1.6;
-  max-width: 600px;
-  margin: 0 auto;
-  white-space: nowrap;
-}
-
-.disclaimer-body {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.disclaimer-panel {
-  width: 90%;
-  max-width: 800px;
-  /* Dark Glass Card */
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
+/* Specific Styles */
 .disclaimer-container {
   border-left: 4px solid #60A5FA; /* Blue-400 */
   padding: 32px;

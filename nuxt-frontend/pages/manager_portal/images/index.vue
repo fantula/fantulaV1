@@ -7,9 +7,26 @@
         <el-button type="danger" :disabled="selectedIds.length === 0" @click="handleBatchDelete">
           批量删除{{ selectedIds.length ? ` (${selectedIds.length})` : '' }}
         </el-button>
-        <el-button type="primary" :icon="Upload" @click="openUpload">
-          {{ activeCategory ? `上传至「${activeCategory.name}」` : '上传图片' }}
+
+        <!-- 如果是在 '全部' 下，呼出选择弹窗 -->
+        <el-button v-if="!activeCategoryId" type="primary" :icon="Upload" @click="openUpload">
+          上传图片 (需选分类)
         </el-button>
+
+        <!-- 如果指定了具体分类，点击直接选图并背景直传 -->
+        <el-upload
+          v-else
+          class="direct-uploader"
+          action="#"
+          :show-file-list="false"
+          :http-request="handleDirectUpload"
+          :accept="'image/jpeg,image/png,image/webp,image/gif'"
+          multiple
+        >
+          <el-button type="primary" :icon="Upload" :loading="uploading">
+            传至「{{ activeCategory?.name }}」
+          </el-button>
+        </el-upload>
       </div>
     </div>
 
@@ -38,8 +55,8 @@
           @click="selectCategory(cat.id)"
         >
           <el-icon><Folder /></el-icon>
-          <span class="cat-name">{{ cat.name }}</span>
-          <span class="cat-count">{{ getCategoryCount(cat.id) }}</span>
+          <span class="cat-name" :title="cat.name">{{ cat.name }}</span>
+          <span class="cat-count-badge" :class="{ 'badge-active': activeCategoryId === cat.id }">{{ getCategoryCount(cat.id) }}</span>
           <el-icon class="cat-delete-btn" @click.stop="deleteCategory(cat)" title="删除分类">
             <Close />
           </el-icon>
@@ -47,23 +64,19 @@
 
         <!-- 新建分类 -->
         <div class="new-cat-area">
-          <div v-if="!showNewCatInput" class="new-cat-btn" @click="showNewCatInput = true">
+          <div v-if="!showNewCatInput" class="new-cat-btn" @click="triggerNewCatInput">
             <el-icon><Plus /></el-icon> 新建分类
           </div>
           <div v-else class="new-cat-form">
             <el-input
+              ref="newCatInputRef"
               v-model="newCatName"
-              placeholder="分类名称"
+              placeholder="输入名称，回车保存"
               size="small"
               @keyup.enter="addCategory"
-              @keyup.esc="showNewCatInput = false"
-              autofocus
+              @keyup.esc="cancelNewCat"
+              @blur="cancelNewCat"
             />
-            <div class="new-cat-hint">slug 将自动生成</div>
-            <div class="new-cat-actions">
-              <el-button size="small" type="primary" @click="addCategory">确认</el-button>
-              <el-button size="small" @click="showNewCatInput = false">取消</el-button>
-            </div>
           </div>
         </div>
       </div>
@@ -212,6 +225,7 @@ const uploadDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const showNewCatInput = ref(false)
 const newCatName = ref('')
+const newCatInputRef = ref()
 
 const session = useSupabaseSession()
 const categories = ref<AdminImageCategory[]>([])
@@ -275,17 +289,33 @@ const selectCategory = (id: string) => {
   selectedIds.value = []
 }
 
+const triggerNewCatInput = async () => {
+  showNewCatInput.value = true
+  await nextTick()
+  newCatInputRef.value?.focus()
+}
+
+const cancelNewCat = () => {
+  // blur and escape could trigger at same time
+  setTimeout(() => {
+    showNewCatInput.value = false
+    newCatName.value = ''
+  }, 100)
+}
+
 const addCategory = async () => {
   const name = newCatName.value.trim()
-  if (!name) return ElMessage.warning('请输入分类名称')
+  if (!name) {
+    cancelNewCat()
+    return
+  }
 
   const res = await adminImageCategoryApi.createCategory(name)
   if (res.success) {
     ElMessage.success('分类创建成功')
-    newCatName.value = ''
     showNewCatInput.value = false
+    newCatName.value = ''
     await fetchCategories()
-    // 自动切换到新创建的分类
     if (res.category) activeCategoryId.value = res.category.id
   } else {
     ElMessage.error('创建失败: ' + res.error)
@@ -351,16 +381,24 @@ const syncFromR2 = async () => {
     const token = session.value?.access_token
     if (!token) return ElMessage.error('无法获取登录凭证，请重新登录')
 
-    const { EDGE_FUNCTIONS_URL } = await import('@/utils/supabase')
-    const response = await fetch(`${EDGE_FUNCTIONS_URL}/list-r2`, {
+    const { getEdgeFunctionsUrl } = await import('@/utils/supabase')
+    const response = await fetch(`${getEdgeFunctionsUrl()}/list-r2`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ prefix: '' }) // 列出所有对象
     })
 
+    if (!response.ok) {
+      const ct = response.headers.get('content-type') || ''
+      const errMsg = ct.includes('application/json')
+        ? (await response.json()).error || `HTTP ${response.status}`
+        : (await response.text()).replace(/<[^>]*>/g, '').trim().slice(0, 80)
+      return ElMessage.error('获取 R2 列表失败: ' + errMsg)
+    }
+
     const result = await response.json()
-    if (!response.ok || result.error) {
-      return ElMessage.error('获取 R2 列表失败: ' + (result.error || '未知错误'))
+    if (result.error) {
+      return ElMessage.error('获取 R2 列表失败: ' + result.error)
     }
 
     const r2Objects: Array<{ key: string; url: string }> = result.objects || []
@@ -422,9 +460,6 @@ const fileList = ref<any[]>([])
 const uploading = ref(false)
 
 const openUpload = () => {
-  if (activeCategory.value) {
-    uploadForm.categoryId = activeCategory.value.id
-  }
   uploadDialogVisible.value = true
 }
 
@@ -433,10 +468,9 @@ const handleFileChange = (file: any, fileListRef: any) => {
   if (!uploadForm.name && file.name) uploadForm.name = file.name
 }
 
+// “全部”分类下，带弹窗的手动上传逻辑
 const submitUpload = async () => {
-  if (!uploadForm.categoryId && !activeCategory.value) {
-    return ElMessage.warning('请选择分类')
-  }
+  if (!uploadForm.categoryId) return ElMessage.warning('请选择分类')
   if (!fileList.value.length) return ElMessage.warning('请选择图片文件')
   if (uploadForm.name && uploadForm.name.length > 50) return ElMessage.warning('图片名称过长')
 
@@ -446,9 +480,7 @@ const submitUpload = async () => {
     const token = session.value?.access_token
     if (!token) return ElMessage.error('请重新登录')
 
-    // 确定上传分类和 R2 folder
-    const catId = activeCategory.value?.id || uploadForm.categoryId
-    const cat = categories.value.find(c => c.id === catId)
+    const cat = categories.value.find(c => c.id === uploadForm.categoryId)
     const folder = cat?.slug || 'others'
 
     const { uploadImageToStorage } = await import('@/utils/uploadImage')
@@ -461,7 +493,7 @@ const submitUpload = async () => {
     const res = await adminImageApi.createImage({
       name: uploadForm.name || file.name,
       url: uploadRes.url!,
-      category_id: catId
+      category_id: uploadForm.categoryId
     })
 
     if (res.success) {
@@ -475,6 +507,42 @@ const submitUpload = async () => {
   } catch (e: any) {
     if (import.meta.dev) console.error('Upload error:', e)
     ElMessage.error('上传失败: ' + (e.message || '未知错误'))
+  } finally {
+    uploading.value = false
+  }
+}
+
+// 选中分类时：静默无弹窗的一键直连上传逻辑
+const handleDirectUpload = async (options: any) => {
+  if (!activeCategory.value) return
+  uploading.value = true
+  const file = options.file
+  try {
+    const token = session.value?.access_token
+    if (!token) throw new Error('Auth Missing')
+
+    const folder = activeCategory.value.slug || 'others'
+    const { uploadImageToStorage } = await import('@/utils/uploadImage')
+    const uploadRes = await uploadImageToStorage(file, folder, undefined, token)
+    
+    if (!uploadRes.success) throw new Error(uploadRes.error)
+
+    const res = await adminImageApi.createImage({
+      name: file.name,
+      url: uploadRes.url!,
+      category_id: activeCategory.value.id
+    })
+
+    if (res.success) {
+      ElMessage.success(` ${file.name} 上传成功`)
+      await fetchData()
+      options.onSuccess(res)
+    } else {
+      throw new Error(res.error)
+    }
+  } catch (e: any) {
+    ElMessage.error('上传出错: ' + (e.message || 'Unknown'))
+    options.onError(e)
   } finally {
     uploading.value = false
   }
@@ -621,6 +689,23 @@ const handleDelete = (img: AdminImage) => {
   min-width: 20px;
   text-align: center;
 }
+.cat-count-badge {
+  display: inline-block;
+  min-width: 20px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  background-color: var(--el-fill-color-darker);
+  color: #fff;
+  transition: all 0.3s;
+}
+.cat-count-badge.badge-active {
+  background-color: var(--el-color-primary);
+  box-shadow: 0 2px 6px var(--el-color-primary-light-5);
+}
+
 .cat-delete-btn {
   opacity: 0;
   transition: opacity 0.15s;

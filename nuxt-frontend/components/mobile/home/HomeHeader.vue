@@ -23,7 +23,7 @@
           </div>
 
           <!-- 2. Favorites (Middle) -->
-          <button class="icon-btn" @click="router.push('/mobile/profile/favorites')">
+          <button class="icon-btn" @click="router.push(mobileRoutes.profileFavorites())">
              <el-icon><Star /></el-icon>
           </button>
 
@@ -47,7 +47,7 @@
                 </button>
             </template>
             <template v-else>
-               <div class="header-avatar" @click="router.push('/mobile/profile')">
+               <div class="header-avatar" @click="router.push(mobileRoutes.profile())">
                   <div v-if="userStore.loading" class="avatar-skeleton"></div>
                   <template v-else>
                       <img 
@@ -69,6 +69,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart'
+import { mobileRoutes } from '~/config/client-routes'
 import { ShoppingCart, User, Star } from '@element-plus/icons-vue'
 import MobileMiniCart from '@/components/mobile/cart/MobileMiniCart.vue'
 import { DEFAULT_AVATAR } from '@/utils/constants'

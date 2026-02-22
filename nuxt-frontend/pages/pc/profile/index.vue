@@ -17,12 +17,13 @@ const userStore = useUserStore()
 const userInfo = computed(() => {
   const storeUser = userStore.user
   if (storeUser) {
+    const su = storeUser as any
     return {
-      id: storeUser.id,
-      uid: storeUser.uid || storeUser.id?.slice(0, 8) || '未分配',
-      nickname: storeUser.nickName || storeUser.nickname || storeUser.email?.split('@')[0] || '用户',
-      avatar: storeUser.avatar || '',
-      email: storeUser.email || '未绑定',
+      id: su.id,
+      uid: su.uid || su.id?.slice(0, 8) || '未分配',
+      nickname: su.nickName || su.nickname || su.email?.split('@')[0] || '用户',
+      avatar: su.avatar || '',
+      email: su.email || '未绑定',
       isGoogleBound: false,
       googleEmail: ''
     }

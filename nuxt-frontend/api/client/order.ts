@@ -90,7 +90,7 @@ export const clientOrderApi = {
         const { data, error } = await query
 
         if (error) {
-            console.error('获取订单列表失败:', error)
+            if (import.meta.dev) console.error('获取订单列表失败:', error)
             return { success: false, error: error.message }
         }
 

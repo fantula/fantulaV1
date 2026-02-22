@@ -167,15 +167,14 @@ export const adminTicketApi = {
     if (filesToDelete.length === 0) return { success: true, count: 0 }
 
     // 4. 调用 delete-r2 Edge Function 删除文件
-    // 4. 调用 delete-r2 Edge Function 删除文件
     try {
-      const { EDGE_FUNCTIONS_URL } = await import('@/utils/supabase')
+      const { getEdgeFunctionsUrl } = await import('@/utils/supabase')
 
       if (!token) {
         return { success: false, count: 0, error: '请先登录后台管理员账号' }
       }
 
-      const response = await fetch(`${EDGE_FUNCTIONS_URL}/delete-r2`, {
+      const response = await fetch(`${getEdgeFunctionsUrl()}/delete-r2`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -184,15 +183,22 @@ export const adminTicketApi = {
         body: JSON.stringify({ paths: filesToDelete })
       })
 
-      const result = await response.json()
+      if (!response.ok) {
+        const ct = response.headers.get('content-type') || ''
+        const errText = ct.includes('application/json')
+          ? (await response.json().catch(() => ({}))).error || `HTTP ${response.status}`
+          : (await response.text()).replace(/<[^>]*>/g, '').trim().slice(0, 80)
+        return { success: false, count: 0, error: errText }
+      }
 
-      if (!response.ok || result.error) {
-        return { success: false, count: 0, error: result.error || '删除失败' }
+      const result = await response.json()
+      if (result.error) {
+        return { success: false, count: 0, error: result.error }
       }
 
       return { success: true, count: result.deleted || 0 }
     } catch (e: any) {
-      console.error('Cleanup error:', e)
+      if (import.meta.dev) console.error('Cleanup error:', e)
       return { success: false, count: 0, error: e.message || '清理失败' }
     }
   }

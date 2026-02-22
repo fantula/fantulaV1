@@ -29,7 +29,7 @@ export const adminDashboardApi = {
         const { data, error } = await client.rpc('admin_get_dashboard_stats')
 
         if (error) {
-            console.error('Failed to fetch dashboard stats:', error)
+            if (import.meta.dev) console.error('Failed to fetch dashboard stats:', error)
             return { success: false, error: error.message }
         }
 

@@ -171,7 +171,12 @@ const fetchFavorites = async () => {
       allFavorites.value = res.data.favorites
       // No need to manually trigger loadMore, watcher in composable will handle it since data updated?
       // Actually `allFavorites` update triggers `filteredSource` update which triggers watcher.
+    } else {
+      error.value = true
     }
+  } catch (e) {
+    if (import.meta.dev) console.error('Fetch favorites failed', e)
+    error.value = true
   } finally {
     // We let the composable manage loading state after initial fetch
     // But composable.loading is for "appending".
@@ -192,22 +197,29 @@ const switchTab = (tab: string) => {
 // === Actions ===
 
 const goToProduct = (id: string) => {
-  router.push(`/pc/goods/${id}`)
+  router.push(pcRoutes.product(id))
 }
 
 const removeFavorite = async (favoriteId: string) => {
-  const res = await favoriteApi.removeFavorite(favoriteId)
-  if (res.success) {
-    // Remove from source data
-    allFavorites.value = allFavorites.value.filter(item => item.id !== favoriteId)
-    // Composable watcher will see source change and might reset or re-evaluate?
-    // Resetting full list on delete is jarring. 
-    // Ideally we just remove from displayList too to avoid full reload.
-    // Client Side hack:
-    const idx = displayList.value.findIndex((i: any) => i.id === favoriteId)
-    if (idx !== -1) displayList.value.splice(idx, 1)
-    
-    ElMessage.success('已取消收藏')
+  try {
+    const res = await favoriteApi.removeFavorite(favoriteId)
+    if (res.success) {
+      // Remove from source data
+      allFavorites.value = allFavorites.value.filter(item => item.id !== favoriteId)
+      // Composable watcher will see source change and might reset or re-evaluate?
+      // Resetting full list on delete is jarring. 
+      // Ideally we just remove from displayList too to avoid full reload.
+      // Client Side hack:
+      const idx = displayList.value.findIndex((i: any) => i.id === favoriteId)
+      if (idx !== -1) displayList.value.splice(idx, 1)
+      
+      ElMessage.success('已取消收藏')
+    } else {
+      ElMessage.error(res.msg || '取消收藏失败')
+    }
+  } catch (e: any) {
+    if (import.meta.dev) console.error('Remove favorite failed', e)
+    ElMessage.error(e.message || '系统异常')
   }
 }
 
@@ -221,9 +233,9 @@ const goShopping = () => {
 <style scoped>
 /* Main Layout - Same as Exchange */
 .favorites-section {
+  flex: 1; min-height: 0; width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 0;
   overflow: hidden; /* Important */
 }
@@ -294,7 +306,7 @@ const goShopping = () => {
 .favorites-list-container {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 32px 0; /* Let BaseInfiniteList handle bottom spacing */
+  padding: 24px 32px 32px 32px;
   min-height: 0;
 }
 

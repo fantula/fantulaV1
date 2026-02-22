@@ -16,7 +16,7 @@
         >
           <el-icon><Picture /></el-icon>
           <span class="nav-label">全部图片</span>
-          <span class="nav-count" v-if="totalImages > 0 && currentCategoryId === ''">{{ totalImages }}</span>
+          <span class="nav-count-badge" v-if="allImageCount > 0">{{ allImageCount }}</span>
         </div>
 
         <!-- 分类列表 -->
@@ -32,6 +32,26 @@
             <el-icon v-if="cat.name === '未分类'"><FolderRemove /></el-icon>
             <el-icon v-else><Folder /></el-icon>
             <span class="nav-label">{{ cat.name }}</span>
+            <span class="nav-count-badge" v-if="categoryCounts[cat.id]">{{ categoryCounts[cat.id] }}</span>
+          </div>
+
+          <!-- 新建分类快捷入口 -->
+          <div class="new-category-wrapper">
+            <div v-if="!showNewCatInput" class="nav-item new-cat-btn" @click="triggerNewCatInput">
+              <el-icon><Plus /></el-icon>
+              <span class="nav-label">新建分类</span>
+            </div>
+            <div v-else class="new-cat-input-container">
+              <el-input
+                ref="newCatInputRef"
+                v-model="newCatName"
+                placeholder="名称 (回车保存)"
+                size="small"
+                @keyup.enter="submitNewCategory"
+                @keyup.esc="cancelNewCategory"
+                @blur="cancelNewCategory"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -70,7 +90,21 @@
              <el-divider direction="vertical" v-if="selectedIds.length > 0" />
              
              <el-button @click="syncFromR2" :loading="syncing" :icon="Refresh">R2 同步</el-button>
-             <el-button type="primary" @click="uploadDialogVisible = true" :icon="Upload">上传图片</el-button>
+             
+             <el-button v-if="!currentCategoryId" type="primary" @click="uploadDialogVisible = true" :icon="Upload">上传图片 (需选分类)</el-button>
+             <el-upload
+               v-else
+               class="direct-uploader"
+               action="#"
+               :show-file-list="false"
+               :http-request="handleDirectUpload"
+               :accept="'image/jpeg,image/png,image/webp,image/gif'"
+               multiple
+             >
+               <el-button type="primary" :icon="Upload" :loading="uploading">
+                 传至「{{ currentCategoryName }}」
+               </el-button>
+             </el-upload>
          </div>
       </div>
 
@@ -170,10 +204,10 @@ definePageMeta({
   middleware: ["mgmt-auth"]
 })
 
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { 
   Picture, Folder, FolderRemove, Setting, Search, 
-  Upload, Refresh, Delete, Edit, View, Check 
+  Upload, Refresh, Delete, Edit, View, Check, Plus
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminImageApi, adminImageCategoryApi, type AdminImage, type AdminImageCategory } from '@/api/admin/media'
@@ -198,11 +232,32 @@ const editDialogVisible = ref(false)
 const previewVisible = ref(false)
 const previewUrl = ref('')
 
+const currentCategoryName = computed(() => {
+  return categories.value.find(c => c.id === currentCategoryId.value)?.name || ''
+})
+
 // --- Initialization ---
 onMounted(async () => {
   await fetchCategories()
+  fetchCategoryCounts()
   await fetchImages()
 })
+
+const categoryCounts = ref<Record<string, number>>({})
+const allImageCount = ref(0)
+const fetchCategoryCounts = async () => {
+  const { getSupabaseClient } = await import('@/utils/supabase')
+  const client = getSupabaseClient()
+  const { data } = await client.from('images').select('category_id')
+  if (data) {
+    allImageCount.value = data.length
+    const counts: Record<string, number> = {}
+    data.forEach(d => {
+      if (d.category_id) counts[d.category_id] = (counts[d.category_id] || 0) + 1
+    })
+    categoryCounts.value = counts
+  }
+}
 
 // --- Category Logic ---
 const fetchCategories = async () => {
@@ -218,6 +273,45 @@ const handleCategorySelect = (id: string) => {
   if (currentCategoryId.value === id) return
   currentCategoryId.value = id
   fetchImages()
+}
+
+// --- New Category Feature ---
+const showNewCatInput = ref(false)
+const newCatName = ref('')
+const newCatInputRef = ref()
+
+const triggerNewCatInput = async () => {
+  showNewCatInput.value = true
+  await nextTick()
+  newCatInputRef.value?.focus()
+}
+
+const cancelNewCategory = () => {
+  setTimeout(() => {
+    showNewCatInput.value = false
+    newCatName.value = ''
+  }, 100)
+}
+
+const submitNewCategory = async () => {
+  const name = newCatName.value.trim()
+  if (!name) {
+    cancelNewCategory()
+    return
+  }
+  const res = await adminImageCategoryApi.createCategory(name)
+  if (res.success) {
+    ElMessage.success('分类创建成功')
+    showNewCatInput.value = false
+    newCatName.value = ''
+    await fetchCategories()
+    if (res.category) {
+      currentCategoryId.value = res.category.id
+      fetchImages()
+    }
+  } else {
+    ElMessage.error(res.error || '创建失败')
+  }
 }
 
 // --- Image Logic ---
@@ -299,10 +393,12 @@ const handleDelete = async (img: AdminImage) => {
    await confirmDelete(
       '确认删除此图片？',
       async () => {
+          const { getAuthToken } = await import('@/utils/supabase')
           const token = await getAuthToken()
           const res = await adminImageApi.deleteImage(img.id, token || undefined)
           if (res.success) {
              fetchImages()
+             fetchCategoryCounts()
           }
           return res
       }
@@ -313,10 +409,12 @@ const handleBatchDelete = async () => {
   await confirmAction(
     `确认删除选中的 ${selectedIds.value.length} 张图片？`,
     async () => {
+        const { getAuthToken } = await import('@/utils/supabase')
         const token = await getAuthToken()
         const res = await adminImageApi.deleteImages(selectedIds.value, token || undefined)
         if (res.success) {
              fetchImages()
+             fetchCategoryCounts()
         }
         return res
     },
@@ -329,6 +427,7 @@ const syncing = ref(false)
 const syncFromR2 = async () => {
   syncing.value = true
   try {
+    const { getAuthToken } = await import('@/utils/supabase')
     const token = await getAuthToken()
     if (!token) return ElMessage.error('请登录管理员账号')
 
@@ -341,6 +440,14 @@ const syncFromR2 = async () => {
     
     // ... (rest of logic)
     
+    if (!response.ok) {
+      const ct = response.headers.get('content-type') || ''
+      const errMsg = ct.includes('application/json')
+        ? (await response.json()).error || `HTTP ${response.status}`
+        : (await response.text()).replace(/<[^>]*>/g, '').trim().slice(0, 80)
+      throw new Error('获取 R2 列表失败: ' + errMsg)
+    }
+
     const result = await response.json()
     if (result.error) throw new Error(result.error)
     
@@ -375,6 +482,7 @@ const syncFromR2 = async () => {
     }
     ElMessage.success(`同步完成，新增 ${added} 张图片`)
     fetchImages()
+    fetchCategoryCounts()
     
   } catch (e: any) {
     ElMessage.error('同步失败: ' + e.message)
@@ -385,6 +493,47 @@ const syncFromR2 = async () => {
 
 const handleUploadSuccess = () => {
   fetchImages()
+  fetchCategoryCounts()
+}
+
+const uploading = ref(false)
+const handleDirectUpload = async (options: any) => {
+  if (!currentCategoryId.value) return
+  uploading.value = true
+  const file = options.file
+  try {
+    const { getAuthToken } = await import('@/utils/supabase')
+    const token = await getAuthToken()
+    if (!token) throw new Error('Auth Missing')
+
+    const currentCat = categories.value.find(c => c.id === currentCategoryId.value)
+    const folder = currentCat?.slug || 'uploads'
+    
+    const { uploadImageToStorage } = await import('@/utils/uploadImage')
+    const uploadRes = await uploadImageToStorage(file, folder, undefined, token)
+    
+    if (!uploadRes.success) throw new Error(uploadRes.error)
+
+    const res = await adminImageApi.createImage({
+      name: file.name,
+      url: uploadRes.url!,
+      category_id: currentCategoryId.value
+    })
+
+    if (res.success) {
+      ElMessage.success(` ${file.name} 上传成功`)
+      await fetchImages()
+      fetchCategoryCounts()
+      options.onSuccess(res)
+    } else {
+      throw new Error(res.error || '创建记录失败')
+    }
+  } catch (e: any) {
+    ElMessage.error('上传出错: ' + (e.message || '未知错误'))
+    options.onError(e)
+  } finally {
+    uploading.value = false
+  }
 }
 
 const previewImage = (url: string) => {
@@ -466,6 +615,42 @@ const formatDate = (dateStr: string) => {
   padding: 2px 6px;
   border-radius: 10px;
 }
+.nav-count-badge {
+  display: inline-block;
+  min-width: 20px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  background-color: var(--el-fill-color-darker);
+  color: #fff;
+  transition: all 0.3s;
+  margin-left: auto;
+}
+.nav-item.active .nav-count-badge {
+  background-color: var(--el-color-white);
+  color: var(--el-color-primary);
+}
+
+.new-category-wrapper {
+  margin: 10px 10px 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--el-border-color-lighter);
+}
+.new-cat-btn {
+  color: var(--el-color-primary);
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.new-cat-btn:hover {
+  background: var(--el-color-primary-light-9);
+}
+.new-cat-input-container {
+  padding: 6px 10px;
+}
+
 .nav-divider {
     height: 1px;
     background: var(--el-border-color-lighter);

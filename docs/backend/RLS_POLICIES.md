@@ -1,6 +1,6 @@
 # RLS 策略文档
 
-> **版本**: V1.0 | **更新时间**: 2026-02-04
+> **版本**: V1.1 | **更新时间**: 2026-02-21
 
 ---
 
@@ -133,6 +133,16 @@ CREATE POLICY "anon_insert" ON wechat_login_sessions
 | Admins can update cdks | UPDATE | authenticated | is_admin() |
 | Allow admin read cdks | SELECT | authenticated | is_admin() |
 | Service role has full access | ALL | service_role | true |
+
+### channel_recognitions
+
+> ⚠️ **注意**: 此表 RLS 策略经历过修复。`20260125000001_optimize_security` 迁移曾清除所有策略，导致管理员后台页面无法读写。`20260220000000_channel_recognition_admin_policy` 迁移已恢复策略。
+
+| 策略名 | 操作 | 角色 | 条件 |
+|--------|------|------|------|
+| admin_users_full_access | ALL | authenticated | auth.uid() IN (SELECT auth_user_id FROM admin_users WHERE status='enabled') |
+
+**移动端访问机制**：移动端通过 RPC `resolve_channel_key`（`SECURITY DEFINER`）访问，绕过 RLS，无需策略。
 
 ### orders
 

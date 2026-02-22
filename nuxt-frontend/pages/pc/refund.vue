@@ -1,16 +1,16 @@
 <template>
-  <div class="refund-page">
+  <div class="pc-glass-page">
 
     <!-- 页面内容 -->
     
-    <div class="refund-content">
-      <div class="refund-header">
-        <div class="refund-header-title">售后支持与权益保障</div>
-        <div class="refund-header-desc">本政策适用于本平台数字化服务的售后处理与权益保障说明</div>
+    <div class="pc-glass-content-b">
+      <div class="pc-glass-header-b">
+        <div class="pc-glass-title" style="margin-bottom: 16px;">售后支持与权益保障</div>
+        <div class="pc-glass-desc-b">本政策适用于本平台数字化服务的售后处理与权益保障说明</div>
       </div>
       
-      <div class="refund-body">
-        <div class="refund-panel">
+      <div class="pc-glass-body-b">
+        <div class="pc-glass-panel">
           <div class="panel-content">
             <!-- 政策说明板块 -->
             <div class="policy-section">
@@ -189,72 +189,7 @@ useHead({
 </script>
 
 <style scoped>
-/* Dark Aurora Theme Styles */
-.refund-page {
-  min-height: 100vh;
-  /* Transparent to reveal global particle sky */
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.refund-content {
-  flex: 1;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.refund-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 40px 0;
-}
-
-.refund-header-title {
-  font-family: 'Outfit', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  /* Blue-Orange Gradient */
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-  text-align: center;
-  text-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
-}
-
-.refund-header-desc {
-  font-size: 16px;
-  color: #94A3B8; /* Slate-400 */
-  text-align: center;
-  line-height: 1.6;
-}
-
-.refund-body {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.refund-panel {
-  width: 100%;
-  max-width: 900px;
-  /* Dark Glass Card */
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-}
-
+/* Specific Styles */
 .panel-content {
   padding: 40px;
 }
@@ -460,7 +395,7 @@ useHead({
 }
 
 @media (max-width: 768px) {
-  .refund-content {
+  .pc-glass-content-b {
     padding: 20px 16px;
   }
   
@@ -478,7 +413,7 @@ useHead({
     padding: 24px;
   }
   
-  .refund-header-title {
+  .pc-glass-title {
     font-size: 24px;
   }
   

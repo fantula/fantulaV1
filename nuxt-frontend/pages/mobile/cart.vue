@@ -18,7 +18,7 @@
              <ShoppingCart class="e-icon" />
           </div>
           <p>购物车空空如也</p>
-          <button class="btn-go" @click="router.push('/mobile')">去逛逛</button>
+          <button class="btn-go" @click="router.push(mobileRoutes.home())">去逛逛</button>
        </div>
 
        <!-- Cart List -->
@@ -112,6 +112,7 @@ import {
   ShoppingCart, Check, Minus, Plus 
 } from '@element-plus/icons-vue'
 import { useCartStore } from '@/stores/client/cart'
+import { mobileRoutes } from '@/config/client-routes'
 import { supabasePreOrderApi } from '@/api/client/supabase'
 import { useNotify } from '@/composables/useNotify'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
@@ -202,7 +203,7 @@ const handleCheckout = async () => {
     try {
         const res = await supabasePreOrderApi.createPreOrder(firstSku, totalQty, 'cart')
         if (res.success && res.pre_order_id) {
-            router.push(`/mobile/checkout/${res.pre_order_id}`)
+            router.push(mobileRoutes.checkout(res.pre_order_id))
         } else {
             error(res.error || '结算失败')
         }
@@ -214,7 +215,9 @@ const handleCheckout = async () => {
 
 <style scoped>
 .mobile-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: transparent; /* Allow global background */
   display: flex; flex-direction: column;
 }

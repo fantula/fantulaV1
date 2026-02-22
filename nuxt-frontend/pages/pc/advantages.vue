@@ -1,10 +1,10 @@
 <template>
-  <div class="advantages-page">
-    <div class="page-content">
-      <div class="content-container">
-        <div class="header-section">
-          <h1 class="main-title">我们的核心优势</h1>
-          <h2 class="sub-title">为何选择凡图拉？五大维度重新定义数字化权益体验</h2>
+  <div class="pc-glass-page">
+    <div class="pc-glass-content-a">
+      <div class="pc-glass-container">
+        <div class="pc-glass-header-a">
+          <h1 class="pc-glass-title">我们的核心优势</h1>
+          <h2 class="pc-glass-desc-a">为何选择凡图拉？五大维度重新定义数字化权益体验</h2>
         </div>
         
         <div class="cards-grid">
@@ -101,65 +101,7 @@ useHead({
 </script>
 
 <style scoped>
-/* Dark Aurora Theme Consistency */
-.advantages-page {
-  min-height: 100vh;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-}
-
-.page-content {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 60px 20px;
-}
-
-.content-container {
-  width: 100%;
-  max-width: 1200px;
-  /* Glassmorphism base consistent with other pages */
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 60px 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-}
-
-.header-section {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.main-title {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 42px;
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 16px;
-  letter-spacing: 1px;
-}
-
-.sub-title {
-  font-family: 'Noto Sans SC', sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  color: #94A3B8;
-  margin: 0;
-}
-
+/* Specific Styles */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -254,15 +196,15 @@ useHead({
 }
 
 @media (max-width: 768px) {
-  .page-content {
+  .pc-glass-content-a {
     padding: 30px 16px;
   }
   
-  .content-container {
+  .pc-glass-container {
     padding: 30px 20px;
   }
   
-  .main-title {
+  .pc-glass-title {
     font-size: 32px;
   }
   

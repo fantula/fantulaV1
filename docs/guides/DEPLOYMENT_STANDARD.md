@@ -25,19 +25,35 @@
 **场景**：修复 Bug、修改文案、调整样式（不涉及 `package.json` 变更）。
 **特点**：速度快，不重新安装依赖。
 **流程**：
-1. 本地 `npm run build`
-2. `rsync` 同步 `.output`
-3. 远程 `pm2 reload`
+1. 本地清理构建缓存：`rm -rf .nuxt .output`（⚠️ 必须，见下方踩坑警告）
+2. 本地 `npm run build`
+3. `rsync` 同步 `.output`
+4. 远程 `pm2 reload`
 
 ### 🅱️ 完整发布 (Full Release)
 **场景**：大版本更新、新增依赖、架构调整。
 **特点**：稳定，强制清理缓存和依赖。
 **流程**：
-1. 本地 `npm run build`
-2. `rsync` 同步 `.output`
-3. 远程清理 `node_modules` (避免平台/版本冲突)
-4. 远程 `npm install` (使用镜像源)
-5. 远程 `pm2 reload`
+1. 本地清理构建缓存：`rm -rf .nuxt .output`（⚠️ 必须）
+2. 本地 `npm run build`
+3. `rsync` 同步 `.output`
+4. 远程清理 `node_modules` (避免平台/版本冲突)
+5. 远程 `npm install` (使用镜像源)
+6. 远程 `pm2 reload`
+
+> ⚠️ **血泪踩坑：为何必须清理 `.nuxt/`**
+>
+> `nuxt dev` 开发时会在 `.nuxt/` 写入 dev 模式存根（`client.precomputed.mjs = export default undefined`）。
+> 若跳过清理直接 `npm run build`，Vite 缓存可能复用这些存根，导致：
+> - 部署后 HTTP 500: `rendererContext._entrypoints is not iterable`
+> - 或 HTML 中 JS 路径变成绝对路径（`/_nuxt/Users/dalin/...`）而非哈希路径
+>
+> **验证构建是否正常**（构建后立即执行）：
+> ```bash
+> wc -c .output/server/chunks/build/client.precomputed.mjs
+> # 正常：~521KB (如: 521602 bytes)
+> # 异常：只有 23 bytes → 说明是 dev 存根，必须重新清理构建
+> ```
 
 ---
 

@@ -42,7 +42,7 @@ export const MODAL_THEMES: Record<string, ModalTheme> = {
         variantClass: 'variant-phantom-light',
         animation: 'phantom-rise-soft',
         opacity: 1,
-        duration: '0.6s'
+        duration: '0.9s'
     },
 
     /* ======================================================================

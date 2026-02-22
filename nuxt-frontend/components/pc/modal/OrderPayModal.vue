@@ -152,10 +152,12 @@ async function handlePay() {
   if (paying.value) return // 防止重复点击
   
   paying.value = true
-  console.log('🚀 开始支付流程')
-  console.log('💳 支付方式:', payType.value)
-  console.log('💰 支付金额:', props.price)
-  console.log('📝 订单ID:', props.orderId)
+  if (import.meta.dev) {
+    console.log('🚀 开始支付流程')
+    console.log('💳 支付方式:', payType.value)
+    console.log('💰 支付金额:', props.price)
+    console.log('📝 订单ID:', props.orderId)
+  }
   
   try {
     if(payType.value === 'balance') {
@@ -165,12 +167,9 @@ async function handlePay() {
         return
       }
       
-      console.log('💰 使用余额支付...')
+      if (import.meta.dev) console.log('💰 使用余额支付...')
       // 🎨 前端UI设计阶段 - 模拟支付过程（已注释，用于检查页面功能）
-      /*
-      await simulatePayment()
-      console.log('✅ 余额支付成功，扣除金额:', props.price)
-      */
+      /* await simulatePayment() */
       
       // ✅ 真实API调用（已启用）
       const response = await paymentApi.getPaymentUrl({
@@ -180,18 +179,15 @@ async function handlePay() {
       })
       
       if (response.success) {
-        console.log('✅ 余额支付成功，扣除金额:', props.price)
+        if (import.meta.dev) console.log('✅ 余额支付成功，扣除金额:', props.price)
       } else {
         throw new Error(response.msg || '支付失败')
       }
       
     } else if(payType.value === 'alipay') {
-      console.log('💙 跳转支付宝支付...')
+      if (import.meta.dev) console.log('💙 跳转支付宝支付...')
       // 🎨 前端UI设计阶段 - 模拟支付过程（已注释，用于检查页面功能）
-      /*
-      await simulatePayment()
-      console.log('✅ 支付宝支付成功')
-      */
+      /* await simulatePayment() */
       
       // ✅ 真实API调用（已启用）
       const response = await paymentApi.getPaymentUrl({
@@ -209,12 +205,9 @@ async function handlePay() {
       }
       
     } else {
-      console.log('🔧 使用其他支付方式...')
+      if (import.meta.dev) console.log('🔧 使用其他支付方式...')
       // 🎨 前端UI设计阶段 - 模拟支付过程（已注释，用于检查页面功能）
-      /*
-      await simulatePayment()
-      console.log('✅ 其他支付方式支付成功')
-      */
+      /* await simulatePayment() */
       
       // ✅ 真实API调用（已启用）
       const response = await paymentApi.getPaymentUrl({
@@ -232,15 +225,15 @@ async function handlePay() {
       }
     }
     
-    console.log('🎉 支付完成，准备显示成功弹窗...')
+    if (import.meta.dev) console.log('🎉 支付完成，准备显示成功弹窗...')
     
     // 确保支付状态先重置
     paying.value = false
     
     // 立即显示成功弹窗
-    console.log('📱 设置showSuccessModal为true')
+    if (import.meta.dev) console.log('📱 设置showSuccessModal为true')
     showSuccessModal.value = true
-    console.log('📱 showSuccessModal当前值:', showSuccessModal.value)
+    if (import.meta.dev) console.log('📱 showSuccessModal当前值:', showSuccessModal.value)
     
     // 触发支付成功事件
     const paymentInfo = {
@@ -248,16 +241,16 @@ async function handlePay() {
       payType: payType.value,
       amount: props.price || 0
     }
-    console.log('📤 触发支付成功事件:', paymentInfo)
+    if (import.meta.dev) console.log('📤 触发支付成功事件:', paymentInfo)
     emits('paySuccess', paymentInfo)
     
     // 等待一下再检查弹窗状态
     setTimeout(() => {
-      console.log('⏰ 1秒后检查弹窗状态:', showSuccessModal.value)
+      if (import.meta.dev) console.log('⏰ 1秒后检查弹窗状态:', showSuccessModal.value)
     }, 1000)
     
   } catch (error) {
-    console.error('❌ 支付失败:', error)
+    if (import.meta.dev) console.error('❌ 支付失败:', error)
     ElMessage.error(CLIENT_MESSAGES.GLOBAL.UNKNOWN_ERROR)
     paying.value = false
   }

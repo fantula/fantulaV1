@@ -222,7 +222,7 @@ export const supabaseProductApi = {
                 .single()
 
             if (error || !data) {
-                console.error('检查 SKU 可购买性失败:', error)
+                if (import.meta.dev) console.error('检查 SKU 可购买性失败:', error)
                 return { available: false, availableCount: 0 }
             }
 
@@ -231,7 +231,7 @@ export const supabaseProductApi = {
                 availableCount: data.stock_count
             }
         } catch (err: any) {
-            console.error('检查 SKU 可购买性异常:', err)
+            if (import.meta.dev) console.error('检查 SKU 可购买性异常:', err)
             return { available: false, availableCount: 0 }
         }
     },
@@ -255,7 +255,7 @@ export const supabaseCategoryApi = {
             .order('sort_order', { ascending: true })
 
         if (error) {
-            console.error('获取分类失败:', error)
+            if (import.meta.dev) console.error('获取分类失败:', error)
             return { success: false, categories: [] }
         }
 
@@ -276,7 +276,7 @@ export const supabaseCategoryApi = {
             .order('created_at', { ascending: false })
 
         if (error) {
-            console.error('获取分类商品失败:', error)
+            if (import.meta.dev) console.error('获取分类商品失败:', error)
             return { success: false, products: [] }
         }
 

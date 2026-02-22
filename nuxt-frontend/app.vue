@@ -16,6 +16,7 @@ import { useRoute } from 'vue-router'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 
 import { isPC } from '@/utils/device'
+import { mobileRoutes, pcRoutes } from '@/config/client-routes'
 
 const route = useRoute()
 
@@ -26,13 +27,13 @@ onMounted(() => {
 
   // Mobile User on PC Route -> Force Mobile
   if (!_isPC && (currentPath.startsWith('/pc') || currentPath === '/')) {
-    navigateTo('/mobile', { external: true })
+    navigateTo(mobileRoutes.home(), { external: true })
     return
   }
 
   // PC User on Mobile Route -> Force PC
   if (_isPC && currentPath.startsWith('/mobile')) {
-    navigateTo('/pc', { external: true })
+    navigateTo(pcRoutes.home(), { external: true })
     return
   }
 })

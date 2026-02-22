@@ -73,7 +73,7 @@ import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { confirmDelete } from '@/composables/admin/useAdminDialog'
-import { useBizFormat } from '@/composables/admin/useBizFormat'
+import { useBizFormat } from '@/composables/common/useBizFormat'
 import { adminRoute } from '@/config/admin-routes'
 
 definePageMeta({

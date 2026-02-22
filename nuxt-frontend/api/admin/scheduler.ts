@@ -43,7 +43,7 @@ export const adminSchedulerApi = {
             const res = await fetch(`${getBaseUrl()}/status`)
             return await res.json()
         } catch (e) {
-            console.error('Failed to get scheduler status:', e)
+            if (import.meta.dev) console.error('Failed to get scheduler status:', e)
             return { isRunning: false, lastRun: null, lastResult: null }
         }
     },
@@ -61,7 +61,7 @@ export const adminSchedulerApi = {
                 error: data.error
             }
         } catch (e: any) {
-            console.error('Failed to get scheduler logs:', e)
+            if (import.meta.dev) console.error('Failed to get scheduler logs:', e)
             return { success: false, error: e.message }
         }
     },
@@ -122,7 +122,7 @@ export const adminSchedulerApi = {
                 error: data.error
             }
         } catch (e: any) {
-            console.error('Failed to get tasks:', e)
+            if (import.meta.dev) console.error('Failed to get tasks:', e)
             return { success: false, error: e.message }
         }
     }

@@ -143,6 +143,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowRight, DocumentCopy } from '@element-plus/icons-vue'
+import { mobileRoutes } from '~/config/client-routes'
 import { useUserStore } from '@/stores/client/user'
 import { authApi } from '@/api/client/auth'
 import { useNotify } from '@/composables/useNotify'
@@ -183,10 +184,10 @@ const handleLogoutConfirm = async () => {
     try {
         await authApi.logout()
     } catch (e) {
-        console.error('Logout API failed:', e)
+        if (import.meta.dev) console.error('Logout API failed:', e)
     } finally {
         userStore.logout()
-        router.replace('/mobile')
+        router.replace(mobileRoutes.home())
         loading.value = false
     }
 }
@@ -220,8 +221,9 @@ const handleImageError = (e: Event) => {
    Account Page Styles (Cyber/Neon Theme)
 ------------------------------------------- */
 .mobile-page {
-  min-height: 100vh;
-  /* background: #0F172A; REMOVED for global bg */
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   color: #fff;
   display: flex; flex-direction: column;
 }

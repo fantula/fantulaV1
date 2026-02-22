@@ -30,7 +30,7 @@
             </div>
 
             <div class="policy-section-title">一、服务说明</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -45,7 +45,7 @@
             </div>
 
             <div class="policy-section-title">二、用户注册与使用</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -63,7 +63,7 @@
             </div>
 
             <div class="policy-section-title">三、服务额度与售后规则</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -79,7 +79,7 @@
 
 
             <div class="policy-section-title">四、售后服务与责任范围</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -94,7 +94,7 @@
             </div>
 
             <div class="policy-section-title">五、知识产权与免责声明</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -109,7 +109,7 @@
             </div>
 
             <div class="policy-section-title">六、法律适用与争议解决</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -124,7 +124,7 @@
             </div>
 
             <div class="policy-section-title">七、附议</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -151,7 +151,7 @@
             </div>
 
             <div class="policy-section-title">1. Service Description</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -166,7 +166,7 @@
             </div>
 
             <div class="policy-section-title">2. User Registration and Usage</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -184,7 +184,7 @@
             </div>
 
             <div class="policy-section-title">3. Service Quota and After-Sales Rules</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -199,7 +199,7 @@
             </div>
 
             <div class="policy-section-title">4. After-Sales Service and Responsibility Scope</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -214,7 +214,7 @@
             </div>
 
             <div class="policy-section-title">5. Intellectual Property and Disclaimer</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -229,7 +229,7 @@
             </div>
 
             <div class="policy-section-title">6. Law Applicable and Dispute Resolution</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -244,7 +244,7 @@
             </div>
 
             <div class="policy-section-title">7. Final Provisions</div>
-            <div class="policy-section-line"></div>
+            <hr class="policy-section-line" />
             
             <div class="policy-highlight-box">
               <div class="policy-section-item">
@@ -535,6 +535,7 @@ const modal = useModalStore()
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
   margin: 8px 0 16px 0;
+  border: none;
 }
 
 .policy-highlight-box {

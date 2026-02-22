@@ -1,0 +1,137 @@
+/* PC Article Shared Styles */
+
+.pc-glass-page {
+    min-height: 100vh;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.pc-glass-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+    text-align: center;
+}
+
+/* Style A: Container is the glass box (about-us, company) */
+.pc-glass-content-a {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px 20px;
+}
+
+.pc-glass-container {
+    width: 100%;
+    max-width: 1200px;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 60px 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+}
+
+.pc-glass-header-a {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.pc-glass-desc-a {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #94A3B8;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* Style B: Header is outside the glass box (disclaimer, refund) */
+.pc-glass-content-b {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.pc-glass-header-b {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0;
+}
+
+.pc-glass-desc-b {
+    font-size: 16px;
+    color: #94A3B8;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.pc-glass-body-b {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.pc-glass-panel {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.pc-glass-section-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: #E2E8F0;
+    margin-bottom: 25px;
+    padding-bottom: 0;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+}
+
+.pc-glass-section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(to bottom, #60A5FA, #F97316);
+    margin-right: 12px;
+    border-radius: 2px;
+}
+
+.pc-glass-paragraph {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #CBD5E1;
+    line-height: 1.8;
+    margin: 0;
+    text-align: justify;
+    text-justify: inter-ideograph;
+}

@@ -11,7 +11,6 @@
       ref="scrollContainer"
       @scroll="handleScroll"
       @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
     >
 
@@ -51,12 +50,10 @@
         </div>
 
         <div class="goods-list" v-else>
-           <MobileProductCard 
-             v-for="(g, index) in currentGoods" 
-             :key="g.id" 
+           <MobileProductCard
+             v-for="g in currentGoods"
+             :key="g.id"
              :goods="g"
-             class="animate-fade-in"
-             :style="{ animationDelay: `${index * 0.05}s` }"
              @click="openDetail(g.id)"
            />
         </div>
@@ -111,6 +108,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ArrowUpBold } from '@element-plus/icons-vue'
 
 import { useUserStore } from '@/stores/client/user'
+import { mobileRoutes } from '@/config/client-routes'
 import { useHomeData } from '@/composables/client/useHomeData'
 
 // Components
@@ -299,9 +297,7 @@ const handleTouchEnd = async () => {
         navigator.vibrate([30, 20, 30])
       }
     } catch (error) {
-      if (import.meta.dev) {
-        console.error('Refresh failed:', error)
-      }
+      if (import.meta.dev) console.error('Refresh failed:', error)
     } finally {
       // 平滑收回动画（使用 RAF）
       const startDist = pullDistance.value
@@ -343,13 +339,13 @@ onMounted(async () => {
         const urlState = route.query.state as string
         
         if (code && !userStore.isLoggedIn) {
-            console.log('[MobileHome] WeChat code detected, redirecting to callback handler...')
+            if (import.meta.dev) console.log('[MobileHome] WeChat code detected, redirecting to callback handler...')
             // 将所有参数传递给 wechat-callback 统一处理
             const query: Record<string, string> = { code }
             if (urlState) query.state = urlState
             const returnTo = route.query.return_to as string
             if (returnTo) query.return_to = returnTo
-            router.replace({ path: '/mobile/wechat-callback', query })
+            router.replace({ path: mobileRoutes.wechatCallback(), query })
             return
         }
         
@@ -358,6 +354,9 @@ onMounted(async () => {
         
         // 设置滚动加载监听
         setupObserver()
+
+        // 手动绑定 touchmove 为 non-passive 以支持 pull-to-refresh 的 preventDefault
+        scrollContainer.value?.addEventListener('touchmove', handleTouchMove, { passive: false })
         
         if (route.query.open) {
             openDetail(route.query.open as string)
@@ -369,15 +368,13 @@ onMounted(async () => {
             router.replace({ query: { ...route.query, login: undefined } })
         }
     } catch (error) {
-        if (import.meta.dev) {
-            console.error('[MobileHome] Init error:', error)
-        }
-    }
+        if (import.meta.dev) console.error('[MobileHome] Init error:', error)
+    } finally {   }
 })
 
 onUnmounted(() => {
   if (observer) observer.disconnect()
-  // 清理 RAF
+  scrollContainer.value?.removeEventListener('touchmove', handleTouchMove)
   if (rafId !== null) cancelAnimationFrame(rafId)
   if (scrollRafId !== null) cancelAnimationFrame(scrollRafId)
 })
@@ -396,8 +393,9 @@ onUnmounted(() => {
 .content-scroll {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   padding-bottom: var(--sp-5);
-  scroll-behavior: smooth;
 }
 
 .goods-list-section { 
@@ -406,26 +404,6 @@ onUnmounted(() => {
   position: relative;
   z-index: 10;
 }
-
-.section-header {
-  margin-bottom: var(--sp-4);
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-2);
-}
-.section-title {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  display: flex; align-items: center; gap: 4px;
-}
-.section-dot {
-  width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent);
-}
-.section-subtitle {
-  font-size: var(--text-xs); color: var(--text-muted);
-}
-
 
 .goods-list {
   display: flex;
@@ -441,17 +419,6 @@ onUnmounted(() => {
   /* Handled by .bg-glass-card */
 }
 .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
-
-/* Premium Spinner */
-.spinner-premium {
-  width: 32px; height: 32px; 
-  border: 3px solid rgba(59, 130, 246, 0.2); 
-  border-top-color: var(--primary-color); 
-  border-radius: 50%; 
-  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
-  margin-bottom: 12px;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
-}
 
 .loading-more { 
   display: flex; align-items: center; justify-content: center; gap: 8px;

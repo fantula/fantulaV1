@@ -171,14 +171,14 @@ const skus = ref<SkuItem[]>([])
 
 // 监听初始数据变化（支持异步加载）
 watch(() => props.initialSpecs, (newSpecs) => {
-  console.log('[SkuEditor] initialSpecs changed:', newSpecs)
+  if (import.meta.dev) console.log('[SkuEditor] initialSpecs changed:', newSpecs)
   if (newSpecs && newSpecs.length > 0) {
     specs.value = JSON.parse(JSON.stringify(newSpecs))
   }
 }, { immediate: true, deep: true })
 
 watch(() => props.initialSkus, (newSkus) => {
-  console.log('[SkuEditor] initialSkus changed:', newSkus)
+  if (import.meta.dev) console.log('[SkuEditor] initialSkus changed:', newSkus)
   if (newSkus && newSkus.length > 0) {
     skus.value = JSON.parse(JSON.stringify(newSkus))
   }

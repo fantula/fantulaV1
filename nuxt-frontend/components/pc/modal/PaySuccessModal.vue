@@ -63,6 +63,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BaseButton from '@/components/shared/BaseButton.vue'
+import { pcRoutes } from '@/config/client-routes'
 
 const props = defineProps({
   orderId: { 
@@ -115,9 +116,9 @@ const safeTime = computed(() => {
 const handleGoToHome = () => {
   emits('close')
   try {
-    navigateTo('/')
+    navigateTo(pcRoutes.home())
   } catch (error) {
-    window.location.href = '/'
+    window.location.href = pcRoutes.home()
   }
 }
 
@@ -125,9 +126,9 @@ const handleGoToOrders = () => {
   emits('close')
   try {
     // Navigate to order list page as requested
-    navigateTo('/profile/order')
+    navigateTo(pcRoutes.profileOrders())
   } catch (error) {
-    window.location.href = '/profile/order'
+    window.location.href = pcRoutes.profileOrders()
   }
 }
 </script>

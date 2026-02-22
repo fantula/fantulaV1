@@ -214,7 +214,7 @@ const fetchCoupons = async () => {
               return true
           })
       }
-   } catch(e) { console.error('Failed to fetch coupons', e) }
+   } catch(e) { if (import.meta.dev) console.error('Failed to fetch coupons', e) }
 }
 
 const handleSpec = (group: string, val: string) => {

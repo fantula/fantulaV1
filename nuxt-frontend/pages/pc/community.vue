@@ -88,6 +88,7 @@ definePageMeta({
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Loading, VideoPlay, Document } from '@element-plus/icons-vue'
+import { pcRoutes } from '@/config/client-routes'
 import { communityApi } from '@/api/client/community'
 import type { Article, Category } from '@/api/client/community'
 
@@ -182,7 +183,7 @@ const loadMore = () => {
 
 // 跳转详情
 const viewArticle = (article: Article) => {
-  router.push(`/article/${article.id}`)
+  router.push(pcRoutes.article(article.id))
 }
 
 // 工具函数

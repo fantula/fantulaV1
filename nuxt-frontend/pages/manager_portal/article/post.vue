@@ -153,8 +153,8 @@ const fetchCategories = async () => {
   }
 }
 
-const handleImageSelect = (url: string) => {
-  form.cover_image = url
+const handleImageSelect = (image: { url: string }) => {
+  form.cover_image = image.url
   ElMessage.success('已选择图片')
 }
 

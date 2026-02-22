@@ -247,9 +247,9 @@ const confirmDelete = async () => {
 
 <style scoped>
 .tickets-section {
+  flex: 1; min-height: 0; width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 0;
   overflow: hidden;
 }
@@ -324,7 +324,7 @@ const confirmDelete = async () => {
 .tickets-list-container {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 32px 64px;
+  padding: 24px 32px 32px 32px;
   min-height: 0;
 }
 

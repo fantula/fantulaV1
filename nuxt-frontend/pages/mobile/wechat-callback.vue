@@ -52,7 +52,7 @@
         <div class="form-agreement">
           <label>
             <input type="checkbox" v-model="bindForm.agree" />
-            <span>同意 <NuxtLink to="/policy" target="_blank" class="link">用户协议</NuxtLink> 和 <NuxtLink to="/privacy" target="_blank" class="link">隐私政策</NuxtLink></span>
+            <span>同意 <NuxtLink :to="mobileRoutes.policy()" target="_blank" class="link">用户协议</NuxtLink> 和 <NuxtLink :to="mobileRoutes.privacy()" target="_blank" class="link">隐私政策</NuxtLink></span>
           </label>
         </div>
 
@@ -83,10 +83,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { wechatLoginApi } from '@/api/client/wechat-login'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
-import { getSupabaseClient } from '~/utils/supabase'
+import { getSupabaseClient } from '@/utils/supabase'
 import { ElMessageBox } from 'element-plus'
 import { useGlobalLoading } from '@/composables/useGlobalLoading'
 import { useNotify } from '@/composables/useNotify'
+import { mobileRoutes } from '@/config/client-routes'
 
 // Components
 import EmailInput from '@/components/shared/EmailInput.vue'
@@ -126,7 +127,7 @@ const globalLoading = useGlobalLoading()
 onMounted(async () => {
   // 0. 特殊处理：如果是 Magic Link 回调（Hash 中包含 access_token）
   if (route.hash && route.hash.includes('access_token')) {
-    console.log('[WechatCallback] Magic Link hash detected')
+    if (import.meta.dev) console.log('[WechatCallback] Magic Link hash detected')
     globalLoading.show('正在验证登录...') 
     
     // 防止 onAuthStateChange 和 getSession 双重触发
@@ -136,7 +137,7 @@ onMounted(async () => {
       if (handled) return
       handled = true
       
-      console.log('[WechatCallback] Session established, syncing user store...')
+      if (import.meta.dev) console.log('[WechatCallback] Session established, syncing user store...')
       await userStore.setUser(session.user, session.access_token)
 
       globalLoading.success('登录成功') 
@@ -146,14 +147,14 @@ onMounted(async () => {
           if (returnTo) {
               window.location.href = decodeURIComponent(returnTo)
           } else {
-              router.replace('/mobile/profile/account')
+              router.replace(mobileRoutes.profileAccount())
           }
       }, 800)
     }
     
     // 监听 Auth 状态变化 (Supabase 客户端会自动处理 Hash 并恢复 Session)
-    const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event, session) => {
-      console.log('[WechatCallback] Auth State Change:', event)
+    const { data: { subscription } } = getSupabaseClient().auth.onAuthStateChange(async (event: any, session: any) => {
+      if (import.meta.dev) console.log('[WechatCallback] Auth State Change:', event)
 
       if (event === 'SIGNED_IN' && session) {
         subscription.unsubscribe()
@@ -176,7 +177,7 @@ onMounted(async () => {
         globalLoading.hide()
         state.value = 'error'
         errorMsg.value = '登录验证超时，请返回重试'
-        console.error('[WechatCallback] Session establishment timed out')
+        if (import.meta.dev) console.error('[WechatCallback] Session establishment timed out')
       }
     }, 15000)
     
@@ -186,10 +187,10 @@ onMounted(async () => {
   // 从 URL 获取微信授权 code
   const code = route.query.code as string
 
-  console.log('[WechatCallback] Processing OAuth code...')
+  if (import.meta.dev) console.log('[WechatCallback] Processing OAuth code...')
 
   if (!code) {
-    console.error('[WechatCallback] No code in URL')
+    if (import.meta.dev) console.error('[WechatCallback] No code in URL')
     state.value = 'error'
     errorMsg.value = '未获取到授权信息'
     return
@@ -206,17 +207,17 @@ onMounted(async () => {
       const res = await wechatPayApi.getOpenId(code)
       if (res.success && res.data?.openid) {
         localStorage.setItem('wechat_openid', res.data.openid)
-        console.log('[WechatCallback] Got openid for recharge:', res.data.openid)
+        if (import.meta.dev) console.log('[WechatCallback] Got openid for recharge:', res.data.openid)
       }
       // 跳回充值页面
       const returnTo = route.query.return_to as string
       if (returnTo) {
         window.location.href = decodeURIComponent(returnTo)
       } else {
-        router.replace('/mobile')
+        router.replace(mobileRoutes.home())
       }
     } catch (e: any) {
-      console.error('[WechatCallback] Get openid for recharge failed:', e)
+      if (import.meta.dev) console.error('[WechatCallback] Get openid for recharge failed:', e)
       state.value = 'error'
       errorMsg.value = '获取支付信息失败: ' + (e.message || '')
     }
@@ -242,7 +243,7 @@ onMounted(async () => {
                     const target = decodeURIComponent(returnTo)
                     window.location.href = target // 使用 href 确保全量加载
                 } else {
-                    router.replace('/mobile/profile/account')
+                    router.replace(mobileRoutes.profileAccount())
                 }
             }, 1000)
         } else {
@@ -267,7 +268,7 @@ onMounted(async () => {
     const res = await wechatLoginApi.oauthLogin(code, { 
         redirectTo: returnTo ? decodeURIComponent(returnTo) : undefined 
     })
-    console.log('[WechatCallback] OAuth response:', res.data?.status || 'error')
+    if (import.meta.dev) console.log('[WechatCallback] OAuth response:', res.data?.status || 'error')
 
     if (!res.success || !res.data) {
       globalLoading.hide()
@@ -282,14 +283,14 @@ onMounted(async () => {
       if (res.data.actionLink) {
          // state.value = 'success'
          globalLoading.show('正在跳转...') 
-         console.log('[WechatCallback] Redirecting to Magic Link for auto-login...')
+         if (import.meta.dev) console.log('[WechatCallback] Redirecting to Magic Link for auto-login...')
          window.location.href = res.data.actionLink
       } else {
           // 降级：Magic Link 生成失败，提示用户
           globalLoading.hide()
           state.value = 'error'
           errorMsg.value = '自动登录失败，请使用邮箱验证码登录'
-          console.error('[WechatCallback] No actionLink returned from server')
+          if (import.meta.dev) console.error('[WechatCallback] No actionLink returned from server')
       }
     } else if (res.data.status === 'need_bind') {
       // 需要绑定邮箱
@@ -353,7 +354,7 @@ const sendCode = async () => {
     // 2. Send Code
     await sendBindCode(bindForm.value.email)
   } catch (err: any) {
-    console.error(err)
+    if (import.meta.dev) console.error(err)
     error('发送失败: ' + (err.message || '网络错误'))
   } finally {
     uniqueLoading.value = false
@@ -404,7 +405,7 @@ const onBind = async () => {
         if (returnTo) {
             window.location.href = decodeURIComponent(returnTo)
         } else {
-            router.replace('/mobile')
+            router.replace(mobileRoutes.home())
         }
       }, 1000)
     } else {
@@ -420,13 +421,15 @@ const onBind = async () => {
 }
 
 const goHome = () => {
-  router.replace('/mobile')
+  router.replace(mobileRoutes.home())
 }
 </script>
 
 <style scoped>
 .wechat-callback-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #0F172A; /* Fallback */
   background: var(--bg-page);
   display: flex;

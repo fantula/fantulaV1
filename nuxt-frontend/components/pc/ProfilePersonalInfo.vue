@@ -246,7 +246,7 @@ const updateEmail = async (newEmail: string) => {
 }
 
 const handleGoogleBind = () => {
-  console.log('Google Bind Action Triggered')
+  if (import.meta.dev) console.log('Google Bind Action Triggered')
 }
 
 const handleWechatSuccess = async () => {
@@ -293,7 +293,7 @@ const handleCopy = (text: string) => {
 .personal-info-page {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1; min-height: 0;
   width: 100%;
   position: relative;
   /* Parent container handles the sheer glass frame */

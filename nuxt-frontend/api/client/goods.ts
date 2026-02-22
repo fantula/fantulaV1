@@ -114,7 +114,8 @@ export const goodsApi = {
         .order('sort_order', { ascending: true })
 
       if (skuError) {
-        console.error('获取 SKU 列表失败:', skuError)
+        if (import.meta.dev) console.error('获取 SKU 列表失败:', skuError)
+        // 继续，SKU 列表可能为空，前端可处理
       }
 
       // 提取 SKU 数据
@@ -138,21 +139,33 @@ export const goodsApi = {
         }
       })
 
-      // 构建规格组（从 SKU 的 spec_combination 提取）
-      const specGroups: { name: string; values: string[] }[] = []
-      const groups: Record<string, Set<string>> = {}
+      // 构建规格组（从 product.spec_definition 获取或从 SKU 提取）
+      let specGroups: { name: string; values: string[] }[] = []
 
-      skus.forEach((sku: any) => {
-        const combination = sku.spec_combination || {}
-        Object.entries(combination).forEach(([name, value]) => {
-          if (!groups[name]) groups[name] = new Set()
-          groups[name].add(value as string)
+      if (product.spec_definition && Array.isArray(product.spec_definition) && product.spec_definition.length > 0) {
+        // Use explicitly ordered spec definition
+        specGroups = product.spec_definition.map((s: any) => ({
+          name: s.name,
+          values: Array.isArray(s.values) ? s.values : []
+        }))
+      } else {
+        // Fallback for older products: reconstruct from SKUs
+        const groups: Record<string, Set<string>> = {}
+
+        skus.forEach((sku: any) => {
+          const combination = sku.spec_combination || {}
+          Object.entries(combination).forEach(([name, value]) => {
+            if (!groups[name]) groups[name] = new Set()
+            groups[name].add(value as string)
+          })
         })
-      })
 
-      Object.keys(groups).forEach(name => {
-        specGroups.push({ name, values: Array.from(groups[name]) })
-      })
+        Object.keys(groups).forEach(name => {
+          specGroups.push({ name, values: Array.from(groups[name]) })
+        })
+      }
+
+
 
       // 适配返回数据
       const goods: Goods = {
@@ -177,9 +190,9 @@ export const goodsApi = {
       } as Goods & { specGroups: any[]; allow_addon: boolean }
 
       return { code: 0, msg: 'success', data: goods, success: true }
-    } catch (err) {
-      console.error('获取商品详情失败:', err)
-      return { code: 500, msg: '获取商品详情失败', data: null as any, success: false }
+    } catch (err: any) {
+      if (import.meta.dev) console.error('获取商品详情失败:', err)
+      return { code: 500, msg: err.message || '获取商品详情失败', data: null as any, success: false }
     }
   },
 
@@ -270,16 +283,21 @@ export const goodsApi = {
    * @param id 商品ID
    */
   async getProductStock(id: string | number): Promise<ApiResponse<number>> {
-    const { data, error } = await callEdgeFunction<{ stock: number }>('products', {
-      method: 'GET',
-      params: { id: String(id) }
-    })
+    try {
+      const { data, error } = await callEdgeFunction<{ stock: number }>('products', {
+        method: 'GET',
+        params: { id: String(id) }
+      })
 
-    if (error) {
-      console.error('获取库存失败:', error)
-      return { code: 500, msg: error, data: 0, success: false }
+      if (error) {
+        if (import.meta.dev) console.error('获取库存失败:', error)
+        return { code: 500, msg: error, data: 0, success: false }
+      }
+
+      return { code: 0, msg: 'success', data: data?.stock ?? 0, success: true }
+    } catch (error: any) {
+      if (import.meta.dev) console.error('获取库存失败:', error)
+      return { code: 500, msg: error.message || '获取库存失败', data: 0, success: false }
     }
-
-    return { code: 0, msg: 'success', data: data?.stock ?? 0, success: true }
   }
 }

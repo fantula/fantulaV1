@@ -1,11 +1,15 @@
 <template>
-  <div class="article-detail-page">
+  <div class="article-detail-page pc-glass-page">
     <div v-if="loading" class="loading-state">
       <el-icon class="is-loading"><Loading /></el-icon>
       <span>加载中...</span>
     </div>
 
-    <div v-else-if="article" class="article-container">
+    <!-- Wrapping Content with Shared Class Array logic -->
+    <div v-else-if="article" class="pc-glass-content-a" style="padding-top: 40px; padding-bottom: 40px;">
+
+    <!-- This matches the previous styling structure to center -->
+    <div class="pc-glass-panel" style="width: 100%; max-width: 900px; display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.6s ease-out; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
       <!-- 顶部视频播放区 (如果有视频) -->
       <div v-if="videoEmbedUrl" class="video-section">
         <div class="video-wrapper">
@@ -56,6 +60,7 @@
           <el-icon><ArrowLeft /></el-icon> 返回列表
         </button>
       </div>
+    </div>
     </div>
 
     <div v-else class="error-state">
@@ -163,25 +168,9 @@ useHead({
 </script>
 
 <style scoped>
+/* Specific Styles */
 .article-detail-page {
-  min-height: 100vh;
-  background: transparent;
   color: #e2e8f0;
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-}
-
-.article-container {
-  width: 100%;
-  max-width: 900px;
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-  animation: fadeIn 0.6s ease-out;
 }
 
 /* 视频区域 */

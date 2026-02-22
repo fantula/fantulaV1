@@ -293,6 +293,8 @@ const onTicketSuccess = () => {
 .order-detail-page {
   display: flex; flex-direction: column; 
   width: 100%; max-width: 100%;
+  flex: 1; min-height: 0;
+  overflow-y: auto;
   padding: 0; /* No global padding to allow full-bleed header */
   padding-bottom: 40px;
 }

@@ -229,7 +229,7 @@ body.show-pc-loader::after {
     // 预渲染配置
     prerender: {
       crawlLinks: false,
-      routes: ['/about-us', '/service', '/faq'],
+      routes: ['/about-us', '/faq'],
       ignore: ['/pc/**', '/mobile/**']
     }
   },
@@ -263,7 +263,8 @@ body.show-pc-loader::after {
   // SEO 优化配置
   css: [
     '@/assets/styles/tokens/index.css',
-    '@/assets/styles/theme-blue-orange.css'
+    '@/assets/styles/theme-blue-orange.css',
+    '@/assets/styles/theme-article.css'
   ],
 
   hooks: {
@@ -286,12 +287,19 @@ body.show-pc-loader::after {
           return
         }
 
+        const cloneRoute = (route: any): any => {
+          const cloned = { ...route }
+          if (cloned.name) cloned.name = 'root-' + cloned.name
+          if (cloned.children) {
+            cloned.children = cloned.children.map(cloneRoute)
+          }
+          return cloned
+        }
+
         if (!exists) {
-          pages.push({
-            ...p,
-            name: p.name ? 'root-' + p.name : undefined,
-            path: newPath
-          })
+          const clonedPage = cloneRoute(p)
+          clonedPage.path = newPath
+          pages.push(clonedPage)
         }
       })
     }

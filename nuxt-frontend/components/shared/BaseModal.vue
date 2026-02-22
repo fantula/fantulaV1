@@ -439,18 +439,41 @@ const handleClose = () => {
    配置: mascotPosition: 'left', variantClass: 'variant-phantom-light'
    ═══════════════════════════════════════════════════════════════════════════ */
 .variant-phantom-light {
-    filter: brightness(1.2) sepia(0.2);
-    mix-blend-mode: hard-light;
+    /* 虚化效果：轻度模糊 + 暖色调 */
+    filter: blur(3px) brightness(1.1) sepia(0.15);
+    mix-blend-mode: soft-light;
+    /* 左侧渐变遮罩：左边清晰、右边源入背景 */
+    mask-image: linear-gradient(
+      to right,
+      rgba(0,0,0,0.9) 0%,
+      rgba(0,0,0,0.6) 50%,
+      rgba(0,0,0,0.15) 80%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0,0,0,0.9) 0%,
+      rgba(0,0,0,0.6) 50%,
+      rgba(0,0,0,0.15) 80%,
+      transparent 100%
+    );
 }
 
+/* 从LEFT滑入：X 轴负偏移→到位，同时模糊渐清 —— 与 suit-001 从下方升起对称 */
 @keyframes phantom-rise-soft {
-    0% { 
-        transform: scale(0.95); 
-        opacity: 0; 
+    0% {
+        opacity: 0;
+        transform: translateX(-60px) scale(0.95);
+        filter: blur(10px) brightness(1.1) sepia(0.15);
     }
-    100% { 
-        transform: scale(1); 
-        opacity: var(--mascot-final-opacity, 0.8); 
+    50% {
+        opacity: 0.5;
+        filter: blur(6px) brightness(1.1) sepia(0.15);
+    }
+    100% {
+        opacity: var(--mascot-final-opacity, 1);
+        transform: translateX(0) scale(1);
+        filter: blur(3px) brightness(1.1) sepia(0.15);
     }
 }
 

@@ -18,6 +18,7 @@ export interface OrderDetail {
     productName: string
     productImage: string
     skuSpec: string
+    delivery_type?: string
     // Raw snapshots for components that need them
     product_snapshot?: any
     sku_snapshot?: any
@@ -37,7 +38,7 @@ export interface SlotItem {
     cdk_id: string
 }
 
-export interface FulfillmentField {
+interface FulfillmentField {
     key: string
     label: string
     value: string

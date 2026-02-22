@@ -1,6 +1,6 @@
 # 数据库 Schema 文档
 
-> **版本**: V1.0 | **更新时间**: 2026-02-04 | **表数量**: 38
+> **版本**: V1.1 | **更新时间**: 2026-02-21 | **表数量**: 38
 
 ---
 
@@ -14,7 +14,7 @@
 | `cart_items` | 5 | ✅ | 购物车 |
 | `cdk_sku_map` | 4 | ✅ | CDK-SKU映射(核心) |
 | `cdks` | 12 | ✅ | CDK密钥(核心) |
-| `channel_recognitions` | 5 | ✅ | 渠道识别 |
+| `channel_recognitions` | 6 | ✅ | 渠道识别（含 channel_name，2026-02-20 新增）|
 | `community_articles` | 11 | ✅ | 社区文章 |
 | `community_categories` | 7 | ✅ | 社区分类 |
 | `coupon_codes` | 10 | ✅ | 优惠券码 |
@@ -45,6 +45,43 @@
 | `user_favorites` | 5 | ✅ | 用户收藏 |
 | `wallet_transactions` | 7 | ✅ | 钱包流水 |
 | `wechat_login_sessions` | 7 | ✅ | 微信登录会话 |
+
+---
+
+## 📡 频道识别表
+
+### channel_recognitions (频道识别)
+
+```sql
+CREATE TABLE channel_recognitions (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  channel_key  text NOT NULL UNIQUE,  -- 频道标识 (如 @xxx)，小写，以 @ 开头
+  channel_name text,                  -- 人类可读的频道名称（前端展示用，可为空）
+  product_id   uuid REFERENCES products(id) ON DELETE SET NULL,  -- 绑定的商品
+  created_at   timestamptz DEFAULT now(),
+  updated_at   timestamptz DEFAULT now()
+);
+```
+
+**关键字段说明**:
+- `channel_key`: 经 `resolve_channel_key` RPC 规范化（trim→lowercase→确保@开头）后存储
+- `channel_name`: 管理员在后台设置的显示名称，展示给移动端用户
+- `product_id`: 为 null 时状态为"待处理"，有值时状态为"已完成"
+
+**RLS 策略**:
+- 标准客户端：无读取权限（RLS 开启，公共策略被 `20260125000001_optimize_security` 迁移清除）
+- 管理员客户端（认证用户且在 admin_users 表中）：全量访问（SELECT/INSERT/UPDATE/DELETE）
+- `resolve_channel_key` RPC：`SECURITY DEFINER`，绕过 RLS，供移动端匿名调用
+
+**相关迁移**:
+- `20260125000000_channel_recognition.sql` — 建表 + RPC 函数
+- `20260220000000_channel_recognition_admin_policy.sql` — 恢复管理员策略
+- `20260220000001_add_channel_name.sql` — 新增 channel_name 列
+- `20260220000002_update_resolve_channel_key.sql` — RPC 返回值加入 channel_name
+
+**使用场景**:
+- 移动端 `/mobile/channel` 页：用户输入频道号 → RPC `resolve_channel_key` → 返回绑定商品
+- 后台 `/manager_portal/cdk/channel-recognition`：管理员绑定频道与商品、设置频道名称
 
 ---
 

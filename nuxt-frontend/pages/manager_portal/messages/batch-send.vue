@@ -136,7 +136,7 @@ import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'elem
 import { adminUserApi, adminMessageApi, type AdminUser, type AdminMessage } from '@/api/admin'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import { useBizFormat } from '@/composables/admin/useBizFormat'
+import { useBizFormat } from '@/composables/common/useBizFormat'
 
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"],

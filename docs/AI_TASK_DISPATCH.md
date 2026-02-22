@@ -1,8 +1,9 @@
 # AI 助理中心调度手册
 
-> **版本**: V4.0 | **更新时间**: 2026-02-20
+> **版本**: V4.2 | **更新时间**: 2026-02-21
 > **你是谁**: 你是被项目经理（PM）派遣来执行特定任务的 AI 执行助手。你不是项目经理，你是执行者。
-> **本文档的作用**: 你收到任务后，必须阅读本文档。它会告诉你该读哪些文档、按什么步骤做、最后更新哪些文档。
+> **⚡ 新入口**: 收到任务后，请优先阅读 **`docs/SKILLS_HUB.md`**，它会根据任务类型路由到对应的技能脚本（bug-fix / new-feature / deployment）。技能脚本内嵌了逐步检查清单，比本文档更适合直接执行。
+> **本文档的作用**: 作为**规则库**被技能脚本按需引用（模块对照表、已知模式、SCAN/OPTIMIZE流程）。不再作为主要入口。
 > **核心原则**: 只做被要求的事，不做没被要求的事。宁可少改一行，不可多改一行。
 
 ---
@@ -256,6 +257,52 @@ if (!selectedSpecs.value[key]) selectedSpecs.value[key] = newValue
 - `layouts/mgmt.vue` → 所有 `pages/manager_portal/**/*.vue`
 - `components/shared/BaseModal.vue` → 所有使用 BaseModal 的弹窗
 - `components/admin/base/AdminModuleLayout.vue` → 所有后台页面
+
+### 模式 7: Nuxt 生产构建缓存污染
+
+**背景**: `nuxt dev` 在 `.nuxt/` 目录写入 dev 存根文件。跳过清理直接 `npm run build` 可导致生产产物包含 dev 内容。
+
+**症状**:
+- 部署后 HTTP 500: `rendererContext._entrypoints is not iterable`
+- 或 HTML JS 路径为绝对路径（`/_nuxt/Users/dalin/...`）而非哈希路径（`/_nuxt/abc123.js`）
+
+**铁律**（领域 C 任何构建任务前必须执行）：
+```bash
+cd nuxt-frontend
+rm -rf .nuxt .output
+npm run build
+```
+
+**验证**:
+```bash
+wc -c .output/server/chunks/build/client.precomputed.mjs
+# 正常 ~521KB，异常 23 bytes (dev stub)
+```
+
+**检查点**: 接到"登录页打不开"/"服务器 500"的报告时，优先检查此问题（比 PM2 日志更快定位）。
+
+### 模式 8: Nuxt pages:extend 浅拷贝路由冲突
+
+**背景**: `nuxt.config.ts` 中的 `pages:extend` 钩子常用于复制特定目录下的路由（例如将 `/pc/*` 复制为根目录 `/*` 用于动态适配）。如果复制时只对顶级页面对象使用了浅拷贝 `{ ...p }`，会导致其嵌套子页面 (`children` 数组) 内部元素保留原有的引用和原有的 `name` 属性。
+
+**症状**: 
+- 嵌套的子路由页面（例如 `/pc/profile/...` 下的二级 Tab）在导航时突然变 404，控制台提示 `No match found for location...`。
+- 这是因为 Vue Router 的底层机制：当重复注册具有相同 `name` 的路由时，后注册的克隆路由会直接覆盖（或静默剔除）先注册的同名原版路由，导致真实路径对应的记录丢失。
+
+**规范 (修复方案)**:
+在 `pages:extend` 中生成克隆路由时，必须执行**深度递归克隆**（Deep Clone），确保彻底隔离名称和子级引用：
+```typescript
+const cloneRoute = (route: any): any => {
+  const cloned = { ...route }
+  if (cloned.name) cloned.name = 'root-' + cloned.name
+  if (cloned.children) {
+    cloned.children = cloned.children.map(cloneRoute)
+  }
+  return cloned
+}
+```
+
+**检查点**: 当遇到一片区域内的动态路由或子嵌套页面全部 404 瘫痪时，必须检查 `nuxt.config.ts` 及运行时是否有不安全的浅拷贝引发了 `name` 冲突被踢出路由表。
 
 ### 模式 6: CSS 残留清理
 
@@ -546,4 +593,4 @@ if (!selectedSpecs.value[key]) selectedSpecs.value[key] = newValue
 >
 > - 执行 SCAN 任务后，请将结果追加到该文档
 > - 后续扫描前，先阅读该文档了解已检查范围，避免重复扫描
-> - 当前最新记录: **V4.0 已知模式规范化 (2026-02-20)**
+> - 当前最新记录: **V4.1 新增模式7：Nuxt构建缓存污染 (2026-02-21)**

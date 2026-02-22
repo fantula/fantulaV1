@@ -58,7 +58,7 @@ defineProps<{
 const emit = defineEmits(['close', 'bind', 'update:visible'])
 
 const handleBind = () => {
-  console.log('Initiating Google Binding...')
+  if (import.meta.dev) console.log('Initiating Google Binding...')
   emit('bind')
   emit('close')
 }

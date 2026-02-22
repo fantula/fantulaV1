@@ -28,15 +28,15 @@
                 <div class="item-info">
                    <div class="item-name">{{ cartItem.productName }}</div>
                    <div class="item-spec">{{ cartItem.specName }}</div>
-                   <div class="item-row">
-                      <span class="text-price">¥{{ cartItem.price }}</span>
+                   <div class="cart-price">
+                    <span class="text-price">¥{{ Number(cartItem.price).toFixed(2) }}</span>
+                </div>
                       <div class="qty-control" v-if="cartItem.allowAddon">
                          <button class="qty-btn" @click="updateQty(-1)" :disabled="cartItem.quantity<=1">-</button>
                          <span class="qty-num">{{ cartItem.quantity }}</span>
                          <button class="qty-btn" @click="updateQty(1)">+</button>
                       </div>
                       <span v-else class="qty-static">x{{ cartItem.quantity }}</span>
-                   </div>
                 </div>
              </div>
           </div>
@@ -61,6 +61,7 @@ import { useCartStore } from '@/stores/client/cart'
 import { supabasePreOrderApi } from '@/api/client/supabase'
 import { useToast } from '@/composables/mobile/useToast'
 import { Delete, Close } from '@element-plus/icons-vue'
+import { mobileRoutes } from '@/config/client-routes'
 
 defineProps<{ visible: boolean }>()
 const emit = defineEmits(['close'])
@@ -90,7 +91,7 @@ const handleCheckout = async () => {
         if (res.success && res.pre_order_id) {
             cartStore.clearCart()
             emit('close')
-            router.push(`/profile/order/${res.pre_order_id}`) // Use root path for now, let middleware handle
+            router.push(mobileRoutes.orderDetail(res.pre_order_id)) 
         } else {
             toast.showToast(res.error || '创建订单失败', 'error')
         }

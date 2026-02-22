@@ -117,7 +117,7 @@ import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
-import { useBizFormat } from '@/composables/admin/useBizFormat'
+import { useBizFormat } from '@/composables/common/useBizFormat'
 
 definePageMeta({
   layout: 'mgmt',

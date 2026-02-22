@@ -140,7 +140,7 @@ const fetchData = async () => {
       checkUrlQuery()
 
    } catch(e) {
-      console.error(e)
+      if (import.meta.dev) console.error(e)
       error('加载失败')
    } finally {
       loading.value = false
@@ -174,9 +174,10 @@ onMounted(() => {
 
 <style scoped>
 .mobile-help-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 20px 16px 100px;
-  /* background: #0F172A; REMOVED to show global background */
   color: #fff;
   display: flex; flex-direction: column;
 }

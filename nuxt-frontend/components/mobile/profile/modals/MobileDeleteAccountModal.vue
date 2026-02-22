@@ -62,6 +62,7 @@ import { useUserStore } from '@/stores/client/user'
 import { useRouter } from 'vue-router'
 import { useNotify } from '@/composables/useNotify'
 import { useSendCode } from '@/composables/client/useSendCode'
+import { mobileRoutes } from '@/config/client-routes'
 
 const props = defineProps<{
   visible: boolean
@@ -83,7 +84,6 @@ const {
 
 const baseLoading = ref(false)
 const loading = computed(() => baseLoading.value || codeLoading.value)
-// let timerInterval: any = null // Removed
 
 const canSubmit = computed(() => {
     return isConfirmed.value && otpCode.value.length >= 4
@@ -94,20 +94,16 @@ watch(() => props.visible, (val) => {
         isConfirmed.value = false
         otpCode.value = ''
         countdown.value = 0
-        // if(timerInterval) clearInterval(timerInterval) // Removed
         checkTimer() // Sync timer
     }
 })
 
 onUnmounted(() => {
-    // if (timerInterval) clearInterval(timerInterval) // Removed
 })
 
 const handleClose = () => {
     emit('close')
 }
-
-// import { useSendCode } from '@/composables/client/useSendCode' // Moved to top
 
 // ... existing code ...
 
@@ -132,7 +128,7 @@ const handleDelete = async () => {
         if (res.success) {
             success('账号已注销')
             await userStore.logout()
-            router.push('/mobile')
+            router.push(mobileRoutes.home())
         } else {
              error(res.msg || '注销失败')
         }

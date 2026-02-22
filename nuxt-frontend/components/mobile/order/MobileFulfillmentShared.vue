@@ -58,24 +58,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { onMounted } from 'vue'
 import { User, CopyDocument, Plus } from '@element-plus/icons-vue'
-import { getSupabaseClient } from '@/utils/supabase'
 import { useToast } from '@/composables/mobile/useToast'
-
-interface CdkItem {
-  id: string
-  code: string
-  parsed: any
-  accountData: any
-}
-
-interface CoSharingUser {
-  id: string
-  avatar: string | null
-  nickname: string | null
-  slot_index: number
-}
+import { useCoSharing } from '@/composables/client/useCoSharing'
+import type { CdkItem } from '@/composables/client/useCoSharing'
 
 const props = defineProps<{
   cdkItem: CdkItem
@@ -83,75 +70,22 @@ const props = defineProps<{
 }>()
 
 const { showToast } = useToast()
-const coSharingUsers = ref<CoSharingUser[]>([])
 
-// Logic reused from PC
-const maxSlots = computed(() => {
-    if (!props.cdkItem) return 5
-    if (props.cdkItem.accountData && props.cdkItem.accountData.max_slots) {
-        return Number(props.cdkItem.accountData.max_slots)
-    }
-    return 5
+const {
+  maxSlots,
+  allSlots,
+  occupiedCount,
+  parseCdkCode,
+  copyText,
+  formatSlotIndex,
+  fetchCoSharingUsers
+} = useCoSharing({
+  cdkItem: () => props.cdkItem,
+  slotIndex: () => props.slotIndex,
+  onCopySuccess: (msg) => showToast(msg, 'success')
 })
-
-const mySlotIndex = computed(() => props.slotIndex)
-
-const allSlots = computed(() => {
-    const slots = []
-    for (let i = 1; i <= maxSlots.value; i++) {
-        const user = coSharingUsers.value.find(u => u.slot_index === i)
-        const isMe = (i === Number(mySlotIndex.value))
-        slots.push({ index: i, user, isMe })
-    }
-    return slots
-})
-
-const occupiedCount = computed(() => coSharingUsers.value.length)
-
-const parseCdkCode = (item: CdkItem) => {
-  if (!item) return {}
-  if (item.parsed && typeof item.parsed === 'object') return item.parsed
-  try { return JSON.parse(item.code) } catch { return { '激活码': item.code } }
-}
-
-const copyText = (t: string) => {
-  navigator.clipboard.writeText(t).then(() => showToast('已复制', 'success'))
-}
-
-const formatSlotIndex = (idx?: number) => String(idx || 0).padStart(2, '0')
-
-const fetchCoSharingUsers = async () => {
-  if (!props.cdkItem || !props.cdkItem.id) return
-  const cdkId = props.cdkItem.id
-
-  try {
-    const client = getSupabaseClient()
-    const { data, error } = await client
-      .from('slot_occupancies')
-      .select(`
-        user_id,
-        slot_index,
-        profiles:user_id (id, avatar, nickname)
-      `)
-      .eq('cdk_id', cdkId)
-      .eq('status', 'using')
-      .not('user_id', 'is', null)
-
-    if (!error && data) {
-      coSharingUsers.value = data
-        .filter((item: any) => item.profiles)
-        .map((item: any) => ({
-          id: item.profiles.id,
-          avatar: item.profiles.avatar,
-          nickname: item.profiles.nickname,
-          slot_index: item.slot_index
-        }))
-    }
-  } catch (err) { console.error(err) }
-}
 
 onMounted(fetchCoSharingUsers)
-watch(() => props.cdkItem, fetchCoSharingUsers, { deep: true })
 </script>
 
 <style scoped>

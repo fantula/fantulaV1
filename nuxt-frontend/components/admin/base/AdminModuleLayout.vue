@@ -94,10 +94,19 @@ const syncHeader = () => {
   mySessionId = headerStore.setLayout(props.title, tabsToShow, activeTab.value)
 }
 
+// Whether tabs should be visible (based on hideTabsOn keywords)
+const tabsVisible = computed(() =>
+  !props.hideTabsOn.some(keyword => route.path.includes(keyword))
+)
+
 // Watchers
+// Route change: only update which tab is active (never rebuild the tabs array)
 watch(() => route.path, () => {
   updateActiveTab()
-  // Re-sync header in case hideTabsOn condition changed
+})
+
+// Tabs visibility change: only sync full layout when show/hide state actually changes
+watch(tabsVisible, () => {
   syncHeader()
 })
 

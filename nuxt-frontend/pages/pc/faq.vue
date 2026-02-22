@@ -1,11 +1,11 @@
 ﻿<template>
-  <div class="faq-page force-light">
+  <div class="pc-glass-page force-light">
     <!-- 顶部导航 -->
 
-    <div class="page-content">
-      <div class="content-container">
-        <div class="header-section">
-          <h1 class="main-title">常见问题</h1>
+    <div class="pc-glass-content-a">
+      <div class="pc-glass-container" style="max-width: 900px; display: block;">
+        <div class="pc-glass-header-a" style="margin-bottom: 30px;">
+          <h1 class="pc-glass-title">常见问题</h1>
         </div>
         
         <div class="search-section">
@@ -181,57 +181,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Dark Aurora Theme Styles */
-.faq-page {
-  min-height: 100vh;
-  /* Transparent background to reveal global particle sky */
-  background-color: transparent; 
-  display: flex;
-  flex-direction: column;
-}
-
-.page-content {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  align-items: flex-start;
-  padding: 20px 20px; /* Reduced top padding */
-}
-
-/* Glassmorphism Container */
-.content-container {
-  width: 100%;
-  max-width: 900px;
-  background: rgba(30, 41, 59, 0.7); /* Dark Slate Glass */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 60px 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  margin: 0 auto;
-}
-
-.header-section {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.main-title {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 42px;
-  /* Blue-Orange Gradient Text */
-  background: linear-gradient(135deg, var(--color-brand-highlight) 0%, var(--color-accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
-  letter-spacing: 1px;
-  text-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
-}
-
 /* Search Section - Dark Glass */
 .search-section {
   background: rgba(15, 23, 42, 0.6);

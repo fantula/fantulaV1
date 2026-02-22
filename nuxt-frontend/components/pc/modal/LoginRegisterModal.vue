@@ -45,7 +45,7 @@
               <a class="forgot-link" @click.prevent="onForgot">忘记密码？</a>
             </div>
             <div class="form-row">
-              <label><input type="checkbox" v-model="loginForm.agree" required /> 我已阅读并同意 <NuxtLink to="/privacy" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink to="/policy" target="_blank">《用户政策》</NuxtLink></label>
+              <label><input type="checkbox" v-model="loginForm.agree" required /> 我已阅读并同意 <NuxtLink :to="pcRoutes.privacy()" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink :to="pcRoutes.policy()" target="_blank">《用户政策》</NuxtLink></label>
             </div>
             <BaseButton themeId="primary" block class="submit-action" type="submit" :loading="loading" :disabled="loading || !loginForm.agree">{{ loading ? '登录中...' : '登录' }}</BaseButton>
             <div class="google-login-wrap">
@@ -74,7 +74,7 @@
               <label><input type="checkbox" v-model="loginCodeForm.remember" /> 记住我</label>
             </div>
             <div class="form-row">
-              <label><input type="checkbox" v-model="loginCodeForm.agree" required /> 我已阅读并同意 <NuxtLink to="/privacy" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink to="/policy" target="_blank">《用户政策》</NuxtLink></label>
+              <label><input type="checkbox" v-model="loginCodeForm.agree" required /> 我已阅读并同意 <NuxtLink :to="pcRoutes.privacy()" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink :to="pcRoutes.policy()" target="_blank">《用户政策》</NuxtLink></label>
             </div>
             <BaseButton themeId="primary" block class="submit-action" type="submit" :loading="loading" :disabled="loading || !loginCodeForm.agree">{{ loading ? '登录中...' : '登录' }}</BaseButton>
             <div class="google-login-wrap">
@@ -121,7 +121,7 @@
                   <input v-model="wechatBindForm.password" type="password" placeholder="设置密码后可用密码登录" />
                 </div>
                 <div class="form-row">
-                  <label><input type="checkbox" v-model="wechatBindForm.agree" required /> 我已阅读并同意 <NuxtLink to="/privacy" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink to="/policy" target="_blank">《用户政策》</NuxtLink></label>
+                  <label><input type="checkbox" v-model="wechatBindForm.agree" required /> 我已阅读并同意 <NuxtLink :to="pcRoutes.privacy()" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink :to="pcRoutes.policy()" target="_blank">《用户政策》</NuxtLink></label>
                 </div>
                 <BaseButton themeId="primary" block class="submit-action" type="submit" :loading="loading" :disabled="loading || !wechatBindForm.agree">{{ loading ? '绑定中...' : '绑定并登录' }}</BaseButton>
               </form>
@@ -158,7 +158,7 @@
               <input v-model="registerForm.inviteId" type="text" placeholder="请输入邀请码" />
             </div>
             <div class="form-row">
-              <label><input type="checkbox" v-model="registerForm.agree" required /> 我已阅读并同意 <NuxtLink to="/privacy" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink to="/policy" target="_blank">《用户政策》</NuxtLink></label>
+              <label><input type="checkbox" v-model="registerForm.agree" required /> 我已阅读并同意 <NuxtLink :to="pcRoutes.privacy()" target="_blank">《隐私协议》</NuxtLink> 和 <NuxtLink :to="pcRoutes.policy()" target="_blank">《用户政策》</NuxtLink></label>
             </div>
             <BaseButton themeId="primary" block class="submit-action" type="submit" :loading="loading" :disabled="loading || !registerForm.agree">{{ loading ? '注册中...' : '注册' }}</BaseButton>
             <div class="google-login-wrap">
@@ -239,6 +239,7 @@ import { authApi } from '@/api/client/auth'
 import { getSupabaseClient } from '@/utils/supabase'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 
 import EmailInput from '@/components/shared/EmailInput.vue'
 import SendCodeButton from '@/components/shared/SendCodeButton.vue'
@@ -505,7 +506,7 @@ async function handleLoginSuccess(data: any, msg = '登录成功') {
   // Removed forced redirect. User stays on the page where they opened the modal.
   // Exception: If on a dedicated login page (which we don't have, but just in case)
   if (route.path.includes('/login')) {
-      router.push('/')
+      router.push(pcRoutes.home())
   }
 }
 

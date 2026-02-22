@@ -66,134 +66,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User, CopyDocument, Plus } from '@element-plus/icons-vue'
-import { getSupabaseClient } from '@/utils/supabase'
-
-interface CdkItem {
-  id: string
-  code: string
-  parsed: any
-  accountData: any
-}
-
-interface CoSharingUser {
-  id: string
-  avatar: string | null
-  nickname: string | null
-  slot_index: number
-}
+import { useCoSharing } from '@/composables/client/useCoSharing'
+import type { CdkItem } from '@/composables/client/useCoSharing'
 
 const props = defineProps<{
   cdkItem: CdkItem
   slotIndex: number
 }>()
 
-const coSharingUsers = ref<CoSharingUser[]>([])
-
-// --- Logic for Slots ---
-// 1. Get Max Slots from CDK
-const maxSlots = computed(() => {
-    if (!props.cdkItem) return 5 // Default fallback
-    // Check accountData for max_slots
-    if (props.cdkItem.accountData && props.cdkItem.accountData.max_slots) {
-        return Number(props.cdkItem.accountData.max_slots)
-    }
-    return 5
+const {
+  maxSlots,
+  allSlots,
+  occupiedCount,
+  parseCdkCode,
+  copyText,
+  formatSlotIndex,
+  fetchCoSharingUsers
+} = useCoSharing({
+  cdkItem: () => props.cdkItem,
+  slotIndex: () => props.slotIndex,
+  onCopySuccess: (msg) => ElMessage.success(msg)
 })
-
-// 2. Identify My Slot
-// We use the prop slotIndex directly
-const mySlotIndex = computed(() => props.slotIndex)
-
-// 3. Build Full Slot List
-const allSlots = computed(() => {
-    const slots = []
-    for (let i = 1; i <= maxSlots.value; i++) {
-        const user = coSharingUsers.value.find(u => u.slot_index === i)
-        // Check if this slot matches the "Me" slot index passed in
-        const isMe = (i === Number(mySlotIndex.value))
-        slots.push({
-            index: i,
-            user,
-            isMe
-        })
-    }
-    return slots
-})
-
-const occupiedCount = computed(() => coSharingUsers.value.length)
-
-
-// 解析 CDK code 为字段对象
-const parseCdkCode = (item: CdkItem) => {
-  if (!item) return {}
-  // 优先使用已解析的 parsed
-  if (item.parsed && typeof item.parsed === 'object') {
-    return item.parsed
-  }
-  // 尝试解析 code
-  try {
-    return JSON.parse(item.code)
-  } catch {
-    return { '激活码': item.code }
-  }
-}
-
-const copyText = (t: string) => {
-  navigator.clipboard.writeText(t).then(() => ElMessage.success('已复制'))
-}
-
-const formatSlotIndex = (idx?: number) => {
-  if (idx === undefined) return '--'
-  return String(idx).padStart(2, '0')
-}
-
-// 获取共享用户列表
-const fetchCoSharingUsers = async () => {
-  if (!props.cdkItem || !props.cdkItem.id) return
-  const cdkId = props.cdkItem.id
-
-  try {
-    const client = getSupabaseClient()
-    const { data, error } = await client
-      .from('slot_occupancies')
-      .select(`
-        user_id,
-        slot_index,
-        profiles:user_id (
-          id,
-          avatar,
-          nickname
-        )
-      `)
-      .eq('cdk_id', cdkId)
-      .eq('status', 'using')
-      .not('user_id', 'is', null)
-
-    if (!error && data) {
-      coSharingUsers.value = data
-        .filter((item: any) => item.profiles)
-        .map((item: any) => ({
-          id: item.profiles.id,
-          avatar: item.profiles.avatar,
-          nickname: item.profiles.nickname,
-          slot_index: item.slot_index
-        }))
-    }
-  } catch (err) {
-    console.error('获取共享用户失败:', err)
-  }
-}
 
 onMounted(() => {
   fetchCoSharingUsers()
 })
-
-watch(() => props.cdkItem, () => {
-  fetchCoSharingUsers()
-}, { deep: true })
 </script>
 
 <style scoped>

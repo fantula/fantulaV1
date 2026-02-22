@@ -10,12 +10,20 @@
           <span class="privacy-brand">凡图拉</span>
         </div>
         <div class="privacy-main-title">凡图拉平台隐私政策</div>
-        <div class="privacy-desc">我们深知个人信息对您的重要性，并承诺依法收集、合理使用并保护您的信息安全</div>
+        <div class="privacy-desc" v-if="currentLang === 'cn'">我们深知个人信息对您的重要性，并承诺依法收集、合理使用并保护您的信息安全</div>
+        <div class="privacy-desc" v-else>We value your privacy and are committed to protecting your data through industry-standard security.</div>
       </div>
 
-      <!-- 主内容卡片 -->
-      <div class="privacy-card">
-        <!-- 概述 -->
+      <!-- 双语切换 Tab -->
+      <div class="lang-tabs-wrapper">
+        <div class="lang-tabs">
+          <div class="lang-tab" :class="{ active: currentLang === 'cn' }" @click="currentLang = 'cn'">中文版 (CN)</div>
+          <div class="lang-tab" :class="{ active: currentLang === 'en' }" @click="currentLang = 'en'">English (EN)</div>
+        </div>
+      </div>
+
+      <!-- 中文版内容 -->
+      <div class="privacy-card" v-show="currentLang === 'cn'">
         <div class="privacy-overview-box">
           <div class="overview-title">隐私政策概览</div>
           <div class="overview-text">
@@ -23,7 +31,6 @@
           </div>
         </div>
 
-        <!-- 一、信息收集与使用 -->
         <div class="section-title">一、我们如何收集与使用信息</div>
         <div class="section-divider"></div>
         <div class="section-body">
@@ -50,7 +57,6 @@
           </ul>
         </div>
 
-        <!-- 二、Cookies -->
         <div class="section-title">二、Cookies 与同类技术的使用</div>
         <div class="section-divider"></div>
         <div class="section-body">
@@ -63,7 +69,6 @@
           <div class="section-desc">2.2 您可根据自己的偏好管理或删除 Cookie。您应当知晓，若禁用 Cookie，某些服务功能可能无法正常运作。</div>
         </div>
 
-        <!-- 三、信息共享 -->
         <div class="section-title">三、信息的共享、披露与转让</div>
         <div class="section-divider"></div>
         <div class="section-body">
@@ -81,7 +86,6 @@
           <div class="section-desc"><strong>3.3</strong> 如涉及到平台运营主体变更（如合并、重组），我们会要求新的主体继续受本隐私政策的约束，否则我们将要求该公司、组织重新向您征求授权同意。</div>
         </div>
 
-        <!-- 四、个人信息管理权 -->
         <div class="section-title">四、您对个人信息的管理权</div>
         <div class="section-divider"></div>
         <div class="section-body">
@@ -90,7 +94,6 @@
           <div class="section-desc"><strong>4.3</strong> 您可以随时申请注销账户。注销后，我们将停止为您提供产品或服务，并依据法律规定对您的个人信息进行匿名化处理或删除。</div>
         </div>
 
-        <!-- 五、信息安全保障 -->
         <div class="section-title">五、信息安全保障措施</div>
         <div class="section-divider"></div>
         <div class="section-body">
@@ -105,14 +108,12 @@
           </div>
         </div>
 
-        <!-- 六、未成年人保护 -->
         <div class="section-title">六、未成年人保护</div>
         <div class="section-divider"></div>
         <div class="section-body">
           <div class="section-desc">本平台仅面向 18 周岁及以上成年人提供服务。若您未满 18 周岁，请立即停止使用本平台。如果你是未成年人的监护人，且认为我们在不知情的情况下收集了未成年人的信息，请联系我们需要删除。</div>
         </div>
 
-        <!-- 七、政策更新 -->
         <div class="section-title">七、政策更新</div>
         <div class="section-divider"></div>
         <div class="section-body">
@@ -120,29 +121,128 @@
         </div>
       </div>
 
-      <!-- 联系我们 -->
-      <div class="privacy-contact-card">
-        <div class="contact-title">联系我们</div>
-        <div class="contact-desc">如您对本隐私政策有任何疑问、投诉或建议，请通过以下方式联系数据安全专员：</div>
-        <div class="contact-email">support@fantura.com</div>
-        <div class="contact-tip">我们将在收到您的请求后 15 个工作日内完成核查与处理</div>
+      <!-- 英文版内容 -->
+      <div class="privacy-card" v-show="currentLang === 'en'">
+        <div class="privacy-overview-box">
+          <div class="overview-title">Ventura Privacy Policy</div>
+          <div class="overview-text">
+            Welcome to Ventura! We value your privacy and are committed to protecting your data through industry-standard security technologies and management mechanisms. This policy details how we collect, use, store, and protect your information during your use of our services.
+          </div>
+        </div>
+
+        <div class="section-title">1. Information Collection and Use</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc">1.1 To provide you with digital equity service assistance (such as account management and redemption records), we collect only necessary information following the "Minimization Principle":</div>
+          <ul class="privacy-list">
+            <li>Email Address: For unique user identification, account security verification, and service notifications.</li>
+            <li>Service Logs: Including login timestamps, operation records, and service redemption flows for system stability.</li>
+            <li>Device/Network Info: Anonymized device identifiers for security risk control.</li>
+          </ul>
+
+          <div class="section-highlight-inline">1.2 We strictly DO NOT collect sensitive personal information, including:</div>
+          <ul class="privacy-list">
+            <li>ID cards, passports, or other legal identity documents</li>
+            <li>Biometric data (facial features, fingerprints, etc.)</li>
+            <li>Bank card numbers, CVV codes, or other financial payment secrets</li>
+            <li>Genetic or health-related sensitive data</li>
+          </ul>
+
+          <div class="section-desc">1.3 Legitimate Usage Scenarios:</div>
+          <ul class="privacy-list">
+            <li>Provide account security management and risk prevention</li>
+            <li>Provide equity inquiry and after-sales support upon your request</li>
+            <li>Generate de-identified statistics to optimize digital service processes</li>
+          </ul>
+        </div>
+
+        <div class="section-title">2. Cookies & Similar Technologies</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc">2.1 We use Cookies or similar local storage technologies to ensure the website functions properly. We use this primarily to:</div>
+          <ul class="privacy-list">
+            <li>Maintain your login session status</li>
+            <li>Ensure data security and detect abnormal login behaviors</li>
+            <li>Analyze service usage to improve our offerings</li>
+          </ul>
+          <div class="section-desc">2.2 You can manage or delete Cookies based on your preferences. Please note that disabling Cookies may affect some service functions.</div>
+        </div>
+
+        <div class="section-title">3. Information Sharing & Disclosure</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc"><strong>3.1</strong> We strictly limit information sharing to necessary circumstances:</div>
+          <ul class="privacy-list">
+            <li>With your explicit separate consent</li>
+            <li>Necessary for service fulfillment: Sharing only necessary redemption identifiers with equity service partners</li>
+            <li>Compliance with laws, regulations, or mandatory government requests</li>
+          </ul>
+
+          <div class="highlight-box">
+            <strong>3.2</strong> We strictly promise NOT to sell your personal information to any third party.
+          </div>
+
+          <div class="section-desc"><strong>3.3</strong> In the event of a merger or restructuring, we will require the new entity to continue to be bound by this policy, otherwise, we will ask them to seek your authorization again.</div>
+        </div>
+
+        <div class="section-title">4. Your Data Management Rights</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc"><strong>4.1</strong> You have the right to access and correct your basic registration information.</div>
+          <div class="section-desc"><strong>4.2</strong> You have the right to request deletion of specific information as permitted by law.</div>
+          <div class="section-desc"><strong>4.3</strong> You can request account cancellation at any time. Upon cancellation, we will stop providing services and anonymize or delete your data according to laws.</div>
+        </div>
+
+        <div class="section-title">5. Information Security Measures</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc"><strong>5.1</strong> We adopt industry-standard security measures, including:</div>
+          <ul class="privacy-list">
+            <li>SSL/TLS encryption for data transmission</li>
+            <li>Strict data access controls and multi-factor authentication</li>
+            <li>Regular security audits and vulnerability scanning</li>
+          </ul>
+          <div class="highlight-box">
+            <strong>5.2</strong> Your data is stored on secure servers within the PRC and will not be transferred cross-border unless required by law.
+          </div>
+        </div>
+
+        <div class="section-title">6. Protection of Minors</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc">This platform is intended for adults aged 18 and above. If you are under 18, please stop using this platform immediately. If you are a guardian and believe we collected a minor's data unknowingly, please contact us for deletion.</div>
+        </div>
+
+        <div class="section-title">7. Policy Updates</div>
+        <div class="section-divider"></div>
+        <div class="section-body">
+          <div class="section-desc">We may revise this policy as our business evolves. Changes will be notified via website announcements or emails. Continued use after updates implies acceptance of the revised policy.</div>
+        </div>
       </div>
 
-      <!-- 附则 -->
-      <div class="privacy-appendix-card">
-        <div class="appendix-title">附：条款效力说明</div>
-        <div class="appendix-desc">本隐私政策提供英文翻译版本供参考，若中英文版本存在理解歧义，应以中文版表述为准。</div>
+      <!-- 联系我们与附则 (通用) -->
+      <div class="privacy-contact-card">
+        <div class="contact-title">联系我们<br /><span>Contact Us</span></div>
+        <div class="contact-email">support@fantura.com</div>
+        <div class="contact-desc">如您对本隐私政策有任何疑问、投诉或建议，请通过以下方式联系数据安全专员。我们将于15个工作日内作出答复。<br />If you have questions or suggestions, please contact our Data Security Officer. We will process your request within 15 working days.</div>
+        <div class="contact-tip">
+          本隐私政策提供英文翻译版本供参考，若中英文版本存在理解歧义，应以中文版表述为准。<br />
+          The English version is for reference only. In case of discrepancy, the Chinese version shall prevail.
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 
 definePageMeta({
   layout: 'mobile'
 })
+
+const currentLang = ref<'cn' | 'en'>('cn')
 </script>
 
 <style scoped>
@@ -205,6 +305,36 @@ definePageMeta({
   font-size: 13px;
   color: var(--text-muted, #64748B);
   line-height: 1.6;
+}
+
+/* 语言切换 Tab */
+.lang-tabs-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.lang-tabs {
+  display: flex;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 20px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lang-tab {
+  padding: 8px 24px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #94A3B8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lang-tab.active {
+  background: var(--color-brand-highlight, #3B82F6);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
 /* 主内容卡片 */
@@ -319,47 +449,40 @@ definePageMeta({
   font-size: 16px;
   font-weight: 700;
   color: #60A5FA;
-  margin-bottom: 8px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.contact-title span {
+  font-size: 14px;
+  font-weight: normal;
+  color: #94A3B8;
 }
 
 .contact-desc {
   font-size: 13px;
   color: var(--text-muted, #94A3B8);
   line-height: 1.6;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  background: rgba(30, 41, 59, 0.4);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .contact-email {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: #60A5FA;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .contact-tip {
   font-size: 12px;
   color: var(--text-muted, #64748B);
-}
-
-/* 附则卡片 */
-.privacy-appendix-card {
-  background: var(--glass-bg);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 16px;
-  padding: 16px;
-  text-align: center;
-}
-
-.appendix-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #60A5FA;
-  margin-bottom: 8px;
-}
-
-.appendix-desc {
-  font-size: 13px;
-  color: var(--text-muted, #94A3B8);
-  line-height: 1.7;
+  line-height: 1.6;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-style: italic;
 }
 </style>

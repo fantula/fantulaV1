@@ -19,10 +19,8 @@
             <div class="privacy-overview-desc">本政策适用于凡图拉平台提供的所有服务。我们深知个人信息对您的重要性，并致力于通过符合行业高标准的安全技术与管理机制，保护您的个人信息安全。本政策旨在详尽说明我们在您使用服务过程中如何收集、使用、存储及保护您的信息。</div>
           </div>
           
-          <div class="privacy-spacer" style="height: 20px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">一、我们如何收集与使用信息</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             <div class="privacy-section-desc">1.1 为向您提供数字化权益服务协助（如账户管理、权益兑换记录），我们仅遵循“最小化原则”收集必要信息：</div>
             <ul class="privacy-list blue-dot">
@@ -31,8 +29,6 @@
               <li>设备及网络信息：匿名化的设备标识符与网络状态，用于反舞弊安全风控。</li>
             </ul>
             
-            <div class="privacy-spacer" style="height: 25px;"></div>
-            
             <div class="privacy-section-highlight">1.2 本平台严格承诺不收集任何非必要的敏感个人信息，包括但不限于：</div>
             <ul class="privacy-list blue-dot">
               <li>居民身份证号码、护照等任何法定身份证明文件</li>
@@ -40,8 +36,6 @@
               <li>银行卡号、信用卡CVV码等金融支付敏感信息</li>
               <li>个人基因、健康医疗等特殊敏感数据</li>
             </ul>
-          
-          <div class="privacy-spacer" style="height: 25px;"></div>
             
             <div class="privacy-section-desc">1.3 信息的合法使用场景：</div>
             <ul class="privacy-list blue-dot">
@@ -51,10 +45,8 @@
             </ul>
           </div>
           
-          <div class="privacy-spacer" style="height: 25px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">二、Cookies 与同类技术的使用</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             <div class="privacy-section-desc">2.1 为确保网站正常运转，我们会在您的计算机或移动设备上存储名为 Cookie 的小数据文件。Cookie 通常包含标识符、站点名称以及一些号码和字符。我们使用该技术主要为了：</div>
             <ul class="privacy-list blue-dot">
@@ -63,15 +55,11 @@
               <li>分析服务使用情况，帮助我们需要改进服务内容</li>
             </ul>
             
-            <div class="privacy-spacer" style="height: 30px;"></div>
-            
             <div class="privacy-section-desc">2.2 您可根据自己的偏好管理或删除 Cookie。您应当知晓，若禁用 Cookie，某些服务功能可能无法正常运作。</div>
           </div>
           
-          <div class="privacy-spacer" style="height: 60px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">三、信息的共享、披露与转让</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             <span class="privacy-bold">3.1</span> 我们严格限制信息共享范围，仅在以下必要情况下：
             <ul class="privacy-list blue-dot">
@@ -80,31 +68,23 @@
               <li>依据法律法规或行政、司法机关的强制性要求</li>
             </ul>
             
-            <div class="privacy-spacer" style="height: 25px;"></div>
-            
             <div class="privacy-highlight-box">
               <span class="privacy-bold">3.2</span> 我们承诺绝不出售您的个人信息给任何第三方用于商业营销。
             </div>
             
-            <div class="privacy-spacer" style="height: 20px;"></div>
-            
             <span class="privacy-bold">3.3</span> 如涉及到平台运营主体变更（如合并、重组），我们会要求新的主体继续受本隐私政策的约束，否则我们将要求该公司、组织重新向您征求授权同意。
           </div>
           
-          <div class="privacy-spacer" style="height: 40px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">四、您对个人信息的管理权</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             <span class="privacy-bold">4.1</span> 您有权随时登录账户，查阅、更正您的基础注册信息。<br />
             <span class="privacy-bold">4.2</span> 在符合法律法规要求的前提下，您有权要求删除您的特定信息。<br />
             <span class="privacy-bold">4.3</span> 您可以随时申请注销账户。注销后，我们将停止为您提供产品或服务，并依据法律规定对您的个人信息进行匿名化处理或删除。
           </div>
           
-          <div class="privacy-spacer" style="height: 50px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">五、信息安全保障措施</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             <span class="privacy-bold">5.1</span> 我们采用符合业界标准的安全防护措施，包括：
             <ul class="privacy-list blue-dot">
@@ -113,30 +93,22 @@
               <li>部署定期的数据安全审计与网络漏洞扫描</li>
             </ul>
             
-            <div class="privacy-spacer" style="height: 25px;"></div>
-            
             <div class="privacy-highlight-box">
               <span class="privacy-bold">5.2</span> 您的信息将存储于中华人民共和国境内的安全服务器中，除非法律法规另有规定，我们不会向境外传输。
             </div>
           </div>
           
-          <div class="privacy-spacer" style="height: 40px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">六、未成年人保护</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             本平台仅面向 18 周岁及以上成年人提供服务。若您未满 18 周岁，请立即停止使用本平台。如果你是未成年人的监护人，且认为我们在不知情的情况下收集了未成年人的信息，请联系我们需要删除。
           </div>
           
-          <div class="privacy-spacer" style="height: 60px;"></div>
-          
           <div class="privacy-section-title blue-title with-line">七、政策更新</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             随着业务发展及法律法规变化，我们可能会修订本政策。所有变更将通过网站公告或邮件通知的方式告知。若您在政策更新后继续使用服务，即表示您已充分阅读、理解并接受更新后的政策内容。
           </div>
-          
-          <div class="privacy-spacer" style="height: 55px;"></div>
           
           <div class="privacy-contact-card">
             <div class="privacy-contact-title">联系我们</div>
@@ -144,8 +116,6 @@
             <div class="privacy-contact-mail">support@fantura.com</div>
             <div class="privacy-contact-tip">我们将在收到您的请求后 15 个工作日内完成核查与处理</div>
           </div>
-          
-          <div class="privacy-spacer" style="height: 15px;"></div>
           
           <div class="privacy-section-appendix">
             <span class="privacy-appendix-title">附：条款效力说明</span><br />
@@ -158,7 +128,7 @@
             <div class="privacy-overview-desc">Welcome to Ventura! We value your privacy and are committed to protecting your data through industry-standard security technologies and management mechanisms. This policy details how we collect, use, store, and protect your information during your use of our services.</div>
           </div>
           <div class="privacy-en-section-title">1. Information Collection and Use</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             1.1 To provide you with digital equity service assistance (such as account management and redemption records), we collect only necessary information following the "Minimization Principle":
             <ul class="privacy-list blue-dot">
@@ -181,7 +151,7 @@
             </ul>
           </div>
           <div class="privacy-en-section-title">2. Cookies and Similar Technologies</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             2.1 We use Cookies or similar local storage technologies to ensure the website functions properly. Cookies typically contain identifiers, site names, and some numbers/characters. We use this primarily to:
             <ul class="privacy-list blue-dot">
@@ -192,7 +162,7 @@
             2.2 You can manage or delete Cookies based on your preferences. Please note that disabling Cookies may affect some service functions.
           </div>
           <div class="privacy-en-section-title">3. Information Sharing and Disclosure</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             3.1 We strictly limit information sharing to necessary circumstances:
             <ul class="privacy-list blue-dot">
@@ -206,14 +176,14 @@
             3.3 In the event of a merger or restructuring, we will require the new entity to continue to be bound by this policy, otherwise, we will ask them to seek your authorization again.
           </div>
           <div class="privacy-en-section-title">4. Your Data Management Rights</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             4.1 You have the right to access and correct your basic registration information.<br />
             4.2 You have the right to request deletion of specific information as permitted by law.<br />
             4.3 You can request account cancellation at any time. Upon cancellation, we will stop providing services and anonymize or delete your data according to laws.
           </div>
           <div class="privacy-en-section-title">5. Information Security Measures</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             5.1 We adopt industry-standard security measures, including:
             <ul class="privacy-list blue-dot">
@@ -226,12 +196,12 @@
             </div>
           </div>
           <div class="privacy-en-section-title">6. Protection of Minors</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             This platform is intended for adults aged 18 and above. If you are under 18, please stop using this platform immediately. If you are a guardian and believe we collected a minor's data unknowingly, please contact us for deletion.
           </div>
           <div class="privacy-en-section-title">7. Policy Updates</div>
-          <div class="privacy-section-line"></div>
+          <hr class="privacy-section-line" />
           <div class="privacy-section">
             We may revise this policy as our business evolves. Changes will be notified via website announcements or emails. Continued use after updates implies acceptance of the revised policy.
           </div>
@@ -368,6 +338,7 @@ const modal = useModalStore()
   color: #CBD5E1;
   display: flex;
   flex-direction: column;
+  gap: 24px;
 }
 .privacy-col-cn {
   margin-right: 0;
@@ -465,7 +436,8 @@ const modal = useModalStore()
   width: 100%;
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
-  margin: 8px 0 18px 0;
+  margin: 16px 0 24px 0;
+  border: none;
 }
 .privacy-overview-box-cn,
 .privacy-overview-box-en {

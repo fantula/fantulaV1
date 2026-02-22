@@ -170,10 +170,18 @@ onMounted(() => {
 
 const handleMessageClick = async (msg: UserMessage) => {
   if (!msg.is_read) {
-    await messageApi.markAsRead(msg.id)
-    msg.is_read = true
-    unreadCount.value = Math.max(0, unreadCount.value - 1)
-    await userStore.fetchUnreadMessageCount()
+    try {
+      const res = await messageApi.markAsRead(msg.id)
+      if (res.success) {
+        msg.is_read = true
+        unreadCount.value = Math.max(0, unreadCount.value - 1)
+        await userStore.fetchUnreadMessageCount()
+      } else {
+        ElMessage.error(res.msg || '标记为已读失败')
+      }
+    } catch (e: any) {
+      ElMessage.error(e.message || '标记为已读失败')
+    }
   }
 }
 
@@ -187,7 +195,11 @@ const handleMarkAllRead = async () => {
       unreadCount.value = 0
       await userStore.fetchUnreadMessageCount()
       ElMessage.success('已全部标记为已读')
+    } else {
+      ElMessage.error(res.msg || '操作失败')
     }
+  } catch (e: any) {
+    ElMessage.error(e.message || '操作失败')
   } finally {
     markingAll.value = false
   }
@@ -224,9 +236,9 @@ const formatTime = (dateStr: string) => {
 
 <style scoped>
 .messages-section {
+  flex: 1; min-height: 0; width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 0;
   overflow: hidden;
 }
@@ -330,7 +342,7 @@ const formatTime = (dateStr: string) => {
 .message-list-container {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 32px 0; /* Removing bottom padding allowing list-status to handle it */
+  padding: 24px 32px 32px 32px;
   min-height: 0;
 }
 

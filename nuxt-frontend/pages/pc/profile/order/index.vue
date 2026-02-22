@@ -223,7 +223,7 @@ const getStatusText = (status: string) => getOrderStatusLabel(status)
 const handleItemClick = (item: any) => {
   // 1. 待支付 -> 结账页
   if (item.status === 'pending' || item.isPending) {
-    router.push(`/pc/checkout/${item.id}`)
+    router.push(pcRoutes.checkout(item.id))
     return
   }
 
@@ -235,7 +235,7 @@ const handleItemClick = (item: any) => {
   }
 
   // 3. 有效订单 -> 详情页
-  router.push(`/pc/profile/order/${item.id}`)
+  router.push(pcRoutes.orderDetail(item.id))
 }
 
 // --- Modal Logic ---
@@ -285,7 +285,8 @@ const handleConfirmDelete = async () => {
 
 <style scoped>
 .orders-page {
-  display: flex; flex-direction: column; height: 100%;
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; flex-direction: column;
   font-family: 'Outfit', sans-serif; color: #F8FAFC;
 }
 
@@ -315,7 +316,7 @@ const handleConfirmDelete = async () => {
 }
 
 /* Scroll Area & Container Limit - WIDE */
-.orders-scroll-area { flex: 1; overflow-y: auto; padding: 24px 32px; }
+.orders-scroll-area { flex: 1; overflow-y: auto; padding: 24px 32px 32px 32px; min-height: 0; }
 .orders-container { max-width: 900px; margin: 0 auto; }
 
 /* List */

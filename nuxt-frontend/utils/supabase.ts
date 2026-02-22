@@ -56,12 +56,7 @@ export const getEdgeFunctionsUrl = () => {
     return `${url}/functions/v1`
 }
 
-// 保持兼容性导出一个静态常量（但在SSR中可能不准确，建议使用 getEdgeFunctionsUrl）
-// 这里为了兼容旧代码，暂时保留，但它可能在客户端不可用如果配置为空
-// 实际上旧代码引用 EDGE_FUNCTIONS_URL，我们需要确保它能工作
-// 由于这只是为了导出字符串，我们可以尝试获取 config，如果不在 nuxt 上下文可能报错
-// 更好的做法是重构调用处，或者在这里 try-catch
-export const EDGE_FUNCTIONS_URL = '' // Deprecated: Use getEdgeFunctionsUrl()
+
 
 /**
  * 获取当前用户的 JWT Token
@@ -125,11 +120,25 @@ export async function callEdgeFunction<T = any>(
             body: body ? JSON.stringify(body) : undefined,
         })
 
-        const data = await response.json()
+        const contentType = response.headers.get('content-type') || ''
 
         if (!response.ok) {
-            return { data: null, error: data.error || data.message || `HTTP ${response.status}` }
+            // 避免 Nginx/Gateway 返回 HTML 错误页时 JSON.parse 抛异常
+            if (contentType.includes('application/json')) {
+                try {
+                    const errData = await response.json()
+                    return { data: null, error: errData.error || errData.message || `HTTP ${response.status}` }
+                } catch {
+                    return { data: null, error: `HTTP ${response.status}` }
+                }
+            } else {
+                const text = await response.text()
+                const preview = text.replace(/<[^>]*>/g, '').trim().slice(0, 80)
+                return { data: null, error: `HTTP ${response.status}${preview ? ': ' + preview : ''}` }
+            }
         }
+
+        const data = await response.json()
 
         return { data, error: null }
     } catch (err: any) {

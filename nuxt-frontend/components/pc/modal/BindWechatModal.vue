@@ -73,7 +73,7 @@ import { ref, watch, onUnmounted } from 'vue'
 import BaseFormModal from '@/components/pc/modal/base/BaseFormModal.vue'
 import { ChatDotRound, Connection, Select, Refresh, Loading } from '@element-plus/icons-vue'
 import { wechatLoginApi } from '@/api/client/wechat-login'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/client/user'
 
 const props = defineProps<{
@@ -203,6 +203,7 @@ const handleUnbind = async () => {
                 confirmButtonText: '确定解绑',
                 cancelButtonText: '取消',
                 type: 'warning',
+                customClass: 'pc-unbind-msg-box',
             }
         )
         
@@ -319,4 +320,42 @@ onUnmounted(() => {
 .scan-tip { color: #94A3B8; font-size: 14px; }
 .highlight { color: #07C160; font-weight: bold; }
 
+</style>
+
+<!-- Global styles for ElMessageBox dark theme (not scoped) -->
+<style>
+.pc-unbind-msg-box {
+  background: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+}
+.pc-unbind-msg-box .el-message-box__header {
+  padding-bottom: 8px !important;
+}
+.pc-unbind-msg-box .el-message-box__title {
+  color: #fff !important;
+}
+.pc-unbind-msg-box .el-message-box__message p {
+  color: #CBD5E1 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+.pc-unbind-msg-box .el-button--primary {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+.pc-unbind-msg-box .el-button--default {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #94A3B8 !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+.pc-unbind-msg-box .el-button--default:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #F1F5F9 !important;
+}
 </style>

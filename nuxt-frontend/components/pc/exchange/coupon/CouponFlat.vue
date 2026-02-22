@@ -20,6 +20,7 @@ import { computed } from 'vue'
 import BaseCouponTicket from './BaseCouponTicket.vue'
 import type { UserCoupon } from '@/api/client/coupon'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 
 const props = defineProps<{
   couponData: UserCoupon
@@ -48,7 +49,7 @@ const expiryText = computed(() => {
 
 const handleAction = () => {
   // Flat coupons usually redirect to shop
-  router.push('/')
+  router.push(pcRoutes.home())
 }
 
 const handleClick = () => {

@@ -46,15 +46,7 @@
          <!-- 2. Payment Method -->
          <div class="section-title mt-4">支付方式</div>
          <div class="pay-methods">
-             <!-- 支付宝暂未开通 -->
-             <div class="pay-item disabled">
-                <div class="pay-left">
-                    <img src="/images/client/pc/zhifu2.png" class="pay-icon" alt="Alipay" />
-                    <span>支付宝</span>
-                    <span class="coming-soon">即将开通</span>
-                </div>
-             </div>
-
+             <!-- 微信支付（默认选中）-->
              <div 
                 :class="['pay-item', { active: payType === 'wechat' }]"
                 @click="payType = 'wechat'"
@@ -65,6 +57,15 @@
                 </div>
                 <div class="pay-radio" :class="{ checked: payType === 'wechat' }">
                     <div class="radio-dot" v-if="payType === 'wechat'"></div>
+                </div>
+             </div>
+
+             <!-- 支付宝（即将开通）-->
+             <div class="pay-item disabled">
+                <div class="pay-left">
+                    <img src="/images/client/pc/zhifu2.png" class="pay-icon" alt="Alipay" />
+                    <span>支付宝</span>
+                    <span class="coming-soon">即将开通</span>
                 </div>
              </div>
          </div>
@@ -188,7 +189,7 @@ async function getOpenId(): Promise<string | null> {
         return refreshedOpenId
       }
     } catch (e) {
-      console.error('[RechargeModal] fetchUserInfo failed:', e)
+      if (import.meta.dev) console.error('[RechargeModal] fetchUserInfo failed:', e)
     }
   }
   
@@ -217,7 +218,7 @@ async function getOpenId(): Promise<string | null> {
         return res.data.openid
       }
     } catch (e) {
-      console.error('Get OpenID failed:', e)
+      if (import.meta.dev) console.error('Get OpenID failed:', e)
     }
   }
   
@@ -363,7 +364,7 @@ onMounted(async () => {
             }))
         }
     } catch (e) {
-        console.error('Fetch tiers failed', e)
+        if (import.meta.dev) console.error('Fetch tiers failed', e)
     }
 })
 

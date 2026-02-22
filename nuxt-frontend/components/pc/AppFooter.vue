@@ -70,6 +70,7 @@ import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/client/user'
 import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
 import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
+import { pcRoutes } from '@/config/client-routes'
 import { ChatDotRound, Platform, Bell, VideoPlay } from '@element-plus/icons-vue'
 
 const showLoginModal = ref(false)
@@ -97,28 +98,28 @@ const footerGroups: FooterGroup[] = [
   {
     title: '关于我们',
     items: [
-      { text: '公司简介', type: 'link', path: '/company' },
-      { text: '我们的使命', type: 'link', path: '/about-us' },
-      { text: '我们的优势', type: 'link', path: '/advantages' },
-      { text: '加入我们', type: 'link', path: '/join-us' }
+      { text: '公司简介', type: 'link', path: pcRoutes.company() },
+      { text: '我们的使命', type: 'link', path: pcRoutes.aboutUs() },
+      { text: '我们的优势', type: 'link', path: pcRoutes.advantages() },
+      { text: '加入我们', type: 'link', path: pcRoutes.joinUs() }
     ]
   },
   {
     title: '服务与支持',
     items: [
-      { text: '个人中心', type: 'button', path: '/profile', auth: true },
-      { text: '我的订单', type: 'button', path: '/profile/orders', auth: true },
-      { text: '常见问题', type: 'link', path: '/faq' },
+      { text: '个人中心', type: 'button', path: pcRoutes.profile(), auth: true },
+      { text: '我的订单', type: 'button', path: pcRoutes.profileOrders(), auth: true },
+      { text: '常见问题', type: 'link', path: pcRoutes.faq() },
       { text: '联系我们', type: 'button', action: 'contact' }
     ]
   },
   {
     title: '条款与政策',
     items: [
-      { text: '隐私政策', type: 'link', path: '/privacy' },
-      { text: '用户协议', type: 'link', path: '/policy' },
-      { text: '退款政策', type: 'link', path: '/refund' },
-      { text: '免责声明', type: 'link', path: '/disclaimer' }
+      { text: '隐私政策', type: 'link', path: pcRoutes.privacy() },
+      { text: '用户协议', type: 'link', path: pcRoutes.policy() },
+      { text: '退款政策', type: 'link', path: pcRoutes.refund() },
+      { text: '免责声明', type: 'link', path: pcRoutes.disclaimer() }
     ]
   },
   {

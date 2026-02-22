@@ -45,7 +45,6 @@ export const wechatLoginApi = {
             const response = await $fetch<{ success: boolean; data: QrCodeResult }>(
                 `${BASE_URL}/login-qrcode`
             )
-            console.log("🔴 [PC Stage 1] Ticket:", response.data?.ticket ? "Received" : "Empty") // Diagnosis Log
             return {
                 code: 0,
                 success: true,
@@ -183,6 +182,42 @@ export const wechatLoginApi = {
                 code: 500,
                 success: false,
                 msg: err.data?.message || err.message || '绑定失败',
+                data: undefined as any,
+            }
+        }
+    },
+
+    /**
+     * 解绑当前用户的微信
+     */
+    async unbindWechat(): Promise<ApiResponse<{ message: string }>> {
+        try {
+            const client = getSupabaseClient()
+            const { data: { session } } = await client.auth.getSession()
+            const token = session?.access_token
+
+            if (!token) {
+                return { code: 401, success: false, msg: '请先登录', data: undefined as any }
+            }
+
+            const response = await $fetch<{ success: boolean; message: string }>(
+                '/api/auth/unbind-wechat',
+                {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            )
+            return {
+                code: 0,
+                success: true,
+                msg: response.message || '解绑成功',
+                data: { message: response.message },
+            }
+        } catch (err: any) {
+            return {
+                code: 500,
+                success: false,
+                msg: err.data?.message || err.message || '解绑失败',
                 data: undefined as any,
             }
         }

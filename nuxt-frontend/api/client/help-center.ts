@@ -36,7 +36,7 @@ export const clientFaqApi = {
             .limit(5) // Max 5 items as requested
 
         if (error) {
-            console.error('Fetch checkout FAQ error', error)
+            if (import.meta.dev) console.error('Fetch checkout FAQ error', error)
             return { success: false, faqs: [] }
         }
 

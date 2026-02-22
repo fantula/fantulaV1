@@ -49,7 +49,8 @@
             <div class="status-icon success">
               <el-icon><CircleCheckFilled /></el-icon>
             </div>
-            <h3 class="result-key">{{ resultKey }}</h3>
+            <h3 class="result-key">{{ channelDisplayName || resultKey }}</h3>
+            <p v-if="channelDisplayName" class="result-sub-key">{{ resultKey }}</p>
             <p class="result-msg">已成功识别频道</p>
             
             <div class="action-buttons">
@@ -81,9 +82,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { Search, Loading, CircleCheckFilled, WarningFilled, Right } from '@element-plus/icons-vue'
 import { getSupabaseClient } from '@/utils/supabase'
+import { pcRoutes } from '@/config/client-routes'
 
 const props = defineProps<{
   modelValue: boolean
@@ -101,6 +105,7 @@ const state = ref<ModalState>('input')
 const loading = ref(false)
 const channelInput = ref('@')
 const resultKey = ref('')
+const channelDisplayName = ref('')
 const boundProductId = ref<string | null>(null)
 
 // Auto-focus logic
@@ -158,6 +163,7 @@ const handleRecognize = async () => {
     if (error) throw error
 
     resultKey.value = data.channel_key
+    channelDisplayName.value = data.channel_name || ''
     boundProductId.value = data.product_id
 
     if (data.bound && data.product_id) {
@@ -166,7 +172,7 @@ const handleRecognize = async () => {
       state.value = 'pending'
     }
   } catch (err: any) {
-    console.error('Channel recognition error:', err)
+    if (import.meta.dev) console.error('[ChannelModal] Recognition error:', err)
     ElMessage.error('识别失败，请重试')
   } finally {
     loading.value = false
@@ -176,7 +182,7 @@ const handleRecognize = async () => {
 const goToProduct = () => {
   if (boundProductId.value) {
     emit('update:modelValue', false)
-    router.push(`/goods/${boundProductId.value}`)
+    router.push(pcRoutes.product(boundProductId.value))
   }
 }
 
@@ -184,6 +190,7 @@ const reset = () => {
   state.value = 'input'
   channelInput.value = '@' // Reset to just prefix
   resultKey.value = ''
+  channelDisplayName.value = ''
   boundProductId.value = null
   nextTick(() => inputRef.value?.focus())
 }
@@ -345,6 +352,14 @@ const close = () => {
   color: #fff;
   margin: 0 0 8px;
   font-family: monospace;
+}
+
+.result-sub-key {
+  font-size: 13px;
+  color: #94A3B8;
+  font-family: monospace;
+  margin-top: -4px;
+  margin-bottom: 12px;
 }
 
 .result-msg {

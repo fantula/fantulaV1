@@ -1,122 +1,91 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登录 Fantula</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-      background-color: #f4f4f5;
-      margin: 0;
-      padding: 0;
-      color: #18181b;
-    }
-    .container {
-      max-width: 480px;
-      margin: 40px auto;
-      background-color: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .header {
-      background-color: #000000;
-      padding: 24px;
-      text-align: center;
-    }
-    .header h1 {
-      color: #ffffff;
-      margin: 0;
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-    }
-    .content {
-      padding: 32px 24px;
-      text-align: left;
-    }
-    .welcome-text {
-      font-size: 16px;
-      line-height: 1.5;
-      margin-bottom: 24px;
-    }
-    .code-container {
-      background-color: #f4f4f5;
-      border-radius: 6px;
-      padding: 16px;
-      text-align: center;
-      margin-bottom: 24px;
-      border: 1px solid #e4e4e7;
-    }
-    .code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: #000000;
-      display: block;
-    }
-    .expiry-text {
-      font-size: 13px;
-      color: #71717a;
-      margin-top: 8px;
-      display: block;
-    }
-    .button {
-      display: block;
-      width: 100%;
-      background-color: #000000;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 12px 0;
-      border-radius: 6px;
-      font-weight: 600;
-      text-align: center;
-      font-size: 16px;
-      margin-bottom: 24px;
-    }
-    .button:hover {
-      background-color: #27272a;
-    }
-    .magic-link-text {
-        font-size: 14px;
-        color: #52525b;
-        text-align: center;
-        margin-bottom: 12px;
-    }
-    .footer {
-      background-color: #fafafa;
-      padding: 16px 24px;
-      text-align: center;
-      font-size: 12px;
-      color: #a1a1aa;
-      border-top: 1px solid #f4f4f5;
-    }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Fantula</h1>
-    </div>
-    <div class="content">
-      <p class="welcome-text">你好！<br>你正在登录 Fantula，请使用下方的验证码完成验证。</p>
-      
-      <div class="code-container">
-        <span class="code">{{ .Token }}</span>
-        <span class="expiry-text">验证码 15 分钟内有效</span>
-      </div>
 
-      <p class="magic-link-text" style="text-align: center; color: #71717a; font-size: 14px;">或者点击下方按钮直接登录：</p>
-      
-      <a href="{{ .ConfirmationURL }}" class="button" target="_blank">一键登录</a>
+<body
+  style="margin:0;padding:0;background-color:#F5F7FA;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;-webkit-font-smoothing:antialiased;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F7FA;padding:60px 20px;">
+    <tr>
+      <td align="center">
+        <!-- Main Content Box -->
+        <table width="500" cellpadding="0" cellspacing="0"
+          style="max-width:500px;width:100%;margin:0 auto;background-color:#FFFFFF;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.03);">
 
-      <p style="font-size: 14px; color: #71717a; margin-top: 24px;">如果这不是你本人的操作，请忽略此邮件。</p>
-    </div>
-    <div class="footer">
-      &copy; 2026 Fantula. All rights reserved.
-    </div>
-  </div>
+          <!-- Top Accent Line -->
+          <tr>
+            <td
+              style="height:4px;background:linear-gradient(90deg, #178fc6, #F97316);border-top-left-radius:8px;border-top-right-radius:8px;">
+            </td>
+          </tr>
+
+          <!-- Header Area -->
+          <tr>
+            <td align="center" style="padding:45px 40px 30px;border-bottom:1px solid #F1F5F9;">
+              <h1 style="margin:0;font-size:34px;font-weight:700;color:#1E293B;letter-spacing:2px;line-height:1.2;">凡图拉
+              </h1>
+              <div
+                style="margin-top:6px;font-size:12px;font-weight:600;color:#94A3B8;letter-spacing:6px;text-transform:uppercase;">
+                FanTula</div>
+            </td>
+          </tr>
+
+          <!-- Message Area -->
+          <tr>
+            <td align="center" style="padding:40px 40px 10px;">
+              <h2 style="margin:0;font-size:20px;font-weight:600;color:#334155;">身份安全验证</h2>
+              <p style="margin:16px 0 0;font-size:15px;line-height:1.6;color:#64748B;text-align:center;">
+                您正在进行敏感操作的安全验证。<br>请在原登录/验证页面输入下方的一次性动态密码：
+              </p>
+            </td>
+          </tr>
+
+          <!-- OTP Code Box -->
+          <tr>
+            <td align="center" style="padding:25px 40px 40px;">
+              <div
+                style="background-color:#FAFAFA;border-radius:6px;padding:24px;display:inline-block;min-width:240px;border:1px solid #E2E8F0;">
+                <div
+                  style="font-size:42px;font-weight:700;color:#178fc6;letter-spacing:12px;font-family:-apple-system,BlinkMacSystemFont,'Courier New',monospace;text-align:center;margin-left:12px;">
+                  {{ .Token }}
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Security Notice -->
+          <tr>
+            <td align="center" style="padding:0 40px 45px;">
+              <p style="margin:0;font-size:13px;color:#94A3B8;line-height:1.6;">
+                验证码将在 <span style="color:#F97316;font-weight:600;">5分钟</span> 后自动失效。<br>
+                请确保您本人操作，切勿将该验证码泄露给任何人。
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Outside Footer -->
+        <table width="500" cellpadding="0" cellspacing="0" style="max-width:500px;width:100%;margin:0 auto;">
+          <tr>
+            <td align="center" style="padding:30px 20px;">
+              <p style="margin:0 0 12px;font-size:12px;color:#94A3B8;line-height:1.5;">
+                如果此操作非您本人发起，这说明有人可能误填了邮箱，您可以安全地忽略此邮件。
+              </p>
+              <p style="margin:0;font-size:12px;color:#CBD5E1;line-height:1.6;">
+                &copy; 2019-2026 凡图拉 | 云南凡图拉科技有限公司<br>
+                <a href="#" style="color:#CBD5E1;text-decoration:none;">滇ICP备 2025060486号-1</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
 </body>
+
 </html>

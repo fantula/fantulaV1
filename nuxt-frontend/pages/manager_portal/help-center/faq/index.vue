@@ -12,7 +12,7 @@
       <div class="toolbar-content">
         <el-form :inline="true" class="search-form">
           <el-form-item>
-            <el-select v-model="filterCategory" placeholder="全部分类" clearable style="width: 150px" @change="fetchFaqs">
+            <el-select v-model="filters.category_id" placeholder="全部分类" clearable style="width: 150px" @change="fetchFaqs">
               <el-option
                 v-for="cat in categories"
                 :key="cat.id"
@@ -23,7 +23,7 @@
           </el-form-item>
           <el-form-item>
             <el-input 
-              v-model="keyword" 
+              v-model="filters.keyword" 
               placeholder="搜索问题关键词..." 
               prefix-icon="Search"
               clearable
@@ -32,7 +32,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="fetchFaqs">查询</el-button>
-            <el-button @click="resetFilter">重置</el-button>
+            <el-button @click="resetFilters">重置</el-button>
           </el-form-item>
         </el-form>
 
@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { Plus, Search, Goods, Sort } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import draggable from 'vuedraggable'
@@ -166,6 +166,7 @@ import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { confirmDelete } from '@/composables/admin/useAdminDialog'
+import { useAdminList } from '@/composables/admin/useAdminList'
 import { adminRoute } from '@/config/admin-routes'
 
 definePageMeta({
@@ -187,56 +188,42 @@ interface AdminFaq {
   is_active: boolean
 }
 
-const loading = ref(false)
-const faqs = ref<AdminFaq[]>([])
 const categories = ref<AdminFaqCategory[]>([])
-const total = ref(0)
-const currentPage = ref(1)
-const pageSize = ref(20)
-
-const keyword = ref('')
-const filterCategory = ref('')
-
-const selectedIds = ref<string[]>([])
 const tableRef = ref()
+
+const {
+  loading,
+  list: faqs,
+  total,
+  currentPage,
+  pageSize,
+  filters,
+  selectedIds,
+  loadList: fetchFaqs,
+  resetFilters,
+  clearSelection,
+  handleSelectionChange
+} = useAdminList<AdminFaq, { keyword: string; category_id: string }>({
+  fetchFn: async (params) => {
+    const res = await adminFaqApi.getFaqs({
+      page: params.page,
+      page_size: params.pageSize,
+      keyword: params.filters.keyword,
+      category_id: params.filters.category_id || undefined
+    })
+    return {
+      success: res.success,
+      data: res.faqs || [],
+      total: res.total || 0,
+      error: res.error as any
+    }
+  },
+  defaultFilters: { keyword: '', category_id: '' }
+})
 
 const fetchCategories = async () => {
   const res = await adminFaqApi.getCategories()
   if (res.success) categories.value = res.categories || []
-}
-
-const fetchFaqs = async () => {
-  loading.value = true
-  try {
-    const res = await adminFaqApi.getFaqs({
-      page: currentPage.value,
-      page_size: pageSize.value,
-      keyword: keyword.value,
-      category_id: filterCategory.value || undefined
-    })
-    if (res.success) {
-      faqs.value = res.faqs || []
-      total.value = res.total || 0
-    } else {
-      ElMessage.error(res.error || '获取列表失败')
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleSelectionChange = (selection: AdminFaq[]) => {
-  selectedIds.value = selection.map(item => item.id)
-}
-
-const clearSelection = () => {
-  if (tableRef.value) {
-    // AdminDataTable exposes el-table via ref? Usually requires inner ref access or exposing method
-    // If AdminDataTable doesn't expose toggleRowSelection, we might need to rely on re-fetching or implementing expose
-    // Fallback: just clear state, user manually deselects or we refresh
-    selectedIds.value = []
-    fetchFaqs() // Quick way to clear selection UI
-  }
 }
 
 const handleDelete = async (row: AdminFaq) => {
@@ -261,7 +248,6 @@ const handleBatchDelete = async () => {
           { type: 'warning', confirmButtonText: '确定删除', cancelButtonText: '取消' }
       )
       
-      // Loop delete (backend missing batch delete)
       let successCount = 0
       for (const id of selectedIds.value) {
           const res = await adminFaqApi.deleteFaq(id)
@@ -277,12 +263,6 @@ const handleBatchDelete = async () => {
   }
 }
 
-const resetFilter = () => {
-  keyword.value = ''
-  filterCategory.value = ''
-  fetchFaqs()
-}
-
 // --- Sorting Logic ---
 const sortDialogVisible = ref(false)
 const sortList = ref<AdminFaq[]>([])
@@ -291,19 +271,16 @@ const savingSort = ref(false)
 const sortFilterCategory = ref('')
 
 const openSortDialog = () => {
-  sortFilterCategory.value = filterCategory.value // Default to current filter
+  sortFilterCategory.value = filters.category_id 
   sortDialogVisible.value = true
   fetchSortList()
 }
 
 const fetchSortList = async () => {
   loadingSortList.value = true
-  // Fetch ALL items for sorting (no pagination), or at least a large number
-  // Ideally backend supports 'get all for sorting'
-  // We reuse getFaqs with large page size
   const res = await adminFaqApi.getFaqs({
       page: 1,
-      page_size: 100, // Limit 100 for drag sort performance
+      page_size: 100, 
       category_id: sortFilterCategory.value || undefined
   })
   if (res.success) {
@@ -340,7 +317,7 @@ const saveSort = async () => {
 
 onMounted(() => {
   fetchCategories()
-  fetchFaqs()
+  // Data load is handled by useAdminList's autoLoad
 })
 </script>
 

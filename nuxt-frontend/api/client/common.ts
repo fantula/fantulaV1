@@ -66,7 +66,7 @@ export const commonApi = {
       .order('sort_order', { ascending: true })
 
     if (error) {
-      console.error('Fetch banners error:', error)
+      if (import.meta.dev) console.error('Fetch banners error:', error)
       return { code: 500, msg: error.message, data: [], success: false }
     }
 
@@ -130,7 +130,7 @@ export const cartApi = {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Fetch cart error:', error)
+      if (import.meta.dev) console.error('Fetch cart error:', error)
       return { code: 500, msg: error.message, data: { list: [] }, success: false }
     }
 
@@ -190,7 +190,7 @@ export const cartApi = {
       })
 
     if (error) {
-      console.error('Add to cart error:', error)
+      if (import.meta.dev) console.error('Add to cart error:', error)
       return { code: 500, msg: error.message, success: false }
     }
     return { code: 0, msg: '已加入购物车', success: true }
@@ -207,7 +207,7 @@ export const cartApi = {
       .eq('id', cartItemId)
 
     if (error) {
-      console.error('Update cart error:', error)
+      if (import.meta.dev) console.error('Update cart error:', error)
       return { code: 500, msg: error.message, success: false }
     }
     return { code: 0, msg: 'success', success: true }
@@ -224,7 +224,7 @@ export const cartApi = {
       .eq('id', cartItemId)
 
     if (error) {
-      console.error('Remove from cart error:', error)
+      if (import.meta.dev) console.error('Remove from cart error:', error)
       return { code: 500, msg: error.message, success: false }
     }
     return { code: 0, msg: '已从购物车删除', success: true }
@@ -244,7 +244,7 @@ export const cartApi = {
       .eq('user_id', user.id)
 
     if (error) {
-      console.error('Clear cart error:', error)
+      if (import.meta.dev) console.error('Clear cart error:', error)
       return { code: 500, msg: error.message, success: false }
     }
     return { code: 0, msg: '购物车已清空', success: true }

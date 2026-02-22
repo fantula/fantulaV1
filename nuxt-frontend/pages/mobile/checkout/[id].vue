@@ -12,7 +12,7 @@
     <div v-else-if="error" class="state-box error">
        <div class="error-icon"><el-icon><CircleCloseFilled /></el-icon></div>
        <span>{{ error }}</span>
-       <button class="btn-retry" @click="router.replace('/')">返回首页</button>
+       <button class="btn-retry" @click="router.replace(mobileRoutes.home())">返回首页</button>
     </div>
 
     <!-- Main Content -->
@@ -169,6 +169,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { mobileRoutes } from '@/config/client-routes'
 import { 
   ArrowRight, CircleCloseFilled, WalletFilled, Select, WarningFilled,
   Ticket, Timer, QuestionFilled, ArrowDown, Refresh
@@ -258,11 +259,11 @@ const fetchFaqs = async () => {
 }
 
 const goToOrder = () => {
-    router.replace('/mobile/profile/order')
+    router.replace(mobileRoutes.profileOrders())
 }
 
 const goToHome = () => {
-    router.replace('/mobile')
+    router.replace(mobileRoutes.home())
 }
 
 onMounted(() => {
@@ -273,7 +274,9 @@ onMounted(() => {
 
 <style scoped>
 .checkout-page-glass {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #0F172A;
   color: #fff;
   padding-bottom: 100px; /* Space for footer */

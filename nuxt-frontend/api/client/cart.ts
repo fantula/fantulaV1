@@ -61,7 +61,7 @@ export const clientCartApi = {
             .order('created_at', { ascending: false })
 
         if (error) {
-            console.error('获取购物车失败:', error)
+            if (import.meta.dev) console.error('获取购物车失败:', error)
             return { success: false, error: error.message }
         }
 

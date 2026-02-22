@@ -94,7 +94,7 @@ const handleUnbind = async () => {
     } catch (e) {
         // Cancelled or Error
         if (e !== 'cancel') {
-             console.error(e)
+             if (import.meta.dev) console.error(e)
              ElMessage.error('操作失败')
         }
     } finally {
@@ -181,5 +181,51 @@ const handleClose = () => {
 }
 .unbind-btn {
     background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #F87171;
+}
+</style>
+
+<!-- Global styles for ElMessageBox dark theme (not scoped) -->
+<style>
+.mobile-msg-box {
+  width: 90% !important;
+  max-width: 320px !important;
+  background: rgba(30, 41, 59, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  padding-bottom: 15px !important;
+}
+.mobile-msg-box .el-message-box__header {
+  padding-bottom: 8px !important;
+}
+.mobile-msg-box .el-message-box__title {
+  color: #fff !important;
+  font-size: 18px !important;
+}
+.mobile-msg-box .el-message-box__message p {
+  color: #CBD5E1 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+.mobile-msg-box .el-message-box__btns {
+  flex-direction: column-reverse;
+  gap: 10px;
+}
+.mobile-msg-box .el-button {
+  width: 100% !important;
+  margin: 0 !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+.mobile-msg-box .el-button--primary {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.mobile-msg-box .el-button--default {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #94A3B8 !important;
 }
 </style>

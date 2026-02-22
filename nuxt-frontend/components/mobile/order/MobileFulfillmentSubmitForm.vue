@@ -78,17 +78,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { getSupabaseClient } from '@/utils/supabase'
+import { onMounted } from 'vue'
 import { useToast } from '@/composables/mobile/useToast'
 import { Loading, CircleCheck, CircleClose, InfoFilled } from '@element-plus/icons-vue'
+import { useFulfillmentSubmit } from '@/composables/client/useFulfillmentSubmit'
 
-interface OrderFulfillment {
-  id: string
-  status: string
-  payload: any
-  reject_reason?: string
-}
 interface FulfillmentField {
   key: string
   label: string
@@ -104,85 +98,23 @@ const props = defineProps<{
 const emit = defineEmits(['submit-success'])
 const { showToast } = useToast()
 
-const formData = reactive<Record<string, string>>({})
-const latestFulfillment = ref<OrderFulfillment | null>(null)
-const isSubmitting = ref(false)
-
-const fields = computed(() => props.cdkFields || [])
-const latestStatus = computed(() => latestFulfillment.value?.status || '')
-const latestRejectReason = computed(() => latestFulfillment.value?.reject_reason || '')
-
-const fetchLatestFulfillment = async () => {
-    if (!props.orderId) return
-    const client = getSupabaseClient()
-    let query = client.from('order_fulfillments').select('*').eq('order_id', props.orderId).order('submitted_at', { ascending: false })
-    if (props.cdkId) query = query.contains('payload', { _cdk_id: props.cdkId })
-    const { data, error } = await query.limit(1).single()
-    
-    if (data && !error) {
-        latestFulfillment.value = data as OrderFulfillment
-        if (data.payload) {
-             Object.assign(formData, data.payload)
-        }
-    }
-}
-
-const validate = () => {
-    for (const f of fields.value) {
-        if (!formData[f.key]) {
-            showToast(`请输入${f.label}`, 'warning')
-            return false
-        }
-    }
-    return true
-}
-
-const handleInsert = async () => {
-    if (!validate()) return
-    isSubmitting.value = true
-    try {
-        const client = getSupabaseClient()
-        const payload = { ...formData, _cdk_id: props.cdkId }
-        
-        const { error } = await client.from('order_fulfillments').insert({
-            order_id: props.orderId,
-            status: 'submitted',
-            payload
-        })
-
-        if (error) throw error
-        showToast('提交成功', 'success')
-        await fetchLatestFulfillment()
-        emit('submit-success')
-    } catch (e: any) {
-        showToast(e.message || '提交失败', 'error')
-    } finally {
-        isSubmitting.value = false
-    }
-}
-
-const handleUpdate = async () => {
-    if (!latestFulfillment.value) return
-    if (!validate()) return
-    isSubmitting.value = true
-    try {
-        const client = getSupabaseClient()
-        const payload = { ...formData, _cdk_id: props.cdkId }
-        
-        const { error } = await client
-           .from('order_fulfillments')
-           .update({ payload, status: 'submitted' }) // Reset to submitted if updated? Or keep as is?
-           .eq('id', latestFulfillment.value.id)
-
-        if (error) throw error
-        showToast('更新成功', 'success')
-        await fetchLatestFulfillment()
-    } catch (e: any) {
-        showToast(e.message || '更新失败', 'error')
-    } finally {
-        isSubmitting.value = false
-    }
-}
+const {
+  formData,
+  latestStatus,
+  latestRejectReason,
+  isSubmitting,
+  fields,
+  fetchLatestFulfillment,
+  handleInsert,
+  handleUpdate
+} = useFulfillmentSubmit({
+  orderId: () => props.orderId,
+  cdkId: () => props.cdkId,
+  cdkFields: () => props.cdkFields,
+  onSuccess: (msg) => showToast(msg, 'success'),
+  onError: (msg) => showToast(msg, 'error'),
+  onCallback: () => emit('submit-success')
+})
 
 onMounted(fetchLatestFulfillment)
 </script>

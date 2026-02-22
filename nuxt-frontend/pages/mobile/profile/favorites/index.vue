@@ -160,7 +160,9 @@ watch(activeTab, () => {
 
 <style scoped>
 .mobile-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-bottom: 40px;
   color: #fff;
   display: flex; flex-direction: column;

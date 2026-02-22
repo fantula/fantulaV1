@@ -46,68 +46,84 @@ export const communityApi = {
     const from = (page - 1) * pageSize
     const to = from + pageSize - 1
 
-    const { data, error, count } = await query.range(from, to)
+    try {
+      const { data, error, count } = await query.range(from, to)
 
-    if (error) {
-      console.error('Error fetching articles:', error)
+      if (error) {
+        if (import.meta.dev) console.error('Error fetching articles:', error)
+        return { success: false, data: [], total: 0 }
+      }
+
+      // Mock author for now since we don't have an authors table relation yet
+      const enrichedData = data?.map(article => ({
+        ...article,
+        author: {
+          name: '官方客服',
+          avatar: '/images/service-avatar.png'
+        }
+      }))
+
+      return { success: true, data: enrichedData, total: count || 0 }
+    } catch (error) {
+      if (import.meta.dev) console.error('Error fetching articles:', error)
       return { success: false, data: [], total: 0 }
     }
-
-    // Mock author for now since we don't have an authors table relation yet
-    const enrichedData = data?.map(article => ({
-      ...article,
-      author: {
-        name: '官方客服',
-        avatar: '/images/service-avatar.png'
-      }
-    }))
-
-    return { success: true, data: enrichedData, total: count || 0 }
   },
 
   // Get active categories (public)
   async getCategories() {
     const client = getSupabaseClient()
-    const { data, error } = await client
-      .from('community_categories')
-      .select('*')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching categories:', error)
+    try {
+      const { data, error } = await client
+        .from('community_categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+
+      if (error) {
+        if (import.meta.dev) console.error('Error fetching categories:', error)
+        return { success: false, data: [] }
+      }
+      return { success: true, data }
+    } catch (error) {
+      if (import.meta.dev) console.error('Error fetching categories:', error)
       return { success: false, data: [] }
     }
-    return { success: true, data }
   },
 
   // Get single article detail
   async getArticleDetail(id: string) {
     const client = getSupabaseClient()
 
-    const { data, error } = await client
-      .from('community_articles')
-      .select('*')
-      .eq('id', id)
-      .single()
+    try {
+      const { data, error } = await client
+        .from('community_articles')
+        .select('*')
+        .eq('id', id)
+        .single()
 
-    if (error) {
-      console.error('Error fetching article detail:', error)
-      return { success: false, msg: error.message }
-    }
+      if (error) {
+        if (import.meta.dev) console.error('Error fetching article detail:', error)
+        return { success: false, msg: error.message }
+      }
 
-    // Increment view count (fire and forget)
-    this.incrementViews(id)
+      // Increment view count (fire and forget)
+      this.incrementViews(id)
 
-    return {
-      success: true,
-      data: {
-        ...data,
-        author: {
-          name: '官方客服',
-          avatar: '/images/service-avatar.png'
+      return {
+        success: true,
+        data: {
+          ...data,
+          author: {
+            name: '官方客服',
+            avatar: '/images/service-avatar.png'
+          }
         }
       }
+    } catch (error: any) {
+      if (import.meta.dev) console.error('Error fetching article detail:', error)
+      return { success: false, msg: error.message || 'Error' }
     }
   },
 

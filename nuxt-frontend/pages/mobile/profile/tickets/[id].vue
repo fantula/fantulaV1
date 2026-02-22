@@ -202,11 +202,13 @@ onMounted(() => {
 
 <style scoped>
 .mobile-page {
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #0F172A; /* Global BG */
   display: flex; flex-direction: column;
   /* Reduced padding since TabBar is hidden */
-  padding-bottom: calc(70px + env(safe-area-inset-bottom)); 
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
 }
 
 /* Chat Container */

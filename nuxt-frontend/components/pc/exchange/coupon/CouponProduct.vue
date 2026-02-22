@@ -22,6 +22,7 @@ import { computed } from 'vue'
 import BaseCouponTicket from './BaseCouponTicket.vue'
 import type { UserCoupon } from '@/api/client/coupon'
 import { useRouter } from 'vue-router'
+import { pcRoutes } from '@/config/client-routes'
 
 const props = defineProps<{
   couponData: UserCoupon
@@ -77,9 +78,9 @@ const displayDesc = computed(() => {
 const handleAction = () => {
   const extra = (props.couponData.coupon as any).extra
   if (extra && extra.product_id) {
-      router.push(`/product/${extra.product_id}`)
+      router.push(pcRoutes.product(extra.product_id))
   } else {
-      router.push('/')
+      router.push(pcRoutes.home())
   }
 }
 

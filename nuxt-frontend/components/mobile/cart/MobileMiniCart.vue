@@ -22,8 +22,9 @@
                <div class="mc-name">{{ cartItem.productName }}</div>
                
                <div class="mc-row-bottom">
-                 <span class="mc-price">¥{{ cartItem.price }}</span>
-                 
+                <div class="mc-price-row">
+                 <span class="mc-price">¥{{ Number(cartItem.price).toFixed(2) }}</span>
+               </div>   
                  <!-- Qty Control -->
                  <div class="mc-qty-control" v-if="cartItem.allowAddon">
                     <button class="qty-btn" @click.stop="updateQty(-1)" :disabled="updating || cartItem.quantity <= 1">-</button>
@@ -64,6 +65,7 @@ import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/client/cart'
 import { supabasePreOrderApi } from '@/api/client/supabase'
 import { Delete } from '@element-plus/icons-vue'
+import { mobileRoutes } from '@/config/client-routes'
 
 const props = defineProps<{
   visible: boolean
@@ -101,10 +103,10 @@ const handleCheckout = async () => {
     if (result.success && result.pre_order_id) {
        cartStore.clearCart()
        emit('close')
-       router.push(`/mobile/checkout/${result.pre_order_id}`)
+       router.push(mobileRoutes.checkout(result.pre_order_id))
     }
   } catch (e) {
-    console.error(e)
+    if (import.meta.dev) console.error(e)
   } finally {
     checkingOut.value = false
   }

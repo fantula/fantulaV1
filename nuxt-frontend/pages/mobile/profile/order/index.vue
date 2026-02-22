@@ -33,7 +33,7 @@
                         <el-icon class="empty-icon"><Box /></el-icon>
                     </div>
                     <p class="empty-text">暂无相关订单</p>
-                    <button class="go-shopping-btn" @click="router.push('/')">前往选购</button>
+                    <button class="go-shopping-btn" @click="router.push(mobileRoutes.home())">前往选购</button>
                 </div>
             </template>
 
@@ -91,6 +91,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { mobileRoutes } from '@/config/client-routes'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
 import MobileInfiniteList from '@/components/mobile/list/MobileInfiniteList.vue'
 import MobileOrderCard from '@/components/mobile/profile/MobileOrderCard.vue'
@@ -131,9 +132,9 @@ const handleItemClick = (item: any) => {
         // Checking Mobile Order Detail implementation plan, it is /mobile/profile/order/[id]
         // But for pending payment, usually it goes to a cashier. 
         // For now, let's keep it consistent.
-        router.push(`/mobile/checkout/${item.id}`) 
+        router.push(mobileRoutes.checkout(item.id)) 
     } else {
-        router.push(`/mobile/profile/order/${item.id}`)
+        router.push(mobileRoutes.orderDetail(item.id))
     }
 }
 
@@ -173,14 +174,16 @@ const handleConfirmDelete = async () => {
                 confirmModalVisible.value = false
             } else showToast('操作失败', 'error')
         }
-    } catch(e) { console.error(e) }
+    } catch(e) { if (import.meta.dev) console.error(e) }
     finally { confirmLoading.value = false }
 }
 </script>
 
 <style scoped>
 .mobile-order-page {
-    min-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: flex; flex-direction: column;
     background: #020617;
     padding-bottom: 40px;

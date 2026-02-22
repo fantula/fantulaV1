@@ -2,7 +2,7 @@
  * 微信支付 API 客户端
  * 调用 Nuxt Server API (本地部署)
  */
-import { getAuthToken } from '~/utils/supabase'
+import { getSupabaseClient } from '@/utils/supabase'
 
 // ============ 类型定义 ============
 
@@ -81,7 +81,7 @@ export const wechatPayApi = {
             })
             return data
         } catch (error: any) {
-            console.error('[WechatPay] nativePayRecharge error:', error)
+            if (import.meta.dev) console.error('[WechatPay] nativePayRecharge error:', error)
             return { success: false, error: error.data?.message || error.message || '支付发起失败' }
         }
     },
@@ -100,7 +100,7 @@ export const wechatPayApi = {
             })
             return data
         } catch (error: any) {
-            console.error('[WechatPay] queryOrder error:', error)
+            if (import.meta.dev) console.error('[WechatPay] queryOrder error:', error)
             return { success: false, error: error.data?.message || error.message || '查询失败' }
         }
     },
@@ -122,7 +122,7 @@ export const wechatPayApi = {
             })
             return data
         } catch (error: any) {
-            console.error('[WechatPay] jsapiPayRecharge error:', error)
+            if (import.meta.dev) console.error('[WechatPay] jsapiPayRecharge error:', error)
             return { success: false, error: error.data?.message || error.message || '支付发起失败' }
         }
     },
@@ -141,7 +141,7 @@ export const wechatPayApi = {
             })
             return data
         } catch (error: any) {
-            console.error('[WechatPay] getOpenId error:', error)
+            if (import.meta.dev) console.error('[WechatPay] getOpenId error:', error)
             return { success: false, error: error.data?.message || error.message || '获取OpenID失败' }
         }
     },

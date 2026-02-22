@@ -86,16 +86,12 @@
                       <MobileFulfillmentCdk :cdk-list="cdkList" />
                       </div>
 
-                      <div v-else-if="['manual', 'shared'].includes(order.delivery_type)">
+                      <div v-else-if="['manual', 'shared'].includes(order.delivery_type || '')">
                           <MobileFulfillmentSubmitForm 
-                              v-if="!hasFulfillmentRecord"
-                              :order-id="order.id"
-                              :delivery-type="order.delivery_type"
+                              :order-id="order.id || ''"
+                              :order-status="order.status || ''"
+                              :cdk-fields="[]"
                               @success="refreshData"
-                          />
-                          <MobileFulfillmentShared 
-                              v-else
-                              :fulfillment="fulfillmentData"
                           />
                       </div>
                   </div>
@@ -103,9 +99,9 @@
 
 
             <!-- History -->
-            <div v-if="fulfillmentHistory.length > 0" class="detail-card">
+            <div class="detail-card">
                <h3 class="card-title">发货记录</h3>
-               <MobileFulfillmentHistory :history="fulfillmentHistory" />
+               <MobileFulfillmentHistory :order-id="order.id || ''" ref="historyRef" />
             </div>
        </template> <!-- Closes Virtual -->
        
@@ -150,6 +146,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { mobileRoutes } from '@/config/client-routes'
 import { useToast } from '@/composables/mobile/useToast'
 import { 
   ArrowLeft, CopyDocument, CircleCheck, InfoFilled, 
@@ -170,6 +167,9 @@ import MobileTicketSheet from '@/components/mobile/order/MobileTicketSheet.vue'
 import MobileCancelRefundSheet from '@/components/mobile/order/MobileCancelRefundSheet.vue'
 import MobileRefundingCard from '@/components/mobile/order/MobileRefundingCard.vue'
 import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
+
+import { useFulfillmentHistory } from '@/composables/client/useFulfillmentHistory'
+import { computed } from 'vue'
 
 definePageMeta({ layout: 'mobile', ssr: false, middleware: 'client-auth' })
 
@@ -205,6 +205,19 @@ const {
   handleCancelRefundSuccess,
 } = useOrderDetail(orderId)
 
+const {
+  records: fulfillmentHistory,
+  fetchHistory
+} = useFulfillmentHistory({ orderId: () => orderId })
+
+const hasFulfillmentRecord = computed(() => fulfillmentHistory.value && fulfillmentHistory.value.length > 0)
+const fulfillmentData = computed(() => fulfillmentHistory.value.length > 0 ? fulfillmentHistory.value[0] : null)
+
+const refreshData = async () => {
+    await fetchHistory()
+    await loadData()
+}
+
 // Virtual Component Refs
 const historyRef = ref<any>(null)
 
@@ -216,13 +229,13 @@ const showContactModal = ref(false)
 const showCancelRefundSheet = ref(false)
 
 const handleFulfillmentSuccess = () => {
-    historyRef.value?.refresh()
+    refreshData()
 }
 
 const handleAction = async (type: string) => {
     if (type === 'contact') showContactModal.value = true
     else if (type === 'create_ticket') showTicketSheet.value = true
-    else if (type === 'view_ticket') router.push('/mobile/profile/tickets')
+    else if (type === 'view_ticket') router.push(mobileRoutes.profileTickets())
     else if (type === 'renew') showRenewalSheet.value = true
     else if (type === 'apply_refund') showRefundSheet.value = true
     else if (type === 'cancel_refund') showCancelRefundSheet.value = true
@@ -240,7 +253,9 @@ const onTicketSuccess = () => {
 
 <style scoped>
 .mobile-order-detail {
-    min-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: #0F172A;
     padding-bottom: 40px;
 }

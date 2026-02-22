@@ -19,7 +19,6 @@ export function useCheckout() {
   const error = ref('')
   const preOrders = ref<PreOrder[]>([])
   const paying = ref(false)
-  // const showBalanceModal = ref(false) // Removed
   const showPaySuccess = ref(false)
   const refreshingBalance = ref(false) // New
 
@@ -278,7 +277,6 @@ export function useCheckout() {
     error,
     preOrders,
     paying,
-    // showBalanceModal, // Removed
     showPaySuccess,
     refreshingBalance, // New
     lastOrderId,

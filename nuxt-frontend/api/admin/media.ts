@@ -201,12 +201,16 @@ export const adminImageApi = {
                     })
 
                     if (!response.ok) {
-                        const result = await response.json()
-                        console.error('Failed to delete files from R2:', result.error)
+                        const ct = response.headers.get('content-type') || ''
+                        const errText = ct.includes('application/json')
+                            ? (await response.json().catch(() => ({}))).error || `HTTP ${response.status}`
+                            : (await response.text()).replace(/<[^>]*>/g, '').trim().slice(0, 80)
+                        if (import.meta.dev) console.error('Failed to delete files from R2:', errText)
+                        // Can continue, not blocking db delete
                     }
                 }
             } catch (e) {
-                console.error('R2 delete request failed:', e)
+                if (import.meta.dev) console.error('R2 delete request failed:', e)
             }
         }
 

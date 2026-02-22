@@ -126,7 +126,7 @@ export const adminOrderApi = {
         const { data, error, count } = await query
 
         if (error) {
-            console.error('获取订单列表失败:', error)
+            if (import.meta.dev) console.error('获取订单列表失败:', error)
             return { success: false, orders: [], total: 0, error: error.message }
         }
 

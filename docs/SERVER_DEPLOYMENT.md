@@ -1,6 +1,6 @@
 # 服务器部署文档
 
-> 最后更新: 2026-02-18
+> 最后更新: 2026-02-21
 
 ---
 
@@ -64,13 +64,41 @@
 
 ### 3.2 部署原理
 1.  **Pre-flight**: SSH 连通性检查，生产环境二次确认。
-2.  **Local Build**: 本地构建 `.output`。
+2.  **Local Build**: 本地**清理缓存后**构建 `.output`（见 §3.4）。
 3.  **Rsync**: 增量同步 (排除 `node_modules` 以节省带宽和保护环境)。
 4.  **Nginx Sync**: 自动将 `config/nginx-prod.conf` 同步到服务器并重载。
 5.  **Remote Install** (Full模式): 服务器端使用国内镜像 (`npmmirror`) 重装 Linux 依赖。
 6.  **Restart**: `pm2 reload` 实现零停机重启。
 7.  **Health Check**: 部署后自动 curl 验证返回 200。
 8.  **Version Tag**: 成功后自动 `git tag deploy-YYYYMMDD-HHMMSS`。
+
+### 3.4 ⚠️ 构建前必须清理缓存（血泪教训）
+
+**问题根因**：Nuxt 3 的 `nuxt dev` 会在 `.nuxt/` 目录写入 dev 模式存根（stub），包括 `client.precomputed.mjs = export default undefined`。如果不清理就执行 `npm run build`，Vite 可能复用缓存，导致生产构建产出同样的 dev 存根内容。
+
+**症状**：
+- 部署后 HTTP 500，错误为 `rendererContext._entrypoints is not iterable`
+- 或：页面 HTML 的 JS 路径是 `/_nuxt/Users/dalin/fantula/.../entry.js`（绝对路径）而非 `/_nuxt/DQDHi-Zj.js`（哈希路径）
+
+**铁律：每次生产构建必须先执行**：
+```bash
+cd nuxt-frontend
+rm -rf .nuxt .output
+npm run build
+```
+
+**快速诊断（构建后验证）**：
+```bash
+# 正常：应为 ~521KB
+wc -c .output/server/chunks/build/client.precomputed.mjs
+# 异常：只有 1 行说明是 dev 存根，必须重新清理构建
+
+# 验证 HTML 引用的是哈希路径
+grep -o 'src="/_nuxt/[^"]*"' .output/server/chunks/routes/renderer.mjs | head -3
+# 应该类似：src="/_nuxt/DQDHi-Zj.js"，不应有绝对路径
+```
+
+> `deploy.sh` 已内置此清理步骤，手动构建时务必注意。
 
 ### 3.3 Nginx 配置管理
 
@@ -366,6 +394,37 @@ pm2 logs fantula --err --lines 50
 # 重启
 pm2 restart fantula --update-env
 ```
+
+### 8.4 HTTP 500: `_entrypoints is not iterable`
+
+**根因**：Nuxt 构建产物中 `client.precomputed.mjs` 为 dev 存根（`export default undefined`）。
+
+```bash
+# 1. 确认根因
+ssh root@180.163.87.70 "wc -c /opt/fantula/nuxt-frontend/.output/server/chunks/build/client.precomputed.mjs"
+# 如果只有 23 字节，说明是 dev 存根
+
+# 2. 本地清理重建
+cd /Users/dalin/fantula/nuxt-frontend
+rm -rf .nuxt .output
+npm run build
+
+# 3. 重新部署
+rsync -az --delete .output/ root@180.163.87.70:/opt/fantula/nuxt-frontend/.output/
+ssh root@180.163.87.70 "pm2 reload fantula --update-env"
+
+# 4. 验证
+curl -s -o /dev/null -w "%{http_code}" https://www.fantula.com/manager_portal/login
+# 预期：200
+```
+
+### 8.5 部署后 JS 加载失败（路径异常）
+
+**症状**：浏览器控制台显示 `/_nuxt/Users/dalin/fantula/...` 路径 404，页面白屏。
+
+**根因**：同 §8.4，`client.manifest.mjs` 包含本地开发路径。
+
+**修复**：同 §8.4 流程（清理缓存重建部署）。
 
 ### 8.2 Supabase 服务异常
 
