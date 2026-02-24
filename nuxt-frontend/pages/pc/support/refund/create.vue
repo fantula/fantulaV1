@@ -41,7 +41,7 @@
           </div>
           <div class="order-content">
             <div class="product-info">
-              <img :src="order?.product_snapshot?.image || '/images/placeholder.png'" class="product-img" />
+              <img :src="order?.product_snapshot?.image || '/images/shared/logo_v2.png'" class="product-img" />
               <div class="product-detail">
                 <div class="product-name">{{ order?.product_snapshot?.product_name }}</div>
                 <div class="product-spec">{{ getSpecText(order?.sku_snapshot) }}</div>
@@ -108,6 +108,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { getSupabaseClient } from '@/utils/supabase'
+import { pcRoutes } from '@/config/client-routes'
 
 const route = useRoute()
 const router = useRouter()
@@ -215,7 +216,7 @@ async function handleSubmit() {
     }
     
     ElMessage.success('退款申请已提交，请等待审核')
-    router.replace(`/profile/order/${orderId.value}`)
+    router.replace(pcRoutes.orderDetail(orderId.value))
     
   } catch (e: any) {
     ElMessage.error(e.message || '提交失败')
@@ -226,7 +227,7 @@ async function handleSubmit() {
 
 function goBack() {
   if (orderId.value) {
-    router.push(`/profile/order/${orderId.value}`)
+    router.push(pcRoutes.orderDetail(orderId.value))
   } else {
     router.back()
   }

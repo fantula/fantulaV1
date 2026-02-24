@@ -112,7 +112,7 @@ onMounted(async () => {
             orderDetail.value = res.data
          }
       } catch (e) {
-         console.error('Fetch order failed', e)
+         if (import.meta.dev) console.error('Fetch order failed', e)
       } finally {
          loadingOrder.value = false
       }
@@ -146,7 +146,7 @@ const handleFileChange = async (e: Event) => {
     }
 
   } catch (err: any) {
-    console.error(err)
+    if (import.meta.dev) console.error(err)
     alert('上传失败: ' + err.message)
   } finally {
     uploading.value = false

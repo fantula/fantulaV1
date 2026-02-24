@@ -93,7 +93,7 @@ const loadData = async () => {
       ElMessage.error(res.error || '加载失败')
     }
   } catch (e: any) {
-    console.error('getProductsBySharedTag Error:', e)
+    if (import.meta.dev) console.error('getProductsBySharedTag Error:', e)
     ElMessage.error(e.message || '网络异常')
   } finally {
     loading.value = false

@@ -12,7 +12,7 @@
     <!-- Body: Image + Info -->
     <div class="prod-row">
       <div class="prod-thumb">
-        <img :src="order.productImage || '/images/placeholder.png'" class="prod-img" loading="lazy" />
+        <img :src="order.productImage || '/images/shared/logo_v2.png'" class="prod-img" loading="lazy" />
       </div>
       <div class="prod-info">
         <div class="info-main">

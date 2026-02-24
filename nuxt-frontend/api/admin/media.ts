@@ -109,19 +109,25 @@ export const adminImageApi = {
     /**
      * 获取图片列表
      */
-    async getImages(params?: { category_id?: string; keyword?: string }): Promise<{ success: boolean; images: AdminImage[]; error?: string }> {
+    async getImages(params?: { category_id?: string; keyword?: string; page?: number; pageSize?: number }): Promise<{ success: boolean; images: AdminImage[]; total?: number; error?: string }> {
         const client = getSupabaseClient()
         let query = client.from('images').select(`
             *,
             category:image_categories(*)
-        `)
+        `, { count: 'exact' })
 
         if (params?.category_id) query = query.eq('category_id', params.category_id)
         if (params?.keyword) query = query.ilike('name', `%${params.keyword}%`)
 
-        const { data, error } = await query.order('created_at', { ascending: false })
-        if (error) return { success: false, images: [], error: error.message }
-        return { success: true, images: data || [] }
+        if (params?.page && params?.pageSize) {
+            const from = (params.page - 1) * params.pageSize
+            const to = from + params.pageSize - 1
+            query = query.range(from, to)
+        }
+
+        const { data, count, error } = await query.order('created_at', { ascending: false })
+        if (error) return { success: false, images: [], total: 0, error: error.message }
+        return { success: true, images: data || [], total: count || 0 }
     },
 
     /**

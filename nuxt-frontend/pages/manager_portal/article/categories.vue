@@ -51,37 +51,14 @@
     </AdminDataTable>
 
     <!-- Edit/Create Dialog -->
-    <AdminDataDialog
+    <AdminCategoryEditor
       v-model="dialog.visible.value"
-      :title="dialog.isEdit.value ? '编辑分类' : '新增分类'"
+      :is-edit="dialog.isEdit.value"
       :loading="dialog.loading.value"
-      @confirm="dialog.submit"
-    >
-      <el-form :model="dialog.form" label-width="80px">
-        <el-form-item label="名称" required>
-          <el-input v-model="dialog.form.name" placeholder="例如: 使用攻略" />
-        </el-form-item>
-        <el-form-item label="图标" required>
-          <el-input v-model="dialog.form.icon" placeholder="Emoji 或 Element 图标名" style="width: 100px;">
-            <template #append>
-              <span v-if="dialog.form.icon">{{ dialog.form.icon }}</span>
-            </template>
-          </el-input>
-          <span class="text-gray-400 text-xs ml-2">推荐使用 Emoji，如 📝</span>
-        </el-form-item>
-        <el-form-item label="颜色" required>
-          <el-color-picker v-model="dialog.form.color" />
-          <el-input v-model="dialog.form.color" style="width: 120px; margin-left: 10px;" />
-        </el-form-item>
-        <el-form-item label="排序">
-          <el-input-number v-model="dialog.form.sort_order" :min="0" :max="999" />
-          <span class="text-gray-400 text-xs ml-2">数字越小越靠前</span>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-switch v-model="dialog.form.is_active" active-text="启用" inactive-text="禁用" />
-        </el-form-item>
-      </el-form>
-    </AdminDataDialog>
+      type="article"
+      :initial-data="dialog.form"
+      @confirm="handleConfirm"
+    />
   </div>
 </template>
 
@@ -93,7 +70,7 @@ import { ElMessage } from 'element-plus'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import AdminCategoryEditor from '@/components/admin/base/AdminCategoryEditor.vue'
 import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
 
 definePageMeta({
@@ -126,28 +103,20 @@ const dialog = useAdminDialog({
   sort_order: 10,
   is_active: true
 }, {
-  onSubmit: async (form, isEdit) => {
-    if (!form.name) {
+      onSubmit: async (payload, isEdit) => {
+    if (!payload.name) {
       ElMessage.warning('请输入分类名称')
       return { success: false }
     }
 
-    const payload = {
-      name: form.name,
-      icon: form.icon,
-      color: form.color,
-      sort_order: form.sort_order,
-      is_active: form.is_active
-    }
-
     let res
     if (isEdit) {
-      res = await adminCommunityApi.updateCategory(form.id, payload)
+      res = await adminCommunityApi.updateCategory(dialog.form.id, payload)
     } else {
       res = await adminCommunityApi.createCategory(payload)
     }
-    
-    if (res.error) {
+
+    if (res.success) {
         return { success: false, error: res.error.message || String(res.error) }
     }
     return { success: true }
@@ -156,6 +125,15 @@ const dialog = useAdminDialog({
       await fetchCategories()
   }
 })
+
+const handleConfirm = async (payload: any) => {
+  if (dialog.isEdit.value) {
+    dialog.form = { ...dialog.form, ...payload }
+  } else {
+    dialog.form = { ...payload }
+  }
+  await dialog.submit()
+}
 
 const handleStatusChange = async (row: Category) => {
   try {

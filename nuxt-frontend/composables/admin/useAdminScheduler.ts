@@ -33,7 +33,7 @@ export const useAdminScheduler = () => {
                 taskGroups.value = res.data.groups
             }
         } catch (e) {
-            console.error('Failed to get tasks:', e)
+            if (import.meta.dev) console.error('Failed to get tasks:', e)
         }
     }
 

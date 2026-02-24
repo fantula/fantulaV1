@@ -10,9 +10,8 @@
     <!-- Left: Value Section -->
     <div class="ticket-left">
       <div class="ticket-value">
-        <span class="symbol" v-if="themeColor === 'gold' || themeColor === 'purple'">¥</span>
         <span class="value-amount">{{ value }}</span>
-        <span class="value-unit" v-if="unit">{{ unit }}</span>
+        <span class="value-unit" v-if="unit">{{ unit }}</span><span class="value-unit" v-else>点</span>
       </div>
       <div class="ticket-type-label">
         {{ typeLabel }}

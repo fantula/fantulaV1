@@ -54,26 +54,15 @@
         </el-table-column>
      </AdminDataTable>
      
-     <!-- Add/Edit Dialog -->
-     <AdminDataDialog
-        v-model="dialogVisible"
-        :title="isEdit ? '编辑分类' : '添加分类'"
-        :loading="submitting"
-        @confirm="submitForm"
-        @closed="resetForm"
-     >
-        <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
-           <el-form-item label="名称" prop="name">
-              <el-input v-model="form.name" placeholder="请输入分类名称" />
-           </el-form-item>
-           <el-form-item label="状态" prop="status">
-              <el-radio-group v-model="form.status">
-                 <el-radio value="on">启用</el-radio>
-                 <el-radio value="off">停用</el-radio>
-              </el-radio-group>
-           </el-form-item>
-        </el-form>
-     </AdminDataDialog>
+     <!-- 编辑/添加弹窗 -->
+    <AdminCategoryEditor
+      v-model="dialogVisible"
+      :is-edit="isEdit"
+      :loading="submitting"
+      type="product"
+      :initial-data="form"
+      @confirm="submitForm"
+    />
 
   </div>
 </template>
@@ -82,26 +71,29 @@
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { Plus, Rank, Refresh } from '@element-plus/icons-vue'
 import { adminCategoryApi, type ProductCategory } from '@/api/admin'
-import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import Sortable from 'sortablejs'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
+import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
+import AdminCategoryEditor from '@/components/admin/base/AdminCategoryEditor.vue'
 
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"], title: '商品分类管理' })
 
 const loading = ref(false)
-const submitting = ref(false)
-const dialogVisible = ref(false)
-const isEdit = ref(false)
-const formRef = ref<FormInstance>()
 const adminTableRef = ref() // Ref to AdminDataTable component
 const categories = ref<any[]>([])
 
-const form = reactive({ id: '', name: '', status: 'on' as 'on' | 'off' })
-const rules = reactive({ name: [{ required: true, message: '请输入名称', trigger: 'blur' }] })
+// Dialog State
+const dialogVisible = ref(false)
+const isEdit = ref(false)
+const submitting = ref(false)
+const form = reactive({
+  id: '',
+  name: '',
+  status: 'on' as 'on' | 'off'
+})
 
 // Logic
 const loadCategories = async () => {
@@ -146,32 +138,48 @@ const saveSortOrder = async () => {
 }
 
 // Dialog Actions
-const openAddDialog = () => { isEdit.value = false; form.name=''; form.status='on'; dialogVisible.value = true }
-const openEditDialog = (row: any) => { isEdit.value = true; form.id=row.id; form.name=row.name; form.status=row.status; dialogVisible.value=true }
-
-const submitForm = async () => {
-    if(!formRef.value) return
-    await formRef.value.validate(async (valid) => {
-        if(!valid) return
-        submitting.value = true
-        try {
-            const api = isEdit.value ? adminCategoryApi.updateCategory : adminCategoryApi.createCategory
-            const payload: any = { name: form.name, status: form.status }
-            if(!isEdit.value) payload.sort_order = categories.value.length
-            
-            const arg = isEdit.value ? form.id : payload
-            const res = await (isEdit.value ? api(form.id, payload) : api(payload))
-            
-            if(res.success) {
-                ElMessage.success(isEdit.value ? '更新成功' : '添加成功')
-                dialogVisible.value = false
-                loadCategories()
-            } else ElMessage.error(res.error)
-        } finally { submitting.value = false }
-    })
+const openAddDialog = () => { 
+  isEdit.value = false; 
+  form.id = ''; 
+  form.name = ''; 
+  form.status = 'on'; 
+  dialogVisible.value = true 
+}
+const openEditDialog = (row: any) => { 
+  isEdit.value = true; 
+  form.id = row.id; 
+  form.name = row.name; 
+  form.status = row.status; 
+  dialogVisible.value = true 
 }
 
-const resetForm = () => formRef.value?.resetFields()
+const submitForm = async (payload: any) => {
+  submitting.value = true
+  try {
+    const apiPayload = {
+      name: payload.name,
+      status: payload.status,
+      sort_order: payload.sort_order || categories.value.length + 1
+    }
+
+    let res
+    if (isEdit.value) {
+      res = await adminCategoryApi.updateCategory(form.id, apiPayload)
+    } else {
+      res = await adminCategoryApi.createCategory(apiPayload)
+    }      
+    
+    if(res.success) {
+        ElMessage.success(isEdit.value ? '更新成功' : '添加成功')
+        dialogVisible.value = false
+        loadCategories()
+    } else ElMessage.error(res.error)
+  } catch (e: any) {
+    ElMessage.error(e.message || '操作失败')
+  } finally {
+    submitting.value = false
+  }
+}
 
 const handleStatusChange = async (row: any) => {
     row.statusLoading = true

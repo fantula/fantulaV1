@@ -135,7 +135,6 @@ import { Close, Refresh } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { adminUserApi, adminMessageApi, type AdminUser, type AdminMessage } from '@/api/admin'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 
 definePageMeta({

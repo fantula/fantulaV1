@@ -1,11 +1,17 @@
 import { ref, computed, watch } from 'vue'
 import { getSupabaseClient } from '@/utils/supabase'
 
-interface CdkItem {
+export interface CdkItem {
     id: string
     code: string
     parsed: any
     accountData: any
+}
+
+export interface CoSharingSlot {
+    index: number
+    user?: CoSharingUser
+    isMe: boolean
 }
 
 export interface CoSharingUser {

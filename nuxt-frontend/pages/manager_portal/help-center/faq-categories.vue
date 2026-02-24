@@ -41,29 +41,15 @@
         </el-table-column>
     </AdminDataTable>
 
-    <!-- Dialog -->
-    <AdminDataDialog
+    <!-- Edit/Create Dialog -->
+    <AdminCategoryEditor
       v-model="dialog.visible.value"
-      :title="dialog.isEdit.value ? '编辑分类' : '新增分类'"
+      :is-edit="dialog.isEdit.value"
       :loading="dialog.loading.value"
-      @confirm="dialog.submit"
-    >
-      <el-form ref="formRef" :model="dialog.form" label-width="110px">
-        <el-form-item label="分类名称" required>
-          <el-input v-model="dialog.form.name" placeholder="请输入分类名称" />
-        </el-form-item>
-        <el-form-item label="排序">
-          <el-input-number v-model="dialog.form.sort_order" :min="0" />
-        </el-form-item>
-        <el-form-item label="启用状态" v-if="dialog.isEdit.value">
-          <el-switch v-model="dialog.form.is_active" />
-        </el-form-item>
-        <el-form-item label="结算页显示">
-          <el-switch v-model="dialog.form.is_checkout_visible" />
-          <div class="form-tip text-gray-400 text-xs mt-1">开启后，该分类下的问题将显示在结算界面。</div>
-        </el-form-item>
-      </el-form>
-    </AdminDataDialog>
+      type="faq"
+      :initial-data="dialog.form"
+      @confirm="handleConfirm"
+    />
 
     <!-- Sort Dialog -->
     <el-dialog
@@ -115,7 +101,7 @@ import { adminFaqApi } from '@/api/admin/help-center'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
+import AdminCategoryEditor from '@/components/admin/base/AdminCategoryEditor.vue'
 import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 
@@ -157,26 +143,17 @@ const dialog = useAdminDialog({
   is_active: true,
   is_checkout_visible: false
 }, {
-  onSubmit: async (form, isEdit) => {
-    if (!form.name) {
+  onSubmit: async (payload, isEdit) => {
+    if (!payload.name) {
        ElMessage.warning('请输入分类名称')
        return { success: false }
     }
   
     let res
     if (isEdit) {
-      res = await adminFaqApi.updateCategory(form.id, {
-        name: form.name,
-        sort_order: form.sort_order,
-        is_active: form.is_active,
-        is_checkout_visible: form.is_checkout_visible
-      })
+      res = await adminFaqApi.updateCategory(dialog.form.id, payload)
     } else {
-      res = await adminFaqApi.createCategory({
-        name: form.name,
-        sort_order: form.sort_order,
-        is_checkout_visible: form.is_checkout_visible
-      })
+      res = await adminFaqApi.createCategory(payload)
     }
 
     if (res.error) {
@@ -190,8 +167,14 @@ const dialog = useAdminDialog({
   }
 })
 
-// Bind formRef to the dialog's reference
-const formRef = dialog.formRef
+const handleConfirm = async (payload: any) => {
+  if (dialog.isEdit.value) {
+    dialog.form = { ...dialog.form, ...payload }
+  } else {
+    dialog.form = { ...payload }
+  }
+  await dialog.submit()
+}
 
 const handleDelete = async (row: AdminFaqCategory) => {
   await confirmDelete(

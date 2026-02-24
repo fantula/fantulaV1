@@ -24,12 +24,12 @@
              </div>
 
              <div v-else class="cart-item-card">
-                <img :src="cartItem.productImage" class="item-img" />
+                <img :src="cartItem.productImage" class="item-img" loading="lazy" />
                 <div class="item-info">
                    <div class="item-name">{{ cartItem.productName }}</div>
                    <div class="item-spec">{{ cartItem.specName }}</div>
                    <div class="cart-price">
-                    <span class="text-price">¥{{ Number(cartItem.price).toFixed(2) }}</span>
+                    <span class="text-price">{{ Number(cartItem.price || 0).toFixed(2) }}点</span>
                 </div>
                       <div class="qty-control" v-if="cartItem.allowAddon">
                          <button class="qty-btn" @click="updateQty(-1)" :disabled="cartItem.quantity<=1">-</button>
@@ -43,8 +43,9 @@
 
           <!-- Footer -->
           <div class="sheet-footer" v-if="hasItems">
-             <button class="btn-cyber-primary w-full" :disabled="checkingOut" @click="handleCheckout">
-                {{ checkingOut ? '处理中...' : '去结算' }}
+             <button class="btn-cyber-primary w-full gap-2" style="display: flex; align-items: center; justify-content: center;" :disabled="checkingOut" @click="handleCheckout">
+                <span v-if="checkingOut" class="btn-spinner"></span>
+                <span>{{ checkingOut ? '处理中...' : '去结算' }}</span>
              </button>
           </div>
 

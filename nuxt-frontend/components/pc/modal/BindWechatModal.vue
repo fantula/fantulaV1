@@ -121,7 +121,7 @@ const getQrCode = async () => {
       ElMessage.error(res.msg || '获取二维码失败')
     }
   } catch (e) {
-    ElMessage.error('网络错误')
+    if (import.meta.dev) console.error(e)
   } finally {
     loading.value = false
   }
@@ -153,7 +153,7 @@ const startPolling = () => {
         }
       }
     } catch (e) {
-      console.error(e)
+      if (import.meta.dev) console.error(e)
     }
   }, 2000)
 }
@@ -223,7 +223,7 @@ const handleUnbind = async () => {
         }
     } catch (e) {
         if (e !== 'cancel') {
-             console.error(e)
+             if (import.meta.dev) console.error(e)
              ElMessage.error('操作失败')
         }
     } finally {

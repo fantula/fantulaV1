@@ -2,8 +2,7 @@
   <div class="wechat-callback-page">
     <!-- Loading State -->
     <div v-if="state === 'loading'" class="callback-loading">
-      <div class="spinner"></div>
-      <p>正在处理登录...</p>
+      <div class="spinner-premium" style="border-top-color: #07C160;"></div>
     </div>
 
     <!-- Need Bind Email -->
@@ -56,8 +55,9 @@
           </label>
         </div>
 
-        <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !bindForm.agree">
-          {{ loading ? '绑定中...' : '绑定并登录' }}
+        <button class="submit-btn aurora-btn-primary gap-2" type="submit" :disabled="loading || !bindForm.agree">
+          <span v-if="loading" class="btn-spinner"></span>
+          <span>{{ loading ? '绑定中...' : '绑定并登录' }}</span>
         </button>
       </form>
     </div>
@@ -74,6 +74,17 @@
       <p>{{ errorMsg }}</p>
       <button class="retry-btn" @click="goHome">返回首页</button>
     </div>
+
+    <!-- Confirm Modal -->
+    <MobileConfirmModal
+      v-model:visible="showMergeConfirm"
+      title="账号合并提示"
+      content="该邮箱已被其他账号注册。继续绑定将把此微信号关联到该现有账号，并共享权益。"
+      confirmText="确认关联"
+      cancelText="更换邮箱"
+      type="danger"
+      @confirm="executeMerge"
+    />
   </div>
 </template>
 
@@ -84,8 +95,7 @@ import { wechatLoginApi } from '@/api/client/wechat-login'
 import { authApi } from '@/api/client/auth'
 import { useUserStore } from '@/stores/client/user'
 import { getSupabaseClient } from '@/utils/supabase'
-import { ElMessageBox } from 'element-plus'
-import { useGlobalLoading } from '@/composables/useGlobalLoading'
+
 import { useNotify } from '@/composables/useNotify'
 import { mobileRoutes } from '@/config/client-routes'
 
@@ -102,6 +112,7 @@ const { success, error, warning } = useNotify()
 const state = ref<'loading' | 'bind' | 'success' | 'error'>('loading')
 const errorMsg = ref('')
 const bindToken = ref('')
+const showMergeConfirm = ref(false)
 
 const bindForm = ref({
   email: '',
@@ -122,13 +133,13 @@ const baseLoading = ref(false)
 const uniqueLoading = ref(false)
 const loading = computed(() => baseLoading.value || codeLoading.value || uniqueLoading.value)
 
-const globalLoading = useGlobalLoading()
+
 
 onMounted(async () => {
   // 0. 特殊处理：如果是 Magic Link 回调（Hash 中包含 access_token）
   if (route.hash && route.hash.includes('access_token')) {
     if (import.meta.dev) console.log('[WechatCallback] Magic Link hash detected')
-    globalLoading.show('正在验证登录...') 
+     
     
     // 防止 onAuthStateChange 和 getSession 双重触发
     let handled = false
@@ -140,10 +151,10 @@ onMounted(async () => {
       if (import.meta.dev) console.log('[WechatCallback] Session established, syncing user store...')
       await userStore.setUser(session.user, session.access_token)
 
-      globalLoading.success('登录成功') 
+       
       setTimeout(() => {
           const returnTo = route.query.return_to as string
-          globalLoading.hide() 
+           
           if (returnTo) {
               window.location.href = decodeURIComponent(returnTo)
           } else {
@@ -174,7 +185,7 @@ onMounted(async () => {
       if (!handled) {
         handled = true
         subscription.unsubscribe()
-        globalLoading.hide()
+        
         state.value = 'error'
         errorMsg.value = '登录验证超时，请返回重试'
         if (import.meta.dev) console.error('[WechatCallback] Session establishment timed out')
@@ -200,7 +211,7 @@ onMounted(async () => {
   const urlState = route.query.state as string
   if (urlState === 'recharge') {
     // state.value = 'loading'
-    globalLoading.show('正在处理充值授权...')
+    
     try {
       // 通过 code 换取 openid 用于支付
       const { wechatPayApi } = await import('@/api/client/wechat-payment')
@@ -227,16 +238,16 @@ onMounted(async () => {
   // 场景: 已登录用户绑定微信
   if (userStore.isLoggedIn) {
      // state.value = 'loading'
-     globalLoading.show('正在绑定微信...')
+     
      try {
         const res = await wechatLoginApi.bindWechatToAccount({ wechatCode: code })
         if (res.success) {
             // state.value = 'success'
-            globalLoading.success('绑定成功')
+            
             // 绑定成功后刷新用户信息以获取最新的 openId
             await userStore.fetchUserInfo()
             setTimeout(() => {
-                globalLoading.hide()
+                
                 const returnTo = route.query.return_to as string
                 if (returnTo) {
                     // 解码 return_to 避免多次编码问题
@@ -247,12 +258,12 @@ onMounted(async () => {
                 }
             }, 1000)
         } else {
-            globalLoading.hide() // Hide loading to show error
+             // Hide loading to show error
             state.value = 'error'
             errorMsg.value = res.msg || '绑定失败'
         }
      } catch (e: any) {
-        globalLoading.hide()
+        
         state.value = 'error'
         errorMsg.value = e.message || '绑定失败'
      }
@@ -260,7 +271,7 @@ onMounted(async () => {
   }
 
   try {
-    globalLoading.show('正在处理微信登录...')
+    
     // 获取 return_to 参数
     const returnTo = route.query.return_to as string
     
@@ -271,7 +282,7 @@ onMounted(async () => {
     if (import.meta.dev) console.log('[WechatCallback] OAuth response:', res.data?.status || 'error')
 
     if (!res.success || !res.data) {
-      globalLoading.hide()
+      
       state.value = 'error'
       errorMsg.value = res.msg || '登录失败'
       return
@@ -282,30 +293,30 @@ onMounted(async () => {
       
       if (res.data.actionLink) {
          // state.value = 'success'
-         globalLoading.show('正在跳转...') 
+          
          if (import.meta.dev) console.log('[WechatCallback] Redirecting to Magic Link for auto-login...')
          window.location.href = res.data.actionLink
       } else {
           // 降级：Magic Link 生成失败，提示用户
-          globalLoading.hide()
+          
           state.value = 'error'
           errorMsg.value = '自动登录失败，请使用邮箱验证码登录'
           if (import.meta.dev) console.error('[WechatCallback] No actionLink returned from server')
       }
     } else if (res.data.status === 'need_bind') {
       // 需要绑定邮箱
-      globalLoading.hide() // Show form
+       // Show form
       bindToken.value = res.data.bindToken || ''
       bindForm.value.nickname = res.data.nickname
       bindForm.value.avatar = res.data.avatar
       state.value = 'bind'
     } else {
-      globalLoading.hide()
+      
       state.value = 'error'
       errorMsg.value = '未知状态'
     }
   } catch (err: any) {
-    globalLoading.hide()
+    
     state.value = 'error'
     errorMsg.value = err.message || '登录失败'
   }
@@ -332,33 +343,27 @@ const sendCode = async () => {
     
     // If email is taken (available = false), warn user about merging
     if (!emailAvailable) {
-       try {
-         await ElMessageBox.confirm(
-           '该邮箱已被其他账号注册。继续绑定将把此微信号关联到该现有账号，并共享权益。',
-           '账号合并提示',
-           {
-             confirmButtonText: '确认关联',
-             cancelButtonText: '更换邮箱',
-             type: 'warning',
-             customClass: 'mobile-msg-box', // Custom Style
-             showClose: false,
-             center: true,
-           }
-         )
-       } catch {
-         // User cancelled
-         return
-       }
+       showMergeConfirm.value = true
+       return // Let modal take over
     }
 
     // 2. Send Code
-    await sendBindCode(bindForm.value.email)
+    await executeMerge()
   } catch (err: any) {
     if (import.meta.dev) console.error(err)
     error('发送失败: ' + (err.message || '网络错误'))
   } finally {
     uniqueLoading.value = false
   }
+}
+
+const executeMerge = async () => {
+    showMergeConfirm.value = false
+    try {
+        await sendBindCode(bindForm.value.email)
+    } catch(err: any) {
+        error('发送失败: ' + (err.message || '网络错误'))
+    }
 }
 
 const onBind = async () => {
@@ -384,7 +389,7 @@ const onBind = async () => {
     })
 
     if (res.success && res.data) {
-      globalLoading.show('正在完成绑定...') 
+       
       // 🔑 关键：在 Supabase JS Client 上建立 session
       const client = getSupabaseClient()
       if (res.data.session?.access_token && res.data.session?.refresh_token) {
@@ -398,9 +403,9 @@ const onBind = async () => {
       userStore.setUser(res.data.user, res.data.session?.access_token)
       await userStore.fetchUserInfo()
       
-      globalLoading.success('绑定成功')
+      
       setTimeout(() => {
-        globalLoading.hide()
+        
         const returnTo = route.query.return_to as string
         if (returnTo) {
             window.location.href = decodeURIComponent(returnTo)
@@ -446,19 +451,6 @@ const goHome = () => {
   align-items: center;
   gap: 16px;
   text-align: center;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #07C160;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 .callback-loading p,
@@ -586,54 +578,5 @@ const goHome = () => {
 .link {
   color: var(--color-brand-primary, #178fc6);
   cursor: pointer;
-}
-</style>
-
-<style>
-/* Global Styles for Mobile Msg Box (Unscoped) */
-.mobile-msg-box {
-  width: 90% !important;
-  max-width: 320px !important;
-  background: rgba(30, 41, 59, 0.95) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 20px !important;
-  padding-bottom: 15px !important;
-}
-
-.mobile-msg-box .el-message-box__title {
-  color: #fff !important;
-  font-size: 18px !important;
-}
-
-.mobile-msg-box .el-message-box__message p {
-  color: #CBD5E1 !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-}
-
-.mobile-msg-box .el-message-box__btns {
-  flex-direction: column-reverse; /* Stack buttons */
-  gap: 10px;
-}
-
-.mobile-msg-box .el-button {
-  width: 100% !important;
-  margin: 0 !important;
-  height: 44px !important;
-  border-radius: 12px !important;
-  font-weight: 600 !important;
-}
-
-.mobile-msg-box .el-button--primary {
-  background: linear-gradient(90deg, #F59E0B, #EA580C) !important;
-  border: none !important;
-  color: #fff !important;
-}
-
-.mobile-msg-box .el-button--default {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #94A3B8 !important;
 }
 </style>

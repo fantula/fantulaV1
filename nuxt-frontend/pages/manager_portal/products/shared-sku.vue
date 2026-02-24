@@ -103,12 +103,7 @@ import { Plus, Refresh } from '@element-plus/icons-vue'
 import { adminSharedSkuApi, type SharedSkuGroup } from '@/api/admin'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
-import SkuEditor from '@/components/admin/SkuEditor.vue'
-import LinkedProductDrawer from '@/components/admin/product/LinkedProductDrawer.vue'
-
 definePageMeta({
   layout: 'mgmt', middleware: ["mgmt-auth"], title: '共享规格管理' })
 

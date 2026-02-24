@@ -15,8 +15,8 @@
 
       <div class="modal-footer">
           <button class="cancel-btn" @click="handleClose">取消</button>
-          <button class="save-btn btn-danger" @click="handleConfirm">
-              <span v-if="loading" class="spinner"></span>
+          <button class="save-btn btn-danger gap-2" style="display: flex; align-items: center; justify-content: center;" @click="handleConfirm">
+              <span v-if="loading" class="btn-spinner"></span>
               <span v-else>确认退出</span>
           </button>
       </div>
@@ -94,8 +94,5 @@ const handleConfirm = () => {
 .btn-danger:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2); }
 .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 </style>

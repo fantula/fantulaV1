@@ -187,8 +187,13 @@ export function useOrderDetail(orderId: string) {
                 await loadTicketInfo()
             }
         } catch (e) {
-            console.error('Failed to load order detail:', e)
+            if (import.meta.dev) console.error('Failed to load order detail:', e)
             error.value = '加载订单详情失败'
+            if (typeof document !== 'undefined') {
+                import('element-plus').then(({ ElMessage }) => {
+                    ElMessage.error('网络异常，加载订单信息失败')
+                }).catch(() => { })
+            }
         } finally {
             loading.value = false
         }
@@ -208,7 +213,7 @@ export function useOrderDetail(orderId: string) {
                 refundCancelledCount.value = res.cancelledCount ?? 0
             }
         } catch (e) {
-            console.error('Failed to load refund info:', e)
+            if (import.meta.dev) console.error('Failed to load refund info:', e)
         }
     }
 
@@ -220,7 +225,7 @@ export function useOrderDetail(orderId: string) {
                 activeTicketId.value = match ? match.id : null
             }
         } catch (e) {
-            console.error('Failed to load ticket info:', e)
+            if (import.meta.dev) console.error('Failed to load ticket info:', e)
         }
     }
 

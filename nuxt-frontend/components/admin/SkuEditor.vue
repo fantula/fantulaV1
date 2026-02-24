@@ -114,9 +114,8 @@
     </div>
 
     <!-- 全局图片选择器 -->
-    <AdminImageSelector 
+    <AdminImagePicker 
         v-model="imagePickerVisible"
-        :multiple="false"
         @select="handleImageSelected"
     />
   </div>
@@ -125,8 +124,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted } from 'vue'
 import { Plus, Delete, Picture } from '@element-plus/icons-vue'
-import AdminImageSelector from '@/components/admin/base/AdminImageSelector.vue'
-
+import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 // ========================================
 // Props
 // ========================================
@@ -304,9 +302,9 @@ const openSkuImagePicker = (row: SkuItem) => {
   imagePickerVisible.value = true
 }
 
-const handleImageSelected = (urls: string[]) => {
-    if (urls.length > 0 && currentSkuRow.value) {
-        currentSkuRow.value.image = urls[0]
+const handleImageSelected = (image: { url: string }) => {
+    if (image && image.url && currentSkuRow.value) {
+        currentSkuRow.value.image = image.url
         emitUpdates()
     }
 }

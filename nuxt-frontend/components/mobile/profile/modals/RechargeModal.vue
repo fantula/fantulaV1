@@ -85,13 +85,14 @@
           </div>
 
           <button 
-            class="pay-btn aurora-btn-accent" 
+            class="pay-btn aurora-btn-accent gap-2" 
+            style="display: flex; align-items: center; justify-content: center;"
             @click="handleRecharge" 
             :disabled="loading || !isValidAmount || !isWechatBrowser"
           >
-              <span v-if="loading" class="spinner"></span>
+              <span v-if="loading" class="btn-spinner"></span>
               <span v-else-if="!isWechatBrowser">请在微信内打开</span>
-              <span v-else>立即支付 ¥{{ payAmount.toFixed(2) }}</span>
+              <span v-else>立即购置 {{ payAmount.toFixed(2) }} 点</span>
           </button>
       </div>
     </div>
@@ -299,7 +300,6 @@ const handleRecharge = async () => {
         
         if (!openid) {
           // 需要授权获取 OpenID
-          info('正在跳转微信授权...')
           redirectToWechatAuth()
           return
         }
@@ -482,10 +482,5 @@ declare const WeixinJSBridge: {
 }
 .pay-btn:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff; border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 </style>

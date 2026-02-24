@@ -25,8 +25,7 @@
             <div class="shop-name">{{ shopName }}</div>
             <div class="shop-desc">{{ shopDesc }}</div>
             <div class="order-id">订单号：#{{ orderId }}</div>
-          </div>
-          <div class="order-amount">￥{{ price }}</div>
+          <div class="order-amount">￥{{ Number(price).toFixed(2) }}</div>
         </div>
         <div class="pay-section">
           <div class="pay-title">选择支付方式</div>
@@ -64,9 +63,8 @@
             </div>
           </div>
         </div>
-        <div class="pay-bottom">
           <button class="btn-pay" @click="handlePay" :disabled="paying">
-            <span v-if="!paying">确认支付￥{{ price }}</span>
+            <span v-if="!paying">确认支付￥{{ Number(price).toFixed(2) }}</span>
             <span v-else>支付中...</span>
           </button>
           <div class="pay-countdown">
@@ -81,12 +79,7 @@
     
   </BaseModal>
   
-  <BalanceNotEnoughModal
-    v-if="showBalanceModal"
-    :balance="userBalance"
-    :needAmount="Number(price)"
-    @close="handleBalanceClose"
-  />
+  </BaseModal>
   <PaySuccessModal
     v-if="showSuccessModal"
     :orderId="props.orderId || 'DEFAULT_ORDER'"
@@ -98,7 +91,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import BaseModal from '@/components/shared/BaseModal.vue'
-import BalanceNotEnoughModal from './BalanceNotEnoughModal.vue'
 import PaySuccessModal from './PaySuccessModal.vue'
 import { useUserStore } from '@/stores/client/user'
 import { paymentApi } from '@/api/client/payment' // 引入支付API
@@ -120,7 +112,6 @@ const emits = defineEmits(['close','timeout','paySuccess'])
 const userStore = useUserStore()
 const payType = ref('alipay') // alipay | other | balance
 const remain = ref(props.countdown)
-const showBalanceModal = ref(false)
 const showSuccessModal = ref(false)
 const paying = ref(false) // 支付中状态
 
@@ -162,7 +153,7 @@ async function handlePay() {
   try {
     if(payType.value === 'balance') {
       if(Number(userBalance.value) < Number(props.price)) {
-        showBalanceModal.value = true
+        ElMessage.error('余额不足，请前往充值')
         paying.value = false
         return
       }
@@ -267,10 +258,6 @@ const simulatePayment = () => {
   })
 }
 */
-
-function handleBalanceClose() {
-  showBalanceModal.value = false
-}
 
 function handleSuccessClose() {
   showSuccessModal.value = false

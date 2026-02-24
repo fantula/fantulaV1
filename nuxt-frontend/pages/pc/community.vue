@@ -81,7 +81,7 @@
 definePageMeta({
   layout: 'pc',
   middleware: () => {
-    return navigateTo('/')
+    return navigateTo(pcRoutes.home())
   }
 })
 

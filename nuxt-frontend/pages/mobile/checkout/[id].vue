@@ -129,7 +129,7 @@
          @click="handlePayAction" 
          :disabled="paying || remainingSeconds <= 0"
        >
-          <div v-if="paying" class="spinner-sm"></div>
+          <span v-if="paying" class="btn-spinner"></span>
           <span v-else-if="remainingSeconds <= 0">订单已超时，请重新下单</span>
           <span v-else-if="isBalanceInsufficient">额度不足，去充值</span>
           <span v-else>立即支付</span>
@@ -422,10 +422,5 @@ onMounted(() => {
     box-shadow: none; border: 1px solid rgba(255,255,255,0.1); 
 }
 .btn-pay-glow:disabled:not(.insufficient) { opacity: 0.7; filter: grayscale(0.5); }
-.spinner-sm {
-    width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-}
 
-@keyframes spin { to { transform: rotate(360deg); } }
 </style>

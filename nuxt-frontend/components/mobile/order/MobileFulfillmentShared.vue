@@ -39,7 +39,7 @@
                  :class="{ 'is-me': slot.isMe }"
               >
                  <div class="avatar-box" :class="{ 'active': slot.user }">
-                    <img v-if="slot.user && slot.user.avatar" :src="slot.user.avatar" />
+                    <img v-if="slot.user && slot.user.avatar" :src="slot.user.avatar" loading="lazy" decoding="async" />
                     <div v-else-if="slot.user" class="avatar-placeholder">
                        {{ (slot.user.nickname || 'U')[0].toUpperCase() }}
                     </div>
@@ -62,7 +62,7 @@ import { onMounted } from 'vue'
 import { User, CopyDocument, Plus } from '@element-plus/icons-vue'
 import { useToast } from '@/composables/mobile/useToast'
 import { useCoSharing } from '@/composables/client/useCoSharing'
-import type { CdkItem } from '@/composables/client/useCoSharing'
+import type { CoSharingSlot, CdkItem } from '@/composables/client/useCoSharing'
 
 const props = defineProps<{
   cdkItem: CdkItem

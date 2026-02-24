@@ -23,8 +23,8 @@
       </div>
 
       <div class="modal-footer">
-          <button class="aurora-btn-primary" @click="handleSave" :disabled="loading || !newValue.trim()">
-              <span v-if="loading" class="spinner"></span>
+          <button class="aurora-btn-primary gap-2" @click="handleSave" :disabled="loading || !newValue.trim()">
+              <span v-if="loading" class="btn-spinner"></span>
               <span v-else>保存</span>
           </button>
       </div>
@@ -129,12 +129,7 @@ const handleSave = async () => {
 /* Handled by global aurora classes */
 .save-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff; border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Button layout override */
 .aurora-btn-ghost { 

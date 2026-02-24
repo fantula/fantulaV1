@@ -511,18 +511,11 @@ export const useUserStore = defineStore('user', () => {
   const logout = async () => {
     try {
       if (token.value) {
-        // Show global loading for logout
-        showLoading('正在退出...')
         await authApi.logout()
       }
     } catch (error) {
       console.error('登出失败:', error)
     } finally {
-      // Ensure loading is hidden
-      setTimeout(() => {
-        hideLoading()
-      }, 500)
-
       token.value = null
       user.value = null
       if (process.client) {
@@ -644,31 +637,31 @@ export const useUserStore = defineStore('user', () => {
    */
   const restoreSessionFromSupabase = async (): Promise<boolean> => {
     if (!process.client) return false
-    
+
     try {
       const { getSupabaseClient } = await import('~/utils/supabase')
       const client = getSupabaseClient()
-      
+
       // 1. Check for active session in Supabase SDK (LocalStorage)
       const { data: { session } } = await client.auth.getSession()
-      
+
       if (session?.access_token && session?.user) {
         console.log('[UserStore] Restoring session from Supabase persistence...')
-        
+
         // 2. Refresh token cookie (Critical stepping stone)
         token.value = session.access_token
-        
+
         // 3. Restore user state
         user.value = {
-           id: session.user.id,
-           email: session.user.email,
-           // Try to recover other fields from localStorage if available, or wait for fetchUserInfo
-           ...((user.value || {}) as any) 
+          id: session.user.id,
+          email: session.user.email,
+          // Try to recover other fields from localStorage if available, or wait for fetchUserInfo
+          ...((user.value || {}) as any)
         } as any
 
         // 4. Verification & Full Profile Fetch
         await fetchUserInfo()
-        
+
         return true
       }
     } catch (e) {

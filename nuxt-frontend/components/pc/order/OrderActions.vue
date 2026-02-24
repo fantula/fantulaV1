@@ -185,7 +185,7 @@ const loadRefundInfo = async () => {
       refundCancelledCount.value = res.cancelledCount ?? 0
     }
   } catch (e) {
-    console.error('Failed to load refund info:', e)
+    if (import.meta.dev) console.error('Failed to load refund info:', e)
   }
 }
 

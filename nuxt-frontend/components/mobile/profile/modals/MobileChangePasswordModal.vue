@@ -26,11 +26,13 @@
                         maxlength="6"
                     />
                     <button 
-                        class="code-btn" 
-                        :disabled="countdown > 0 || loading"
-                        @click="sendCode"
+                        class="code-btn gap-1" 
+                        style="display: flex; align-items: center; justify-content: center;"
+                        @click="handleSendCode" 
+                        :disabled="countdown > 0 || sendingCode || !isValidEmail"
                     >
-                        {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
+                        <span v-if="sendingCode" class="btn-spinner spinner-mini"></span>
+                        <span>{{ countdown > 0 ? `${countdown}s` : '发送验证码' }}</span>
                     </button>
                 </div>
             </div>
@@ -59,11 +61,11 @@
 
       <div class="modal-footer">
         <button 
-            class="aurora-btn-primary" 
+            class="aurora-btn-primary gap-2" 
             :disabled="!canSubmit || loading"
             @click="handleConfirm"
         >
-            <div v-if="loading" class="spinner"></div>
+            <span v-if="loading" class="btn-spinner"></span>
             <span v-else>确认修改</span>
         </button>
       </div>
@@ -120,18 +122,28 @@ const {
   checkTimer 
 } = useSendCode({ timerKey: 'otp_security_timer' })
 
-const baseLoading = ref(false)
-const loading = computed(() => baseLoading.value || codeLoading.value)
+const sendingCode = ref(false)
+const isValidEmail = computed(() => {
+    return userStore.user?.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userStore.user.email)
+})
 
-const sendCode = async () => {
-  await sendOtp(userStore.user?.email || '')
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || codeLoading.value || sendingCode.value)
+
+const handleSendCode = async () => {
+    if (!isValidEmail.value) return
+    sendingCode.value = true
+    try {
+        await sendOtp(userStore.user?.email || '')
+    } finally {
+        sendingCode.value = false
+    }
 }
 
 const handleConfirm = async () => {
     if (!canSubmit.value || !userStore.user?.email) return
 
-    // loading.value = true // Removed deprecated
-    
+
     baseLoading.value = true
     try {
         // 1. Verify OTP
@@ -234,10 +246,7 @@ const handleConfirm = async () => {
 .submit-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Flex adjustments for input-row with aurora-input */
 .input-row .aurora-input { flex: 1; min-width: 0; }

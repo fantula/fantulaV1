@@ -123,7 +123,6 @@
 import { ref, onMounted } from 'vue'
 import { Top, Money, Goods, User } from '@element-plus/icons-vue'
 import AdminPageSkeleton from '@/components/admin/base/AdminPageSkeleton.vue'
-import AdminSimpleChart from '@/components/admin/base/AdminSimpleChart.vue'
 import { adminDashboardApi, type DashboardStats } from '@/api/admin/dashboard'
 
 definePageMeta({

@@ -12,7 +12,7 @@
         <div class="wallet-content">
             <div class="wallet-left">
                 <div class="wallet-label">我的额度</div>
-                <div class="wallet-value text-price">{{ Number(userStore.user?.balance || 0).toFixed(2) }}</div>
+                <div class="wallet-value text-price">{{ Number(userStore.user?.balance || 0).toFixed(2) }}<span style="font-size: 14px; font-weight: normal; margin-left: 2px;">点</span></div>
             </div>
             <div class="wallet-actions">
                 <button class="action-btn primary-btn pill-btn" @click.stop="handleRecharge">充值</button>
@@ -103,12 +103,6 @@
 
     </div>
 
-    <!-- Settings Sheet -->
-    <MobileSettingsSheet
-        :visible="showSettings"
-        @close="showSettings = false"
-    />
-
     <!-- Recharge Modal -->
     <RechargeModal
         :visible="showRecharge"
@@ -131,11 +125,9 @@ import {
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart' // Import Cart Store
-import MobileSettingsSheet from '@/components/mobile/profile/MobileSettingsSheet.vue'
+import MobileMenuLink from '@/components/mobile/profile/MobileMenuLink.vue'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
-import MobileProfileHeader from '@/components/mobile/profile/MobileProfileHeader.vue'
-import MobileMenuLink from '@/components/mobile/profile/MobileMenuLink.vue'
 import { mobileRoutes } from '@/config/client-routes'
 
 definePageMeta({
@@ -146,7 +138,6 @@ definePageMeta({
 const router = useRouter()
 const userStore = useUserStore()
 const cartStore = useCartStore()
-const showSettings = ref(false)
 const showRecharge = ref(false)
 const showContactModal = ref(false)
 

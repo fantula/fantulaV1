@@ -50,7 +50,7 @@
                 </div>
                 
                 <div class="ci-bottom">
-                   <div class="ci-price">¥<span class="price-val">{{ Number(item.price).toFixed(2) }}</span></div>
+                   <div class="ci-price"><span class="price-val">{{ Number(item.price || 0).toFixed(2) }}</span>点</div>
                    
                    <!-- Stepper -->
                    <div class="stepper" @click.stop>
@@ -80,14 +80,14 @@
        <div class="footer-right" v-if="!isEditMode">
           <div class="total-box">
              <span class="t-label">合计:</span>
-             <span class="t-price">¥{{ totalPrice }}</span>
+             <span class="t-price">{{ totalPrice }}点</span>
           </div>
           <button
              class="btn-checkout"
              @click="handleCheckout"
              :disabled="selectedIds.size === 0 || checkoutLoading"
           >
-             <span v-if="checkoutLoading" class="checkout-spinner"></span>
+             <span v-if="checkoutLoading" class="btn-spinner spinner-orange"></span>
              <span v-else>去结算({{ totalCount }})</span>
           </button>
        </div>
@@ -232,14 +232,7 @@ const handleCheckout = async () => {
 
 /* Loading */
 .loading-state { display: flex; align-items: center; justify-content: center; height: 200px; }
-.spinner-premium {
-  width: 32px; height: 32px; 
-  border: 3px solid rgba(56, 189, 248, 0.2); 
-  border-top-color: var(--cyber-primary); 
-  border-radius: 50%; 
-  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Empty State */
 .empty-state {
@@ -391,15 +384,7 @@ const handleCheckout = async () => {
     background: #475569;
 }
 
-.checkout-spinner {
-   width: 16px; height: 16px;
-   border: 2px solid rgba(255,255,255,0.3);
-   border-top-color: #fff;
-   border-radius: 50%;
-   animation: checkout-spin 0.7s linear infinite;
-   display: inline-block;
-}
-@keyframes checkout-spin { to { transform: rotate(360deg); } }
+
 
 .btn-delete {
    background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);

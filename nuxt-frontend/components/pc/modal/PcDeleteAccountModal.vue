@@ -145,5 +145,4 @@ const handleDelete = async () => {
   display: block; /* SendCodeButton is absolute inside */
 }
 
-/* Removed legacy .send-code-btn, .delete-btn styles */
 </style>

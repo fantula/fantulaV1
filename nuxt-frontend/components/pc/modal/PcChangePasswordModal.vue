@@ -137,7 +137,7 @@ const handleConfirm = async () => {
       ElMessage.error(updateRes.msg || '密码修改失败')
     }
   } catch (e: any) {
-    console.error(e)
+    if (import.meta.dev) console.error(e)
     ElMessage.error(e.message || '操作失败')
   } finally {
     baseLoading.value = false
@@ -189,5 +189,4 @@ const handleConfirm = async () => {
   display: block; /* Was flex, now block for absolute child */
 }
 
-/* Removed legacy .send-code-btn styles */
 </style>

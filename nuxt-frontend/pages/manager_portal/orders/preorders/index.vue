@@ -98,8 +98,6 @@ import { onMounted } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import BulkActionBar from '@/components/admin/base/BulkActionBar.vue'
 import { useAdminPreOrderList } from '@/composables/admin/useAdminPreOrderList'
 
 definePageMeta({

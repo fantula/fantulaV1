@@ -6,6 +6,7 @@
       <BaseButton 
          theme-id="primary"
          class="contact-btn-wrapper"
+         @click="modalStore.openContact()"
       >
          <el-icon class="mr-2"><Service /></el-icon>
          联系在线客服
@@ -16,6 +17,9 @@
   <script setup lang="ts">
   import { Service } from '@element-plus/icons-vue'
   import BaseButton from '@/components/shared/BaseButton.vue'
+  import { useModalStore } from '@/stores/client/modal'
+  
+  const modalStore = useModalStore()
   </script>
   
   <style scoped>

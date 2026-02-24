@@ -54,11 +54,13 @@
               暂不取消
             </button>
             <button 
-              class="btn-glass primary"
+              class="btn-glass primary gap-2"
+              style="display: flex; align-items: center; justify-content: center;"
               :disabled="submitting"
               @click="handleConfirm"
             >
-              {{ submitting ? '处理中...' : '确认取消' }}
+              <span v-if="submitting" class="btn-spinner"></span>
+              <span>{{ submitting ? '处理中...' : '确认取消' }}</span>
             </button>
           </div>
         </div>

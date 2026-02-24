@@ -24,7 +24,7 @@ export function useAdminPreOrderList() {
             // Double Hydration Protection
             rawList.value = orders
         } catch (e) {
-            console.error('加载预订单失败:', e)
+            if (import.meta.dev) console.error('加载预订单失败:', e)
             ElMessage.error('系统异常')
         } finally {
             loading.value = false

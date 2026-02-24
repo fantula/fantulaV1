@@ -49,11 +49,12 @@
 
        <div class="sheet-footer">
           <button 
-             class="aurora-btn-danger" 
+             class="aurora-btn-danger gap-2" 
              :disabled="!form.reason || submitting"
              @click="handleSubmit"
           >
-             {{ submitting ? '提交中...' : '提交申请' }}
+             <span v-if="submitting" class="btn-spinner"></span>
+             <span>{{ submitting ? '提交中...' : '提交申请' }}</span>
           </button>
        </div>
     </div>
@@ -165,8 +166,6 @@ const handleSubmit = async () => {
 .chk { font-size: 14px; }
 
 /* aurora-textarea global */
-/* .input-glass legacy */
-
 .sheet-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
 
 .submit-btn-danger {

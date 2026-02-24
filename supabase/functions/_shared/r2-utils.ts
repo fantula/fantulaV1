@@ -79,3 +79,56 @@ export async function getSignatureKey(secretKey: string, dateStamp: string, regi
     const kSigning = await hmacSha256(kService, 'aws4_request')
     return kSigning
 }
+
+// ============================================
+// AWS Signature V4 认证头生成库 (Shared Helper)
+// ============================================
+
+export async function generateR2AuthHeaders(
+    method: string,
+    bucketName: string,
+    canonicalUri: string, // e.g., '/' + bucketName or '/' + bucketName + '/' + fileName
+    canonicalQueryString: string,
+    payloadHash: string,
+    r2Config: R2Config
+): Promise<{ authorization: string; amzDate: string }> {
+    const region = 'auto'
+    const service = 's3'
+
+    const now = new Date()
+    const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '')
+    const dateStamp = amzDate.slice(0, 8)
+
+    const canonicalHeaders =
+        `host:${r2Config.accountId}.r2.cloudflarestorage.com\n` +
+        `x-amz-content-sha256:${payloadHash}\n` +
+        `x-amz-date:${amzDate}\n`
+
+    const signedHeaders = 'host;x-amz-content-sha256;x-amz-date'
+
+    const canonicalRequest =
+        `${method}\n` +
+        `${canonicalUri}\n` +
+        `${canonicalQueryString}\n` +
+        `${canonicalHeaders}\n` +
+        `${signedHeaders}\n` +
+        `${payloadHash}`
+
+    const algorithm = 'AWS4-HMAC-SHA256'
+    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`
+    const stringToSign =
+        `${algorithm}\n` +
+        `${amzDate}\n` +
+        `${credentialScope}\n` +
+        `${await sha256(canonicalRequest)}`
+
+    const signingKey = await getSignatureKey(r2Config.secretAccessKey, dateStamp, region, service)
+    const signature = toHex(await hmacSha256(signingKey, stringToSign))
+
+    const authorization =
+        `${algorithm} Credential=${r2Config.accessKeyId}/${credentialScope}, ` +
+        `SignedHeaders=${signedHeaders}, ` +
+        `Signature=${signature}`
+
+    return { authorization, amzDate }
+}

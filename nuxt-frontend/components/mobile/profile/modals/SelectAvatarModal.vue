@@ -12,7 +12,7 @@
   >
     <div class="current-avatar-section">
       <div class="avatar-wrapper">
-          <img :src="currentAvatar || defaultAvatar" class="current-img" @error="handleImageError" />
+          <img :src="currentAvatar || defaultAvatar" class="current-img" @error="handleImageError" loading="lazy" decoding="async" />
       </div>
       <p class="section-label">当前头像</p>
     </div>

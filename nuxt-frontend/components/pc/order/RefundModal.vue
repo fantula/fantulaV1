@@ -134,7 +134,7 @@ watch(() => props.modelValue, async (val) => {
           orderDetail.value = res.data
         }
       } catch (e) {
-        console.error('Load order failed:', e)
+        if (import.meta.dev) console.error('Load order failed:', e)
       } finally {
         loadingOrder.value = false
       }

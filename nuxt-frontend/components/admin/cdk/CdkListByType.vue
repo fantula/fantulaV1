@@ -174,7 +174,6 @@ import { Refresh, Plus, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminProductApi, adminCdkApi, adminCategoryApi, type AdminProduct, type AdminCDK, type ProductCategory } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { adminRoute, adminRoutes } from '@/config/admin-routes'
 
@@ -272,7 +271,7 @@ const handleEdit = (row: AdminCDK) => {
         path: adminRoutes.cdkEdit(row.id),
         query: { type: props.type }
     }).catch(err => {
-        console.error('Navigation Error:', err)
+        if (import.meta.dev) console.error('Navigation Error:', err)
         ElMessage.error('跳转失败')
     })
 }

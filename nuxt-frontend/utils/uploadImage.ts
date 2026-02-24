@@ -146,17 +146,3 @@ export async function uploadImageToStorage(
     }
 }
 
-/**
- * 删除图片（现在通过 delete-r2 Edge Function 实现）
- * @param url 图片的公开 URL
- * @returns 删除结果
- * @deprecated 请使用 adminImageApi.deleteImages() 替代，它会自动处理 R2 删除
- */
-export async function deleteImageFromStorage(url: string): Promise<{
-    success: boolean
-    error?: string
-}> {
-    // 单独删除现在通过 API 层处理，这里保留接口兼容性
-    console.warn('deleteImageFromStorage is deprecated, use adminImageApi.deleteImages() instead')
-    return { success: true }
-}

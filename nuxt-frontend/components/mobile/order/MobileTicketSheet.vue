@@ -40,7 +40,7 @@
              <label>截图 ({{ form.attachments.length }}/3)</label>
              <div class="upload-row">
                 <div v-for="(url, idx) in form.attachments" :key="idx" class="img-preview">
-                   <img :src="url" />
+                   <img :src="url" loading="lazy" decoding="async" />
                    <div class="del-btn" @click="form.attachments.splice(idx, 1)">×</div>
                 </div>
                 <div v-if="form.attachments.length < 3" class="add-btn-glass" @click="triggerUpload">
@@ -53,8 +53,9 @@
        </div>
 
        <div class="sheet-footer">
-          <button class="aurora-btn-primary" :disabled="!isValid || submitting" @click="submit">
-             {{ submitting ? '提交中...' : '提交工单' }}
+          <button class="aurora-btn-primary gap-2" :disabled="!isValid || submitting" @click="submit">
+             <span v-if="submitting" class="btn-spinner"></span>
+             <span>{{ submitting ? '提交中...' : '提交工单' }}</span>
           </button>
        </div>
     </div>
@@ -120,7 +121,7 @@ const handleFile = async (e: Event) => {
       } else {
          error(result.error || '上传失败')
       }
-   } catch(e) { error('上传失败') }
+   } catch(e) { error('网络抖动，上传失败') }
    finally { uploading.value = false; if(fileRaw.value) fileRaw.value.value = '' }
 }
 
@@ -132,8 +133,8 @@ const submit = async () => {
          success('工单已提交')
          emit('success')
          handleClose()
-      } else error(res.error || 'Fail')
-   } catch(e) { error('系统错误') }
+      } else error(res.error || '操作失败')
+   } catch(e) { error('服务繁忙，请稍后再试') }
    finally { submitting.value = false }
 }
 </script>
@@ -194,7 +195,6 @@ const submit = async () => {
 
 .sheet-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
 .submit-btn-glow {
-   /* Legacy */
 }
 .submit-btn-glow:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
 

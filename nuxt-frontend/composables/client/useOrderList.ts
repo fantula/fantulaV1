@@ -122,8 +122,8 @@ export function useOrderList() {
             if (preOrdersRes.success) {
                 preOrders.value = preOrdersRes.data || []
             }
-        } catch (error) {
-            console.error('加载订单列表失败:', error)
+        } catch (err) { // Renamed error to err to avoid conflict with error ref
+            if (import.meta.dev) console.error('加载订单列表失败:', err)
         } finally {
             loading.value = false
         }

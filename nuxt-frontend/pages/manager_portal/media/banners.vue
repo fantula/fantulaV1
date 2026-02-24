@@ -106,8 +106,6 @@ import { ElMessage } from 'element-plus'
 import { adminBannerApi, type AdminBanner, type AdminImage } from '@/api/admin/media'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
-import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
 
 definePageMeta({
@@ -124,9 +122,15 @@ const pickerVisible = ref(false)
 // --- Data ---
 const fetchData = async () => {
   loading.value = true
-  const res = await adminBannerApi.getBanners()
-  if (res.success) banners.value = res.banners
-  loading.value = false
+  try {
+    const res = await adminBannerApi.getBanners()
+    if (res.success) banners.value = res.banners
+  } catch (e: any) {
+    if (import.meta.dev) console.error(e)
+    ElMessage.error(e.message || '获取轮播图失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 // --- Dialog ---

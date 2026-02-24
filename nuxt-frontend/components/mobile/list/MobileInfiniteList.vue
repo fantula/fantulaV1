@@ -16,7 +16,7 @@
     <div class="list-status" ref="sentinel">
       <div v-if="loading" class="loading-text">
         <slot name="loading">
-             <div class="loading-spinner"></div> 加载中...
+             <div class="spinner-mini"></div> 加载中...
         </slot>
       </div>
       <div v-else-if="finished && list.length > 0" class="finished-text">
@@ -97,17 +97,5 @@ watch(sentinel, () => {
 
 .loading-text {
     display: flex; align-items: center; gap: 8px;
-}
-
-.loading-spinner {
-    width: 14px; height: 14px;
-    border: 2px solid rgba(6, 182, 212, 0.3);
-    border-top-color: #06B6D4;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
 </style>

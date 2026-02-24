@@ -198,8 +198,8 @@
               <!-- Common: Image -->
               <el-divider />
               <div class="common-section">
-                 <span class="section-label">详情页帮助图片 (可选)</span>
-                 <div class="image-selector" @click="handleSelectImage">
+                 <div class="section-label">详情页帮助图片 (可选)</div>
+                 <div class="image-selector" @click="imagePickerVisible = true">
                     <img v-if="commonImage" :src="commonImage" class="preview-img" />
                     <div v-else class="placeholder">
                        <el-icon><Picture /></el-icon>
@@ -268,48 +268,10 @@
     </div>
 
     <!-- 图库选择弹窗 -->
-    <el-dialog v-model="imagePickerVisible" title="图库选择" width="800px" append-to-body destroy-on-close class="picker-dialog">
-      <div class="picker-container">
-        <div class="picker-sidebar">
-          <div 
-            class="picker-cat-item" 
-            :class="{ active: pickerActiveCatId === '' }"
-            @click="pickerActiveCatId = ''; fetchPickerImages()"
-          >全部图片</div>
-          <div 
-            v-for="cat in pickerCategories" 
-            :key="cat.id" 
-            class="picker-cat-item"
-            :class="{ active: pickerActiveCatId === cat.id }"
-            @click="pickerActiveCatId = cat.id; fetchPickerImages()"
-          >{{ cat.name }}</div>
-        </div>
-        <div class="picker-main" v-loading="pickerLoading">
-          <div class="picker-toolbar">
-            <el-upload
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              :on-change="handlePickerUpload"
-            >
-              <el-button type="primary" size="small">上传新图片</el-button>
-            </el-upload>
-          </div>
-          <div class="picker-grid">
-            <div 
-              v-for="img in galleryImages" 
-              :key="img.id" 
-              class="picker-img-card"
-              @click="selectGalleryImage(img.url)"
-            >
-              <el-image :src="img.url" fit="cover" />
-              <div class="picker-img-name">{{ img.name }}</div>
-            </div>
-          </div>
-          <el-empty v-if="galleryImages.length === 0" description="暂无图片" />
-        </div>
-      </div>
-    </el-dialog>
+    <AdminImagePicker 
+      v-model="imagePickerVisible" 
+      @select="handleImageSelected" 
+    />
 
   </div>
 </template>
@@ -327,7 +289,9 @@ import {
 } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { adminRoute } from '@/config/admin-routes';
-import { adminCategoryApi, adminProductApi, adminCdkApi, adminApi, type AdminProduct, type AdminImage, type AdminImageCategory } from '@/api/admin';
+import { adminCategoryApi, adminProductApi, adminCdkApi, type AdminProduct } from '@/api/admin';
+import type { AdminImage } from '@/api/admin/media'
+import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 
 
 const router = useRouter();
@@ -490,58 +454,11 @@ const removeVirtualField = (idx: number) => formVirtual.fields.splice(idx, 1);
 
 // --- 图库选择器逻辑 ---
 const imagePickerVisible = ref(false);
-const pickerLoading = ref(false);
-const galleryImages = ref<AdminImage[]>([]);
-const pickerCategories = ref<AdminImageCategory[]>([]);
-const pickerActiveCatId = ref('');
 
-const openImagePicker = async () => {
-  imagePickerVisible.value = true;
-  
-  if (pickerCategories.value.length === 0) {
-    const res = await adminApi.imageCategory.getCategories();
-    if (res.success) pickerCategories.value = res.categories;
+const handleImageSelected = (image: { url: string }) => {
+  if (image && image.url) {
+    commonImage.value = image.url;
   }
-  
-  fetchPickerImages();
-};
-
-const fetchPickerImages = async () => {
-  pickerLoading.value = true;
-  const res = await adminApi.image.getImages({
-    category_id: pickerActiveCatId.value
-  });
-  if (res.success) galleryImages.value = res.images;
-  pickerLoading.value = false;
-};
-
-const selectGalleryImage = (url: string) => {
-  commonImage.value = url;
-  imagePickerVisible.value = false;
-  ElMessage.success('已选择图片');
-};
-
-const handlePickerUpload = async (file: any) => {
-  pickerLoading.value = true;
-  try {
-    const { uploadImageToStorage } = await import('@/utils/uploadImage');
-    const upRes = await uploadImageToStorage(file.raw);
-    if (upRes.success) {
-      await adminApi.image.createImage({
-        name: file.name,
-        url: upRes.url!,
-        category_id: pickerActiveCatId.value || undefined
-      });
-      selectGalleryImage(upRes.url!);
-      fetchPickerImages();
-    }
-  } finally {
-    pickerLoading.value = false;
-  }
-};
-
-const handleSelectImage = () => {
-  openImagePicker();
 };
 
 const handleNext = async () => {

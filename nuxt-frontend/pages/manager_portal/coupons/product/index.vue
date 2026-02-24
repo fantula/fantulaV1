@@ -119,11 +119,6 @@ import { useBizFormat } from '@/composables/common/useBizFormat'
 const { formatDate, formatPrice } = useBizFormat()
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import BulkActionBar from '@/components/admin/base/BulkActionBar.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import CouponCodeDrawer from '@/components/admin/coupon/CouponCodeDrawer.vue'
-import CouponCodeGenerator from '@/components/admin/CouponCodeGenerator.vue'
-import CouponCodeEditor from '@/components/admin/coupon/CouponCodeEditor.vue'
 import { adminRoute } from '@/config/admin-routes'
 
 const router = useRouter()

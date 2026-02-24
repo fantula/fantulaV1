@@ -20,7 +20,7 @@
     <!-- Card Body -->
     <div class="card-body">
        <div class="thumb">
-          <img :src="order.product_image || '/images/placeholder.png'" class="product-img" loading="lazy" decoding="async" />
+          <img :src="order.product_image || '/images/shared/logo_v2.png'" class="product-img" loading="lazy" decoding="async" />
        </div>
        <div class="info">
           <!-- Name & Spec Inline -->
@@ -31,8 +31,7 @@
           
           <div class="price-row">
              <div class="price">
-                <span class="unit">¥</span>
-                <span class="amount">{{ Number(order.total_amount).toFixed(2) }}</span>
+                <span class="amount">{{ Number(order.total_amount || 0).toFixed(2) }}</span><span class="unit">点</span>
              </div>
              <div class="qty">x{{ order.quantity }}</div>
           </div>

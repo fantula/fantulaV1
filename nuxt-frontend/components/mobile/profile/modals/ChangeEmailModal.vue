@@ -32,17 +32,19 @@
                         maxlength="6"
                     />
                     <button 
-                        class="code-btn" 
-                        :disabled="countdown > 0 || loading"
-                        @click="sendOldCode"
+                        class="code-btn gap-1" 
+                        style="display: flex; align-items: center; justify-content: center;"
+                        @click="handleSendCode1" 
+                        :disabled="countdown > 0 || sendingCode1"
                     >
-                        {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
+                        <span v-if="sendingCode1" class="btn-spinner spinner-mini"></span>
+                        <span>{{ countdown > 0 ? `${countdown}s` : '发送验证码' }}</span>
                     </button>
                 </div>
             </div>
 
-            <button class="aurora-btn-primary" @click="verifyOldEmail" :disabled="loading || oldCode.length < 4">
-                <div v-if="loading" class="spinner"></div>
+            <button class="aurora-btn-primary gap-2" @click="verifyOldEmail" :disabled="loading || oldCode.length < 4">
+                <span v-if="loading" class="btn-spinner"></span>
                 <span v-else>下一步</span>
             </button>
          </template>
@@ -70,17 +72,19 @@
                         maxlength="6"
                     />
                     <button 
-                        class="code-btn" 
-                        :disabled="countdown > 0 || loading || !isEmailValid"
-                        @click="sendNewCode"
+                        class="send-code-btn gap-2" 
+                        style="display: flex; align-items: center; justify-content: center;"
+                        :disabled="countdown > 0 || loading || !isValidNewEmail || sendingCode2"
+                        @click="handleSendCode2"
                     >
-                        {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
+                        <span v-if="sendingCode2" class="btn-spinner spinner-mini"></span>
+                        <span>{{ countdown > 0 ? `${countdown}s` : '发送验证码' }}</span>
                     </button>
                 </div>
             </div>
 
-            <button class="aurora-btn-primary" @click="handleConfirm" :disabled="loading || !canSubmit">
-                <div v-if="loading" class="spinner"></div>
+            <button class="aurora-btn-primary gap-2" @click="handleConfirm" :disabled="loading || !canSubmit">
+                <span v-if="loading" class="btn-spinner"></span>
                 <span v-else>确认绑定</span>
             </button>
          </template>
@@ -113,30 +117,22 @@ const currentEmail = computed(() => userStore.user?.email)
 
 // Step 1 Data
 const oldCode = ref('')
+const sendingCode1 = ref(false)
 
 // Step 2 Data
 const form = reactive({
   email: '',
   code: ''
 })
+const sendingCode2 = ref(false)
 
-const isEmailValid = computed(() => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+const isValidNewEmail = computed(() => {
+  return form.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
 })
 
+const canVerifyOld = computed(() => oldCode.value.length >= 4)
 const canSubmit = computed(() => {
-  return isEmailValid.value && form.code.length >= 4
-})
-
-// Watchers
-watch(() => props.visible, (val) => {
-  if (val) {
-    step.value = currentEmail.value ? 1 : 2
-    oldCode.value = ''
-    form.email = ''
-    form.code = ''
-
-  }
+  return isValidNewEmail.value && form.code.length >= 4
 })
 
 const { 
@@ -153,21 +149,54 @@ const {
   checkTimer: checkNewTimer 
 } = useSendCode({ timerKey: 'otp_bind_new_timer_end' })
 
-// Move Watcher Logic here to ensure variables are defined
+const baseLoading = ref(false)
+const loading = computed(() => baseLoading.value || oldLoading.value || newLoading.value || sendingCode1.value || sendingCode2.value)
+
+// Dynamic countdown display based on step
+const countdown = computed(() => step.value === 1 ? oldCountdown.value : newCountdown.value)
+
+// Watchers
 watch(() => props.visible, (val) => {
   if (val) {
-     checkOldTimer()
-     checkNewTimer()
+    step.value = currentEmail.value ? 1 : 2
+    oldCode.value = ''
+    form.email = ''
+    form.code = ''
+    checkOldTimer()
+    checkNewTimer()
   }
 })
-
-const baseLoading = ref(false)
-const loading = computed(() => baseLoading.value || oldLoading.value || newLoading.value)
-const countdown = computed(() => step.value === 1 ? oldCountdown.value : newCountdown.value)
 
 // Handlers
 const handleClose = () => {
     emit('close')
+}
+
+const handleSendCode1 = async () => {
+    if (!currentEmail.value) return
+    sendingCode1.value = true
+    try {
+        await sendOldOtp(currentEmail.value)
+    } finally {
+        sendingCode1.value = false
+    }
+}
+
+const handleSendCode2 = async () => {
+    if (!isValidNewEmail.value) return
+    sendingCode2.value = true
+    try {
+        const checkRes = await authApi.checkEmailAvailable(form.email)
+        if (!checkRes.success) {
+             error('该邮箱已被注册')
+             return
+        }
+        await sendNewOtp(form.email)
+    } catch (e) {
+        // Handled by API error interceptor
+    } finally {
+        sendingCode2.value = false
+    }
 }
 
 // 1. Send Old Code
@@ -185,7 +214,6 @@ const verifyOldEmail = async () => {
         if (res.success) {
             success('验证通过')
             step.value = 2
-            // No need to manually reset timer, they are independent
         } else {
             error(res.msg || '验证码错误')
         }
@@ -194,29 +222,6 @@ const verifyOldEmail = async () => {
     } finally {
         baseLoading.value = false
     }
-}
-
-// 3. Send New Code
-const sendNewCode = async () => {
-    // Check availability logic can remain or move inside sendOtp if supported. 
-    // For now, keep pre-check here as it's specific business logic before sending code.
-    if (!isEmailValid.value) return
-    // if (countdown.value > 0) return // Handled by useSendCode
-
-    baseLoading.value = true
-    try {
-        const checkRes = await authApi.checkEmailAvailable(form.email)
-        if (!checkRes.success) {
-             error('该邮箱已被注册')
-             return
-        }
-    } catch (e) {
-        return // Stop if check failed
-    } finally {
-        baseLoading.value = false
-    }
-
-    await sendNewOtp(form.email)
 }
 
 // 4. Confirm Binding
@@ -322,10 +327,7 @@ const handleConfirm = async () => {
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 .full-width { width: 100%; }
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Flex adjustments for input-row with aurora-input */
 .input-row .aurora-input { flex: 1; min-width: 0; }

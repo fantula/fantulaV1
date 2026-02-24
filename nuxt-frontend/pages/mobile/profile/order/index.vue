@@ -78,8 +78,9 @@
                 </div>
                 <div class="modal-footer">
                     <button class="modal-btn cancel" @click="confirmModalVisible = false">{{ confirmModalType === 'pending' ? '我不取消' : '我再想想' }}</button>
-                    <button class="modal-btn confirm" @click="handleConfirmDelete" :disabled="confirmLoading">
-                        {{ confirmLoading ? '处理中...' : (confirmModalType === 'pending' ? '确认取消' : '确认删除') }}
+                    <button class="modal-btn confirm gap-2" style="display: flex; align-items: center; justify-content: center;" @click="handleConfirmDelete" :disabled="confirmLoading">
+                        <span v-if="confirmLoading" class="btn-spinner"></span>
+                        <span>{{ confirmLoading ? '处理中...' : (confirmModalType === 'pending' ? '确认取消' : '确认删除') }}</span>
                     </button>
                 </div>
             </div>

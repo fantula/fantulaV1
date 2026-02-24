@@ -155,7 +155,7 @@
           </el-descriptions-item>
           
           <template v-for="(value, key) in currentReceipt.payload" :key="key">
-            <el-descriptions-item :label="key" label-class-name="bold-label">
+            <el-descriptions-item v-if="!String(key).toLowerCase().includes('cdk')" :label="key" label-class-name="bold-label">
               <div class="payload-row">
                 <span class="payload-value">{{ value }}</span>
                 <el-icon 
@@ -231,11 +231,8 @@ import { Refresh, Loading, Check, CopyDocument } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
 import ProductThumbCell from '@/components/admin/base/ProductThumbCell.vue'
-import OrderDetailDialog from '@/components/admin/order/OrderDetailDialog.vue'
 import { useAdminOrderList } from '@/composables/admin/useAdminOrderList'
 import { adminFulfillmentApi } from '@/api/admin/fulfillment'
 import type { OrderFulfillment } from '@/types/order'

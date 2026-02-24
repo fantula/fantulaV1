@@ -191,7 +191,6 @@ import { Search, Refresh, Loading, Check } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
 import { useAdminList } from '@/composables/admin/useAdminList'
 import { getSupabaseClient } from '@/utils/supabase' // FIX: use regular client, not admin

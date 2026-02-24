@@ -50,8 +50,7 @@
                   
                   <div class="info-row-bottom">
                       <div class="price-wrap">
-                         <span class="symbol">¥</span>
-                         <span class="amount">{{ Number(item.price).toFixed(2) }}</span>
+                         <span class="amount">{{ Number(item.price || 0).toFixed(2) }}点</span>
                       </div>
                       
                       <!-- Cancel Collection Toggle -->
@@ -138,7 +137,7 @@ const handleRemove = async (id: string) => {
          showToast(res.msg || '操作失败', 'error')
       }
    } catch(e) {
-      showToast('网络错误', 'error')
+      showToast('服务繁忙，请稍后再试', 'error')
    }
 }
 

@@ -45,7 +45,7 @@ export function useAdminCdkList(cdkType: 'virtual' | 'shared' | 'one_time') {
             list.value = cdks
             total.value = totalCount
         } catch (e) {
-            console.error('加载 CDK 失败:', e)
+            if (import.meta.dev) console.error('加载 CDK 失败:', e)
             ElMessage.error('系统异常')
         } finally {
             loading.value = false

@@ -497,9 +497,10 @@ async function handleLoginSuccess(data: any, msg = '登录成功') {
         store.loadFavorites(),
         store.loadOrders()
     ])
-  } catch(e) { console.warn(e) }
+  } catch(e) { 
+    if (import.meta.dev) console.warn(e) 
+  }
 
-  ElMessage.success(msg)
   ElMessage.success(msg)
   close()
   
@@ -600,7 +601,7 @@ async function pollWechatStatus() {
       }
     }
   } catch (err) {
-    console.error('Poll error:', err)
+    if (import.meta.dev) console.error('Poll error:', err)
   }
 }
 

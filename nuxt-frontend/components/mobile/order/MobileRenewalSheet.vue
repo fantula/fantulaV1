@@ -75,7 +75,7 @@
                        <span class="c-name">{{ coupon.coupon.name }}</span>
                     </div>
                     <div class="c-right">
-                       <span class="c-val" v-if="coupon.coupon.type === 'flat'">-¥{{ coupon.coupon.value }}</span>
+                       <span class="c-val" v-if="coupon.coupon.type === 'flat'">-{{ coupon.coupon.value }}点</span>
                        <span class="c-val" v-else-if="coupon.coupon.type === 'product'">免单</span>
                        <el-icon v-if="selectedCoupon?.id === coupon.id" class="chk"><Select /></el-icon>
                     </div>
@@ -89,12 +89,13 @@
              <div class="total-label">总计</div>
              <div class="price-row">
                 <!-- <span class="currency">¥</span> -->
-                <span class="price-val">{{ finalAmount }}</span>
-                <div v-if="discountAmount > 0" class="discount-tag">已省 ¥{{ discountAmount }}</div>
+                <span class="price-val">{{ finalAmount }}</span><span class="unit-text">点</span>
+                <div v-if="discountAmount > 0" class="discount-tag">已省 {{ discountAmount }}点</div>
              </div>
           </div>
-          <button class="aurora-btn-accent" :disabled="!selectedSkuId || paying" @click="handlePay">
-             {{ paying ? '支付中...' : '立即续费' }}
+          <button class="aurora-btn-accent gap-2" :disabled="!selectedSkuId || paying" @click="handlePay">
+             <span v-if="paying" class="btn-spinner"></span>
+             <span>{{ paying ? '支付中...' : '立即续费' }}</span>
           </button>
        </div>
     </div>
@@ -306,8 +307,6 @@ watch(originalAmount, () => fetchCoupons()) // Refresh coupons if price changes 
 
 .sheet-body { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
 .loading-box { color: #64748B; text-align: center; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; }
-.spinner { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #3B82F6; border-radius: 50%; animation: spin 1s linear infinite; }
-
 .prod-card-glass {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);

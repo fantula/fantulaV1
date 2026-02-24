@@ -39,7 +39,14 @@
                         <el-input v-model="form.wechat_id" placeholder="Spotify-cn" />
                      </el-form-item>
                      <el-form-item label="微信二维码">
-                        <ContactImageUploader v-model="form.wechat_qr" folder="contact_materials" tip="建议尺寸: 300x300" />
+                        <div class="image-selector" @click="openPicker('wechat')">
+                            <el-image v-if="form.wechat_qr" :src="form.wechat_qr" fit="cover" class="preview-img" />
+                            <div v-else class="placeholder">
+                                <el-icon><Plus /></el-icon>
+                                <span>点击从图片库选择</span>
+                            </div>
+                        </div>
+                        <div class="form-tip">建议尺寸: 300x300。请先在「图片库」上传图片，再来此处选择。</div>
                      </el-form-item>
                 </el-col>
                 <el-col :span="12">
@@ -48,7 +55,14 @@
                         <el-input v-model="form.telegram_id" placeholder="@Fantula_Support" />
                      </el-form-item>
                      <el-form-item label="Telegram二维码">
-                        <ContactImageUploader v-model="form.telegram_qr" folder="contact_materials" tip="建议尺寸: 300x300" />
+                        <div class="image-selector" @click="openPicker('telegram')">
+                            <el-image v-if="form.telegram_qr" :src="form.telegram_qr" fit="cover" class="preview-img" />
+                            <div v-else class="placeholder">
+                                <el-icon><Plus /></el-icon>
+                                <span>点击从图片库选择</span>
+                            </div>
+                        </div>
+                        <div class="form-tip">建议尺寸: 300x300。请先在「图片库」上传图片，再来此处选择。</div>
                      </el-form-item>
                 </el-col>
             </el-row>
@@ -71,15 +85,24 @@
          </div>
 
       </el-form>
+
+      <!-- 图片选择器 -->
+      <AdminImagePicker
+        v-model="pickerVisible"
+        @select="handleImageSelect"
+      />
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
-import ContactImageUploader from '@/components/admin/base/ContactImageUploader.vue'
+import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 import { useAdminContactConfig } from '@/composables/admin/useAdminContactConfig'
+import type { AdminImage } from '@/api/admin/media'
 
 definePageMeta({
   layout: 'mgmt', // Mandatory strictly standard layout
@@ -88,6 +111,23 @@ definePageMeta({
 })
 
 const { form, loading, saving, saveConfig } = useAdminContactConfig()
+
+// --- Image Picker Logic ---
+const pickerVisible = ref(false)
+const currentPickField = ref<'wechat' | 'telegram'>('wechat')
+
+const openPicker = (field: 'wechat' | 'telegram') => {
+    currentPickField.value = field
+    pickerVisible.value = true
+}
+
+const handleImageSelect = (image: AdminImage) => {
+    if (currentPickField.value === 'wechat') {
+        form.value.wechat_qr = image.url
+    } else {
+        form.value.telegram_qr = image.url
+    }
+}
 </script>
 
 <style scoped>
@@ -100,4 +140,30 @@ const { form, loading, saving, saveConfig } = useAdminContactConfig()
 .p-4 { padding: 16px; }
 .rounded { border-radius: 8px; }
 .mb-6 { margin-bottom: 24px; }
+
+/* 图片选择区域 */
+.image-selector {
+  width: 160px;
+  height: 160px;
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.2s;
+  background: var(--el-fill-color-extra-light);
+}
+.image-selector:hover { border-color: var(--el-color-primary); }
+.preview-img { width: 100%; height: 100%; }
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+}
+.placeholder .el-icon { font-size: 24px; }
 </style>

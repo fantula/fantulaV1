@@ -203,7 +203,6 @@ import { Search, Plus, Refresh, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getSupabaseClient } from '@/utils/supabase' // SECURITY FIX: Use standard client
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useAdminList } from '@/composables/admin/useAdminList'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 

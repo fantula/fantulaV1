@@ -141,7 +141,7 @@ const handleGenerate = async () => {
     }
   } catch (e) {
     ElMessage.error('系统异常')
-    console.error(e)
+    if (import.meta.dev) console.error(e)
   } finally {
     loading.value = false
   }

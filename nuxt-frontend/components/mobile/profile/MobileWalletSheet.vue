@@ -12,7 +12,7 @@
       
       <div class="sheet-body">
          <div v-if="loading" class="loading-state">
-             <div class="loading-spinner"></div>
+             <div class="spinner-sm" style="margin: 0 auto 10px auto;"></div>
              加载中...
          </div>
          <div v-else-if="transactions.length > 0" class="transaction-list">
@@ -24,9 +24,9 @@
                  </div>
                  <div class="t-right">
                      <span :class="['t-amount', Number(item.amount) >= 0 ? 'text-green' : 'text-red']">
-                         {{ Number(item.amount) > 0 ? '+' : '' }}{{ Number(item.amount).toFixed(2) }}
+                         {{ Number(item.amount) > 0 ? '+' : '' }}{{ Number(item.amount || 0).toFixed(2) }}点
                      </span>
-                     <span class="t-balance">余额 {{ Number(item.balance_after).toFixed(2) }}</span>
+                     <span class="t-balance">余额 {{ Number(item.balance_after || 0).toFixed(2) }}点</span>
                  </div>
              </div>
          </div>
@@ -132,14 +132,7 @@ const parseDescription = (item: any) => {
 .loading-state, .empty-state {
     text-align: center; color: #94A3B8; padding-top: 60px;
 }
-.loading-spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1);
-    border-top: 2px solid #fff; border-radius: 50%;
-    margin: 0 auto 10px auto;
-    animation: spin 1s linear infinite;
-}
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>

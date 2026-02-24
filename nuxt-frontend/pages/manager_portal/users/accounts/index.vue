@@ -152,10 +152,8 @@ const dialog = useAdminDialog({
     const payload = { ...form }
     
     // Fix: Convert empty string to null for UUID validation
-    // if (!payload.department_id) {
     //     // @ts-ignore
     //     payload.department_id = null
-    // }
 
     if (isEdit) {
        // @ts-ignore

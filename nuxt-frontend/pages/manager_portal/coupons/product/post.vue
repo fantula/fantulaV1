@@ -126,7 +126,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
 import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
-import AdminSkuSelector from '@/components/admin/base/AdminSkuSelector.vue'
 import { adminApi, adminCategoryApi, adminProductApi } from '@/api/admin'
 import { adminRoute } from '@/config/admin-routes'
 

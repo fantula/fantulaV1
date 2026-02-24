@@ -90,7 +90,6 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { adminRechargeApi } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import AdminDataDialog from '@/components/admin/base/AdminDataDialog.vue'
 import { useAdminDialog, confirmDelete } from '@/composables/admin/useAdminDialog'
 
 interface TierItem {

@@ -74,8 +74,8 @@
              placeholder="请输入回复内容..."
              @keyup.enter="handleReply"
            />
-           <button class="send-btn" @click="handleReply" :disabled="!replyContent || sending">
-              <div v-if="sending" class="spinner-mini"></div>
+           <button class="send-btn gap-2" @click="handleReply" :disabled="!replyContent || sending">
+              <span v-if="sending" class="btn-spinner"></span>
               <span v-else>发送</span>
            </button>
        </div>
@@ -147,7 +147,8 @@ const fetchDetail = async () => {
           router.back()
       }
    } catch(e) {
-      showToast('网络错误', 'error')
+      if (import.meta.dev) console.error('Fetch ticket detail failed', e)
+      showToast('服务繁忙，请稍后再试', 'error')
    } finally {
       loading.value = false
    }
@@ -231,21 +232,7 @@ onMounted(() => {
 .loading-state {
     display: flex; justify-content: center; padding: 40px;
 }
-.spinner-premium {
-    width: 30px; height: 30px;
-    border: 3px solid rgba(56, 189, 248, 0.2);
-    border-top-color: var(--cyber-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-.spinner-mini {
-    width: 16px; height: 16px;
-    border: 2px solid rgba(255,255,255, 0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Compact Ticket Status Card */
 .ticket-status-card {

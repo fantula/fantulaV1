@@ -164,9 +164,9 @@ export function useAdminProductForm() {
         imagePickerVisible.value = true
     }
 
-    const handleImageSelected = (urls: string[]) => {
-        if (urls.length === 0) return
-        const url = urls[0]
+    const handleImageSelected = (image: { url: string }) => {
+        if (!image || !image.url) return
+        const url = image.url
         if (pickerTarget.value === 'image') {
             form.image = url
         } else if (typeof pickerTarget.value === 'number') {

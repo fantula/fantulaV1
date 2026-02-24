@@ -115,7 +115,6 @@ import { Plus, Edit } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminCommunityApi, communityApi, type Category } from '@/api/client/community'
 // Explicitly import AdminImagePicker
-import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
 import { adminRoute } from '@/config/admin-routes'
 

@@ -73,7 +73,7 @@ export function useAdminDialog<T extends Record<string, any>>(
         if (!valid) return
 
         if (!options?.onSubmit) {
-            console.warn('[useAdminDialog] onSubmit is not defined')
+            if (import.meta.dev) console.warn('[useAdminDialog] onSubmit is not defined')
             return
         }
 

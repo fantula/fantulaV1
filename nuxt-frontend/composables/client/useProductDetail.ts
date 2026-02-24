@@ -77,7 +77,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
     return {
       id: data.id, // Ensure ID is available
       name: data.title || data.product_name || '正在加载商品...',
-      image: data.coverImage || data.image || '/images/placeholder.png',
+      image: data.coverImage || data.image || '/images/shared/logo_v2.png',
       price: data.price || 0,
       sales: data.initial_sales || data.sales || 0,
       rating: data.rating || 100
@@ -128,10 +128,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
   const detailModules = computed(() => {
     const dataModules = (goodsData.value?.data as any)?.detail_modules
     if (dataModules && dataModules.length > 0) return dataModules
-    return [
-      { type: 'image', content: '/images/client/pc/netflix_detail_1.png' },
-      { type: 'image', content: '/images/client/pc/netflix_detail_2.png' }
-    ]
+    return []
   })
 
   const allowAddon = computed(() => (goodsData.value?.data as any)?.allow_addon === true)

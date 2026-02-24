@@ -160,7 +160,7 @@
           <!-- Helping Image Section (Common for all types) -->
           <el-divider content-position="left">详情页帮助图片</el-divider>
           <div class="form-item">
-            <div class="image-selector" @click="openImagePicker">
+            <div class="image-selector" @click="imagePickerVisible = true">
               <img v-if="commonImage" :src="commonImage" class="preview-img" />
               <div v-else class="placeholder">
                 <el-icon :size="24"><Picture /></el-icon>
@@ -184,53 +184,10 @@
     </div>
 
     <!-- Image Picker Dialog -->
-    <el-dialog
-      v-model="imagePickerVisible"
-      title="选择图片"
-      width="800px"
-      append-to-body
-    >
-      <div class="picker-container">
-        <div class="picker-sidebar">
-          <div 
-            class="picker-cat-item" 
-            :class="{ active: pickerActiveCatId === '' }"
-            @click="pickerActiveCatId = ''; fetchPickerImages()"
-          >全部图片</div>
-          <div 
-            v-for="cat in pickerCategories" 
-            :key="cat.id" 
-            class="picker-cat-item"
-            :class="{ active: pickerActiveCatId === cat.id }"
-            @click="pickerActiveCatId = cat.id; fetchPickerImages()"
-          >{{ cat.name }}</div>
-        </div>
-        <div class="picker-main" v-loading="pickerLoading">
-          <div class="picker-toolbar">
-            <el-upload
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              :on-change="handlePickerUpload"
-            >
-              <el-button type="primary" size="small">上传新图片</el-button>
-            </el-upload>
-          </div>
-          <div class="picker-grid">
-            <div 
-              v-for="img in galleryImages" 
-              :key="img.id" 
-              class="picker-img-card"
-              @click="selectGalleryImage(img.url)"
-            >
-              <el-image :src="img.url" fit="cover" />
-              <div class="picker-img-name">{{ img.name }}</div>
-            </div>
-          </div>
-          <el-empty v-if="galleryImages.length === 0" description="暂无图片" />
-        </div>
-      </div>
-    </el-dialog>
+    <AdminImagePicker 
+      v-model="imagePickerVisible" 
+      @select="handleImageSelected" 
+    />
   </div>
 </template>
 
@@ -245,8 +202,9 @@ import { useRouter, useRoute } from 'vue-router'
 import { ArrowLeft, Delete, Plus, Minus, Picture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminRoute } from '@/config/admin-routes'
-import { adminCdkApi, adminApi, adminProductApi, adminCategoryApi, type AdminProduct } from '@/api/admin'
+import { adminCdkApi, adminProductApi, adminCategoryApi, type AdminProduct } from '@/api/admin'
 import { getSupabaseClient } from '@/utils/supabase'
+import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -284,10 +242,6 @@ const minStock = computed(() => usedStock.value)
 // Image Picker State
 const commonImage = ref('')
 const imagePickerVisible = ref(false)
-const pickerLoading = ref(false)
-const galleryImages = ref<any[]>([])
-const pickerCategories = ref<any[]>([])
-const pickerActiveCatId = ref('')
 
 // SKU Selection State
 const selectedSkuIds = ref<string[]>([])
@@ -481,48 +435,9 @@ const removeSharedAttr = (idx: number) => {
 }
 
 // Image Picker Logic
-const openImagePicker = async () => {
-  imagePickerVisible.value = true
-  
-  if (pickerCategories.value.length === 0) {
-    const res = await adminApi.imageCategory.getCategories()
-    if (res.success) pickerCategories.value = res.categories
-  }
-  
-  fetchPickerImages()
-}
-
-const fetchPickerImages = async () => {
-  pickerLoading.value = true
-  const res = await adminApi.image.getImages({
-    category_id: pickerActiveCatId.value
-  })
-  if (res.success) galleryImages.value = res.images
-  pickerLoading.value = false
-}
-
-const selectGalleryImage = (url: string) => {
-  commonImage.value = url
-  imagePickerVisible.value = false
-  ElMessage.success('已选择图片')
-}
-
-const handlePickerUpload = async (file: any) => {
-  pickerLoading.value = true
-  try {
-    const { uploadImageToStorage } = await import('@/utils/uploadImage')
-    const upRes = await uploadImageToStorage(file.raw)
-    if (upRes.success) {
-      await adminApi.image.createImage({
-        name: file.name,
-        url: upRes.url!,
-        category_id: pickerActiveCatId.value || undefined
-      })
-      selectGalleryImage(upRes.url!)
-      fetchPickerImages()
-    }
-  } finally {
-    pickerLoading.value = false
+const handleImageSelected = (image: { url: string }) => {
+  if (image && image.url) {
+    commonImage.value = image.url
   }
 }
 
@@ -746,17 +661,4 @@ const handleBack = () => {
 .image-selector:hover { border-color: #409EFF; }
 .preview-img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }
 .placeholder { display: flex; flex-direction: column; align-items: center; color: #909399; font-size: 12px; gap: 4px; }
-
-/* Picker Logic reused styles */
-.picker-container { display: flex; height: 400px; }
-.picker-sidebar { width: 120px; border-right: 1px solid #ebeef5; overflow-y: auto; }
-.picker-cat-item { padding: 10px; cursor: pointer; color: #606266; font-size: 13px; }
-.picker-cat-item:hover, .picker-cat-item.active { background: #ecf5ff; color: #409EFF; }
-.picker-main { flex: 1; padding: 16px; display: flex; flex-direction: column; overflow-y: auto; }
-.picker-toolbar { margin-bottom: 12px; display: flex; justify-content: flex-end; }
-.picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-.picker-img-card { cursor: pointer; border: 1px solid #ebeef5; border-radius: 4px; overflow: hidden; }
-.picker-img-card:hover { border-color: #409EFF; }
-.picker-img-card .el-image { width: 100%; height: 80px; display: block; }
-.picker-img-name { font-size: 12px; padding: 4px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #606266; }
 </style>

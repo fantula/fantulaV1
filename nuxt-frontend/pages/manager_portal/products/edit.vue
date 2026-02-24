@@ -167,9 +167,8 @@
     </div>
 
     <!-- 全局图片选择器 -->
-    <AdminImageSelector 
+    <AdminImagePicker 
         v-model="imagePickerVisible"
-        :multiple="false"
         @select="handleImageSelected"
     />
 
@@ -178,9 +177,7 @@
 
 <script setup lang="ts">
 import { PictureFilled, Document, Picture, ArrowUp, ArrowDown, Delete } from '@element-plus/icons-vue'
-import AdminImageSelector from '@/components/admin/base/AdminImageSelector.vue'
 import StickyFormHeader from '@/components/admin/base/StickyFormHeader.vue'
-import TagInputGroup from '@/components/admin/base/TagInputGroup.vue'
 import { useAdminProductForm } from '@/composables/admin/useAdminProductForm'
 
 definePageMeta({

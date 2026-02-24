@@ -2,7 +2,7 @@
   <div class="glass-card product-card">
     <!-- Left: Product Image -->
     <div class="product-thumb-wrapper" @click="previewImage">
-      <img v-if="productImage" :src="productImage" class="product-img" />
+      <img v-if="productImage" :src="productImage" class="product-img" loading="lazy" />
       <div v-else class="placeholder">📦</div>
     </div>
 

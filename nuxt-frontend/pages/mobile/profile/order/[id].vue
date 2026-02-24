@@ -4,48 +4,50 @@
     <!-- Sticky Header -->
     <MobileSubPageHeader title="订单详情" />
 
-    <!-- Status Card (Glass & Neon & Colored) -->
-    <div class="status-card-glass" :class="order.status">
-       <div class="status-main">
-          <div class="status-icon-wrapper">
-             <el-icon v-if="order.status === 'active'"><CircleCheck /></el-icon>
-             <el-icon v-else-if="order.status === 'pending_delivery'"><Box /></el-icon>
-             <el-icon v-else-if="order.status === 'refunding'"><RefreshLeft /></el-icon>
-             <el-icon v-else><InfoFilled /></el-icon>
-          </div>
-          <div class="status-content">
-             <div class="status-title">{{ statusText }}</div>
-             <div class="status-desc" v-if="order.status === 'active'">到期: {{ formatTime(order.expires_at) }}</div>
-             <div class="status-desc" v-else>下单: {{ formatTime(order.createdAt) }}</div>
-          </div>
-          <div class="status-price">
-             <span class="val">{{ Number(order.totalAmount).toFixed(2) }}</span>
-          </div>
-       </div>
-       
-       <!-- Operation Bar (Gradient Pills) -->
-       <div class="ops-bar-glass">
-          <button class="action-btn ghost" @click="handleAction('contact')">
-             <el-icon><Headset /></el-icon> 联系客服
-          </button>
-          <button v-if="activeTicketId" class="action-btn ghost" @click="handleAction('view_ticket')">
-             <el-icon><Tickets /></el-icon> 查看工单
-          </button>
-          <button v-else class="action-btn ghost" @click="handleAction('create_ticket')">
-             <el-icon><Tickets /></el-icon> 申请工单
-          </button>
+    <!-- Status Card and Content combined inside !loading -->
+    <template v-if="!loading">
+      <!-- Status Card (Glass & Neon & Colored) -->
+      <div class="status-card-glass" :class="order.status">
+         <div class="status-main">
+            <div class="status-icon-wrapper">
+               <el-icon v-if="order.status === 'active'"><CircleCheck /></el-icon>
+               <el-icon v-else-if="order.status === 'pending_delivery'"><Box /></el-icon>
+               <el-icon v-else-if="order.status === 'refunding'"><RefreshLeft /></el-icon>
+               <el-icon v-else><InfoFilled /></el-icon>
+            </div>
+            <div class="status-content">
+               <div class="status-title">{{ statusText }}</div>
+               <div class="status-desc" v-if="order.status === 'active'">到期: {{ formatTime(order.expires_at) }}</div>
+               <div class="status-desc" v-else>下单: {{ formatTime(order.createdAt) }}</div>
+            </div>
+            <div class="status-price">
+               <span class="val">{{ Number(order.totalAmount || 0).toFixed(2) }}</span>
+            </div>
+         </div>
+         
+         <!-- Operation Bar (Gradient Pills) -->
+         <div class="ops-bar-glass">
+            <button class="action-btn ghost" @click="handleAction('contact')">
+               <el-icon><Headset /></el-icon> 联系客服
+            </button>
+            <button v-if="activeTicketId" class="action-btn ghost" @click="handleAction('view_ticket')">
+               <el-icon><Tickets /></el-icon> 查看工单
+            </button>
+            <button v-else class="action-btn ghost" @click="handleAction('create_ticket')">
+               <el-icon><Tickets /></el-icon> 申请工单
+            </button>
 
-          <!-- Dynamic Buttons -->
-          <button v-if="canRenew" class="action-btn primary" @click="handleAction('renew')">续费</button>
-          
-          <button v-if="canCancelRefund" class="action-btn warning" @click="handleAction('cancel_refund')">取消退款</button>
-          <button v-else-if="canRefund" class="action-btn danger" @click="handleAction('apply_refund')">申请退款</button>
-          <button v-else-if="isRefundBlocked" class="action-btn disabled" disabled>退款上限</button>
-       </div>
-    </div>
+            <!-- Dynamic Buttons -->
+            <button v-if="canRenew" class="action-btn primary" @click="handleAction('renew')">续费</button>
+            
+            <button v-if="canCancelRefund" class="action-btn warning" @click="handleAction('cancel_refund')">取消退款</button>
+            <button v-else-if="canRefund" class="action-btn danger" @click="handleAction('apply_refund')">申请退款</button>
+            <button v-else-if="isRefundBlocked" class="action-btn disabled" disabled>退款上限</button>
+         </div>
+      </div>
 
     <!-- Scroll Content -->
-    <div class="content-body" v-if="!loading">
+    <div class="content-body">
        
        <!-- Product Card Component -->
        <MobileOrderProductInfo :order="order" />
@@ -77,30 +79,25 @@
               </template>
 
               <!-- Virtual -->
-              <template v-else-if="order.orderType === 'virtual'">
+              <template v-else-if="order.orderType === 'virtual' && cdkList.length > 0">
                   <div class="section-group">
                      <div class="section-header">充值进度</div>
                   <!-- Delivery Content -->
                   <div class="delivery-content">
-                      <div v-if="order.delivery_type === 'cdk'">
-                      <MobileFulfillmentCdk :cdk-list="cdkList" />
-                      </div>
-
-                      <div v-else-if="['manual', 'shared'].includes(order.delivery_type || '')">
-                          <MobileFulfillmentSubmitForm 
-                              :order-id="order.id || ''"
-                              :order-status="order.status || ''"
-                              :cdk-fields="[]"
-                              @success="refreshData"
-                          />
-                      </div>
+                      <MobileFulfillmentSubmitForm 
+                          :order-id="order.id || ''"
+                          :order-status="order.status || ''"
+                          :cdk-fields="getFieldsForCdk(cdkList[0])"
+                          :cdk-id="cdkList[0].id"
+                          @submit-success="handleFulfillmentSuccess"
+                      />
                   </div>
               </div>
 
 
             <!-- History -->
             <div class="detail-card">
-               <h3 class="card-title">发货记录</h3>
+               <h3 class="card-title">回执记录</h3>
                <MobileFulfillmentHistory :order-id="order.id || ''" ref="historyRef" />
             </div>
        </template> <!-- Closes Virtual -->
@@ -118,6 +115,7 @@
        </div>
 
     </div>
+    </template>
     
     <div v-if="loading" class="loading-screen">
        <div class="spinner"></div>
@@ -347,11 +345,7 @@ const onTicketSuccess = () => {
 }
 
 .loading-screen { padding: 40px; display: flex; justify-content: center; }
-.spinner {
-    width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #3B82F6;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 .fulfillment-container { display: flex; flex-direction: column; gap: 20px; }
 </style>

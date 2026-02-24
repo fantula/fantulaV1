@@ -1,27 +1,34 @@
 <template>
   <div class="order-detail-page">
     
-    <!-- 1. Sticky Status Hero Card -->
-    <div class="hero-sticky-wrapper">
-      <OrderDetailHero
-        :order="order"
-        :statusText="statusText"
-        :remainingDays="remainingDays"
-        :pendingRefundReason="pendingRefundReason"
-        :activeTicketId="activeTicketId"
-        :canRenew="canRenew"
-        :canRefund="canRefund"
-        :canCancelRefund="canCancelRefund"
-        :isRefundBlocked="isRefundBlocked"
-        :getTimeLevel="getTimeLevel"
-        @back="router.back()"
-        @copy="copyText"
-        @action="handleAction"
-      />
+    <!-- Skeleton Loader -->
+    <div v-if="loading" class="hero-sticky-wrapper" style="padding: 24px;">
+      <OrderSkeleton />
     </div>
 
-    <!-- 2. Content Stream (Glass Tiles) -->
-    <div class="content-stream">
+    <!-- Active Content -->
+    <template v-else>
+      <!-- 1. Sticky Status Hero Card -->
+      <div class="hero-sticky-wrapper">
+        <OrderDetailHero
+          :order="order"
+          :statusText="statusText"
+          :remainingDays="remainingDays"
+          :pendingRefundReason="pendingRefundReason"
+          :activeTicketId="activeTicketId"
+          :canRenew="canRenew"
+          :canRefund="canRefund"
+          :canCancelRefund="canCancelRefund"
+          :isRefundBlocked="isRefundBlocked"
+          :getTimeLevel="getTimeLevel"
+          @back="router.back()"
+          @copy="copyText"
+          @action="handleAction"
+        />
+      </div>
+
+      <!-- 2. Content Stream (Glass Tiles) -->
+      <div class="content-stream">
       
       <!-- Product Info Card -->
       <!-- Product Info Card -->
@@ -113,6 +120,7 @@
       </div>
 
     </div>
+    </template>
 
     <!-- Modals -->
     <RenewalModal
@@ -171,6 +179,7 @@ import PcFulfillmentShared from '@/components/pc/order/PcFulfillmentShared.vue'
 import PcFulfillmentSubmitForm from '@/components/pc/order/PcFulfillmentSubmitForm.vue'
 import PcFulfillmentHistory from '@/components/pc/order/PcFulfillmentHistory.vue'
 import OrderDetailHero from '@/components/pc/order/OrderDetailHero.vue'
+import OrderSkeleton from '@/components/pc/order/OrderSkeleton.vue'
 import RefundingCard from '@/components/pc/order/RefundingCard.vue'
 import RenewalModal from '@/components/pc/order/RenewalModal.vue'
 import RefundModal from '@/components/pc/order/RefundModal.vue'

@@ -152,8 +152,6 @@ definePageMeta({
 
 import { ref, computed, onMounted } from 'vue'
 import { Loading, VideoPause, CaretRight, Refresh, Timer, Sunny, Calendar, Document } from '@element-plus/icons-vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-
 // Task display name mapping
 const taskDisplayNames: Record<string, string> = {
   cleanup_expired_preorders: '清理过期预订单',

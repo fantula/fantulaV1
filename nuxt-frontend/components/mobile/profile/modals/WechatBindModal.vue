@@ -36,16 +36,29 @@
 
         <div class="modal-footer">
           <div v-if="isBound" class="footer-actions">
-              <button class="submit-btn unbind-btn" :disabled="loading" @click="handleUnbind">
-                {{ loading ? '处理中...' : '解除绑定' }}
+              <button class="submit-btn unbind-btn gap-2" :disabled="loading" @click="handleUnbind">
+                  <span v-if="loading" class="btn-spinner"></span>
+                  <span>{{ loading ? '解除中...' : '确认解除微信绑定' }}</span>
               </button>
           </div>
-          <button v-else class="submit-btn" @click="handleBind">
-            立即绑定
+          <button v-else class="submit-btn gap-2" :disabled="loading" @click="handleBind">
+             <span v-if="loading" class="btn-spinner"></span>
+             <span>立即绑定微信</span>
           </button>
         </div>
       </div>
     </div>
+
+    <!-- Confirm Modal for Unbind -->
+    <MobileConfirmModal
+      v-model:visible="showUnbindConfirm"
+      title="解除绑定"
+      content="解除绑定后将无法通过微信快速登录，确定要解绑吗？"
+      confirmText="确定解绑"
+      cancelText="取消"
+      type="danger"
+      @confirm="executeUnbind"
+    />
   </Teleport>
 </template>
 
@@ -54,7 +67,7 @@ import { ref, computed } from 'vue'
 import { Close, ChatDotRound } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { wechatLoginApi } from '@/api/client/wechat-login'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { useNotify } from '@/composables/useNotify'
 
 const props = defineProps<{
   visible: boolean
@@ -62,41 +75,33 @@ const props = defineProps<{
 
 const emit = defineEmits(['close'])
 const userStore = useUserStore()
+const { success, error, warning } = useNotify()
 const loading = ref(false)
+const showUnbindConfirm = ref(false)
 
 const isBound = computed(() => {
     return !!userStore.user?.openId
 })
 
-const handleUnbind = async () => {
+const handleUnbind = () => {
+    showUnbindConfirm.value = true
+}
+
+const executeUnbind = async () => {
+    showUnbindConfirm.value = false
+    loading.value = true
     try {
-        await ElMessageBox.confirm(
-            '解除绑定后将无法通过微信快速登录，确定要解绑吗？',
-            '解除绑定',
-            {
-                confirmButtonText: '确定解绑',
-                cancelButtonText: '取消',
-                type: 'warning',
-                customClass: 'mobile-msg-box',
-                center: true
-            }
-        )
-        
-        loading.value = true
         const res = await wechatLoginApi.unbindWechat()
         if (res.success) {
-            ElMessage.success('解除绑定成功')
+            success('解除绑定成功')
             await userStore.fetchUserInfo()
             // Don't close, allow user to bind new one immediately if they want
         } else {
-            ElMessage.error(res.msg || '解绑失败')
+            error(res.msg || '解绑失败')
         }
     } catch (e) {
-        // Cancelled or Error
-        if (e !== 'cancel') {
-             if (import.meta.dev) console.error(e)
-             ElMessage.error('操作失败')
-        }
+        if (import.meta.dev) console.error(e)
+        error('操作失败')
     } finally {
         loading.value = false
     }
@@ -106,7 +111,7 @@ const handleBind = () => {
     // Check if in WeChat browser (for Mobile)
     const isWechat = /MicroMessenger/i.test(navigator.userAgent)
     if (!isWechat) {
-        ElMessage.warning('请在微信内打开此页面进行绑定')
+        warning('请在微信内打开此页面进行绑定')
         return
     }
 
@@ -181,51 +186,5 @@ const handleClose = () => {
 }
 .unbind-btn {
     background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #F87171;
-}
-</style>
-
-<!-- Global styles for ElMessageBox dark theme (not scoped) -->
-<style>
-.mobile-msg-box {
-  width: 90% !important;
-  max-width: 320px !important;
-  background: rgba(30, 41, 59, 0.95) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 20px !important;
-  padding-bottom: 15px !important;
-}
-.mobile-msg-box .el-message-box__header {
-  padding-bottom: 8px !important;
-}
-.mobile-msg-box .el-message-box__title {
-  color: #fff !important;
-  font-size: 18px !important;
-}
-.mobile-msg-box .el-message-box__message p {
-  color: #CBD5E1 !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-}
-.mobile-msg-box .el-message-box__btns {
-  flex-direction: column-reverse;
-  gap: 10px;
-}
-.mobile-msg-box .el-button {
-  width: 100% !important;
-  margin: 0 !important;
-  height: 44px !important;
-  border-radius: 12px !important;
-  font-weight: 600 !important;
-}
-.mobile-msg-box .el-button--primary {
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
-  border: none !important;
-  color: #fff !important;
-}
-.mobile-msg-box .el-button--default {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #94A3B8 !important;
 }
 </style>

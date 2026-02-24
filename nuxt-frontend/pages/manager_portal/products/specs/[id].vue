@@ -85,7 +85,6 @@ definePageMeta({
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import AdminSkuEditor from '@/components/admin/SkuEditor.vue'
 import { useAdminSkuEditor } from '@/composables/admin/useAdminSkuEditor'
 
 const router = useRouter()

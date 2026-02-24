@@ -42,8 +42,7 @@
                    <div class="h-title">{{ goodsInfo.name || '加载中...' }}</div>
                    <div class="h-price-row">
                       <div class="price-wrap">
-                          <span class="cy">¥</span>
-                          <span class="val">{{ formatPrice(currentPrice) }}</span>
+                          <span class="val">{{ formatPrice(currentPrice) }}</span><span class="cy">点</span>
                       </div>
                       <div class="stock-tag" :class="{ 'no-stock': !hasStock }">
                           {{ hasStock ? `库存: ${stock}` : '暂时缺货' }}
@@ -52,7 +51,6 @@
                 </div>
              </div>
              
-             <!-- Detail Button (Top Right) -->
              <!-- Help Button (Top Right, Refined) -->
              <button class="help-btn" @click="showDetailViewer = true" v-if="!pending">
                 <el-icon class="h-icon"><QuestionFilled /></el-icon>
@@ -75,8 +73,6 @@
               </div>
 
               <template v-else>
-              <!-- FAQ Ticker -->
-              <!-- FAQ Ticker (Re-inserted) -->
               <!-- FAQ Ticker (Vertical Pill) -->
               <div class="faq-sticker-pill" v-if="faqs.length > 0" @click="goToHelp">
                  <div class="faq-pill-text-wrap">
@@ -92,7 +88,10 @@
               <!-- Specs -->
               <div class="specs-area" v-if="specGroups.length > 0">
                  <div v-for="group in specGroups" :key="group.name" class="spec-row">
-                    <div class="s-label">{{ group.name }}</div>
+                    <div class="s-label-cyber">
+                        <div class="neon-bar"></div>
+                        <span>{{ group.name }}</span>
+                    </div>
                     <div class="s-vals">
                        <div 
                          v-for="val in group.values" 
@@ -129,17 +128,20 @@
              <div class="action-capsule">
                  <!-- Favorite (20%) -->
                  <button class="cap-btn cap-favorite" @click="handleToggleFavorite" :class="{ active: isFavorited }">
-                    {{ isFavorited ? '已收藏' : '收藏' }}
+                    <el-icon class="fav-icon"><StarFilled v-if="isFavorited" /><Star v-else /></el-icon>
+                    <span>{{ isFavorited ? '已收藏' : '收藏' }}</span>
                  </button>
                  
                  <!-- Add to Cart (40%) -->
-                 <button class="cap-btn cap-cart" @click="addToCart" :disabled="!hasStock || pending || actionLoading">
-                    {{ actionLoading ? '处理中' : '加入购物车' }}
+                 <button class="cap-btn cap-cart gap-2" @click="addToCart" :disabled="!hasStock || pending || actionLoading">
+                    <span v-if="actionLoading" class="btn-spinner"></span>
+                    <span v-else>加入购物车</span>
                  </button>
                  
                  <!-- Buy Now (40%) -->
-                 <button class="cap-btn cap-buy" @click="buyNow" :disabled="!hasStock || pending || actionLoading">
-                    {{ actionLoading ? '处理中' : '立即购买' }}
+                 <button class="cap-btn cap-buy gap-2" @click="buyNow" :disabled="!hasStock || pending || actionLoading">
+                    <span v-if="actionLoading" class="btn-spinner"></span>
+                    <span v-else>立即购买</span>
                  </button>
              </div>
           </div>
@@ -240,7 +242,7 @@ const showDetailViewer = ref(false)
 // --- FAQ Ticker Logic (UI Only) ---
 const activeFaqIndex = ref(0)
 const isTransitioning = ref(true)
-let faqTimer: any = null
+let faqTimer: ReturnType<typeof setInterval> | null = null
 
 const displayFaqs = computed(() => {
     if (faqs.value.length === 0) return []
@@ -300,11 +302,10 @@ const addToCart = async () => {
             success('已加入购物车')
             handleClose()
         } else {
-            error(res.msg || '失败')
+            error(res.msg || '操作失败')
         }
-    } finally {
-        actionLoading.value = false
-    }
+    } catch(e: any) { error(e.message || '服务繁忙，请稍后再试') }
+    finally { actionLoading.value = false }
 }
 
 const buyNow = async () => {
@@ -323,11 +324,10 @@ const buyNow = async () => {
             handleClose()
             router.push(mobileRoutes.checkout(res.pre_order_id))
         } else {
-            error(res.error || '失败')
+            error(res.error || '操作失败')
         }
-    } finally {
-        actionLoading.value = false
-    }
+    } catch(e: any) { error(e.message || '服务繁忙，请稍后再试') }
+    finally { actionLoading.value = false }
 }
 
 const handleToggleFavorite = async () => {
@@ -370,15 +370,10 @@ watch(() => props.visible, async (val) => {
 
 .sheet-panel {
   position: fixed; bottom: 0; left: 0; width: 100%; 
-  /* Global Aurora Panel */
-  /* background: rgba(15, 23, 42, 0.9); */ 
-  
   z-index: 3051;
   padding-bottom: 0; /* Footer handles padding */
   max-height: 85vh;
   display: flex; flex-direction: column;
-  /* box-shadow: 0 -8px 30px rgba(0,0,0,0.5); */ /* Handled by aurora */
-  
   overflow: hidden;
 }
 
@@ -466,28 +461,96 @@ watch(() => props.visible, async (val) => {
 
 /* Specs */
 .specs-area { margin-bottom: 20px; }
-.spec-row { margin-bottom: 12px; }
-.s-label { font-size: 12px; color: #94A3B8; margin-bottom: 8px; }
+.spec-row { margin-bottom: 16px; }
+
+/* Cyberpunk Spec Header */
+.s-label-cyber { 
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 12px; 
+}
+.s-label-cyber .neon-bar {
+  width: 3px; height: 14px;
+  background: var(--cyber-primary, #38BDF8);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+.s-label-cyber span {
+  font-size: 13px; color: #E2E8F0; font-weight: 600; letter-spacing: 0.5px;
+}
+
+/* Glass/Neon Spec Chips */
 .s-vals { display: flex; flex-wrap: wrap; gap: 10px; }
 .val-chip {
-  padding: 6px 14px; background: rgba(255,255,255,0.05); border-radius: 8px;
-  font-size: 12px; color: #CBD5E1; border: 1px solid rgba(255,255,255,0.1);
-  transition: all 0.2s;
+  padding: 8px 16px; /* Larger hit area */
+  background: rgba(30, 41, 59, 0.6); /* Deeper glass */
+  border-radius: 10px;
+  font-size: 13px; color: #CBD5E1; 
+  border: 1px solid rgba(56, 189, 248, 0.15); /* Slight blue hint */
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 .val-chip.active {
-  background: rgba(249, 115, 22, 0.2); color: var(--accent); border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
+  background: rgba(14, 165, 233, 0.15); /* Deep Sky Blue base */
+  color: #fff; 
+  border-color: #0EA5E9; /* Neon Sky Blue Outline */
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.3), inset 0 0 8px rgba(14, 165, 233, 0.15);
+  font-weight: 600;
+  transform: scale(1.02);
+}
+
+/* Subtle Tech Accents - Cyber Brackets */
+.val-chip.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 12px;
+  background: #38BDF8; /* Brighter inner cyan */
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  box-shadow: 1px 0 4px rgba(56, 189, 248, 0.6);
+}
+.val-chip.active::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 12px;
+  background: #38BDF8;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+  box-shadow: -1px 0 4px rgba(56, 189, 248, 0.6);
 }
 
 /* SKU Intro */
 .sku-intro-box {
-   background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);
-   border-radius: 8px; padding: 10px; 
+   background: rgba(255, 255, 255, 0.05);  /* Ghost Glass */
+   border: 1px solid rgba(255, 255, 255, 0.1); 
+   backdrop-filter: blur(10px); 
+   -webkit-backdrop-filter: blur(10px);
+   border-radius: 16px; 
+   padding: 12px 16px; 
    display: flex; gap: 8px; align-items: flex-start; 
    margin-bottom: 20px;
 }
-.sku-intro-box .el-icon { color: #3B82F6; margin-top: 2px; }
-.sku-intro-box span { font-size: 12px; color: #60A5FA; line-height: 1.4; }
+.sku-intro-box .el-icon { 
+   color: #38BDF8; 
+   margin-top: 2px;
+   font-size: 15px; 
+}
+.sku-intro-box span { 
+   font-size: 13px; 
+   color: #38BDF8; 
+   font-weight: 500;
+   line-height: 1.5; 
+}
 
 /* Qty */
 .qty-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -539,18 +602,23 @@ watch(() => props.visible, async (val) => {
 /* Favorite: 20% width */
 .cap-favorite {
   flex: 0 0 22%;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(30, 41, 59, 0.4); /* 深色磨砂底 */
   color: #94A3B8;
-  font-size: 12px;
+  font-size: 11px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05); /* 微弱玻璃分割线 */
+  display: flex; flex-direction: column; gap: 2px;
 }
-.cap-favorite.active { color: #F59E0B; }
+.cap-favorite .fav-icon { font-size: 16px; margin-bottom: -2px; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+.cap-favorite.active { color: #F59E0B; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
+.cap-favorite.active .fav-icon { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6)); }
 
 /* Add to Cart: 39% width */
 .cap-cart {
   flex: 1;
-  background: rgba(56, 189, 248, 0.1);
-  color: #E2E8F0;
-  border-left: 1px solid rgba(255,255,255,0.05); /* subtle divider */
+  background: rgba(14, 165, 233, 0.1);
+  color: #0EA5E9; /* 天际蓝文字，充满极客感 */
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
 /* Buy Now: 39% width */
@@ -558,6 +626,10 @@ watch(() => props.visible, async (val) => {
   flex: 1;
   background: linear-gradient(135deg, var(--primary) 0%, #0c6a96 100%);
   color: #ffffff;
+  /* 增加内发光，模拟高级玻璃弧面 */
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2); 
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Detail Viewer Image Popup */

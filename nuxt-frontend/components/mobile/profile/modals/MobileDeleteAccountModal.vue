@@ -26,11 +26,13 @@
                     maxlength="6"
                 />
                 <button 
-                    class="code-btn" 
-                    :disabled="countdown > 0 || loading"
-                    @click="sendCode"
+                    class="code-btn gap-1" 
+                    style="display: flex; align-items: center; justify-content: center;"
+                    @click="handleSendCode" 
+                    :disabled="countdown > 0 || sendingCode || !isValidEmail"
                 >
-                    {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
+                    <span v-if="sendingCode" class="btn-spinner spinner-mini"></span>
+                    <span>{{ countdown > 0 ? `${countdown}s` : '发送验证码' }}</span>
                 </button>
             </div>
         </div>
@@ -44,8 +46,8 @@
       </div>
 
       <div class="modal-footer">
-          <button class="aurora-btn-danger" @click="handleDelete" :disabled="loading || !canSubmit">
-              <span v-if="loading" class="spinner"></span>
+          <button class="aurora-btn-danger gap-2" @click="handleDelete" :disabled="loading || !canSubmit">
+              <span v-if="loading" class="btn-spinner"></span>
               <span v-else>确认注销</span>
           </button>
       </div>
@@ -68,13 +70,18 @@ const props = defineProps<{
   visible: boolean
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'success'])
 const userStore = useUserStore()
 const router = useRouter()
 const { success, error } = useNotify()
 
 const isConfirmed = ref(false)
 const otpCode = ref('')
+
+const isValidEmail = computed(() => {
+    return userStore.user?.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userStore.user.email)
+})
+
 const {
   loading: codeLoading, 
   countdown, 
@@ -82,8 +89,21 @@ const {
   checkTimer 
 } = useSendCode({ timerKey: 'otp_security_timer' })
 
+const sendingCode = ref(false)
+
+const handleSendCode = async () => {
+    if (!isValidEmail.value) return
+    sendingCode.value = true
+    try {
+        await sendOtp(userStore.user?.email || '')
+    } finally {
+        sendingCode.value = false
+    }
+}
+
+const submitLoading = ref(false)
 const baseLoading = ref(false)
-const loading = computed(() => baseLoading.value || codeLoading.value)
+const loading = computed(() => submitLoading.value || baseLoading.value || codeLoading.value || sendingCode.value)
 
 const canSubmit = computed(() => {
     return isConfirmed.value && otpCode.value.length >= 4
@@ -236,10 +256,7 @@ const handleDelete = async () => {
 .modal-footer { display: flex; gap: 12px; }
 /* Handled by global aurora classes */
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Flex adjustments */
 .input-row .aurora-input { flex: 1; min-width: 0; }

@@ -125,8 +125,8 @@ const handleConfirm = async () => {
         ElMessage.error(res.msg || '修改失败')
       }
     } catch (e: any) {
-      console.error(e)
-      ElMessage.error(e.message || '操作失败')
+      if (import.meta.dev) console.error(e)
+      ElMessage.error(e.message || '头像更新失败')
     } finally {
       loading.value = false
     }

@@ -21,8 +21,8 @@
               :disabled="redeeming"
              />
            </div>
-           <button class="redeem-btn" @click="handleRedeem" :disabled="!redeemCode || redeeming">
-             <div v-if="redeeming" class="spinner-sm"></div>
+           <button class="redeem-btn gap-2" @click="handleRedeem" :disabled="!redeemCode || redeeming">
+             <span v-if="redeeming" class="btn-spinner"></span>
              <span v-else>兑换</span>
            </button>
         </div>
@@ -195,7 +195,8 @@ const handleRedeem = async () => {
           showToast(res.msg || '兑换失败', 'error')
       }
    } catch(e) {
-      showToast('网络请求失败', 'error')
+      if (import.meta.dev) console.error(e)
+      showToast('服务繁忙，请稍后再试', 'error')
    } finally {
       redeeming.value = false
    }
@@ -375,11 +376,7 @@ const getExpiryText = (dateStr?: string) => {
     font-size: 12px; color: #64748B; margin: 0; position: relative; z-index: 1;
 }
 
-.spinner-sm {
-    width: 20px; height: 20px; 
-    border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-}
+
 
 /* History Header */
 .section-header {
@@ -410,5 +407,5 @@ const getExpiryText = (dateStr?: string) => {
     font-size: 32px; color: #475569; margin-bottom: 16px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+
 </style>

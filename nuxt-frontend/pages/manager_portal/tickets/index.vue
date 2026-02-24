@@ -113,12 +113,9 @@ definePageMeta({
 import { ref, onMounted } from 'vue'
 import AdminModuleLayout from '@/components/admin/base/AdminModuleLayout.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
 import { useAdminTicketList } from '@/composables/admin/useAdminTicketList'
 import { Delete } from '@element-plus/icons-vue'
-import TicketChatModal from './components/TicketChatModal.vue'
-
 import { useClipboard } from '@vueuse/core'
 
 // Use standard composable + Common Config helpers

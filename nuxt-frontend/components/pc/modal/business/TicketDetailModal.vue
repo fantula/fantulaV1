@@ -143,7 +143,7 @@ const loadData = async () => {
             }
         }
     } catch (e) {
-        console.error(e)
+        if (import.meta.dev) console.error(e)
     } finally {
         loading.value = false
     }

@@ -60,8 +60,8 @@
     <!-- 登录注册弹窗 -->
     <LoginRegisterModal :visible="showLoginModal" @close="closeLoginModal" />
     
-    <!-- 联系我们弹窗 -->
-    <ServiceModal v-if="showContactModal" @close="closeContactModal" />
+    <!-- 联系我们弹窗 (Global State Controlled) -->
+    <ServiceModal v-if="modalStore.showContact" @close="modalStore.closeContact()" />
   </footer>
 </template>
 
@@ -70,12 +70,13 @@ import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/client/user'
 import LoginRegisterModal from '@/components/pc/modal/LoginRegisterModal.vue'
 import ServiceModal from '@/components/pc/modal/ServiceModal.vue'
+import { useModalStore } from '@/stores/client/modal'
 import { pcRoutes } from '@/config/client-routes'
 import { ChatDotRound, Platform, Bell, VideoPlay } from '@element-plus/icons-vue'
 
 const showLoginModal = ref(false)
-const showContactModal = ref(false)
 const userStore = useUserStore()
+const modalStore = useModalStore()
 
 // --- Data Structures ---
 
@@ -149,7 +150,7 @@ function handleItemClick(item: FooterItem) {
 
   // 2. Handle Custom Actions
   if (item.action === 'contact') {
-    showContactModal.value = true
+    modalStore.openContact()
     return
   }
 
@@ -157,10 +158,6 @@ function handleItemClick(item: FooterItem) {
   if (item.path) {
     navigateTo(item.path)
   }
-}
-
-function closeContactModal() {
-  showContactModal.value = false
 }
 
 function closeLoginModal() {

@@ -1,12 +1,13 @@
 <template>
-  <AdminModuleLayout
-    :title="'订单管理'"
-    :tabs="tabs"
-    default-tab="recharge"
-    :hide-tabs-on="['/post', '/detail']"
-  >
-    <router-view />
-  </AdminModuleLayout>
+    <!-- Use AdminModuleLayout for consistent spacing and titles across tabs -->
+    <AdminModuleLayout
+        title="订单管理"
+        :tabs="tabs"
+        :active-tab="activeTab"
+        @update:active-tab="handleTabChange"
+    >
+        <NuxtPage />
+    </AdminModuleLayout>
 </template>
 
 <script setup lang="ts">

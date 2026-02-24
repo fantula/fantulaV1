@@ -55,8 +55,9 @@
                          <span>同意 <NuxtLink :to="mobileRoutes.policy()" class="link">用户协议</NuxtLink> 和 <NuxtLink :to="mobileRoutes.privacy()" class="link">隐私政策</NuxtLink></span>
                       </label>
                   </div>
-                  <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !loginForm.agree">
-                     {{ loading ? '登录中...' : '立即登录' }}
+                  <button class="submit-btn aurora-btn-primary gap-2" type="submit" :disabled="loading || !loginForm.agree">
+                     <span v-if="loading" class="btn-spinner"></span>
+                     <span>{{ loading ? '登录中...' : '立即登录' }}</span>
                   </button>
                </form>
 
@@ -78,8 +79,9 @@
                          <span>同意 <NuxtLink :to="mobileRoutes.policy()" class="link">用户协议</NuxtLink> 和 <NuxtLink :to="mobileRoutes.privacy()" class="link">隐私政策</NuxtLink></span>
                       </label>
                   </div>
-                  <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !loginCodeForm.agree">
-                     {{ loading ? '登录中...' : '立即登录' }}
+                  <button class="submit-btn aurora-btn-primary gap-2" type="submit" :disabled="loading || !loginCodeForm.agree">
+                     <span v-if="loading" class="btn-spinner"></span>
+                     <span>{{ loading ? '登录中...' : '立即登录' }}</span>
                   </button>
                </form>
             </div>
@@ -110,8 +112,9 @@
                          <span>同意 <NuxtLink :to="mobileRoutes.policy()" class="link">用户协议</NuxtLink> 和 <NuxtLink :to="mobileRoutes.privacy()" class="link">隐私政策</NuxtLink></span>
                       </label>
                   </div>
-                  <button class="submit-btn aurora-btn-primary" type="submit" :disabled="loading || !registerForm.agree">
-                     {{ loading ? '注册中...' : '立即注册' }}
+                  <button class="submit-btn aurora-btn-primary gap-2" type="submit" :disabled="loading || !registerForm.agree">
+                     <span v-if="loading" class="btn-spinner"></span>
+                     <span>{{ loading ? '注册中...' : '立即注册' }}</span>
                   </button>
                </form>
             </div>
@@ -240,7 +243,7 @@ const onRegister = async () => {
         const res = await authApi.registerWithCodeAndPassword(registerForm.value)
         if (res.success) await handleSuccess(res.data)
         else error(res.msg || '注册失败')
-    } catch(e: any) { error(e.message || '注册异常') }
+    } catch(e: any) { error(e.message || '服务繁忙，请稍后再试') }
     finally { baseLoading.value = false }
 }
 
@@ -355,7 +358,6 @@ const onWechatLogin = () => {
    but cleaner to delete specific styles and rely on global class in template. 
    We will update the template class usage. */
 .submit-btn {
-   /* Legacy Mapping to check if we missed anything (Empty) */
 }
 
 
@@ -387,15 +389,7 @@ const onWechatLogin = () => {
 .wechat-btn:active { transform: scale(0.98); }
 .wechat-btn:disabled { opacity: 0.75; transform: none; }
 
-.btn-spinner {
-   width: 18px; height: 18px;
-   border: 2px solid rgba(255,255,255,0.3);
-   border-top-color: #fff;
-   border-radius: 50%;
-   animation: spin 0.7s linear infinite;
-   display: inline-block; flex-shrink: 0;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Transitions */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }

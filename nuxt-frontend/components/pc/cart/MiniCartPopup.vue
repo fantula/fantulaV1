@@ -22,7 +22,7 @@
         <template v-if="cartItem">
            <div class="mc-product-card">
              <div class="mc-img-wrap">
-               <img :src="cartItem.productImage || '/images/placeholder.png'" alt="Product" />
+               <img :src="cartItem.productImage || '/images/shared/logo_v2.png'" alt="Product" />
              </div>
              <div class="mc-details">
                <div class="mc-name">{{ cartItem.productName }}</div>

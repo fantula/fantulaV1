@@ -45,8 +45,8 @@
                 />
             </div>
 
-            <button class="aurora-btn-primary" type="submit" :disabled="loading || !canSubmit">
-                <div v-if="loading" class="spinner"></div>
+            <button class="aurora-btn-primary gap-2" type="submit" :disabled="loading || !canSubmit">
+                <span v-if="loading" class="btn-spinner"></span>
                 <span v-else>重置密码</span>
             </button>
          </form>
@@ -211,10 +211,7 @@ const handleSubmit = async () => {
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 .full-width { width: 100%; }
 
-.spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 /* Flex adjustments for input-row with aurora-input */
 .input-row .aurora-input { flex: 1; min-width: 0; }

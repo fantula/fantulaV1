@@ -457,13 +457,7 @@ const reset = () => {
 .btn-ghost-reset:active { background: rgba(255,255,255,0.1); }
 
 /* Animations */
-.spinner-sm {
-    width: 20px; height: 20px;
-    border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 .fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.3s ease; }
 .fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(-10px); }

@@ -2,7 +2,7 @@
   <div class="member-card" @click="$emit('click')">
     <div class="card-content">
       <div class="avatar-wrap">
-        <img :src="user?.avatar || DEFAULT_AVATAR" class="avatar-img" />
+        <img :src="user?.avatar || DEFAULT_AVATAR" class="avatar-img" loading="lazy" decoding="async" />
       </div>
       <div class="user-details">
         <h1 class="username">{{ user?.nickname || 'FANTULA User' }}</h1>

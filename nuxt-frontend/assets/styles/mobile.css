@@ -644,3 +644,76 @@ body {
   background: rgba(255, 255, 255, 0.15);
   transform: rotate(90deg);
 }
+
+/* =========================================
+   7. Universal Inline Spinners
+   ========================================= */
+/* Base Shared Animation & Color */
+.spinner,
+.spinner-sm,
+.spinner-mini,
+.spinner-premium,
+.btn-spinner {
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  /* Universal faint ring, slightly thicker */
+  border-top-color: var(--color-brand-primary, #38BDF8);
+  /* Tech Blue Default */
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  /* Speed boost to 0.6s */
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Orange Variant */
+.spinner.spinner-orange,
+.spinner-sm.spinner-orange,
+.spinner-mini.spinner-orange,
+.spinner-premium.spinner-orange,
+.btn-spinner.spinner-orange {
+  border-top-color: var(--color-accent, #F97316);
+  /* Brand Orange */
+}
+
+/* Base Spinner (24px) -> slightly larger line */
+.spinner {
+  width: 24px;
+  height: 24px;
+}
+
+/* Small Spinner (18px) -> Enlarge slightly to 20px for better visibility */
+.spinner-sm {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mini Spinner (14px) -> Enlarge slightly */
+.spinner-mini {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+/* Premium/Large (32px) -> Enlarge to 36px, thicker line */
+.spinner-premium {
+  width: 36px;
+  height: 36px;
+  border-width: 4px;
+}
+
+/* Button Inner (18px) -> Enlarge slightly to 20px to match text height better */
+.btn-spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 3px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

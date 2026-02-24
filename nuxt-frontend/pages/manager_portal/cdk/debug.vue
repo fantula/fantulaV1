@@ -42,9 +42,14 @@ const typeMap = { 'virtual': 'virtual', 'shared': 'shared_account', 'one_time': 
 const targetType = computed(() => route.query.type ? typeMap[route.query.type] : 'N/A')
 
 onMounted(async () => {
-    const res = await adminProductApi.getProducts()
-    if (import.meta.dev) console.log('Raw Products:', res.products)
-    products.value = res.products
-    loading.value = false
+    try {
+        const res = await adminProductApi.getProducts()
+        if (import.meta.dev) console.log('Raw Products:', res.products)
+        products.value = res.products
+    } catch (e) {
+        if (import.meta.dev) console.error(e)
+    } finally {
+        loading.value = false
+    }
 })
 </script>

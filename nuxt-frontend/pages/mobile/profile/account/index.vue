@@ -13,7 +13,7 @@
                     <span class="label">头像</span>
                 </div>
                 <div class="right">
-                    <img :src="userStore.user?.avatar || DEFAULT_AVATAR" class="avatar-img" @error="handleImageError" />
+                    <img :src="userStore.user?.avatar || DEFAULT_AVATAR" class="avatar-img" @error="handleImageError" loading="lazy" decoding="async" />
                     <el-icon class="arrow"><ArrowRight /></el-icon>
                 </div>
             </div>
@@ -75,19 +75,15 @@
            </div>
        </div>
 
-       <!-- Group 3: Danger Zone -->
-       <div class="setting-container">
-           <div class="setting-item" @click="activeModal = 'delete'">
-              <span class="label text-danger">注销账号</span>
-              <div class="value-wrap">
-                 <el-icon class="arrow"><ArrowRight /></el-icon>
-              </div>
-           </div>
-       </div>
-
        <!-- Actions -->
        <div class="action-group">
-          <button class="logout-btn" @click="handleLogout">退出登录</button>
+          <!-- 退出登录 (Logout/Safe) -->
+          <button class="logout-btn-safe" @click="handleLogout">退出登录</button>
+          
+          <div class="danger-zone-spacer"></div>
+
+          <!-- 注销账号 (Delete Account/Ghost Danger) -->
+          <button class="delete-account-ghost" @click="activeModal = 'delete'">注销账号 (危险操作)</button>
        </div>
     </div>
 
@@ -143,7 +139,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowRight, DocumentCopy } from '@element-plus/icons-vue'
-import { mobileRoutes } from '~/config/client-routes'
+import { mobileRoutes } from '@/config/client-routes'
 import { useUserStore } from '@/stores/client/user'
 import { authApi } from '@/api/client/auth'
 import { useNotify } from '@/composables/useNotify'
@@ -182,13 +178,13 @@ const handleLogout = () => {
 const handleLogoutConfirm = async () => {
     loading.value = true
     try {
-        await authApi.logout()
+        await userStore.logout()
     } catch (e) {
-        if (import.meta.dev) console.error('Logout API failed:', e)
+        if (import.meta.dev) console.error('Logout failed:', e)
     } finally {
-        userStore.logout()
-        router.replace(mobileRoutes.home())
+        activeModal.value = null
         loading.value = false
+        router.replace(mobileRoutes.home())
     }
 }
 
@@ -261,7 +257,7 @@ const handleImageError = (e: Event) => {
 }
 
 .value { font-size: 14px; color: #94A3B8; }
-.value-wrap { display: flex; align-items: center; gap: 10px; } /* Keep for legacy if needed or remove */
+.value-wrap { display: flex; align-items: center; gap: 10px; }
 .text-val { font-size: 14px; color: #94A3B8; }
 .text-val.muted { color: #64748B; }
 .text-val.success { color: #10B981; } /* Green */
@@ -282,22 +278,40 @@ const handleImageError = (e: Event) => {
 
 .copy-hint { font-size: 10px; color: var(--cyber-primary); margin-left: 4px; opacity: 0.8; }
 
-.action-group { margin-top: 30px; }
+.action-group { margin-top: 30px; display: flex; flex-direction: column; }
 
-.logout-btn {
+/* 退出登录: 安全中性样式 */
+.logout-btn-safe {
     width: 100%; height: 50px;
-    background: rgba(239, 68, 68, 0.05);
-    color: #F87171; 
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: #E2E8F0; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     font-size: 16px; font-weight: 600;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
     transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
 }
-.logout-btn:active { 
-    background: rgba(239, 68, 68, 0.15); 
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
-    border-color: #F87171;
+.logout-btn-safe:active { 
+    background: rgba(255, 255, 255, 0.1); 
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.danger-zone-spacer { height: 50px; }
+
+/* 注销账号: 弱视觉危险警告样式 */
+.delete-account-ghost {
+    width: 100%; height: 44px;
+    background: transparent;
+    color: #F87171; 
+    border: 1px dashed rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.delete-account-ghost:active { 
+    background: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.6);
 }
 
 .text-danger { color: #F87171; text-shadow: 0 0 5px rgba(248, 113, 113, 0.3); }

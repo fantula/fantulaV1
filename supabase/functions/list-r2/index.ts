@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-import { getR2Config, hmacSha256, sha256, toHex, getSignatureKey } from "../_shared/r2-utils.ts"
+import { getR2Config, sha256, generateR2AuthHeaders } from "../_shared/r2-utils.ts"
 
 /**
  * list-r2 Edge Function
@@ -32,10 +32,6 @@ async function listR2Objects(
     const endpoint = `https://${accountId}.r2.cloudflarestorage.com`
     const method = 'GET'
 
-    const now = new Date()
-    const amzDate = now.toISOString().replace(/[:-]|\.\\d{3}/g, '')
-    const dateStamp = amzDate.slice(0, 8)
-
     const queryParams = new URLSearchParams({
         'list-type': '2',
         'max-keys': '1000'
@@ -48,36 +44,14 @@ async function listR2Objects(
     const canonicalUri = `/${bucketName}`
     const payloadHash = await sha256('')
 
-    const canonicalHeaders =
-        `host:${accountId}.r2.cloudflarestorage.com\n` +
-        `x-amz-content-sha256:${payloadHash}\n` +
-        `x-amz-date:${amzDate}\n`
-
-    const signedHeaders = 'host;x-amz-content-sha256;x-amz-date'
-
-    const canonicalRequest =
-        `${method}\n` +
-        `${canonicalUri}\n` +
-        `${canonicalQueryString}\n` +
-        `${canonicalHeaders}\n` +
-        `${signedHeaders}\n` +
-        `${payloadHash}`
-
-    const algorithm = 'AWS4-HMAC-SHA256'
-    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`
-    const stringToSign =
-        `${algorithm}\n` +
-        `${amzDate}\n` +
-        `${credentialScope}\n` +
-        `${await sha256(canonicalRequest)}`
-
-    const signingKey = await getSignatureKey(secretAccessKey, dateStamp, region, service)
-    const signature = toHex(await hmacSha256(signingKey, stringToSign))
-
-    const authorization =
-        `${algorithm} Credential=${accessKeyId}/${credentialScope}, ` +
-        `SignedHeaders=${signedHeaders}, ` +
-        `Signature=${signature}`
+    const { authorization, amzDate } = await generateR2AuthHeaders(
+        method,
+        bucketName,
+        canonicalUri,
+        canonicalQueryString,
+        payloadHash,
+        { accountId, accessKeyId, secretAccessKey, bucketName, publicBaseUrl: '' }
+    )
 
     const url = `${endpoint}/${bucketName}?${canonicalQueryString}`
     const response = await fetch(url, {

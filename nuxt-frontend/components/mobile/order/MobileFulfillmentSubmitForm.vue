@@ -48,20 +48,22 @@
     <div class="form-actions">
         <button 
            v-if="!latestStatus || latestStatus === 'rejected'" 
-           class="action-btn primary" 
+           class="action-btn primary gap-2" 
            :disabled="isSubmitting"
            @click="handleInsert"
         >
-           {{ isSubmitting ? '提交中...' : (latestStatus === 'rejected' ? '重新提交' : '提交回执') }}
+           <span v-if="isSubmitting" class="btn-spinner"></span>
+           <span>{{ isSubmitting ? '提交中...' : (latestStatus === 'rejected' ? '重新提交' : '提交回执') }}</span>
         </button>
 
         <button 
            v-if="latestStatus === 'submitted'" 
-           class="action-btn secondary" 
+           class="action-btn secondary gap-2" 
            :disabled="isSubmitting"
            @click="handleUpdate"
         >
-           {{ isSubmitting ? '保存中...' : '修改信息' }}
+           <span v-if="isSubmitting" class="btn-spinner"></span>
+           <span>{{ isSubmitting ? '保存中...' : '修改信息' }}</span>
         </button>
         
         <button 

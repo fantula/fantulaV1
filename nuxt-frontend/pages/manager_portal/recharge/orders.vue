@@ -110,8 +110,6 @@ import { Search, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { adminRechargeApi, type RechargeOrder } from '@/api/admin/recharge'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-
 // --- State ---
 const loading = ref(false)
 const orders = ref<RechargeOrder[]>([])

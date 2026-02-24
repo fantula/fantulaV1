@@ -1,6 +1,4 @@
 
-import { useState, useNuxtApp } from '#app'
-
 export interface ContactConfig {
     wechat_id: string
     wechat_qr: string
@@ -12,9 +10,10 @@ export interface ContactConfig {
 export const useSystemConfig = () => {
     const contactConfig = useState<ContactConfig | null>('contact-config', () => null)
 
-    // Fetch contact config
+    // Fetch contact config (cached locally per session/request)
     const fetchContactConfig = async () => {
-        if (contactConfig.value) return contactConfig.value // Return cached if exists
+        // Return immediately if data exists
+        if (contactConfig.value) return contactConfig.value
 
         try {
             const { data, success } = await $fetch('/api/client/config/contact')
@@ -22,7 +21,7 @@ export const useSystemConfig = () => {
                 contactConfig.value = data
             }
         } catch (e) {
-            console.error('Failed to fetch contact config', e)
+            if (import.meta.dev) console.error('Failed to fetch contact config', e)
         }
         return contactConfig.value
     }

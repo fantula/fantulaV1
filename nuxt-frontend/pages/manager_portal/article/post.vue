@@ -117,8 +117,6 @@ import { ElMessage } from 'element-plus'
 import { adminRoute } from '@/config/admin-routes'
 import { adminCommunityApi, communityApi, type Category } from '@/api/client/community'
 // Explicitly import AdminImagePicker
-import AdminImagePicker from '@/components/admin/AdminImagePicker.vue'
-
 const router = useRouter()
 const route = useRoute()
 const formRef = ref()

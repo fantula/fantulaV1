@@ -39,7 +39,7 @@ export function useAdminOrderList(orderType: 'virtual' | 'shared_account' | 'one
             total.value = totalCount
 
         } catch (e) {
-            console.error('加载订单失败:', e)
+            if (import.meta.dev) console.error('加载订单失败:', e)
             ElMessage.error('系统异常')
         } finally {
             loading.value = false
@@ -70,12 +70,11 @@ export function useAdminOrderList(orderType: 'virtual' | 'shared_account' | 'one
         ElMessage.success('已复制')
     }
 
-    // 工具函数：格式化规格
     function formatSpec(spec: any): string {
         if (!spec) return '-'
         if (typeof spec === 'string') return spec
         if (typeof spec === 'object') {
-            return Object.entries(spec).map(([k, v]) => `${k}: ${v}`).join(' / ')
+            return Object.values(spec).join(' / ')
         }
         return '-'
     }

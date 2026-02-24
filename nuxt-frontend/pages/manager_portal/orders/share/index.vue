@@ -26,20 +26,19 @@
       <!-- 用户ID+头像 -->
       <el-table-column label="用户" min-width="140">
         <template #default="{ row }">
-          <div class="user-cell">
-            <el-avatar :size="28" :src="row._profile?.avatar || DEFAULT_AVATAR" />
-            <span class="uid-text">{{ row._profile?.uid || '无UID' }}</span>
-          </div>
+          <AdminUserCell :user="row._profile" :uid="row._profile?.uid" />
         </template>
       </el-table-column>
 
       <!-- 商品名称+头图 -->
       <el-table-column label="商品" min-width="200">
         <template #default="{ row }">
-          <div class="product-cell">
-            <img v-if="row.product_snapshot?.image" :src="row.product_snapshot.image" class="product-thumb" />
-            <span>{{ row.product_snapshot?.product_name || '未知商品' }}</span>
-          </div>
+          <ProductThumbCell 
+            :image="row.product_snapshot?.image" 
+            :name="row.product_snapshot?.product_name || '未知商品'" 
+            :id="row.product_id"
+            :truncate-id="true"
+          />
         </template>
       </el-table-column>
 
@@ -77,7 +76,7 @@
       <!-- 状态 -->
       <el-table-column label="状态" width="90">
         <template #default="{ row }">
-          <el-tag :type="getStatusType(row.status)" size="small">{{ getStatusText(row.status) }}</el-tag>
+          <el-tag :type="getStatusType(row.status) || 'info'" size="small">{{ getStatusText(row.status) }}</el-tag>
         </template>
       </el-table-column>
 
@@ -117,9 +116,8 @@
 import { watch, ref } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
-import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
-import OrderDetailDialog from '@/components/admin/order/OrderDetailDialog.vue'
+import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
+import ProductThumbCell from '@/components/admin/base/ProductThumbCell.vue'
 import { useAdminOrderList } from '@/composables/admin/useAdminOrderList'
 
 definePageMeta({
@@ -155,10 +153,6 @@ watch([page, pageSize], () => loadList(), { immediate: true })
 .page-container { display: flex; flex-direction: column; gap: 16px; }
 .mono-text { font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; color: #94a3b8; cursor: pointer; }
 .mono-text:hover { color: #60a5fa; }
-.user-cell { display: flex; align-items: center; gap: 8px; }
-.uid-text { font-size: 12px; color: #94a3b8; font-family: 'Monaco', monospace; }
-.product-cell { display: flex; align-items: center; gap: 8px; }
-.product-thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; background: #1e293b; }
 .spec-text { font-size: 12px; color: #94a3b8; }
 .amount { font-weight: 600; color: #22c55e; }
 .discount { font-size: 12px; color: #f59e0b; }

@@ -23,7 +23,7 @@ export function useAdminContactConfig() {
             } else {
                 // FALLBACK: Use static assets if DB is empty or fails (e.g. Schema Cache issue)
                 // This ensures the UI looks correct immediately for the user.
-                console.warn('Using static defaults due to DB missing/error', res.error)
+                if (import.meta.dev) console.warn('Using static defaults due to DB missing/error', res.error)
                 form.value = {
                     wechat_id: 'Spotify-cn',
                     wechat_qr: '/images/contact/wechat_qr.jpg',

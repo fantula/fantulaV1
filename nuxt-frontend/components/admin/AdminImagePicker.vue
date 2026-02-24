@@ -13,7 +13,7 @@
         <div
           class="picker-cat-item"
           :class="{ active: activeCategoryId === '' }"
-          @click="activeCategoryId = ''; fetchImages()"
+          @click="selectCategory('')"
         >
           <el-icon><Picture /></el-icon> 全部图片
         </div>
@@ -22,7 +22,7 @@
           :key="cat.id"
           class="picker-cat-item"
           :class="{ active: activeCategoryId === cat.id }"
-          @click="activeCategoryId = cat.id; fetchImages()"
+          @click="selectCategory(cat.id)"
         >
           <el-icon><Folder /></el-icon> {{ cat.name }}
         </div>
@@ -37,14 +37,27 @@
             placeholder="搜索图片名称..."
             clearable
             style="width: 220px;"
-            @input="fetchImages"
-            @clear="fetchImages"
+            @keyup.enter="handleSearch"
+            @clear="handleSearch"
           >
             <template #prefix><el-icon><Search /></el-icon></template>
           </el-input>
+          <!-- 快捷上传 -->
+          <el-upload
+            class="inline-uploader"
+            action="#"
+            :show-file-list="false"
+            :http-request="handleInlineUpload"
+            :accept="'image/jpeg,image/png,image/webp,image/gif'"
+          >
+            <el-button type="primary" plain :loading="uploading" :icon="Upload">
+              上传图片
+            </el-button>
+          </el-upload>
+          <span style="flex: 1;"></span>
           <span class="picker-tip">
             <el-icon><InfoFilled /></el-icon>
-            如需上传图片，请前往「图片库」管理
+            双击图片可快捷选择
           </span>
         </div>
 
@@ -56,6 +69,7 @@
             class="picker-img-card"
             :class="{ selected: tempSelected?.id === img.id }"
             @click="tempSelected = img"
+            @dblclick="handleDoubleClick(img)"
           >
             <el-image :src="img.url" fit="cover" class="picker-img" lazy />
             <div class="picker-img-name" :title="img.name">{{ img.name }}</div>
@@ -63,7 +77,21 @@
               <el-icon><Check /></el-icon>
             </div>
           </div>
-          <el-empty v-if="images.length === 0 && !loading" description="暂无图片，请先去图片库上传" />
+          <el-empty v-if="images.length === 0 && !loading" description="暂无图片" />
+        </div>
+
+        <!-- 分页栏 -->
+        <div class="picker-pagination" v-if="total > 0">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :total="total"
+            layout="total, prev, pager, next"
+            background
+            size="small"
+            hide-on-single-page
+            @current-change="fetchImages"
+          />
         </div>
       </div>
     </div>
@@ -79,7 +107,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Picture, Folder, Search, Check, InfoFilled } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { Picture, Folder, Search, Check, InfoFilled, Upload } from '@element-plus/icons-vue'
 import { adminImageApi, adminImageCategoryApi, type AdminImage, type AdminImageCategory } from '@/api/admin/media'
 
 const props = defineProps<{
@@ -99,10 +128,18 @@ const activeCategoryId = ref('')
 const keyword = ref('')
 const tempSelected = ref<AdminImage | null>(null)
 
+// 优化状态
+const uploading = ref(false)
+const currentPage = ref(1)
+const pageSize = ref(30)
+const total = ref(0)
+
 watch(() => props.modelValue, (val) => {
   visible.value = val
   if (val) {
     tempSelected.value = null
+    currentPage.value = 1
+    keyword.value = ''
     loadCategories()
     fetchImages()
   }
@@ -114,18 +151,100 @@ watch(visible, (val) => {
 
 const loadCategories = async () => {
   if (categories.value.length > 0) return // 缓存，避免重复请求
-  const res = await adminImageCategoryApi.getCategories()
-  if (res.success) categories.value = res.categories
+  try {
+    const res = await adminImageCategoryApi.getCategories()
+    if (res.success) categories.value = res.categories
+  } catch (e: any) {
+    if (import.meta.dev) console.error(e)
+    ElMessage.error(e.message || '获取分类失败')
+  }
+}
+
+const selectCategory = (id: string) => {
+  if (activeCategoryId.value === id) return
+  activeCategoryId.value = id
+  currentPage.value = 1
+  fetchImages()
+}
+
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchImages()
 }
 
 const fetchImages = async () => {
   loading.value = true
-  const res = await adminImageApi.getImages({
-    category_id: activeCategoryId.value || undefined,
-    keyword: keyword.value || undefined
-  })
-  if (res.success) images.value = res.images
-  loading.value = false
+  try {
+    const res = await adminImageApi.getImages({
+      category_id: activeCategoryId.value || undefined,
+      keyword: keyword.value || undefined,
+      page: currentPage.value,
+      pageSize: pageSize.value
+    })
+    if (res.success) {
+      images.value = res.images
+      total.value = res.total || 0
+    }
+  } catch (e: any) {
+    if (import.meta.dev) console.error(e)
+    ElMessage.error(e.message || '获取图片失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleInlineUpload = async (options: any) => {
+  uploading.value = true
+  try {
+    const { getAuthToken } = await import('@/utils/supabase')
+    const token = await getAuthToken()
+    if (!token) throw new Error('未授权，请重新登录')
+
+    // 智能选择上传目录：如果当前选中了某分类则用其slug，否则存入 others
+    let folder = 'others'
+    if (activeCategoryId.value) {
+      const cat = categories.value.find(c => c.id === activeCategoryId.value)
+      if (cat?.slug) folder = cat.slug
+    }
+
+    const { uploadImageToStorage } = await import('@/utils/uploadImage')
+    const uploadRes = await uploadImageToStorage(options.file, folder, undefined, token)
+    
+    if (!uploadRes.success) throw new Error(uploadRes.error)
+
+    const res = await adminImageApi.createImage({
+      name: options.file.name,
+      url: uploadRes.url!,
+      category_id: activeCategoryId.value || undefined
+    })
+
+    if (res.success && res.image) {
+      ElMessage.success('图片上传成功')
+      
+      // 刷新列表并回到第一页
+      currentPage.value = 1
+      await fetchImages()
+      
+      // 自动选中刚刚上传的图片，实现"传完即用"的平滑体验
+      const newlyUploaded = images.value.find(img => img.id === res.image!.id) || res.image
+      tempSelected.value = newlyUploaded
+      
+      options.onSuccess(res)
+    } else {
+      throw new Error(res.error || '创建图片记录失败')
+    }
+  } catch (e: any) {
+    if (import.meta.dev) console.error('Upload Error:', e)
+    ElMessage.error('上传出错: ' + (e.message || '未知错误'))
+    options.onError(e)
+  } finally {
+    uploading.value = false
+  }
+}
+
+const handleDoubleClick = (img: AdminImage) => {
+  tempSelected.value = img
+  confirmSelect()
 }
 
 const confirmSelect = () => {
@@ -209,6 +328,7 @@ const confirmSelect = () => {
 .picker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  align-content: start;
   gap: 12px;
   overflow-y: auto;
   flex: 1;
@@ -223,6 +343,7 @@ const confirmSelect = () => {
   position: relative;
   background: var(--el-fill-color-extra-light);
   transition: all 0.2s;
+  user-select: none;
 }
 .picker-img-card:hover {
   border-color: var(--el-color-primary-light-5);
@@ -264,5 +385,13 @@ const confirmSelect = () => {
   align-items: center;
   justify-content: center;
   font-size: 12px;
+}
+
+/* 分页区 */
+.picker-pagination {
+  padding: 12px 0 0 0;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px dashed var(--el-border-color-lighter);
 }
 </style>

@@ -3,7 +3,7 @@
     <!-- Top Row: Logo & Actions -->
     <div class="header-top">
 <div class="logo-area">
-         <img src="/images/shared/logo_v3.png" class="logo-img" alt="FANTULA" />
+         <img src="/images/shared/logo_v3.png" class="logo-img" alt="FANTULA" loading="lazy" decoding="async" />
          <span class="site-name">凡图拉</span>
       </div>
       
@@ -53,6 +53,7 @@
                       <img 
                         :src="userStore.user?.avatar || DEFAULT_AVATAR" 
                         @error="(e) => (e.target as HTMLImageElement).src = DEFAULT_AVATAR"
+                        loading="lazy" decoding="async"
                       />
                       <div class="avatar-ring"></div>
                   </template>
@@ -69,7 +70,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/client/user'
 import { useCartStore } from '@/stores/client/cart'
-import { mobileRoutes } from '~/config/client-routes'
+import { mobileRoutes } from '@/config/client-routes'
 import { ShoppingCart, User, Star } from '@element-plus/icons-vue'
 import MobileMiniCart from '@/components/mobile/cart/MobileMiniCart.vue'
 import { DEFAULT_AVATAR } from '@/utils/constants'

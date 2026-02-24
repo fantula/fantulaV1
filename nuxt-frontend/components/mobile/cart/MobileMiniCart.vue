@@ -16,14 +16,14 @@
         <template v-if="cartItem">
            <div class="mc-product-card">
              <div class="mc-img-wrap">
-               <img :src="cartItem.productImage || '/images/placeholder.png'" />
+               <img :src="cartItem.productImage || '/images/shared/logo_v2.png'" />
              </div>
              <div class="mc-details">
                <div class="mc-name">{{ cartItem.productName }}</div>
                
                <div class="mc-row-bottom">
                 <div class="mc-price-row">
-                 <span class="mc-price">¥{{ Number(cartItem.price).toFixed(2) }}</span>
+                 <span class="mc-price">{{ Number(cartItem.price || 0).toFixed(2) }}点</span>
                </div>   
                  <!-- Qty Control -->
                  <div class="mc-qty-control" v-if="cartItem.allowAddon">
@@ -48,11 +48,12 @@
       <!-- Footer -->
       <div class="mc-footer" v-if="hasItems">
           <button 
-           class="btn-cyber-checkout" 
+           class="btn-cyber-checkout gap-2" style="display: flex; align-items: center; justify-content: center;"
            :disabled="checkingOut"
            @click="handleCheckout"
          >
-           {{ checkingOut ? '处理中...' : '去结算' }}
+           <span v-if="checkingOut" class="btn-spinner"></span>
+           <span>{{ checkingOut ? '处理中...' : '去结算' }}</span>
          </button>
       </div>
     </div>
@@ -66,6 +67,7 @@ import { useCartStore } from '@/stores/client/cart'
 import { supabasePreOrderApi } from '@/api/client/supabase'
 import { Delete } from '@element-plus/icons-vue'
 import { mobileRoutes } from '@/config/client-routes'
+import { useNotify } from '@/composables/useNotify'
 
 const props = defineProps<{
   visible: boolean
@@ -75,6 +77,7 @@ const emit = defineEmits(['close'])
 
 const router = useRouter()
 const cartStore = useCartStore()
+const { error } = useNotify()
 const updating = ref(false)
 const checkingOut = ref(false)
 
@@ -105,8 +108,9 @@ const handleCheckout = async () => {
        emit('close')
        router.push(mobileRoutes.checkout(result.pre_order_id))
     }
-  } catch (e) {
+  } catch (e: any) {
     if (import.meta.dev) console.error(e)
+    error(e.message || '结算失败，请稍后再试')
   } finally {
     checkingOut.value = false
   }

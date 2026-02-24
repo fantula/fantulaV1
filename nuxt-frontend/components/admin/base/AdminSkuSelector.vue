@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { adminProductApi } from '@/api/admin'
 
 // Props
@@ -99,16 +100,22 @@ const handleProductChange = async (val: string) => {
     if (!val) return
     
     skuLoading.value = true
-    const res = await adminProductApi.getProductWithSkus(val)
-    if (res.success && res.skus) {
-        currentProductSkus.value = res.skus
-         // Auto-select match: Check if any of these SKUs are in the global modelValue
-        const skuIdsInModel = new Set(props.modelValue.map(s => s.id))
-        currentBatchSkuIds.value = res.skus
-            .filter(sku => skuIdsInModel.has(sku.id))
-            .map(sku => sku.id)
+    try {
+        const res = await adminProductApi.getProductWithSkus(val)
+        if (res.success && res.skus) {
+            currentProductSkus.value = res.skus
+             // Auto-select match: Check if any of these SKUs are in the global modelValue
+            const skuIdsInModel = new Set(props.modelValue.map(s => s.id))
+            currentBatchSkuIds.value = res.skus
+                .filter(sku => skuIdsInModel.has(sku.id))
+                .map(sku => sku.id)
+        }
+    } catch (e: any) {
+        if (import.meta.dev) console.error(e)
+        ElMessage.error(e.message || '获取商品SKU失败')
+    } finally {
+        skuLoading.value = false
     }
-    skuLoading.value = false
 }
 
 const handleSkuSelectionChange = () => {

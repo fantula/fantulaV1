@@ -412,11 +412,18 @@ onUnmounted(() => {
 }
 
 /* Updated Loading/Empty States using Glass */
-.loading-state, .empty-state {
+.empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   height: 200px;
   padding: var(--sp-5);
   /* Handled by .bg-glass-card */
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* No fixed height or justify-content: center, allowing skeletons to flow naturally downwards */
 }
 .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
 
@@ -424,15 +431,7 @@ onUnmounted(() => {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 24px; color: var(--text-muted); font-size: 12px; 
 }
-.spinner-mini {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.1);
-  border-top-color: var(--text-secondary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
 
-@keyframes spin { to { transform: rotate(360deg); } }
 
 .load-more-trigger {
   height: 60px;

@@ -126,7 +126,6 @@ import { Refresh, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminCdkApi, type AdminCDK } from '@/api/admin'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
-import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { useBizConfig } from '@/composables/common/useBizConfig'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import { useAdminList } from '@/composables/admin/useAdminList'
@@ -159,37 +158,49 @@ const {
         // Mode 'all': Standard Server-Side Pagination
         if (params.filters.mode === 'all') {
             const offset = (params.page - 1) * params.pageSize
-            const res = await adminCdkApi.getCdks({ 
-                limit: params.pageSize,
-                offset: offset
-            })
-            if (!res.success) throw new Error(res.error)
-            
-            return {
-                success: true,
-                data: res.cdks,
-                total: res.total
+            try {
+                const res = await adminCdkApi.getCdks({ 
+                    limit: params.pageSize,
+                    offset: offset
+                })
+                if (!res.success) throw new Error(res.error)
+                
+                return {
+                    success: true,
+                    data: res.cdks,
+                    total: res.total
+                }
+            } catch (e: any) {
+                if (import.meta.dev) console.error(e)
+                ElMessage.error(e.message || '获取 CDK 列表失败')
+                return { success: false, data: [], total: 0 }
             }
         }
         
         // Mode 'unlinked': Client-Side Filtering (Temporary Scalability Fix)
         // Limitation: Can only find orphans within the first 1000 records.
         // TODO: Implement backend filter for 'unlinked'
-        const res = await adminCdkApi.getCdks({ limit: 1000 }) 
-        if (!res.success) throw new Error(res.error)
-
-        let data = res.cdks || []
-        data = data.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
-        
-        const total = data.length
-        const start = (params.page - 1) * params.pageSize
-        const end = start + params.pageSize
-        const pagedData = data.slice(start, end)
-        
-        return {
-            success: true,
-            data: pagedData,
-            total
+        try {
+            const res = await adminCdkApi.getCdks({ limit: 1000 }) 
+            if (!res.success) throw new Error(res.error)
+    
+            let data = res.cdks || []
+            data = data.filter(cdk => !cdk.sku_mappings || cdk.sku_mappings.length === 0)
+            
+            const total = data.length
+            const start = (params.page - 1) * params.pageSize
+            const end = start + params.pageSize
+            const pagedData = data.slice(start, end)
+            
+            return {
+                success: true,
+                data: pagedData,
+                total
+            }
+        } catch (e: any) {
+            if (import.meta.dev) console.error(e)
+            ElMessage.error(e.message || '获取 CDK 列表失败')
+            return { success: false, data: [], total: 0 }
         }
     }
 })
