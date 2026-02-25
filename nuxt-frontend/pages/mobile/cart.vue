@@ -39,7 +39,7 @@
 
              <!-- Thumb -->
              <div class="card-thumb">
-                <img :src="item.productImage" loading="lazy" decoding="async" />
+                <NuxtImg :src="item.productImage" loading="lazy" decoding="async" width="80" quality="80" format="webp" />
              </div>
 
              <!-- Info -->

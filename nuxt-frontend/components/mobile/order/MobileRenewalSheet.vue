@@ -88,7 +88,7 @@
           <div class="price-info">
              <div class="total-label">总计</div>
              <div class="price-row">
-                <!-- <span class="currency">¥</span> -->
+                <!-- <span class="currency-unit">点</span> -->
                 <span class="price-val">{{ finalAmount }}</span><span class="unit-text">点</span>
                 <div v-if="discountAmount > 0" class="discount-tag">已省 {{ discountAmount }}点</div>
              </div>

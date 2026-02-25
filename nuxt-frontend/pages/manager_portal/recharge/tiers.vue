@@ -24,12 +24,12 @@
     >
         <el-table-column prop="amount" label="充值金额 (元)" min-width="150" align="center">
            <template #default="{ row }">
-             <span style="font-weight: bold; font-size: 16px;">¥{{ row.amount }}</span>
+             <span style="font-weight: bold; font-size: 16px;">{{ row.amount }}点</span>
            </template>
         </el-table-column>
         <el-table-column prop="bonus" label="赠送金额 (元)" min-width="150" align="center">
            <template #default="{ row }">
-             <span v-if="row.bonus > 0" style="color: #67C23A;">+ ¥{{ row.bonus }}</span>
+             <span v-if="row.bonus > 0" style="color: #67C23A;">+ {{ row.bonus }}点</span>
              <span v-else style="color: #909399;">-</span>
            </template>
         </el-table-column>

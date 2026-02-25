@@ -33,12 +33,13 @@
 
       <div class="goods-bottom">
         <div class="goods-price-row">
-          <span class="price-val text-price">{{ formatPrice(goods.display_price || goods.price) }}</span>
+          <span class="price-val text-price">{{ formatPrice(goods.display_price || goods.price) }}</span><span class="currency">点</span>
         </div>
 
         <!-- Action Button -->
         <button class="buy-btn btn-marketing-buy">
-          查看详情
+          <span v-if="loading" class="btn-spinner"></span>
+          <span v-else>查看详情</span>
         </button>
       </div>
     </div>
@@ -52,6 +53,7 @@ import { useBizFormat } from '@/composables/common/useBizFormat'
 
 const props = defineProps<{
   goods: Goods
+  loading?: boolean
 }>()
 
 defineEmits(['click'])
@@ -227,4 +229,12 @@ const getBadgeClass = (label: string) => {
   box-shadow: 0 4px 12px var(--primary-glow);
 
 }
+
+.btn-spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
+  border-top-color: #fff; animation: spin 1s ease-in-out infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -37,7 +37,7 @@
             >
                <!-- Image Section -->
                <div class="card-img">
-                  <img :src="item.productImage" :alt="item.productName" loading="lazy" decoding="async" />
+                  <NuxtImg :src="item.productImage" :alt="item.productName" loading="lazy" decoding="async" width="80" quality="80" format="webp" />
                   <!-- Status Overlay (e.g. No Stock) -->
                   <div class="stock-overlay" v-if="item.stock === 0">
                       <span>缺货</span>

@@ -28,7 +28,7 @@
                <div class="mc-name">{{ cartItem.productName }}</div>
                <div class="mc-spec">{{ cartItem.specName }}</div>
                <div class="mc-price-row">
-                 <span class="mc-price">¥{{ cartItem.price }}</span>
+                 <span class="mc-price">{{ cartItem.price }}点</span>
                  
                  <!-- Quantity Control -->
                  <div class="mc-qty-control" v-if="cartItem.allowAddon">

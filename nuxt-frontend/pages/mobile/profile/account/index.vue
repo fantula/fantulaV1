@@ -13,7 +13,7 @@
                     <span class="label">头像</span>
                 </div>
                 <div class="right">
-                    <img :src="userStore.user?.avatar || DEFAULT_AVATAR" class="avatar-img" @error="handleImageError" loading="lazy" decoding="async" />
+                    <NuxtImg :src="userStore.user?.avatar || DEFAULT_AVATAR" class="avatar-img" @error="handleImageError" loading="lazy" decoding="async" width="80" quality="80" format="webp" />
                     <el-icon class="arrow"><ArrowRight /></el-icon>
                 </div>
             </div>

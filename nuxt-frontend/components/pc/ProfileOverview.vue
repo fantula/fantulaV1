@@ -68,7 +68,7 @@
           <div class="stat-icon">💰</div>
           <div class="stat-content">
             <div class="stat-label">账户余额</div>
-            <div class="stat-value">¥{{ formatCurrency(user.balance) }}</div>
+            <div class="stat-value">{{ formatCurrency(user.balance) }}点</div>
           </div>
           <button class="stat-action" aria-label="充值">充值</button>
         </div>
@@ -127,7 +127,7 @@
             <span :class="['status-badge', `status-${order.status}`]">
               {{ order.statusText }}
             </span>
-            <div class="order-amount">¥{{ formatCurrency(order.totalAmount) }}</div>
+            <div class="order-amount">{{ formatCurrency(order.totalAmount) }}点</div>
           </div>
         </div>
         

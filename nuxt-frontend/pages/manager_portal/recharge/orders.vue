@@ -55,7 +55,7 @@
 
       <el-table-column label="充值金额" width="120" align="right">
         <template #default="{ row }">
-          <span class="amount-text">¥{{ Number(row.amount).toFixed(2) }}</span>
+          <span class="amount-text">{{ Number(row.amount).toFixed(2) }}点</span>
         </template>
       </el-table-column>
 

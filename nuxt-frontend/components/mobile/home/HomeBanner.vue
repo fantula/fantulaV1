@@ -26,7 +26,7 @@
                      :key="banner.id" 
                      class="banner-item"
                    >
-                     <img :src="banner.image" class="banner-img" loading="lazy" decoding="async" />
+                     <NuxtImg :src="banner.image" class="banner-img" loading="lazy" decoding="async" width="750" quality="80" format="webp" />
                      <div class="banner-overlay"></div>
                    </div>
                 </div>

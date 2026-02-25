@@ -25,7 +25,7 @@
           </span>
         </div>
         <div class="price-row">
-          <span class="price">¥{{ formatPrice() }}</span>
+          <span class="price">{{ formatPrice() }}点</span>
           <span class="quantity">x{{ order.quantity || 1 }}</span>
         </div>
       </div>

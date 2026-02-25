@@ -1,6 +1,6 @@
 import process from 'node:process';globalThis._importMeta_={url:import.meta.url,env:process.env};import 'node:http';
 import 'node:https';
-export { ad as default } from './chunks/nitro/nitro.mjs';
+export { ak as default } from './chunks/nitro/nitro.mjs';
 import '@supabase/supabase-js';
 import 'zod';
 import 'crypto';

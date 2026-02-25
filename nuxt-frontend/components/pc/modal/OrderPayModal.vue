@@ -49,7 +49,7 @@
               <el-icon class="pay-other-icon" :size="24" color="var(--color-accent)"><Wallet /></el-icon>
               <div class="pay-other-info">
                 <div class="pay-other-label">余额支付</div>
-                <div class="pay-other-desc">使用账户余额支付 ¥{{ userBalance.toFixed(2) }}</div>
+                <div class="pay-other-desc">使用账户余额支付 {{ userBalance.toFixed(2) }}点</div>
               </div>
               <input type="checkbox" :checked="payType==='balance'" readonly />
             </div>
@@ -145,9 +145,9 @@ async function handlePay() {
   paying.value = true
   if (import.meta.dev) {
     console.log('🚀 开始支付流程')
-    console.log('💳 支付方式:', payType.value)
+    if (import.meta.dev) console.log('💳 支付方式:', payType.value)
     console.log('💰 支付金额:', props.price)
-    console.log('📝 订单ID:', props.orderId)
+    if (import.meta.dev) console.log('📝 订单ID:', props.orderId)
   }
   
   try {
@@ -252,7 +252,7 @@ async function handlePay() {
 const simulatePayment = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log('💳 模拟支付处理中...')
+      if (import.meta.dev) console.log('💳 模拟支付处理中...')
       resolve(true)
     }, 2000)
   })

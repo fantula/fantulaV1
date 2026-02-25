@@ -20,6 +20,7 @@ export function useCheckout() {
   const preOrders = ref<PreOrder[]>([])
   const paying = ref(false)
   const showPaySuccess = ref(false)
+  const payDismissed = ref(false)      // 用户已关闭弹窗，禁止再弹
   const refreshingBalance = ref(false) // New
 
   // Settlement Data
@@ -94,7 +95,7 @@ export function useCheckout() {
       try {
         await supabasePreOrderApi.expirePreOrder(preOrders.value[0].id)
       } catch (e) {
-        console.error('Failed to expire order', e)
+        if (import.meta.dev) console.error('Failed to expire order', e)
       }
     }
   }
@@ -111,7 +112,7 @@ export function useCheckout() {
         const status = res.pre_order.status
 
         if (status === 'converted' || status === 'confirmed') {
-          if (!showPaySuccess.value) {
+          if (!showPaySuccess.value && !payDismissed.value) {
             lastOrderId.value = res.pre_order.order_no
             lastOrderAmount.value = res.pre_order.total_amount
             showPaySuccess.value = true
@@ -199,7 +200,7 @@ export function useCheckout() {
       }
     } catch (e: any) {
       notifyError('系统异常: ' + (e.message || JSON.stringify(e)))
-      console.error(e)
+      if (import.meta.dev) console.error(e)
     } finally {
       loading.value = false
     }
@@ -246,11 +247,30 @@ export function useCheckout() {
 
       // Delay slightly to let user see success state before modal
       setTimeout(async () => {
+        if (payDismissed.value) return  // 用户已关弹窗，不再重新弹
         lastOrderId.value = res.order_no || ''
         lastOrderAmount.value = finalPayAmount.value
         showPaySuccess.value = true
         await userStore.fetchUserInfo()
       }, 1000)
+
+      // 异步发送购买成功微信通知（不阻塞支付流程）
+      if (preOrder && res.order_no && userStore.user?.id) {
+        const notifyPayload = {
+          orderNo: res.order_no,
+          productTitle: preOrder.product_snapshot?.product_name || '商品',
+          totalAmount: finalPayAmount.value,
+          userId: userStore.user.id,
+          status: '待发货',   // 与 ORDER_STATUS.pending_delivery.label 一致
+        }
+        $fetch('/api/wechat/notify-purchase', {
+          method: 'POST',
+          body: notifyPayload,
+        }).catch(() => {
+          // 通知失败不影响购买，静默忽略
+          if (import.meta.dev) console.log('[Checkout] WeChat notify skipped or failed')
+        })
+      }
 
     } catch (e: any) {
       notifyError(e.message || '系统异常')
@@ -263,6 +283,14 @@ export function useCheckout() {
   const formatSpec = (spec: any) => {
     if (!spec) return '默认规格'
     return Object.values(spec).join(' / ')
+  }
+
+  /** 用户关闭支付成功弹窗后调用：清理定时器 + 锁住，防止二次弹出 */
+  const dismissPay = () => {
+    showPaySuccess.value = false
+    payDismissed.value = true
+    if (countdownTimer) clearInterval(countdownTimer)
+    if (pollTimer) clearInterval(pollTimer)
   }
 
   // Cleanup
@@ -297,6 +325,7 @@ export function useCheckout() {
     loadPreOrders,
     handleCouponSelect,
     handlePay,
+    dismissPay,
     formatSpec,
     refreshBalance // New
   }

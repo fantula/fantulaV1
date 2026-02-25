@@ -220,6 +220,7 @@ const {
   loadPreOrders,
   handleCouponSelect,
   handlePay,
+  dismissPay,
   formatSpec,
   refreshBalance,
   refreshingBalance
@@ -259,12 +260,20 @@ const fetchFaqs = async () => {
 }
 
 const goToOrder = () => {
+    dismissPay()   // 清定时器 + 锁住，防止二次弹出
     router.replace(mobileRoutes.profileOrders())
 }
 
 const goToHome = () => {
+    dismissPay()
     router.replace(mobileRoutes.home())
 }
+
+// 路由离开时也兜底
+import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeUnmount } from 'vue'
+onBeforeRouteLeave(() => { dismissPay() })
+onBeforeUnmount(() => { dismissPay() })
 
 onMounted(() => {
    loadPreOrders(preOrderIds.value)

@@ -33,8 +33,8 @@
               </div>
             </template>
             <div class="metric-content">
-              <el-statistic :value="stats.today_sales" prefix="¥" :precision="2" />
-               <div class="metric-sub">昨日: ¥{{ Number(stats.yesterday_sales).toFixed(2) }}</div>
+              <el-statistic :value="stats.today_sales" suffix="点" :precision="2" />
+               <div class="metric-sub">昨日: {{ Number(stats.yesterday_sales).toFixed(2) }}点</div>
             </div>
           </el-card>
         </el-col>
@@ -98,7 +98,7 @@
                     :data="stats.sales_trend" 
                     value-key="amount" 
                     label-key="date" 
-                    value-prefix="¥"
+                    value-suffix="点"
                     is-sales
                  />
             </div>

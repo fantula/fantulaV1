@@ -54,6 +54,7 @@
              v-for="g in currentGoods"
              :key="g.id"
              :goods="g"
+             :loading="loadingStates[g.id] || false"
              @click="openDetail(g.id)"
            />
         </div>
@@ -110,6 +111,8 @@ import { ArrowUpBold } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
 import { mobileRoutes } from '@/config/client-routes'
 import { useHomeData } from '@/composables/client/useHomeData'
+import { goodsApi } from '@/api/client/goods'
+import { useNuxtApp } from '#app'
 
 // Components
 import HomeHeader from '@/components/mobile/home/HomeHeader.vue'
@@ -182,10 +185,28 @@ const scrollContainer = ref<HTMLElement | null>(null)
 const loadMoreTrigger = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
 
-// Interactions
-const openDetail = (id: string | number) => {
-    selectedGoodsId.value = id
-    showDetailSheet.value = true
+const loadingStates = ref<Record<string, boolean>>({})
+
+const openDetail = async (id: string | number) => {
+    if (loadingStates.value[id]) return
+    loadingStates.value[id] = true
+    
+    try {
+        const nuxtApp = useNuxtApp()
+        const cacheKey = `goods-detail-${id}`
+        if (!nuxtApp.payload.data[cacheKey]) {
+            const res = await goodsApi.getGoodsDetail(String(id))
+            if(res && res.success) {
+                nuxtApp.payload.data[cacheKey] = res
+            }
+        }
+    } catch(e) {
+        if (import.meta.dev) console.error(e)
+    } finally {
+        loadingStates.value[id] = false
+        selectedGoodsId.value = id
+        showDetailSheet.value = true
+    }
 }
 
 // 分类切换处理 wrapper

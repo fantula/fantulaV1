@@ -1,4 +1,4 @@
-import { O as publicAssetsURL } from '../nitro/nitro.mjs';
+import { S as publicAssetsURL } from '../nitro/nitro.mjs';
 
 const _imports_0 = publicAssetsURL("/images/shared/logo.png");
 

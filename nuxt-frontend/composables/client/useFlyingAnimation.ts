@@ -13,7 +13,7 @@ export const useFlyingAnimation = () => {
      */
     const startAnimation = (startEl: HTMLElement | null, imageSrc: string, targetId: string, onComplete?: () => void) => {
         if (!startEl) {
-            console.warn('Start element is null')
+            if (import.meta.dev) console.warn('Start element is null')
             onComplete?.()
             return
         }
@@ -21,7 +21,7 @@ export const useFlyingAnimation = () => {
         // 1. 获取目标元素位置
         const targetEl = document.getElementById(targetId)
         if (!targetEl) {
-            console.warn(`Target element #${targetId} not found`)
+            if (import.meta.dev) console.warn(`Target element #${targetId} not found`)
             onComplete?.()
             return
         }

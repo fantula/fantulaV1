@@ -34,7 +34,7 @@ export const useHomeData = async (key: string) => {
           : []
 
         if (bannersResult.status === 'rejected') {
-          console.error('Banners fetch failed', bannersResult.reason)
+          if (import.meta.dev) console.error('Banners fetch failed', bannersResult.reason)
         }
 
         const categories = categoriesResult.status === 'fulfilled' && categoriesResult.value.success
@@ -42,7 +42,7 @@ export const useHomeData = async (key: string) => {
           : []
 
         if (categoriesResult.status === 'rejected') {
-          console.error('Categories fetch failed', categoriesResult.reason)
+          if (import.meta.dev) console.error('Categories fetch failed', categoriesResult.reason)
         }
 
         // Default to first category if available
@@ -66,7 +66,7 @@ export const useHomeData = async (key: string) => {
               initialHasMore = goodsRes.data.list.length >= 10
             }
           } catch (err) {
-            console.error('Initial goods fetch failed', err)
+            if (import.meta.dev) console.error('Initial goods fetch failed', err)
             // Fail silently for goods, page still loads
           }
         }
@@ -79,7 +79,7 @@ export const useHomeData = async (key: string) => {
           initialHasMore
         }
       } catch (e) {
-        console.error('CRITICAL: Home Data Fetch Failed Completely', e)
+        if (import.meta.dev) console.error('CRITICAL: Home Data Fetch Failed Completely', e)
         // Return safe empty state so page doesn't crash
         return {
           banners: [],
@@ -141,7 +141,7 @@ export const useHomeData = async (key: string) => {
         hasMore.value = false
       }
     } catch (e) {
-      console.error('Category switch error:', e)
+      if (import.meta.dev) console.error('Category switch error:', e)
       currentGoods.value = []
     } finally {
       isSwitchingCategory.value = false
@@ -172,7 +172,7 @@ export const useHomeData = async (key: string) => {
         }
       }
     } catch (e) {
-      console.error('Load more error:', e)
+      if (import.meta.dev) console.error('Load more error:', e)
     } finally {
       isLoadingMore.value = false
     }

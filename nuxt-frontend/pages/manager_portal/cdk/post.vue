@@ -199,11 +199,18 @@
               <el-divider />
               <div class="common-section">
                  <div class="section-label">详情页帮助图片 (可选)</div>
-                 <div class="image-selector" @click="imagePickerVisible = true">
-                    <img v-if="commonImage" :src="commonImage" class="preview-img" />
-                    <div v-else class="placeholder">
-                       <el-icon><Picture /></el-icon>
-                       <span>选择图片</span>
+                 <div class="image-grid">
+                    <div v-for="(img, idx) in commonImages" :key="idx" class="image-selector">
+                        <img :src="img" class="preview-img" />
+                        <el-button class="delete-img-btn" type="danger" circle size="small" @click.stop="removeCommonImage(idx)">
+                            <el-icon><Delete /></el-icon>
+                        </el-button>
+                    </div>
+                    <div v-if="commonImages.length < 5" class="image-selector placeholder-selector" @click="imagePickerVisible = true">
+                       <div class="placeholder">
+                          <el-icon><Picture /></el-icon>
+                          <span>{{ commonImages.length > 0 ? '加图片' : '选择图片' }}</span>
+                       </div>
                     </div>
                  </div>
               </div>
@@ -453,12 +460,21 @@ const addVirtualField = () => formVirtual.fields.push('');
 const removeVirtualField = (idx: number) => formVirtual.fields.splice(idx, 1);
 
 // --- 图库选择器逻辑 ---
+const commonImages = ref<string[]>([]);
 const imagePickerVisible = ref(false);
 
 const handleImageSelected = (image: { url: string }) => {
   if (image && image.url) {
-    commonImage.value = image.url;
+    if (commonImages.value.length < 5) {
+      commonImages.value.push(image.url);
+    } else {
+      ElMessage.warning('最多添加 5 张图片');
+    }
   }
+};
+
+const removeCommonImage = (idx: number) => {
+  commonImages.value.splice(idx, 1);
 };
 
 const handleNext = async () => {
@@ -500,9 +516,9 @@ const handleNext = async () => {
       
       // 构造 codes 数组
       let codes: string[] = [];
-      // account_data 统一只存图片
-      let accountData: Record<string, any> | undefined = commonImage.value 
-        ? { image: commonImage.value } 
+      // account_data 兼顾新老格式
+      let accountData: Record<string, any> | undefined = commonImages.value.length > 0
+        ? { images: commonImages.value, image: commonImages.value[0] } 
         : undefined;
       
       if (productType === 'one_time_cdk') {
@@ -820,4 +836,8 @@ const handleBackNavigation = () => {
   text-overflow: ellipsis;
   background: #fafafa;
 }
+.image-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.delete-img-btn { position: absolute; top: -10px; right: -10px; opacity: 0; transition: 0.2s; z-index: 10; padding: 4px; height: 24px; width: 24px; }
+.image-selector:hover .delete-img-btn { opacity: 1; }
+.placeholder-selector { background: #fafafa; }
 </style>

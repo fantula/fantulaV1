@@ -54,6 +54,7 @@ export function useOrderDetail(orderId: string) {
     const cdkList = ref<CdkItem[]>([])
     const slotList = ref<SlotItem[]>([])
     const instructionImage = ref('')
+    const instructionImages = ref<string[]>([])
     const loading = ref(true)
     const error = ref<string | null>(null)
 
@@ -169,10 +170,18 @@ export function useOrderDetail(orderId: string) {
                     if (cdkList.value.length > 0) {
                         const first = cdkList.value[0]
                         if (first.accountData) {
-                            instructionImage.value =
-                                first.accountData.image ||
+                            const singleImage = first.accountData.image ||
                                 first.accountData.help_image ||
                                 first.accountData.common_image || ''
+                            instructionImage.value = singleImage
+
+                            if (Array.isArray(first.accountData.images) && first.accountData.images.length > 0) {
+                                instructionImages.value = first.accountData.images
+                            } else if (singleImage) {
+                                instructionImages.value = [singleImage]
+                            } else {
+                                instructionImages.value = []
+                            }
                         }
                     }
                 }
@@ -254,6 +263,7 @@ export function useOrderDetail(orderId: string) {
         cdkList,
         slotList,
         instructionImage,
+        instructionImages,
         loading,
         error,
 

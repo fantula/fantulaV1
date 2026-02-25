@@ -45,7 +45,7 @@
                   controls-position="right" 
                   style="width: 100%"
                 >
-                  <template #prefix>¥</template>
+                  <template #suffix>点</template>
                 </el-input-number>
                 <div class="form-tip">用户领券后直接增加到账户余额的金额</div>
               </el-form-item>
@@ -94,7 +94,7 @@
           <div class="preview-container">
              <div class="coupon-ticket">
                <div class="ticket-left">
-                 <div class="ticket-amount">¥{{ form.value || '0' }}</div>
+                 <div class="ticket-amount">{{ form.value || '0' }}点</div>
                  <div class="ticket-label">余额红包</div>
                </div>
                <div class="ticket-right">

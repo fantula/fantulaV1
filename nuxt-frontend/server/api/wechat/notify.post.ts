@@ -9,6 +9,11 @@ import {
     decryptCallback,
     verifyCallbackSignature,
 } from '~/server/utils/wechat-pay'
+import {
+    sendWechatTemplateMessage,
+    buildRechargeSuccessData,
+    WECHAT_TEMPLATE_IDS,
+} from '~/server/utils/wechat-template'
 
 interface NotifyResource {
     original_type: string
@@ -180,7 +185,7 @@ export default defineEventHandler(async (event) => {
             // 异步发送充值到账邮件通知（不阻塞支付回调）
             const { data: userProfile } = await supabase
                 .from('profiles')
-                .select('email')
+                .select('email, wechat_openid')
                 .eq('id', attach.userId)
                 .single()
 
@@ -190,6 +195,16 @@ export default defineEventHandler(async (event) => {
                     bonus: bonus.toFixed(2),
                     balance: newBalance.toFixed(2),
                 }).catch(e => console.error('[Notify] Email send error:', e))
+            }
+
+            // 异步发送充值成功微信模板通知（不阻塞支付回调）
+            if (userProfile?.wechat_openid) {
+                sendWechatTemplateMessage(
+                    userProfile.wechat_openid,
+                    WECHAT_TEMPLATE_IDS.RECHARGE_SUCCESS,
+                    buildRechargeSuccessData({ amount: orderAmount, bonus, newBalance }),
+                    'https://www.fantula.com/profile/wallet'
+                ).catch((e: Error) => console.error('[Notify] WeChat template send error:', e.message))
             }
         }
 

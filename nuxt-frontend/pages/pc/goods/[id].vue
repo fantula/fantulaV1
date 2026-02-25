@@ -84,7 +84,7 @@
               <template v-if="hasSkus">
                 <div class="price-stock-row">
                   <div class="current-price-box">
-                    <span class="p-amount">{{ formatPrice(currentPrice) }}</span>
+                    <span class="p-amount">{{ formatPrice(currentPrice) }}点</span>
                   </div>
                   <div class="stock-info">
                     <span v-if="stockLoading" class="stock-badge loading">查询中...</span>

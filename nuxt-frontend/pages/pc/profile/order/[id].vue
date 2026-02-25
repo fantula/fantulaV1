@@ -100,21 +100,26 @@
 
       <!-- Tutorial Section -->
       <!-- 退款中状态时不显示使用说明 -->
-      <div v-if="instructionImage && order.status !== 'refunding'" class="glass-tile tutorial-tile fade-in-up">
+      <div v-if="instructionImages.length > 0 && order.status !== 'refunding'" class="glass-tile tutorial-tile fade-in-up">
         <div class="tile-header">
           <div class="header-left">
              <el-icon class="header-icon"><Guide /></el-icon>
              <span class="tile-title">使用说明</span>
           </div>
         </div>
-        <div class="tutorial-body" @click="previewImage(instructionImage)">
-          <div class="image-wrapper">
-             <img :src="instructionImage" loading="lazy" />
-          </div>
-          <div class="zoom-overlay">
-            <div class="zoom-pill">
-               <el-icon><ZoomIn /></el-icon> 点击查看大图
-            </div>
+        <div class="tutorial-body">
+          <div 
+            v-for="(img, index) in instructionImages" 
+            :key="index" 
+            class="image-wrapper" 
+            @click="previewImage(img)"
+          >
+             <img :src="img" loading="lazy" />
+             <div class="zoom-overlay">
+               <div class="zoom-pill">
+                  <el-icon><ZoomIn /></el-icon> 点击查看大图
+               </div>
+             </div>
           </div>
         </div>
       </div>
@@ -203,6 +208,7 @@ const {
   cdkList,
   slotList,
   instructionImage,
+  instructionImages,
   loading,
   
   // Refund State

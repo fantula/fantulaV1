@@ -82,7 +82,7 @@ export function useInfiniteScroll<T>(options: UseInfiniteScrollOptions<T>) {
                 }
             }
         } catch (e) {
-            console.error('Infinite Scroll Load Error:', e)
+            if (import.meta.dev) console.error('Infinite Scroll Load Error:', e)
             error.value = true
         } finally {
             loading.value = false

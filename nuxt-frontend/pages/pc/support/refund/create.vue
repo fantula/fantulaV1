@@ -47,7 +47,7 @@
                 <div class="product-spec">{{ getSpecText(order?.sku_snapshot) }}</div>
               </div>
             </div>
-            <div class="order-amount">¥{{ order?.total_amount }}</div>
+            <div class="order-amount">{{ order?.total_amount }}点</div>
           </div>
         </div>
 

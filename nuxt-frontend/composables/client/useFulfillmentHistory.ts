@@ -25,6 +25,7 @@ export function useFulfillmentHistory(options: {
     const toggleExpand = () => isExpanded.value = !isExpanded.value
 
     const fetchHistory = async () => {
+        records.value = []
         const oid = options.orderId()
         if (!oid) return
 

@@ -13,7 +13,7 @@ export const useCartAnimation = () => {
         // 1. 获取目标元素位置 (购物车图标)
         const targetEl = document.getElementById('cart-icon-ref')
         if (!targetEl) {
-            console.warn('Cart icon target not found')
+            if (import.meta.dev) console.warn('Cart icon target not found')
             onComplete?.()
             return
         }

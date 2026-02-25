@@ -137,7 +137,7 @@ const getPriceRange = (group: SharedSkuGroup) => {
     const prices = group.skus.map(s => s.price)
     const min = Math.min(...prices)
     const max = Math.max(...prices)
-    if(min === max) return `¥${min}`
+    if(min === max) return `${min}点`
     return `¥${min} - ¥${max}`
 }
 

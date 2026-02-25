@@ -73,5 +73,8 @@ watch(sheetVisible, (val) => {
 .goods-page-container {
     min-height: 100vh;
     background: #000; /* Dark background behind the sheet */
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 </style>

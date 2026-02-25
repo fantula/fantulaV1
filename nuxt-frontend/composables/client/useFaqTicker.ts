@@ -59,7 +59,7 @@ export function useFaqTicker(productId: Ref<string>) {
 
             fetchedFaqs.value = finalFaqs
         } catch (e) {
-            console.error('Fetch FAQ error:', e)
+            if (import.meta.dev) console.error('Fetch FAQ error:', e)
         }
     }
 

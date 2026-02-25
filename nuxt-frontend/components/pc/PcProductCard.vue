@@ -35,7 +35,7 @@
       <div class="goods-price-row">
         <!-- Use useBizFormat for price -->
         <span class="price-val">{{ formatPrice(goods.display_price) }}</span>
-        <span class="price-unit">/起</span>
+        <span class="price-unit">点/起</span>
       </div>
 
       <div class="selling-tags" v-if="tagsList.length">
@@ -60,9 +60,9 @@
       </div>
 
        <div class="action-btn-wrap">
-         <BaseButton themeId="marketing-buy" block class="product-action-btn">
-           查看详情
-           <template #icon>
+         <BaseButton themeId="marketing-buy" block class="product-action-btn" :loading="loading">
+           <template v-if="!loading">查看详情</template>
+           <template #icon v-if="!loading">
              <el-icon class="btn-icon"><ArrowRight /></el-icon>
            </template>
          </BaseButton>
@@ -91,6 +91,7 @@ interface GoodsItem {
 
 const props = defineProps<{
   goods: GoodsItem
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{

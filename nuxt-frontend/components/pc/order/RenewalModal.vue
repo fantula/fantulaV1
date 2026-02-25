@@ -75,7 +75,7 @@
             <div class="coupon-section" @click="showCouponModal = true">
               <div class="coupon-label">优惠券</div>
               <div class="coupon-value">
-                <span v-if="selectedCoupon" class="coupon-selected">-¥{{ discountAmount.toFixed(2) }}</span>
+                <span v-if="selectedCoupon" class="coupon-selected">-{{ discountAmount.toFixed(2) }}点</span>
                 <span v-else class="coupon-placeholder">选择优惠券</span>
                 <el-icon><ArrowRight /></el-icon>
               </div>
@@ -89,11 +89,11 @@
                 
                 <div class="summary-row">
                    <span>商品金额</span>
-                   <span>¥{{ originalAmount.toFixed(2) }}</span>
+                   <span>{{ originalAmount.toFixed(2) }}点</span>
                 </div>
                 <div class="summary-row" v-if="discountAmount > 0">
                    <span>优惠抵扣</span>
-                   <span class="text-danger">-¥{{ discountAmount.toFixed(2) }}</span>
+                   <span class="text-danger">-{{ discountAmount.toFixed(2) }}点</span>
                 </div>
                 
                 <div class="divider"></div>
@@ -101,7 +101,7 @@
                 <div class="total-row">
                    <div class="total-label">应付金额</div>
                    <div class="total-price">
-                      <span class="unit">¥</span>{{ finalAmount.toFixed(2) }}
+                      <span class="currency-unit">点</span>{{ finalAmount.toFixed(2) }}
                    </div>
                 </div>
 

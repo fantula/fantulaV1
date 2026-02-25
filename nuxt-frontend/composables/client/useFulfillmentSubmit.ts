@@ -72,16 +72,16 @@ export function useFulfillmentSubmit(options: {
                 initFormData()
             }
         } catch (err) {
-            console.error('获取回执失败:', err)
+            if (import.meta.dev) console.error('获取回执失败:', err)
         }
     }
 
     const validate = () => {
-        for (const f of fields.value) {
-            if (!formData[f.key]) {
-                options.onError(`请输入${f.label}`)
-                return false
-            }
+        // 只要求至少填了一个字段，不强制所有字段都填（如备注等选填）
+        const hasAnyValue = fields.value.some(f => formData[f.key]?.trim())
+        if (!hasAnyValue) {
+            options.onError('请至少填写一项信息')
+            return false
         }
         return true
     }

@@ -26,7 +26,7 @@
 
       <div class="info-row">
          <span class="label">金额</span>
-         <span class="value price">¥{{ formatPrice(order.total_amount || order.amount) }}</span>
+         <span class="value price">{{ formatPrice(order.total_amount || order.amount) }}点</span>
       </div>
       
       <!-- Time Remaining -->

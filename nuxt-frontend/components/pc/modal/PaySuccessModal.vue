@@ -22,7 +22,7 @@
           <div class="info-divider"></div>
           <div class="info-row">
             <span class="info-label">支付金额</span>
-            <span class="info-value info-amount">¥{{ safeAmount }}</span>
+            <span class="info-value info-amount">{{ safeAmount }}点</span>
           </div>
           <div class="info-divider"></div>
           <div class="info-row">

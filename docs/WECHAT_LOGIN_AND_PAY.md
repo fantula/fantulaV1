@@ -1,7 +1,7 @@
 # 微信登录 + 微信支付 完整技术文档
 
 > ⚠️ **维护文档** — 修改微信相关功能前必读  
-> 最后更新: 2026-02-11
+> 最后更新: 2026-02-25（新增 §九 微信模板消息通知）
 
 ---
 
@@ -57,17 +57,24 @@ nuxt-frontend/
 │   │   ├── oauth-login.post.ts    # 微信OAuth登录入口(code→openid→检查绑定)
 │   │   ├── get-openid.post.ts     # 单独获取OpenID（已登录用户,支付用）
 │   │   ├── jsapi-pay.post.ts      # 微信JSAPI支付下单（公众号内）
-│   │   ├── notify.post.ts         # 微信支付回调（余额+bonus更新）
+│   │   ├── notify.post.ts         # 微信支付回调（余额+bonus更新+充值模板通知）
+│   │   ├── notify-purchase.post.ts # 购买成功微信模板通知（用户端调用）
 │   │   └── callback.post.ts       # 微信公众号消息/事件推送处理
-│   └── auth/
-│       └── bind-wechat.post.ts    # 绑定微信到邮箱（新用户注册/已有用户绑定）
+│   ├── auth/
+│   │   └── bind-wechat.post.ts    # 绑定微信到邮箱（新用户注册/已有用户绑定）
+│   └── admin/orders/
+│       └── notify-dispatch.post.ts # 发货通知（管理端审批发货后调用）
 │
 ├── server/utils/
 │   ├── supabase.ts                # Supabase 客户端工具
 │   │   ├── getSupabaseClient()        # 用户级客户端(带RLS)
 │   │   └── getSupabaseServiceClient() # Service Role客户端(绕过RLS)
-│   ├── wechat-login.ts            # 微信登录工具(bindToken生成/验证)
-│   └── wechat-pay.ts              # 微信支付工具(签名/解密/API请求)
+│   ├── wechat-login.ts            # 微信登录工具 + getWechatAccessToken()
+│   ├── wechat-pay.ts              # 微信支付工具(签名/解密/API请求)
+│   └── wechat-template.ts         # 微信模板消息工具（新增 2026-02-25）
+│                                  #   sendWechatTemplateMessage()
+│                                  #   WECHAT_TEMPLATE_IDS 常量
+│                                  #   build*Data() 三种通知数据构建函数
 │
 ├── api/client/
 │   ├── wechat-login.ts            # 前端微信登录API封装
@@ -473,3 +480,54 @@ docker exec supabase-db psql -U supabase_admin -d postgres -c "
 
 > ⚠️ **重要**：构建时 `npm run build` 会将 runtimeConfig 默认值写入 `.output`。  
 > 运行时只有 `NUXT_` 前缀的环境变量才能覆盖这些默认值。
+
+---
+
+## 九、微信模板通知（2026-02-25 新增）
+
+### 9.1 功能概述
+
+利用微信服务号模板消息，在关键业务事件后主动推送通知给用户。
+用户 openid 来源：`profiles.wechat_openid`（微信登录时已写入，无需额外授权）。
+
+### 9.2 三种通知
+
+| 通知类型 | 模板 ID | 触发时机 | 触发位置 |
+|---------|---------|---------|--------|
+| 购买成功 | `B8XTeSdNDedNzjLv...` | 用户余额支付成功 | `useCheckout.ts` handlePay() 成功后 |
+| 订单发货 | `XSaOOr_63i4YmnczX...` | 管理员审批通过发货 | `fulfillment.ts` approveFulfillment() 成功后 |
+| 充值成功 | `UPg8SLiEvaHaaBMS...` | 微信支付回调成功 | `notify.post.ts` 余额更新后 |
+
+### 9.3 核心文件
+
+```
+server/utils/wechat-template.ts   ← 发送函数 + 模板ID常量 + 数据构建函数
+server/api/wechat/notify-purchase.post.ts   ← 购买成功通知 API
+server/api/admin/orders/notify-dispatch.post.ts  ← 发货通知 API
+```
+
+### 9.4 设计原则
+
+- **不阻塞主流程**：全部异步，通知失败静默忽略（`.catch()`）
+- **不依赖额外授权**：openid 在微信登录时已存入 profiles，服务号可直接发
+- **用户未绑定微信时静默跳过**：`profiles.wechat_openid` 为 null → 直接 return
+- **Access Token 复用缓存**：调用 `getWechatAccessToken()`（`wechat-login.ts` 已有缓存实现）
+
+### 9.5 模板字段顺序
+
+> ⚠️ 如微信公众平台模板字段顺序与代码不一致，修改 `wechat-template.ts` 中对应的 `build*Data()` 函数
+
+| 通知 | 微信字段名 | 内容 |
+|-----|-----------|------|
+| **购买成功** | `character_string9` | 订单号 |
+|  | `thing2` | 商品名称（最长20字） |
+|  | `character_string8` | 商品规格（最长20字） |
+|  | `amount5` | 商品金额 |
+| **订单发货** | `character_string2` | 订单编号 |
+|  | `thing4` | 商品名称（最长20字） |
+|  | `amount8` | 订单金额 |
+|  | `phrase9` | 订单状态 |
+| **充值成功** | `thing8` | 商户名称（固定：`凡图拉`） |
+|  | `amount5` | 当前余额 |
+|  | `amount3` | 充值金额 |
+|  | `amount4` | 赠送金额 |

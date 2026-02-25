@@ -63,8 +63,10 @@ export const useAdminStore = defineStore('admin', () => {
                     }
                     adminInfo.value = info
                 } else {
-                    // 有 session 但获取不到管理员信息 (Token失效或非管理员)
-                    await logout()
+                    // 有 session 但不是管理员：只清空 admin 状态
+                    // ⚠️ 绝对不能调 logout()，logout() 会调 signOut() 销毁用户 session！
+                    adminUser.value = null
+                    adminInfo.value = null
                 }
             } else {
                 adminUser.value = null

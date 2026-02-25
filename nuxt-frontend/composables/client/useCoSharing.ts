@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { getSupabaseClient } from '@/utils/supabase'
 
-export interface CdkItem {
+interface CdkItem {
     id: string
     code: string
     parsed: any
@@ -71,6 +71,7 @@ export function useCoSharing(options: {
     }
 
     const fetchCoSharingUsers = async () => {
+        coSharingUsers.value = []
         const item = options.cdkItem()
         if (!item || !item.id) return
         const cdkId = item.id

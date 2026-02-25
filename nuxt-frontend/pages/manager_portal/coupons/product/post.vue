@@ -97,7 +97,7 @@
              <div class="coupon-ticket product-ticket">
                <div class="ticket-left">
                  <div class="ticket-amount">
-                   <small>¥</small>{{ form.value || '0' }}
+                   <small>点</small>{{ form.value || '0' }}
                  </div>
                  <div class="ticket-cond">指定商品</div>
                </div>

@@ -101,7 +101,7 @@
                       @click="handleRecharge"
                     >
                       <template v-if="!loading">
-                        <span class="btn-text">立即支付 ¥{{ payAmount.toFixed(2) }}</span>
+                        <span class="btn-text">立即支付 {{ payAmount.toFixed(2) }}点</span>
                         <el-icon class="btn-icon"><ArrowRight /></el-icon>
                       </template>
                       <template v-else>正在发起支付...</template>
@@ -147,7 +147,7 @@
             <div class="qrcode-info">
               <div class="amount-display">
                 <span class="label">支付金额</span>
-                <span class="amount">¥{{ payAmount.toFixed(2) }}</span>
+                <span class="amount">{{ payAmount.toFixed(2) }}点</span>
               </div>
               <div class="order-no">
                 订单号: {{ currentOrderNo }}

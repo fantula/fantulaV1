@@ -6,7 +6,74 @@ import { getAuthToken, getEdgeFunctionsUrl } from './supabase'
 export type UploadProgressCallback = (progress: number) => void
 
 /**
+ * 客户端图片压缩（Canvas API，无需额外依赖）
+ * - 最大宽度 1200px（覆盖 PC / 移动端展示需求）
+ * - 输出 WebP 格式，quality 0.82（视觉无损，体积降 60-80%）
+ * - GIF 不压缩（保留动画）
+ */
+async function compressImage(file: File): Promise<File> {
+    // GIF 不压缩（会丢失动画）
+    if (file.type === 'image/gif') return file
+
+    // 小于 200KB 不压缩
+    if (file.size < 200 * 1024) return file
+
+    return new Promise((resolve) => {
+        const img = new Image()
+        const url = URL.createObjectURL(file)
+
+        img.onload = () => {
+            URL.revokeObjectURL(url)
+
+            const MAX_WIDTH = 1200
+            let { width, height } = img
+
+            // 不需要放大，只缩小
+            if (width > MAX_WIDTH) {
+                height = Math.round(height * (MAX_WIDTH / width))
+                width = MAX_WIDTH
+            }
+
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')!
+            ctx.drawImage(img, 0, 0, width, height)
+
+            canvas.toBlob(
+                (blob) => {
+                    if (blob && blob.size < file.size) {
+                        // 压缩有效，使用压缩后的文件
+                        const compressed = new File([blob], file.name.replace(/\.\w+$/, '.webp'), {
+                            type: 'image/webp',
+                            lastModified: Date.now(),
+                        })
+                        if (import.meta.dev) {
+                            console.log(`[compressImage] ${(file.size / 1024).toFixed(0)}KB → ${(compressed.size / 1024).toFixed(0)}KB (${Math.round((1 - compressed.size / file.size) * 100)}% saved)`)
+                        }
+                        resolve(compressed)
+                    } else {
+                        // 压缩后反而更大，保留原文件
+                        resolve(file)
+                    }
+                },
+                'image/webp',
+                0.82
+            )
+        }
+
+        img.onerror = () => {
+            URL.revokeObjectURL(url)
+            resolve(file) // 压缩失败则原样上传
+        }
+
+        img.src = url
+    })
+}
+
+/**
  * 上传图片到 Cloudflare R2（通过 Edge Function）
+ * 自动压缩：最大 1200px 宽，WebP 格式，quality 0.82
  * @param file 要上传的图片文件
  * @param folder 存储目录，默认 'uploads'
  * @param onProgress 可选的进度回调，参数为 0-100 的百分比
@@ -53,6 +120,10 @@ export async function uploadImageToStorage(
                 error: '请先登录'
             }
         }
+
+        // 上传前自动压缩（最大 1200px，WebP，quality 0.82）
+        file = await compressImage(file)
+
         // 构建 FormData
         const formData = new FormData()
         formData.append('file', file)

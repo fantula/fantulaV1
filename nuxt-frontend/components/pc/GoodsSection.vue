@@ -10,6 +10,7 @@
           v-for="item in goodsList" 
           :key="item.id" 
           :goods="item"
+          :loading="loadingStates[item.id] || false"
           @click="navigateToGoods"
         />
       </div>
@@ -35,6 +36,10 @@
 import PcProductCard from '@/components/pc/PcProductCard.vue'
 import PcProductCardSkeleton from '@/components/pc/base/PcProductCardSkeleton.vue'
 
+import { ref } from 'vue'
+import { goodsApi } from '@/api/client/goods'
+import { useNuxtApp } from '#app'
+
 // Prop type matches the fields defined in AdminProduct for high fidelity
 interface GoodsDisplayItem {
   id: string | number
@@ -57,8 +62,27 @@ const emit = defineEmits<{
   (e: 'retry'): void
 }>()
 
-const navigateToGoods = (id: number | string) => {
-  navigateTo(`/goods/${id}`)
+const loadingStates = ref<Record<string, boolean>>({})
+
+const navigateToGoods = async (id: number | string) => {
+  if (loadingStates.value[id]) return
+  loadingStates.value[id] = true
+  
+  try {
+    const nuxtApp = useNuxtApp()
+    const cacheKey = `goods-detail-${id}`
+    if (!nuxtApp.payload.data[cacheKey]) {
+        const res = await goodsApi.getGoodsDetail(String(id))
+        if(res) {
+            nuxtApp.payload.data[cacheKey] = res
+        }
+    }
+  } catch(err) {
+    if (import.meta.dev) console.error(err)
+  } finally {
+    loadingStates.value[id] = false
+    navigateTo(`/goods/${id}`)
+  }
 }
 </script>
 

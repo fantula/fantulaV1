@@ -177,6 +177,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
   }
 
   const fetchBoundFaqs = async () => {
+    fetchedFaqs.value = []
     try {
       let finalFaqs: any[] = []
       const res = await supabaseFaqApi.getFaqsByProduct(goodsId.value)
@@ -191,7 +192,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
         }
       }
       fetchedFaqs.value = finalFaqs
-    } catch (e) { console.error('Fetch FAQ error:', e) }
+    } catch (e) { if (import.meta.dev) console.error('Fetch FAQ error:', e) }
   }
 
   const checkFavoriteStatus = async () => {
@@ -234,7 +235,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
       }
       router.push(`/checkout/${result.pre_order_id}`)
     } catch (e) {
-      console.error('立即购买失败', e)
+      if (import.meta.dev) console.error('立即购买失败', e)
     } finally {
       submitting.value = false
     }
@@ -326,6 +327,8 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
     // 重置选择状态，确保每次打开新商品都从第一个规格开始
     selectedSpecs.value = {}
     selectedSkuImage.value = ''
+    qty.value = 1
+    stock.value = 0
 
     if (specGroups.value && specGroups.value.length > 0) {
       specGroups.value.forEach((g: any) => {

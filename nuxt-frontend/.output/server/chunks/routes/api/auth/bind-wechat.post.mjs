@@ -1,4 +1,4 @@
-import { d as defineEventHandler, r as readBody, f as getSupabaseServiceClient, h as getCurrentUser, c as createError, i as verifyBindToken, j as getWechatUserInfo, u as useRuntimeConfig, k as sendNotification } from '../../../nitro/nitro.mjs';
+import { d as defineEventHandler, r as readBody, b as getSupabaseServiceClient, j as getCurrentUser, c as createError, k as verifyBindToken, n as getWechatUserInfo, u as useRuntimeConfig, o as sendNotification } from '../../../nitro/nitro.mjs';
 import '@supabase/supabase-js';
 import 'zod';
 import 'crypto';
@@ -199,7 +199,7 @@ const bindWechat_post = defineEventHandler(async (event) => {
   }
 });
 async function bindWechatToExistingUser(supabase, userId, wechatCode) {
-  const { getWechatPayConfig } = await import('../../../nitro/nitro.mjs').then(function (n) { return n.ae; });
+  const { getWechatPayConfig } = await import('../../../nitro/nitro.mjs').then(function (n) { return n.al; });
   const config = getWechatPayConfig();
   const url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${config.appid}&secret=${config.appSecret}&code=${wechatCode}&grant_type=authorization_code`;
   const response = await fetch(url);

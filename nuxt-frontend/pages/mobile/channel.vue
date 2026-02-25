@@ -73,7 +73,7 @@
                    <!-- Compact Product Preview Card (Left Image, Right Content) -->
                    <div v-else-if="product" class="compact-product-card" @click="openProductSheet">
                       <div class="cpc-image-wrap">
-                         <img :src="product.image || product.coverImage" class="cpc-image" decoding="async" loading="lazy" />
+                         <NuxtImg :src="product.image || product.coverImage" class="cpc-image" decoding="async" loading="lazy" width="400" quality="80" format="webp" />
                       </div>
                       <div class="cpc-content">
                          <div class="cpc-title">{{ product.name || product.title }}</div>
@@ -81,7 +81,10 @@
                             <div class="cpc-price">
                                {{ formatPrice(product.display_price || product.price) }}<span class="currency-unit">点</span>
                             </div>
-                            <button class="btn-buy-mini">立即获取</button>
+                            <button class="btn-buy-mini" @click.stop="openProductSheet">
+                              <span v-if="productLoading" class="btn-spinner"></span>
+                              <span v-else>立即获取</span>
+                            </button>
                          </div>
                       </div>
                    </div>
@@ -118,6 +121,7 @@ import { getSupabaseClient } from '@/utils/supabase'
 import { useToast } from '@/composables/mobile/useToast'
 import { goodsApi } from '@/api/client/goods'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useNuxtApp } from '#app'
 
 const ProductDetailSheet = defineAsyncComponent(() => import('@/components/mobile/goods/ProductDetailSheet.vue'))
 
@@ -240,9 +244,25 @@ const handleRecognize = async () => {
   }
 }
 
-const openProductSheet = () => {
+const openProductSheet = async () => {
     if (boundProductId.value) {
-        showDetailSheet.value = true
+        if (productLoading.value) return 
+        productLoading.value = true
+        try {
+            const nuxtApp = useNuxtApp()
+            const cacheKey = `goods-detail-${boundProductId.value}`
+            if (!nuxtApp.payload.data[cacheKey]) {
+                const res = await goodsApi.getGoodsDetail(String(boundProductId.value))
+                if(res) {
+                    nuxtApp.payload.data[cacheKey] = res
+                }
+            }
+        } catch(e) {
+            if (import.meta.dev) console.error(e)
+        } finally {
+            productLoading.value = false
+            showDetailSheet.value = true
+        }
     }
 }
 

@@ -99,7 +99,7 @@
     <template #footer-left>
       <div class="selected-info" v-if="tempSelected">
         已选择: <span class="highlight">{{ tempSelected.coupon.name }}</span>
-        <span class="discount-preview">-¥{{ tempSelected.coupon.value }}</span>
+        <span class="discount-preview">-{{ tempSelected.coupon.value }}点</span>
       </div>
       <div class="selected-info" v-else>
         未选择优惠券

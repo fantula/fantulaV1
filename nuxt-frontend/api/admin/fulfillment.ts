@@ -62,6 +62,14 @@ export const adminFulfillmentApi = {
                 return { success: false, error: '更新订单状态失败: ' + orderError.message }
             }
 
+            // 异步发送发货微信通知（不阻塞审批流程）
+            $fetch('/api/admin/orders/notify-dispatch', {
+                method: 'POST',
+                body: { orderId },
+            }).catch(() => {
+                // 通知失败不影响审批结果，静默忽略
+            })
+
             return { success: true }
         } catch (e: any) {
             return { success: false, error: e.message || '系统异常' }

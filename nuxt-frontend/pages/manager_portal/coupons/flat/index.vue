@@ -112,6 +112,9 @@ import { adminRoute } from '@/config/admin-routes'
 const { formatDate, formatPrice } = useBizFormat()
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import CouponCodeGenerator from '@/components/admin/CouponCodeGenerator.vue'
+import CouponCodeDrawer from '@/components/admin/coupon/CouponCodeDrawer.vue'
+import CouponCodeEditor from '@/components/admin/coupon/CouponCodeEditor.vue'
 const router = useRouter()
 
 // Generator Modal State

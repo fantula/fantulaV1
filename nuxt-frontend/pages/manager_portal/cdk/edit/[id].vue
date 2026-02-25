@@ -160,13 +160,20 @@
           <!-- Helping Image Section (Common for all types) -->
           <el-divider content-position="left">详情页帮助图片</el-divider>
           <div class="form-item">
-            <div class="image-selector" @click="imagePickerVisible = true">
-              <img v-if="commonImage" :src="commonImage" class="preview-img" />
-              <div v-else class="placeholder">
-                <el-icon :size="24"><Picture /></el-icon>
-                <span>点击选择图片</span>
-              </div>
-            </div>
+             <div class="image-grid">
+                <div v-for="(img, idx) in commonImages" :key="idx" class="image-selector">
+                    <img :src="img" class="preview-img" />
+                    <el-button class="delete-img-btn" type="danger" circle size="small" @click.stop="removeCommonImage(idx)">
+                        <el-icon><Delete /></el-icon>
+                    </el-button>
+                </div>
+                <div v-if="commonImages.length < 5" class="image-selector placeholder-selector" @click="imagePickerVisible = true">
+                   <div class="placeholder">
+                      <el-icon :size="24"><Picture /></el-icon>
+                      <span>{{ commonImages.length > 0 ? '添加图片' : '选择图片' }}</span>
+                   </div>
+                </div>
+             </div>
             <div class="form-tip" style="margin-top: 8px">
               将在客户端订单详情页展示，用于引导用户使用
             </div>
@@ -240,7 +247,7 @@ const usedStock = computed(() => {
 const minStock = computed(() => usedStock.value)
 
 // Image Picker State
-const commonImage = ref('')
+const commonImages = ref<string[]>([])
 const imagePickerVisible = ref(false)
 
 // SKU Selection State
@@ -288,8 +295,15 @@ onMounted(async () => {
     if (res.success && res.cdk) {
       cdkData.value = res.cdk
       
-      // Load helping image（新格式用 image，兼容旧格式 common_image/help_image）
-      commonImage.value = res.cdk.account_data?.image || res.cdk.account_data?.common_image || res.cdk.account_data?.help_image || ''
+      // Load helping image（新格式用 images 排列，兼容旧格式 common_image/help_image/image）
+      const singleImage = res.cdk.account_data?.image || res.cdk.account_data?.common_image || res.cdk.account_data?.help_image || ''
+      if (Array.isArray(res.cdk.account_data?.images) && res.cdk.account_data.images.length > 0) {
+        commonImages.value = res.cdk.account_data.images
+      } else if (singleImage) {
+        commonImages.value = [singleImage]
+      } else {
+        commonImages.value = []
+      }
       
       // Initialize form based on type
       if (res.cdk.cdk_type === 'virtual') {
@@ -437,8 +451,16 @@ const removeSharedAttr = (idx: number) => {
 // Image Picker Logic
 const handleImageSelected = (image: { url: string }) => {
   if (image && image.url) {
-    commonImage.value = image.url
+    if (commonImages.value.length < 5) {
+      commonImages.value.push(image.url)
+    } else {
+      ElMessage.warning('最多添加 5 张图片')
+    }
   }
+}
+
+const removeCommonImage = (idx: number) => {
+  commonImages.value.splice(idx, 1)
 }
 
 // Submit
@@ -447,9 +469,11 @@ const handleSubmit = async () => {
   
   submitting.value = true
   try {
-    // account_data 统一只存图片
+    // account_data 兼顾新老格式
     const updateData: any = {
-      account_data: commonImage.value ? { image: commonImage.value } : null
+      account_data: commonImages.value.length > 0 
+        ? { images: commonImages.value, image: commonImages.value[0] } 
+        : null
     }
     
     // 更新商品快照（当选择了新商品时）
@@ -522,7 +546,8 @@ const handleSubmit = async () => {
     }
 
     ElMessage.success('保存成功')
-    handleBack()
+    // 延迟跳转，避免 el-select 等组件卸载时序与页面销毁冲突（unregisterPanel 报错）
+    setTimeout(() => handleBack(), 800)
   } finally {
     submitting.value = false
   }
@@ -661,4 +686,9 @@ const handleBack = () => {
 .image-selector:hover { border-color: #409EFF; }
 .preview-img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }
 .placeholder { display: flex; flex-direction: column; align-items: center; color: #909399; font-size: 12px; gap: 4px; }
+
+.image-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.delete-img-btn { position: absolute; top: -10px; right: -10px; opacity: 0; transition: 0.2s; z-index: 10; padding: 4px; height: 24px; width: 24px; }
+.image-selector:hover .delete-img-btn { opacity: 1; }
+.placeholder-selector { background: #fafafa; }
 </style>

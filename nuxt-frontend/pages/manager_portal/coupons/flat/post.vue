@@ -44,7 +44,7 @@
                   controls-position="right" 
                   style="width: 100%"
                 >
-                  <template #prefix>¥</template>
+                  <template #suffix>点</template>
                 </el-input-number>
               </el-form-item>
             </el-col>
@@ -57,7 +57,7 @@
                   controls-position="right" 
                   style="width: 100%"
                 >
-                  <template #prefix>¥</template>
+                  <template #suffix>点</template>
                 </el-input-number>
                 <div class="form-tip">订单满多少元可用（0表示无门槛）</div>
               </el-form-item>
@@ -104,7 +104,7 @@
              <div class="coupon-ticket flat-ticket">
                <div class="ticket-left">
                  <div class="ticket-amount">
-                   <small>¥</small>{{ form.value || '0' }}
+                   <small>点</small>{{ form.value || '0' }}
                  </div>
                  <div class="ticket-cond">满 {{ form.minUsage }} 可用</div>
                </div>

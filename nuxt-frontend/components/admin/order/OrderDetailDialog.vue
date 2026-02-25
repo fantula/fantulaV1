@@ -21,7 +21,7 @@
             </div>
             <div class="info-item">
                 <span class="label">金额</span>
-                <span class="amount">¥{{ order.amount }}</span>
+                <span class="amount">{{ order.amount }}点</span>
             </div>
          </div>
 
@@ -62,7 +62,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="单价" width="100">
-                    <template #default="{ row }">¥{{ row.price }}</template>
+                    <template #default="{ row }">{{ row.price }}点</template>
                 </el-table-column>
              </AdminDataTable>
          </div>

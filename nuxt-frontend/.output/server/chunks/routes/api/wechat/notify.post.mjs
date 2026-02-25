@@ -1,4 +1,4 @@
-import { d as defineEventHandler, g as getHeader, w as readRawBody, I as verifyCallbackSignature, y as getWechatPayConfig, J as decryptCallback, f as getSupabaseServiceClient, k as sendNotification } from '../../../nitro/nitro.mjs';
+import { d as defineEventHandler, g as getHeader, y as readRawBody, L as verifyCallbackSignature, A as getWechatPayConfig, M as decryptCallback, b as getSupabaseServiceClient, o as sendNotification, e as sendWechatTemplateMessage, W as WECHAT_TEMPLATE_IDS, N as buildRechargeSuccessData } from '../../../nitro/nitro.mjs';
 import '@supabase/supabase-js';
 import 'zod';
 import 'crypto';
@@ -93,13 +93,21 @@ const notify_post = defineEventHandler(async (event) => {
         created_at: (/* @__PURE__ */ new Date()).toISOString()
       });
       console.log(`[Notify] Success: User ${attach.userId} recharged ${totalAmount} (amount: ${order.amount}, bonus: ${bonus})`);
-      const { data: userProfile } = await supabase.from("profiles").select("email").eq("id", attach.userId).single();
+      const { data: userProfile } = await supabase.from("profiles").select("email, wechat_openid").eq("id", attach.userId).single();
       if (userProfile == null ? void 0 : userProfile.email) {
         sendNotification("recharge_success", userProfile.email, {
           amount: orderAmount.toFixed(2),
           bonus: bonus.toFixed(2),
           balance: newBalance.toFixed(2)
         }).catch((e) => console.error("[Notify] Email send error:", e));
+      }
+      if (userProfile == null ? void 0 : userProfile.wechat_openid) {
+        sendWechatTemplateMessage(
+          userProfile.wechat_openid,
+          WECHAT_TEMPLATE_IDS.RECHARGE_SUCCESS,
+          buildRechargeSuccessData({ amount: orderAmount, bonus, newBalance }),
+          "https://www.fantula.com/profile/wallet"
+        ).catch((e) => console.error("[Notify] WeChat template send error:", e.message));
       }
     }
     return { code: "SUCCESS", message: "\u6210\u529F" };

@@ -1,4 +1,4 @@
-import { d as defineEventHandler, n as setHeader } from '../../../../nitro/nitro.mjs';
+import { d as defineEventHandler, q as setHeader } from '../../../../nitro/nitro.mjs';
 import { g as getAdminSupabaseClient } from '../../../../_/supabase-admin.mjs';
 import '@supabase/supabase-js';
 import 'zod';

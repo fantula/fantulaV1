@@ -53,7 +53,7 @@
       </el-table-column>
       <el-table-column label="金额" width="100">
         <template #default="{ row }">
-          <span class="amount">¥{{ row.total_amount }}</span>
+          <span class="amount">{{ row.total_amount }}点</span>
         </template>
       </el-table-column>
       <el-table-column label="数量" prop="quantity" width="80" />

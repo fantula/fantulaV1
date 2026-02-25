@@ -106,11 +106,18 @@
     </template> <!-- Closes Active/Pending Wrapper -->
 
        <!-- Tutorial -->
-       <div class="section-group" v-if="instructionImage && order.status !== 'refunding'">
+       <div class="section-group" v-if="instructionImages.length > 0 && order.status !== 'refunding'">
            <div class="section-header">使用说明</div>
-           <div class="tutorial-box" @click="previewImage(instructionImage)">
-              <img :src="instructionImage" class="tutorial-img" loading="lazy" />
-              <div class="zoom-hint"><el-icon><ZoomIn /></el-icon></div>
+           <div class="tutorial-gallery">
+               <div 
+                   v-for="(img, idx) in instructionImages" 
+                   :key="idx"
+                   class="tutorial-box" 
+                   @click="previewImage(img)"
+               >
+                  <NuxtImg :src="img" class="tutorial-img" loading="lazy" width="750" quality="80" format="webp" />
+                  <div class="zoom-hint" v-if="idx === 0"><el-icon><ZoomIn /></el-icon></div>
+               </div>
            </div>
        </div>
 
@@ -182,6 +189,7 @@ const {
   cdkList,
   slotList,
   instructionImage,
+  instructionImages,
   loading,
   activeTicketId,
   pendingRefundRequest,
@@ -334,9 +342,17 @@ const onTicketSuccess = () => {
 }
 
 /* Tutorial */
-.tutorial-box {
-    border-radius: 12px; overflow: hidden; position: relative;
+.tutorial-gallery { 
+    display: flex; 
+    flex-direction: column; 
+    border-radius: 12px; 
+    overflow: hidden;
     border: 1px solid rgba(255,255,255,0.1);
+    background: #000;
+}
+.tutorial-box {
+    position: relative;
+    /* Flush edges to create a seamless scroll */
 }
 .tutorial-img { display: block; width: 100%; object-fit: cover; }
 .zoom-hint {
