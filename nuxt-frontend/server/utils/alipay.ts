@@ -61,10 +61,10 @@ function wrapPublicKey(key: string): string {
     return `-----BEGIN PUBLIC KEY-----\n${formatted}\n-----END PUBLIC KEY-----`
 }
 
-// 构建待签名字符串（参数按字典序排列，去掉 sign 和 sign_type）
+// 构建待签名字符串（参数按字典序排列，仅排除 sign 本身，sign_type 需保留）
 function buildSignString(params: Record<string, string>): string {
     return Object.keys(params)
-        .filter(k => k !== 'sign' && k !== 'sign_type' && params[k] !== '' && params[k] !== undefined)
+        .filter(k => k !== 'sign' && params[k] !== '' && params[k] !== undefined)
         .sort()
         .map(k => `${k}=${params[k]}`)
         .join('&')
@@ -156,14 +156,15 @@ export async function alipayRequest(
     return data
 }
 
-// 构建 H5 手机网站支付跳转 URL（前端直接跳转，无需服务端请求）
-export function buildH5PayUrl(
+// 构建跳转支付 URL（H5/PC 通用，传入不同 method 即可）
+function buildRedirectPayUrl(
+    method: string,
     bizContent: object,
     returnUrl: string,
     config: AlipayConfig
 ): string {
     const params: Record<string, string> = {
-        ...buildBaseParams('alipay.trade.wap.pay', config),
+        ...buildBaseParams(method, config),
         notify_url: config.notifyUrl,
         return_url: returnUrl,
         biz_content: JSON.stringify(bizContent),
@@ -177,4 +178,22 @@ export function buildH5PayUrl(
         .join('&')
 
     return `${config.gateway}?${queryString}`
+}
+
+// 构建 H5 手机网站支付跳转 URL (alipay.trade.wap.pay)
+export function buildH5PayUrl(
+    bizContent: object,
+    returnUrl: string,
+    config: AlipayConfig
+): string {
+    return buildRedirectPayUrl('alipay.trade.wap.pay', bizContent, returnUrl, config)
+}
+
+// 构建 PC 电脑网站支付跳转 URL (alipay.trade.page.pay)
+export function buildPagePayUrl(
+    bizContent: object,
+    returnUrl: string,
+    config: AlipayConfig
+): string {
+    return buildRedirectPayUrl('alipay.trade.page.pay', bizContent, returnUrl, config)
 }

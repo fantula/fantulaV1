@@ -7,7 +7,7 @@ import { getAuthToken } from '~/utils/supabase'
 export interface AlipayNativePayResponse {
     success: boolean
     data?: {
-        qr_code: string       // 支付宝二维码链接
+        pay_url: string       // 支付宝电脑网站支付跳转链接
         out_trade_no: string  // 商户订单号
         amount: number        // 金额
     }

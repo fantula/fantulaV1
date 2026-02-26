@@ -35,10 +35,12 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const WalletRechargeModal = defineAsyncComponent(() => import('@/components/pc/modal/business/WalletRechargeModal.vue'))
 import { authApi } from '@/api/client/auth'
+import { alipayApi } from '@/api/client/alipay-payment'
 import { useUserStore } from '@/stores/client/user'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import AssetHeroCard from '@/components/pc/wallet/AssetHeroCard.vue'
 import WalletLedger from '@/components/pc/wallet/WalletLedger.vue'
+import { ElMessage } from 'element-plus'
 
 const userStore = useUserStore()
 const route = useRoute()
@@ -79,10 +81,51 @@ const fetchWallet = async () => {
   }
 }
 
+// 处理支付宝回跳 - 轮询订单状态
+async function handleAlipayReturn() {
+    const orderNo = route.query.alipay_order as string
+    if (!orderNo) return
+
+    ElMessage.info('正在确认支付结果...')
+
+    let attempts = 0
+    const maxAttempts = 10
+
+    const poll = async () => {
+        if (attempts >= maxAttempts) {
+            ElMessage.warning('支付结果确认超时，请刷新页面查看余额')
+            return
+        }
+        attempts++
+
+        try {
+            const res = await alipayApi.queryOrder(orderNo)
+            if (res.success && res.data?.paid) {
+                ElMessage.success('充值成功！余额已更新')
+                await fetchWallet()
+                await userStore.fetchUserInfo()
+                return
+            }
+        } catch (e) {
+            console.error('[AlipayReturn] Query error:', e)
+        }
+
+        // 未支付，3秒后重试
+        setTimeout(poll, 3000)
+    }
+
+    // 延迟1秒后开始轮询（等支付宝异步通知处理完）
+    setTimeout(poll, 1000)
+}
+
 onMounted(async () => {
     await fetchWallet()
     if (route.query.amount) {
         showRechargeModal.value = true
+    }
+    // 处理支付宝电脑网站支付回跳
+    if (route.query.alipay_order) {
+        await handleAlipayReturn()
     }
 })
 
