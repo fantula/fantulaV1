@@ -71,8 +71,6 @@ export default defineEventHandler(async (event) => {
         // .env 中 \n 是字面量，需转换为真实换行符才能用于 RSA 验证
         const rawCert = String(useRuntimeConfig().wechatPlatformCert || '')
         const platformCert = rawCert.replace(/\\n/g, '\n')
-        // 诊断日志：确认公钥是否正确加载（部署验证后删除）
-        console.log('[WechatNotify] cert loaded, length:', rawCert.length, 'starts:', rawCert.slice(0, 27))
         const isValid = verifyCallbackSignature(timestamp, nonce, rawBody || '', signature, platformCert)
 
         if (!isValid) {

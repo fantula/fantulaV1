@@ -91,11 +91,9 @@ export async function handleRechargeCallback(
 
     const { user_id, amount, bonus, new_balance } = rpcResult
 
-    if (import.meta.dev) {
-        console.log(
-            `[RechargeHandler] OK user=${user_id} amount=${amount} bonus=${bonus} balance=${new_balance}`
-        )
-    }
+    console.log(
+        `[RechargeHandler] OK user=${user_id} source=${params.paySource} amount=${amount} bonus=${bonus} balance=${new_balance}`
+    )
 
     // ── 2. 异步发送通知（不阻塞回调响应）─────────────────────
     const { data: profile } = await supabase
@@ -112,7 +110,7 @@ export async function handleRechargeCallback(
         }).catch((e: Error) => console.error('[RechargeHandler] Email error:', e.message))
     }
 
-    if (params.paySource === 'wechat' && profile?.wechat_openid) {
+    if (profile?.wechat_openid) {
         sendWechatTemplateMessage(
             profile.wechat_openid,
             WECHAT_TEMPLATE_IDS.RECHARGE_SUCCESS,
