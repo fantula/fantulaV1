@@ -1,10 +1,10 @@
 /**
  * POST /api/alipay/native-pay
- * 支付宝当面付 - 生成支付二维码 (PC扫码支付)
- * 调用: alipay.trade.precreate
+ * 支付宝电脑网站支付 - 生成跳转支付URL
+ * 调用: alipay.trade.page.pay
  */
 import { getSupabaseClient, getCurrentUser } from '~/server/utils/supabase'
-import { getAlipayConfig, alipayRequest, generateAlipayOrderNo } from '~/server/utils/alipay'
+import { getAlipayConfig, buildPagePayUrl, generateAlipayOrderNo } from '~/server/utils/alipay'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
         const config = getAlipayConfig()
         if (!config.appId || !config.privateKey) {
-            console.error('[AlipayNative] Missing Alipay config')
+            console.error('[AlipayPC] Missing Alipay config')
             throw createError({ statusCode: 500, message: '支付配置错误，请联系管理员' })
         }
 
@@ -39,39 +39,41 @@ export default defineEventHandler(async (event) => {
                 bonus: bonus,
                 amount_cents: Math.round(amount * 100),
                 status: 'pending',
-                pay_type: 'alipay_native',
+                pay_type: 'alipay_pc',
                 description: description || `充值${amount}点`,
                 created_at: new Date().toISOString(),
             })
 
         if (insertError && !insertError.message.includes('does not exist')) {
-            console.error('[AlipayNative] Insert error:', insertError)
+            console.error('[AlipayPC] Insert error:', insertError)
             throw insertError
         }
 
-        // 调用 alipay.trade.precreate 获取二维码
-        const result = await alipayRequest(
-            'alipay.trade.precreate',
+        // 构建电脑网站支付跳转 URL
+        const returnUrl = `https://www.fantula.com/pc/profile/wallet?alipay_order=${outTradeNo}`
+        const payUrl = buildPagePayUrl(
             {
                 out_trade_no: outTradeNo,
+                product_code: 'FAST_INSTANT_TRADE_PAY',
                 total_amount: amount.toFixed(2),
                 subject: description || `凡图拉-充值${amount}点`,
             },
+            returnUrl,
             config
         )
 
-        console.log('[AlipayNative] QR Code URL:', result.qr_code)
+        console.log('[AlipayPC] Pay URL generated for order:', outTradeNo)
 
         return {
             success: true,
             data: {
-                qr_code: result.qr_code,
+                pay_url: payUrl,
                 out_trade_no: outTradeNo,
                 amount: amount,
             },
         }
     } catch (err: any) {
-        console.error('[AlipayNative] Error:', err)
+        console.error('[AlipayPC] Error:', err)
         throw createError({
             statusCode: err.statusCode || 500,
             message: err.message || '支付下单失败',

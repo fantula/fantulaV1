@@ -123,11 +123,11 @@
           <div class="qrcode-container">
             <div class="qrcode-header">
               <img
-                :src="payType === 'alipay' ? '/images/client/pc/zhifu2.png' : '/images/client/pc/weixin.png'"
-                :alt="payType === 'alipay' ? '支付宝' : '微信'"
+                src="/images/client/pc/weixin.png"
+                alt="微信"
                 class="wechat-icon"
               />
-              <span>{{ payType === 'alipay' ? '支付宝扫码支付' : '微信扫码支付' }}</span>
+              <span>微信扫码支付</span>
             </div>
             
             <div class="qrcode-wrapper">
@@ -247,10 +247,8 @@ async function handleRecharge() {
   loading.value = true
 
   try {
-    let qrCodeUrl = ''
-    let orderNo = ''
-
     if (payType.value === 'alipay') {
+      // 电脑网站支付：直接跳转到支付宝收银台
       const res = await alipayApi.nativePayRecharge(
         payAmount.value,
         currentBonus.value,
@@ -260,28 +258,28 @@ async function handleRecharge() {
         ElMessage.error(res.error || '支付发起失败')
         return
       }
-      qrCodeUrl = res.data.qr_code
-      orderNo = res.data.out_trade_no
-    } else {
-      const res = await wechatPayApi.nativePayRecharge(
-        payAmount.value,
-        currentBonus.value,
-        `凡图拉-充值${payAmount.value}点`
-      )
-      if (!res.success || !res.data) {
-        ElMessage.error(res.error || '支付发起失败')
-        return
-      }
-      qrCodeUrl = res.data.code_url
-      orderNo = res.data.out_trade_no
+      // 跳转到支付宝支付页面，支付完成后回跳钱包页
+      window.location.href = res.data.pay_url
+      return
     }
 
-    currentOrderNo.value = orderNo
+    // 微信 Native 支付：显示扫码二维码
+    const res = await wechatPayApi.nativePayRecharge(
+      payAmount.value,
+      currentBonus.value,
+      `凡图拉-充值${payAmount.value}点`
+    )
+    if (!res.success || !res.data) {
+      ElMessage.error(res.error || '支付发起失败')
+      return
+    }
+
+    currentOrderNo.value = res.data.out_trade_no
     showQrCode.value = true
 
     // 生成二维码图片
     try {
-      const url = await QRCode.toDataURL(qrCodeUrl, {
+      const url = await QRCode.toDataURL(res.data.code_url, {
         width: 200,
         margin: 2,
         color: { dark: '#000000', light: '#ffffff' }
@@ -310,9 +308,7 @@ function startPolling() {
     paymentStatus.value = 'checking'
     
     try {
-      const res = payType.value === 'alipay'
-        ? await alipayApi.queryOrder(currentOrderNo.value)
-        : await wechatPayApi.queryOrder(currentOrderNo.value)
+      const res = await wechatPayApi.queryOrder(currentOrderNo.value)
       console.log('[Polling] Response:', JSON.stringify(res))
       
       if (res.success && res.data?.paid) {
