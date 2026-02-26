@@ -2,7 +2,7 @@
   <div class="notification-list-page">
     <div class="page-header">
       <h3>邮件通知配置</h3>
-      <el-button :icon="Refresh" circle @click="() => refresh()" :loading="pending" />
+      <el-button :icon="Refresh" circle @click="fetchTemplates" :loading="pending" />
     </div>
 
     <AdminDataTable
@@ -28,9 +28,9 @@
       </el-table-column>
       <el-table-column label="操作" width="120" align="center">
         <template #default="{ row }">
-          <el-button 
-            type="primary" 
-            link 
+          <el-button
+            type="primary"
+            link
             @click="router.push(adminRoute(`backend-settings/notification/template/${row.id}`))"
           >
             编辑模板
@@ -44,10 +44,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { adminRoute } from '@/config/admin-routes'
+import { getSupabaseClient } from '@/utils/supabase'
 
 definePageMeta({
   layout: 'mgmt',
@@ -55,35 +56,53 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { data: res, pending, refresh, error } = await useFetch('/api/admin/system/notifications/templates')
+const pending = ref(false)
+const templates = ref<any[]>([])
 
-const templates = computed(() => res.value?.data || [])
+const getAuthToken = async (): Promise<string | null> => {
+  const { data: { session } } = await getSupabaseClient().auth.getSession()
+  return session?.access_token ?? null
+}
+
+const fetchTemplates = async () => {
+  pending.value = true
+  try {
+    const token = await getAuthToken()
+    const res = await $fetch<{ data: any[] }>('/api/admin/system/notifications/templates', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+    templates.value = res?.data || []
+  } catch (e: any) {
+    ElMessage.error('加载模板列表失败')
+    if (import.meta.dev) console.error('[NotificationList] fetch error:', e)
+  } finally {
+    pending.value = false
+  }
+}
 
 const handleToggle = async (row: any) => {
   row.updating = true
   try {
-    const { error } = await useFetch('/api/admin/system/notifications/templates', {
+    const token = await getAuthToken()
+    await $fetch('/api/admin/system/notifications/templates', {
       method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: {
         id: row.id,
-        event_type: row.event_type, // Required by validation
+        event_type: row.event_type,
         is_enabled: row.is_enabled
       }
     })
-    
-    if (error.value) {
-      ElMessage.error(error.value.statusMessage || '更新失败')
-      row.is_enabled = !row.is_enabled // revert
-    } else {
-      ElMessage.success('更新成功')
-    }
-  } catch (e) {
-    ElMessage.error('更新失败')
-    row.is_enabled = !row.is_enabled
+    ElMessage.success('更新成功')
+  } catch (e: any) {
+    ElMessage.error(e.data?.statusMessage || '更新失败')
+    row.is_enabled = !row.is_enabled // revert
   } finally {
     row.updating = false
   }
 }
+
+onMounted(() => fetchTemplates())
 </script>
 
 <style scoped>

@@ -27,7 +27,7 @@
                 />
               </div>
             </template>
-            
+
             <el-form label-position="top">
               <el-form-item label="邮件标题">
                 <el-input v-model="form.subject_template" placeholder="请输入邮件标题" />
@@ -74,13 +74,13 @@
               <el-form-item label="收件人邮箱">
                 <el-input v-model="testEmail" placeholder="name@example.com" />
               </el-form-item>
-              
+
               <div v-if="template.variables && template.variables.length > 0" class="mb-4">
                 <div class="text-sm text-gray-500 mb-2">测试数据 (可选 JSON)</div>
-                <el-input 
-                  v-model="testDataJson" 
-                  type="textarea" 
-                  :rows="3" 
+                <el-input
+                  v-model="testDataJson"
+                  type="textarea"
+                  :rows="3"
                   placeholder='{"order_no": "TEST001"}'
                 />
               </div>
@@ -91,13 +91,14 @@
         </div>
       </div>
     </template>
-    
+
     <el-empty v-else description="模板不存在" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { getSupabaseClient } from '@/utils/supabase'
 
 definePageMeta({
   layout: 'mgmt',
@@ -108,13 +109,31 @@ const route = useRoute()
 const router = useRouter()
 const templateId = route.params.id as string
 
-// Fetch all templates (simplest way to get data without new endpoint)
-const { data: res, pending, refresh } = await useFetch('/api/admin/system/notifications/templates')
+const pending = ref(false)
+const allTemplates = ref<any[]>([])
 
-const template = computed(() => {
-  if (!res.value?.data) return null
-  return res.value.data.find((t: any) => t.id === templateId)
-})
+const getAuthToken = async (): Promise<string | null> => {
+  const { data: { session } } = await getSupabaseClient().auth.getSession()
+  return session?.access_token ?? null
+}
+
+const fetchTemplates = async () => {
+  pending.value = true
+  try {
+    const token = await getAuthToken()
+    const res = await $fetch<{ data: any[] }>('/api/admin/system/notifications/templates', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+    allTemplates.value = res?.data || []
+  } catch (e: any) {
+    ElMessage.error('加载模板失败')
+    if (import.meta.dev) console.error('[TemplateEdit] fetch error:', e)
+  } finally {
+    pending.value = false
+  }
+}
+
+const template = computed(() => allTemplates.value.find((t: any) => t.id === templateId) || null)
 
 // Form State
 const form = ref({
@@ -123,7 +142,6 @@ const form = ref({
   is_enabled: true
 })
 
-// Initialize form when template loads
 watch(template, (newVal) => {
   if (newVal) {
     form.value = {
@@ -140,23 +158,20 @@ const handleSave = async () => {
   if (!template.value) return
   saving.value = true
   try {
-    const { error } = await useFetch('/api/admin/system/notifications/templates', {
+    const token = await getAuthToken()
+    await $fetch('/api/admin/system/notifications/templates', {
       method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: {
         id: template.value.id,
         event_type: template.value.event_type,
         ...form.value
       }
     })
-
-    if (error.value) {
-      ElMessage.error(error.value.statusMessage || '保存失败')
-    } else {
-      ElMessage.success('保存成功')
-      refresh() // update local data
-    }
-  } catch (e) {
-    ElMessage.error('保存失败')
+    ElMessage.success('保存成功')
+    fetchTemplates()
+  } catch (e: any) {
+    ElMessage.error(e.data?.statusMessage || '保存失败')
   } finally {
     saving.value = false
   }
@@ -172,7 +187,6 @@ const handleSendTest = async () => {
     ElMessage.warning('请输入收件人邮箱')
     return
   }
-  
   if (!template.value) return
 
   let testData: any = {}
@@ -180,7 +194,6 @@ const handleSendTest = async () => {
     if (testDataJson.value) {
       testData = JSON.parse(testDataJson.value)
     } else {
-      // Auto generate dummy data
       template.value.variables?.forEach((v: any) => {
         testData[v.key] = `[TEST_${v.key.toUpperCase()}]`
       })
@@ -192,26 +205,25 @@ const handleSendTest = async () => {
 
   sendingTest.value = true
   try {
-    const { error } = await useFetch('/api/admin/system/notifications/test', {
+    const token = await getAuthToken()
+    await $fetch('/api/admin/system/notifications/test', {
       method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: {
         event_type: template.value.event_type,
         to: testEmail.value,
         data: testData
       }
     })
-
-    if (error.value) {
-      ElMessage.error(error.value.statusMessage || '发送失败')
-    } else {
-      ElMessage.success('测试邮件已发送')
-    }
-  } catch (e) {
-    ElMessage.error('发送失败')
+    ElMessage.success('测试邮件已发送')
+  } catch (e: any) {
+    ElMessage.error(e.data?.statusMessage || '发送失败')
   } finally {
     sendingTest.value = false
   }
 }
+
+onMounted(() => fetchTemplates())
 </script>
 
 <style scoped>
@@ -242,6 +254,8 @@ const handleSendTest = async () => {
   color: var(--el-text-color-secondary);
   margin-top: 4px;
 }
+
+.mb-4 { margin-bottom: 16px; }
 
 @media (max-width: 1024px) {
   .content-grid {
