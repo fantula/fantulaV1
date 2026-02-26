@@ -144,6 +144,11 @@ body.show-pc-loader::after {
     wechatPayPrivateKey: process.env.WECHAT_PAY_PRIVATE_KEY || '',
     wechatPayNotifyUrl: process.env.WECHAT_PAY_NOTIFY_URL || '',
     wechatAppSecret: process.env.WECHAT_APP_SECRET || '',
+    // 支付宝配置 (服务端私有)
+    alipayAppId: process.env.ALIPAY_APP_ID || '',
+    alipayPrivateKey: process.env.ALIPAY_PRIVATE_KEY || '',
+    alipayPublicKey: process.env.ALIPAY_PUBLIC_KEY || '',
+    alipayNotifyUrl: process.env.ALIPAY_NOTIFY_URL || 'https://www.fantula.com/api/alipay/notify',
     // 定时任务服务内部地址（服务端代理用，浏览器不可访问）
     schedulerInternalUrl: process.env.SCHEDULER_INTERNAL_URL || 'http://127.0.0.1:3001',
 

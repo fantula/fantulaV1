@@ -46,16 +46,20 @@
          <!-- 2. Payment Method -->
          <div class="section-title mt-4">支付方式</div>
          <div class="pay-methods">
-             <!-- 支付宝暂未开通 -->
-             <div class="pay-item disabled">
+             <div
+                :class="['pay-item', { active: payType === 'alipay' }]"
+                @click="payType = 'alipay'"
+             >
                 <div class="pay-left">
                     <img src="/images/client/pc/zhifu2.png" class="pay-icon" alt="Alipay" />
                     <span>支付宝</span>
-                    <span class="coming-soon">即将开通</span>
+                </div>
+                <div class="pay-radio" :class="{ checked: payType === 'alipay' }">
+                    <div class="radio-dot" v-if="payType === 'alipay'"></div>
                 </div>
              </div>
 
-             <div 
+             <div
                 :class="['pay-item', { active: payType === 'wechat' }]"
                 @click="payType = 'wechat'"
              >
@@ -69,8 +73,8 @@
              </div>
          </div>
 
-         <!-- 非微信浏览器提示 -->
-         <div v-if="!isWechatBrowser" class="wechat-tip">
+         <!-- 非微信浏览器提示（仅选微信时显示） -->
+         <div v-if="payType === 'wechat' && !isWechatBrowser" class="wechat-tip">
            <div class="tip-icon">💡</div>
            <div class="tip-text">请在微信中打开本页面以使用微信支付</div>
          </div>
@@ -83,13 +87,13 @@
               <span class="bonus-hint" v-if="currentBonus > 0">(含赠送 {{ currentBonus }})</span>
           </div>
 
-          <button 
-            class="pay-btn aurora-btn-accent" 
-            @click="handleRecharge" 
-            :disabled="loading || !isValidAmount || !isWechatBrowser"
+          <button
+            class="pay-btn aurora-btn-accent"
+            @click="handleRecharge"
+            :disabled="loading || !isValidAmount || (payType === 'wechat' && !isWechatBrowser)"
           >
               <span v-if="loading" class="spinner"></span>
-              <span v-else-if="!isWechatBrowser">请在微信内打开</span>
+              <span v-else-if="payType === 'wechat' && !isWechatBrowser">请在微信内打开</span>
               <span v-else>立即支付 ¥{{ payAmount.toFixed(2) }}</span>
           </button>
       </div>
@@ -103,6 +107,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
 import { wechatPayApi } from '@/api/client/wechat-payment'
+import { alipayApi } from '@/api/client/alipay-payment'
 import { useNotify } from '@/composables/useNotify'
 import { useUserStore } from '@/stores/client/user'
 
@@ -127,7 +132,7 @@ const options = ref<RechargeOption[]>([])
 const loading = ref(false)
 const selectedIdx = ref(0)
 const customValue = ref<number | null>(null)
-const payType = ref<'wechat'>('wechat')
+const payType = ref<'wechat' | 'alipay'>('alipay')  // 默认支付宝
 
 // Computed
 const payAmount = computed(() => {
@@ -283,59 +288,71 @@ function invokeWechatPay(params: {
 }
 
 const handleRecharge = async () => {
-    if (!isValidAmount.value || loading.value) return 
-    
-    if (!isWechatBrowser.value) {
-      warning('请在微信中打开本页面')
-      return
-    }
-    
+    if (!isValidAmount.value || loading.value) return
+
     loading.value = true
-    
+
     try {
-        // 获取用户 OpenID
+        if (payType.value === 'alipay') {
+            // 支付宝 H5 支付：获取跳转链接后直接跳转
+            const res = await alipayApi.h5PayRecharge(
+                payAmount.value,
+                currentBonus.value,
+                `凡图拉-充值${payAmount.value}点`
+            )
+
+            if (!res.success || !res.data) {
+                error(res.error || '支付发起失败')
+                return
+            }
+
+            // 跳转到支付宝付款页面（支付完成后自动回到钱包页）
+            window.location.href = res.data.pay_url
+            return
+        }
+
+        // 微信 JSAPI 支付
+        if (!isWechatBrowser.value) {
+            warning('请在微信中打开本页面')
+            return
+        }
+
         let openid = await getOpenId()
-        
+
         if (!openid) {
-          // 需要授权获取 OpenID
-          info('正在跳转微信授权...')
-          redirectToWechatAuth()
-          return
+            info('正在跳转微信授权...')
+            redirectToWechatAuth()
+            return
         }
-        
-        // 调用 JSAPI 下单（传入 bonus 赠送额度）
+
         const res = await wechatPayApi.jsapiPayRecharge(
-          payAmount.value,
-          openid,
-          `凡图拉-充值${payAmount.value}点`,
-          currentBonus.value
+            payAmount.value,
+            openid,
+            `凡图拉-充值${payAmount.value}点`,
+            currentBonus.value
         )
-        
+
         if (!res.success || !res.data) {
-          error(res.error || '支付发起失败')
-          return
+            error(res.error || '支付发起失败')
+            return
         }
-        
-        // 调起微信支付
+
         const paySuccess = await invokeWechatPay({
-          appId: res.data.appId,
-          timeStamp: res.data.timeStamp,
-          nonceStr: res.data.nonceStr,
-          package: res.data.package,
-          signType: res.data.signType,
-          paySign: res.data.paySign,
+            appId: res.data.appId,
+            timeStamp: res.data.timeStamp,
+            nonceStr: res.data.nonceStr,
+            package: res.data.package,
+            signType: res.data.signType,
+            paySign: res.data.paySign,
         })
-        
+
         if (paySuccess) {
-          success('充值成功！')
-          
-          // 刷新用户余额
-          await userStore.fetchUserInfo()
-          
-          emit('success')
-          close()
+            success('充值成功！')
+            await userStore.fetchUserInfo()
+            emit('success')
+            close()
         }
-        
+
     } catch (e: any) {
         error(e.message || '支付失败')
     } finally {

@@ -63,14 +63,14 @@
               <div class="section-container">
                 <div class="section-label">支付方式</div>
                 <div class="pay-methods">
-                  <div :class="['pay-method', 'disabled']" title="支付宝暂未开通">
+                  <div :class="['pay-method', payType==='alipay' ? 'active' : '']" @click="payType='alipay'">
                     <div class="icon-container alipay">
                       <img class="pay-icon" src="/images/client/pc/zhifu2.png" alt="支付宝" />
                     </div>
                     <span>支付宝</span>
-                    <span class="coming-soon">即将开通</span>
+                    <div v-if="payType==='alipay'" class="pay-check"><el-icon><Select /></el-icon></div>
                   </div>
-                  
+
                   <div :class="['pay-method', payType==='wechat' ? 'active' : '']" @click="payType='wechat'">
                     <div class="icon-container wechat">
                       <img class="pay-icon" src="/images/client/pc/weixin.png" alt="微信" />
@@ -122,8 +122,12 @@
         <template v-else>
           <div class="qrcode-container">
             <div class="qrcode-header">
-              <img src="/images/client/pc/weixin.png" alt="微信" class="wechat-icon" />
-              <span>微信扫码支付</span>
+              <img
+                :src="payType === 'alipay' ? '/images/client/pc/zhifu2.png' : '/images/client/pc/weixin.png'"
+                :alt="payType === 'alipay' ? '支付宝' : '微信'"
+                class="wechat-icon"
+              />
+              <span>{{ payType === 'alipay' ? '支付宝扫码支付' : '微信扫码支付' }}</span>
             </div>
             
             <div class="qrcode-wrapper">
@@ -173,6 +177,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { authApi } from '@/api/client/auth'
 import { wechatPayApi } from '@/api/client/wechat-payment'
+import { alipayApi } from '@/api/client/alipay-payment'
 import BaseButton from '@/components/shared/BaseButton.vue'
 import { Check, Select, ArrowRight, Lock, Present, CircleCheck } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -198,7 +203,7 @@ const options = ref<RechargeOption[]>([])
 const loading = ref(false)
 const selectedIdx = ref(0)
 const inputValue = ref<number | null>(null)
-const payType = ref('wechat')  // 默认微信支付
+const payType = ref<'wechat' | 'alipay'>('alipay')  // 默认支付宝
 
 // 二维码相关
 const showQrCode = ref(false)
@@ -235,46 +240,59 @@ function selectOption(idx:number) {
   if(idx!==-1) inputValue.value = null
 }
 
-// 发起微信支付
+// 发起支付
 async function handleRecharge() {
   if (!isValidAmount.value || loading.value) return
-  
+
   loading.value = true
-  
+
   try {
-    const res = await wechatPayApi.nativePayRecharge(
-      payAmount.value,
-      currentBonus.value,
-      `凡图拉-充值${payAmount.value}点`
-    )
-    
-    if (!res.success || !res.data) {
-      ElMessage.error(res.error || '支付发起失败')
-      return
+    let qrCodeUrl = ''
+    let orderNo = ''
+
+    if (payType.value === 'alipay') {
+      const res = await alipayApi.nativePayRecharge(
+        payAmount.value,
+        currentBonus.value,
+        `凡图拉-充值${payAmount.value}点`
+      )
+      if (!res.success || !res.data) {
+        ElMessage.error(res.error || '支付发起失败')
+        return
+      }
+      qrCodeUrl = res.data.qr_code
+      orderNo = res.data.out_trade_no
+    } else {
+      const res = await wechatPayApi.nativePayRecharge(
+        payAmount.value,
+        currentBonus.value,
+        `凡图拉-充值${payAmount.value}点`
+      )
+      if (!res.success || !res.data) {
+        ElMessage.error(res.error || '支付发起失败')
+        return
+      }
+      qrCodeUrl = res.data.code_url
+      orderNo = res.data.out_trade_no
     }
-    
-    // 显示二维码
-    currentOrderNo.value = res.data.out_trade_no
+
+    currentOrderNo.value = orderNo
     showQrCode.value = true
-    
-    // 生成二维码
+
+    // 生成二维码图片
     try {
-      const url = await QRCode.toDataURL(res.data!.code_url, {
+      const url = await QRCode.toDataURL(qrCodeUrl, {
         width: 200,
         margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
+        color: { dark: '#000000', light: '#ffffff' }
       })
       qrcodeDataUrl.value = url
     } catch (qrErr) {
       console.error('QR Code generation failed:', qrErr)
     }
-    
-    // 开始轮询支付状态
+
     startPolling()
-    
+
   } catch (err: any) {
     ElMessage.error(err.message || '网络错误')
   } finally {
@@ -292,7 +310,9 @@ function startPolling() {
     paymentStatus.value = 'checking'
     
     try {
-      const res = await wechatPayApi.queryOrder(currentOrderNo.value)
+      const res = payType.value === 'alipay'
+        ? await alipayApi.queryOrder(currentOrderNo.value)
+        : await wechatPayApi.queryOrder(currentOrderNo.value)
       console.log('[Polling] Response:', JSON.stringify(res))
       
       if (res.success && res.data?.paid) {

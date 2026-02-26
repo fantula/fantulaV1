@@ -82,12 +82,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ArrowLeft, InfoFilled, Lightning } from '@element-plus/icons-vue'
 import { authApi } from '@/api/client/auth'
+import { alipayApi } from '@/api/client/alipay-payment'
 import { useUserStore } from '@/stores/client/user'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
 import { useBizFormat } from '@/composables/common/useBizFormat'
+import { useNotify } from '@/composables/useNotify'
 const RechargeModal = defineAsyncComponent(() => import('@/components/mobile/profile/modals/RechargeModal.vue'))
 import MobileInfiniteList from '@/components/mobile/list/MobileInfiniteList.vue'
 import MobileSubPageHeader from '@/components/mobile/layout/MobileSubPageHeader.vue'
@@ -98,8 +100,10 @@ definePageMeta({
 })
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const { formatDate } = useBizFormat()
+const { success, info, error } = useNotify()
 const showRecharge = ref(false)
 const showTipModal = ref(false)
 
@@ -156,12 +160,41 @@ const getAmountClass = (amt: number) => {
     return amt > 0 ? 'text-green' : 'text-white'
 }
 
+// 处理支付宝 H5 支付回跳（alipay_order 参数）
+async function handleAlipayReturn() {
+    const orderNo = route.query.alipay_order as string
+    if (!orderNo) return
+
+    // 清除 URL 参数，避免刷新重复触发
+    router.replace({ query: {} })
+
+    info('正在确认支付结果...')
+
+    // 轮询最多 10 次（30 秒）
+    for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        try {
+            const res = await alipayApi.queryOrder(orderNo)
+            if (res.success && res.data?.paid) {
+                success('充值成功！')
+                await refreshData()
+                return
+            }
+        } catch (e) {
+            console.error('[AlipayReturn] Query error:', e)
+        }
+    }
+
+    error('支付结果确认超时，如已扣款请稍后刷新查看余额')
+}
+
 onMounted(() => {
     if (!userStore.isLoggedIn) {
         router.push('/mobile')
         return
     }
     fetchData()
+    handleAlipayReturn()
 })
 
 watch(currentTab, () => {
