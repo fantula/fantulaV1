@@ -196,6 +196,13 @@ export const useAdminStore = defineStore('admin', () => {
 
     /**
      * 检查页面权限
+     *
+     * 优先级：
+     *   1. 未登录 → false
+     *   2. 超级管理员（部门名含"超级"或权限含"*"）→ true
+     *   3. 首页 → true（所有登录管理员可访问）
+     *   4. 部门未配置权限（length === 0）→ false（最小权限原则）
+     *   5. 精确匹配或路径前缀匹配 → true
      */
     const hasPermission = (path: string): boolean => {
         if (!adminUser.value) return false
@@ -203,7 +210,7 @@ export const useAdminStore = defineStore('admin', () => {
         const perms = adminInfo.value?.department?.permissions || []
         if (deptName.includes('超级') || perms.includes('*')) return true
         if (path === adminRoutes.home()) return true
-        if (permissions.value.length === 0) return true
+        if (permissions.value.length === 0) return false
         if (permissions.value.includes(path)) return true
         for (const perm of permissions.value) {
             if (path.startsWith(perm + '/')) return true

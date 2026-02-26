@@ -108,7 +108,20 @@ export function decryptCallback(
     return decrypted.toString('utf8')
 }
 
-// 验证微信支付回调签名
+/**
+ * 验证微信支付回调签名（RSA-SHA256）
+ *
+ * 签名串格式（微信文档规定）：
+ *   timestamp\nnonce\nbody\n
+ *
+ * wechatPublicKey：微信支付平台证书公钥，PEM 格式（含 BEGIN/END 头尾）
+ * 可从 GET /v3/certificates 接口获取，存入环境变量 WECHAT_PLATFORM_CERT
+ *
+ * 安全策略（三层）：
+ *   1. 时间戳有效期检查（±5分钟），防重放
+ *   2. RSA-SHA256 签名验证（有公钥时）
+ *   3. 无公钥时拒绝请求并记录警告（生产环境必须配置公钥）
+ */
 export function verifyCallbackSignature(
     timestamp: string,
     nonce: string,
@@ -116,15 +129,30 @@ export function verifyCallbackSignature(
     signature: string,
     wechatPublicKey: string
 ): boolean {
-    // 构建验签串
-    const message = `${timestamp}\n${nonce}\n${body}\n`
+    // 层1：时间戳防重放（±5分钟）
+    const ts = parseInt(timestamp, 10)
+    const now = Math.floor(Date.now() / 1000)
+    if (isNaN(ts) || Math.abs(now - ts) > 300) {
+        console.error('[WechatVerify] Timestamp out of range:', timestamp)
+        return false
+    }
 
-    // TODO: 实现完整的验签逻辑（需要获取微信平台证书）
-    // 可以通过调用 GET /v3/certificates 获取
-    console.log('[Verify] Message to verify:', message.substring(0, 50) + '...')
+    // 层2：无公钥时拒绝（禁止在生产环境留空）
+    if (!wechatPublicKey || wechatPublicKey.trim() === '') {
+        console.error('[WechatVerify] WECHAT_PLATFORM_CERT not configured, rejecting callback')
+        return false
+    }
 
-    // 暂时返回 true，生产环境需要完善
-    return true
+    // 层3：RSA-SHA256 验签
+    try {
+        const message = `${timestamp}\n${nonce}\n${body}\n`
+        const verifier = crypto.createVerify('RSA-SHA256')
+        verifier.update(message, 'utf8')
+        return verifier.verify(wechatPublicKey, signature, 'base64')
+    } catch (e: any) {
+        console.error('[WechatVerify] Verification error:', e.message)
+        return false
+    }
 }
 
 // 发起微信支付 API 请求
@@ -155,7 +183,7 @@ export async function wechatPayRequest<T>(
         options.body = bodyString
     }
 
-    console.log(`[WechatPay] ${method} ${path}`)
+    if (import.meta.dev) console.log(`[WechatPay] ${method} ${path}`)
 
     const response = await fetch(url, options)
     const responseText = await response.text()

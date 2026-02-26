@@ -1,6 +1,6 @@
 # 数据库 Schema 文档
 
-> **版本**: V1.1 | **更新时间**: 2026-02-21 | **表数量**: 38
+> **版本**: V1.2 | **更新时间**: 2026-02-26 | **表数量**: 38
 
 ---
 
@@ -45,6 +45,50 @@
 | `user_favorites` | 5 | ✅ | 用户收藏 |
 | `wallet_transactions` | 7 | ✅ | 钱包流水 |
 | `wechat_login_sessions` | 7 | ✅ | 微信登录会话 |
+
+---
+
+## ⚙️ RPC 函数
+
+### `process_recharge_payment` (2026-02-26 新增)
+
+**迁移文件**: `nuxt-frontend/supabase/migrations/20260226000000_add_process_recharge_rpc.sql`
+
+**签名**:
+```sql
+process_recharge_payment(
+    p_out_trade_no   TEXT,
+    p_transaction_id TEXT,
+    p_payer_openid   TEXT    DEFAULT NULL,
+    p_paid_at        TEXT    DEFAULT NULL,
+    p_pay_source     TEXT    DEFAULT 'wechat'   -- 'wechat' | 'alipay'
+) RETURNS JSON
+LANGUAGE plpgsql SECURITY DEFINER
+```
+
+**职责**: 在单个事务内原子完成充值回调的所有数据库操作：
+1. `FOR UPDATE` 锁定订单行（防并发重复处理）
+2. 幂等检查（已 paid 则直接返回）
+3. 更新 `recharge_orders.status = 'paid'`
+4. 原子累加 `profiles.balance`（直接 `balance + amount + bonus`，无竞态）
+5. 插入 `wallet_transactions` 流水记录
+
+**返回值 JSON 结构**:
+```json
+{
+  "success": true,
+  "already_processed": false,
+  "user_id": "uuid",
+  "amount": 10.00,
+  "bonus": 2.00,
+  "total_amount": 12.00,
+  "new_balance": 42.00
+}
+```
+
+**调用方**: `server/utils/recharge-handler.ts`（微信和支付宝共用）
+
+**权限**: 仅 `service_role` 可调用（已 REVOKE PUBLIC + GRANT service_role）
 
 ---
 

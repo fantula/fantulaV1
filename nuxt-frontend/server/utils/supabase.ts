@@ -37,26 +37,8 @@ function resolveServiceKey(): string {
         || String(config.supabaseServiceKey || config.supabaseKey || DEFAULT_SERVICE_KEY)
 }
 
-// 启动时打印一次配置来源，方便排查
-let _configLogged = false
-function logConfigOnce() {
-    if (_configLogged) return
-    _configLogged = true
-    const url = resolveSupabaseUrl()
-    const key = resolveSupabaseKey()
-    const svcKey = resolveServiceKey()
-    console.log('[Supabase] Resolved URL:', url)
-    console.log('[Supabase] Anon Key:', key.substring(0, 20) + '...')
-    console.log('[Supabase] Service Key:', svcKey.substring(0, 20) + '...')
-    console.log('[Supabase] URL source:',
-        process.env.NUXT_PUBLIC_API_BASE ? 'NUXT_PUBLIC_API_BASE' :
-        process.env.SUPABASE_URL ? 'SUPABASE_URL' :
-        'runtimeConfig/fallback')
-}
-
 // 获取 Supabase 客户端 (使用用户 token)
 export function getSupabaseClient(event: H3Event) {
-    logConfigOnce()
     const supabaseUrl = resolveSupabaseUrl()
     const supabaseKey = resolveSupabaseKey()
 
@@ -71,7 +53,6 @@ export function getSupabaseClient(event: H3Event) {
 
 // 获取 Supabase Service Role 客户端 (用于回调等无用户场景)
 export function getSupabaseServiceClient() {
-    logConfigOnce()
     const supabaseUrl = resolveSupabaseUrl()
     const serviceKey = resolveServiceKey()
 

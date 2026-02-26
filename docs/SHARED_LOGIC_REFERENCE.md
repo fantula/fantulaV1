@@ -1,6 +1,6 @@
 # 共享逻辑参考文档
 
-> **版本**: V1.0 | **更新时间**: 2026-02-08
+> **版本**: V1.1 | **更新时间**: 2026-02-26
 > **适用范围**: PC 客户端 + 移动端
 > **目的**: 记录所有 PC/Mobile 共享的逻辑模块，便于复用和扩展
 
@@ -342,7 +342,56 @@ const { channel } = useChannel()
 
 ---
 
-## 📝 六、Bug 修复记录
+## 🔧 六、服务端共享工具（Server Utils）
+
+> 以下工具位于 `nuxt-frontend/server/utils/`，供多个 API route 共用。
+
+### `recharge-handler.ts` — 统一充值处理器（2026-02-26 新增）
+
+**职责**：充值回调验证通过后的统一业务处理，包括调用 RPC、发送通知。
+
+```typescript
+import { handleRechargeCallback } from '~/server/utils/recharge-handler'
+
+const result = await handleRechargeCallback({
+    outTradeNo:    'FTL20260226xxxxx',   // 商户订单号
+    transactionId: '4200001234',          // 支付渠道订单号
+    payerOpenid:   'oXxxxx',             // 微信 OpenID（支付宝传 undefined）
+    paidAt:        '2026-02-26T10:00:00Z',
+    paySource:     'wechat',             // 'wechat' | 'alipay'
+})
+
+if (result.success && !result.alreadyProcessed) {
+    // result.summary = { userId, amount, bonus, newBalance }
+}
+```
+
+**使用方**: `server/api/wechat/notify.post.ts`、`server/api/alipay/notify.post.ts`
+
+---
+
+### `admin-auth.ts` — 后台 API 鉴权工具（2026-02-26 新增）
+
+**职责**：所有 admin API 路由的统一鉴权入口，验证 Bearer token + admin_users 表身份。
+
+```typescript
+import { requireAdmin } from '~/server/utils/admin-auth'
+
+export default defineEventHandler(async (event) => {
+    await requireAdmin(event)  // 未通过自动 throw 401/403
+    // ... 业务逻辑
+})
+```
+
+**使用方**: `server/api/admin/system/notifications/` 下所有 API
+
+**底层**: 调用 `process_recharge_payment` RPC（原子事务，防竞态）
+
+> ⚠️ 规则：新增充值渠道必须调用此函数，禁止直接操作 `profiles.balance`
+
+---
+
+## 📝 七、Bug 修复记录
 
 ### 2026-02-08: 优惠券删除失效
 

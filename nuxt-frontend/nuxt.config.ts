@@ -144,6 +144,7 @@ body.show-pc-loader::after {
     wechatPayPrivateKey: process.env.WECHAT_PAY_PRIVATE_KEY || '',
     wechatPayNotifyUrl: process.env.WECHAT_PAY_NOTIFY_URL || '',
     wechatAppSecret: process.env.WECHAT_APP_SECRET || '',
+    wechatPlatformCert: process.env.WECHAT_PLATFORM_CERT || '',
     // 支付宝配置 (服务端私有)
     alipayAppId: process.env.ALIPAY_APP_ID || '',
     alipayPrivateKey: process.env.ALIPAY_PRIVATE_KEY || '',

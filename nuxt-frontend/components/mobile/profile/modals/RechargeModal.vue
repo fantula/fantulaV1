@@ -47,19 +47,6 @@
          <div class="section-title mt-4">支付方式</div>
          <div class="pay-methods">
              <div
-                :class="['pay-item', { active: payType === 'alipay' }]"
-                @click="payType = 'alipay'"
-             >
-                <div class="pay-left">
-                    <img src="/images/client/pc/zhifu2.png" class="pay-icon" alt="Alipay" />
-                    <span>支付宝</span>
-                </div>
-                <div class="pay-radio" :class="{ checked: payType === 'alipay' }">
-                    <div class="radio-dot" v-if="payType === 'alipay'"></div>
-                </div>
-             </div>
-
-             <div
                 :class="['pay-item', { active: payType === 'wechat' }]"
                 @click="payType = 'wechat'"
              >
@@ -69,6 +56,19 @@
                 </div>
                 <div class="pay-radio" :class="{ checked: payType === 'wechat' }">
                     <div class="radio-dot" v-if="payType === 'wechat'"></div>
+                </div>
+             </div>
+
+             <div
+                :class="['pay-item', { active: payType === 'alipay' }]"
+                @click="payType = 'alipay'"
+             >
+                <div class="pay-left">
+                    <img src="/images/client/pc/zhifu2.png" class="pay-icon" alt="Alipay" />
+                    <span>支付宝</span>
+                </div>
+                <div class="pay-radio" :class="{ checked: payType === 'alipay' }">
+                    <div class="radio-dot" v-if="payType === 'alipay'"></div>
                 </div>
              </div>
          </div>

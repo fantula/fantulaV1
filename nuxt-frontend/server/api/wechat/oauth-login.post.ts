@@ -49,7 +49,6 @@ export default defineEventHandler(async (event) => {
 
         const access_token = result.access_token
         const openid = result.openid
-        console.log("🔴 [Stage 3] Backend OpenID:", openid) // Diagnosis Log
 
         // 使用 access_token 获取用户头像昵称 (snsapi_userinfo)
         let userInfo: any = {}
@@ -57,7 +56,6 @@ export default defineEventHandler(async (event) => {
             const userInfoUrl = `https://api.weixin.qq.com/sns/userinfo?access_token=${access_token}&openid=${openid}&lang=zh_CN`
             const userRes = await fetch(userInfoUrl)
             userInfo = await userRes.json()
-            console.log('[OAuthLogin] Got config:', { nickname: userInfo.nickname })
         } catch (e) {
             console.warn('[OAuthLogin] Failed to fetch user info:', e)
         }
@@ -95,8 +93,6 @@ export default defineEventHandler(async (event) => {
                 // 用户实际想去的页面通过 return_to query 参数传递
                 const finalDestination = body.redirectTo || '/mobile'
                 const callbackUrl = `${baseUrl}/mobile/wechat-callback?return_to=${encodeURIComponent(finalDestination)}`
-
-                console.log('[OAuthLogin] Magic Link RedirectTo:', callbackUrl)
 
                 const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
                     type: 'magiclink',
