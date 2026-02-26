@@ -68,7 +68,8 @@ export default defineEventHandler(async (event) => {
 
         // ── 2. 签名验证 ───────────────────────────────────────
         const config = getWechatPayConfig()
-        const platformCert = String(useRuntimeConfig().wechatPlatformCert || '')
+        // .env 中 \n 是字面量，需转换为真实换行符才能用于 RSA 验证
+        const platformCert = String(useRuntimeConfig().wechatPlatformCert || '').replace(/\\n/g, '\n')
         const isValid = verifyCallbackSignature(timestamp, nonce, rawBody || '', signature, platformCert)
 
         if (!isValid) {

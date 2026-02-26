@@ -132,7 +132,7 @@ const options = ref<RechargeOption[]>([])
 const loading = ref(false)
 const selectedIdx = ref(0)
 const customValue = ref<number | null>(null)
-const payType = ref<'wechat' | 'alipay'>('alipay')  // 默认支付宝
+const payType = ref<'wechat' | 'alipay'>('wechat')  // 默认微信支付
 
 // Computed
 const payAmount = computed(() => {
