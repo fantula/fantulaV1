@@ -61,10 +61,10 @@ function wrapPublicKey(key: string): string {
     return `-----BEGIN PUBLIC KEY-----\n${formatted}\n-----END PUBLIC KEY-----`
 }
 
-// 构建待签名字符串（参数按字典序排列，去掉 sign 和 sign_type）
+// 构建待签名字符串（参数按字典序排列，仅排除 sign 本身，sign_type 需保留）
 function buildSignString(params: Record<string, string>): string {
     return Object.keys(params)
-        .filter(k => k !== 'sign' && k !== 'sign_type' && params[k] !== '' && params[k] !== undefined)
+        .filter(k => k !== 'sign' && params[k] !== '' && params[k] !== undefined)
         .sort()
         .map(k => `${k}=${params[k]}`)
         .join('&')
