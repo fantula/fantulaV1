@@ -1,8 +1,8 @@
-import { d as defineEventHandler, q as setHeader } from '../../../../nitro/nitro.mjs';
+import { d as defineEventHandler, A as setHeader } from '../../../../nitro/nitro.mjs';
 import { g as getAdminSupabaseClient } from '../../../../_/supabase-admin.mjs';
+import 'crypto';
 import '@supabase/supabase-js';
 import 'zod';
-import 'crypto';
 import 'node:http';
 import 'node:https';
 import 'node:events';
