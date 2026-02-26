@@ -366,7 +366,7 @@ onMounted(async () => {
     if (res.success && res.data) {
       options.value = res.data.map(item => ({
         value: item.value,
-        bonus: parseInt(item.desc.replace(/[^0-9]/g, '') || '0')
+        bonus: item.bonus,
       }))
     }
   } catch (e) {

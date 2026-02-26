@@ -280,7 +280,7 @@ export const authApi = {
   /**
    * 获取已启用的充值档位（供客户端使用）
    */
-  async getActiveTiers(): Promise<ApiResponse<{ value: number; desc: string }[]>> {
+  async getActiveTiers(): Promise<ApiResponse<{ value: number; bonus: number; desc: string }[]>> {
     const client = getSupabaseClient()
     const { data, error } = await client
       .from('recharge_tiers')
@@ -295,6 +295,7 @@ export const authApi = {
     // 适配前端弹窗格式
     const adapted = (data || []).map(item => ({
       value: Number(item.amount),
+      bonus: Number(item.bonus ?? 0),
       desc: item.bonus > 0 ? `送￥${item.bonus}` : '无优惠'
     }))
 

@@ -120,8 +120,8 @@ const userStore = useUserStore()
 const { success, warning, error, info } = useNotify()
 
 interface RechargeOption {
-  value: number
-  bonus: number
+  value: number   // 充值金额（元）
+  bonus: number   // 赠送金额（元）
 }
 
 // 检测是否在微信浏览器内
@@ -376,7 +376,7 @@ onMounted(async () => {
         if (res.success && res.data) {
             options.value = res.data.map(item => ({
                 value: item.value,
-                bonus: parseInt(item.desc.replace(/[^0-9]/g, '') || '0')
+                bonus: item.bonus,
             }))
         }
     } catch (e) {
