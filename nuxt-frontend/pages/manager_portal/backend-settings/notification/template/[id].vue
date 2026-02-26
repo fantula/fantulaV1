@@ -98,7 +98,6 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { getSupabaseClient } from '@/utils/supabase'
 
 definePageMeta({
   layout: 'mgmt',
@@ -107,20 +106,18 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
+const adminStore = useAdminStore()
 const templateId = route.params.id as string
 
 const pending = ref(false)
 const allTemplates = ref<any[]>([])
 
-const getAuthToken = async (): Promise<string | null> => {
-  const { data: { session } } = await getSupabaseClient().auth.getSession()
-  return session?.access_token ?? null
-}
+const getAuthToken = (): string | null => adminStore.accessToken
 
 const fetchTemplates = async () => {
   pending.value = true
   try {
-    const token = await getAuthToken()
+    const token = getAuthToken()
     const res = await $fetch<{ data: any[] }>('/api/admin/system/notifications/templates', {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
@@ -158,7 +155,7 @@ const handleSave = async () => {
   if (!template.value) return
   saving.value = true
   try {
-    const token = await getAuthToken()
+    const token = getAuthToken()
     await $fetch('/api/admin/system/notifications/templates', {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -205,7 +202,7 @@ const handleSendTest = async () => {
 
   sendingTest.value = true
   try {
-    const token = await getAuthToken()
+    const token = getAuthToken()
     await $fetch('/api/admin/system/notifications/test', {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},

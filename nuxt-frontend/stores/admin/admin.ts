@@ -30,6 +30,7 @@ export const useAdminStore = defineStore('admin', () => {
     // 状态
     const adminUser = ref<AdminUser | null>(null)
     const adminInfo = ref<AdminInfo | null>(null)
+    const accessToken = ref<string | null>(null)
     const loading = ref(true)
     const isInitialized = ref(false)  // 标识是否已完成初始化
     const isLoggedIn = computed(() => !!adminUser.value)
@@ -62,15 +63,18 @@ export const useAdminStore = defineStore('admin', () => {
                         role: info.role || 'admin'
                     }
                     adminInfo.value = info
+                    accessToken.value = session.access_token
                 } else {
                     // 有 session 但不是管理员：只清空 admin 状态
                     // ⚠️ 绝对不能调 logout()，logout() 会调 signOut() 销毁用户 session！
                     adminUser.value = null
                     adminInfo.value = null
+                    accessToken.value = null
                 }
             } else {
                 adminUser.value = null
                 adminInfo.value = null
+                accessToken.value = null
             }
         } catch (error) {
             console.error('Admin init error:', error)
@@ -115,6 +119,7 @@ export const useAdminStore = defineStore('admin', () => {
                 role: result.adminInfo.role || 'admin'
             }
             adminInfo.value = result.adminInfo
+            accessToken.value = result.session.access_token
 
             return { success: true }
         } catch (error: any) {
@@ -134,6 +139,7 @@ export const useAdminStore = defineStore('admin', () => {
         } finally {
             adminUser.value = null
             adminInfo.value = null
+            accessToken.value = null
         }
     }
 
@@ -186,6 +192,7 @@ export const useAdminStore = defineStore('admin', () => {
                 role: result.adminInfo.role || 'admin'
             }
             adminInfo.value = result.adminInfo
+            accessToken.value = result.session.access_token
 
             return { success: true }
         } catch (error: any) {
@@ -223,6 +230,7 @@ export const useAdminStore = defineStore('admin', () => {
         user: readonly(adminUser),
         adminUser: readonly(adminUser),
         adminInfo: readonly(adminInfo),
+        accessToken: readonly(accessToken),
         isLoggedIn,
         isInitialized: readonly(isInitialized),
         loading: readonly(loading),

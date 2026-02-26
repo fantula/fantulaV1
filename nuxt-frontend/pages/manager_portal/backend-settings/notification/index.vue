@@ -48,7 +48,6 @@ import { ref, onMounted } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import AdminDataTable from '@/components/admin/base/AdminDataTable.vue'
 import { adminRoute } from '@/config/admin-routes'
-import { getSupabaseClient } from '@/utils/supabase'
 
 definePageMeta({
   layout: 'mgmt',
@@ -56,18 +55,16 @@ definePageMeta({
 })
 
 const router = useRouter()
+const adminStore = useAdminStore()
 const pending = ref(false)
 const templates = ref<any[]>([])
 
-const getAuthToken = async (): Promise<string | null> => {
-  const { data: { session } } = await getSupabaseClient().auth.getSession()
-  return session?.access_token ?? null
-}
+const getAuthToken = (): string | null => adminStore.accessToken
 
 const fetchTemplates = async () => {
   pending.value = true
   try {
-    const token = await getAuthToken()
+    const token = getAuthToken()
     const res = await $fetch<{ data: any[] }>('/api/admin/system/notifications/templates', {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
@@ -83,7 +80,7 @@ const fetchTemplates = async () => {
 const handleToggle = async (row: any) => {
   row.updating = true
   try {
-    const token = await getAuthToken()
+    const token = getAuthToken()
     await $fetch('/api/admin/system/notifications/templates', {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},

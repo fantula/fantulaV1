@@ -6,7 +6,14 @@ import { getAdminSupabaseClient } from '~/utils/supabase-admin'
 import { requireAdmin } from '~/server/utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
-    await requireAdmin(event)
+    console.log('[NotificationTemplates] GET request received')
+    try {
+        await requireAdmin(event)
+        console.log('[NotificationTemplates] Admin verified')
+    } catch (e: any) {
+        console.error('[NotificationTemplates] requireAdmin failed:', e.statusCode, e.statusMessage)
+        throw e
+    }
 
     const client = getAdminSupabaseClient()
 
@@ -14,6 +21,8 @@ export default defineEventHandler(async (event) => {
         .from('notification_templates')
         .select('id, event_type, name, subject_template, body_template, variables, is_enabled, updated_at')
         .order('event_type')
+
+    console.log('[NotificationTemplates] Query result:', { count: data?.length, error: error?.message })
 
     if (error) {
         throw createError({ statusCode: 500, statusMessage: '获取模板列表失败: ' + error.message })
