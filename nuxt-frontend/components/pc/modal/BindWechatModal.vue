@@ -277,8 +277,9 @@ onUnmounted(() => {
 .btn-secondary {
   background: rgba(255,255,255,0.05); color: #94A3B8;
   border: 1px solid rgba(255,255,255,0.1); padding: 10px 24px;
-  border-radius: 8px; cursor: not-allowed; display: flex; align-items: center; gap: 8px;
+  border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px;
 }
+.btn-secondary:disabled { cursor: not-allowed; opacity: 0.5; }
 
 /* Bind State (QR) */
 .bind-state { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }

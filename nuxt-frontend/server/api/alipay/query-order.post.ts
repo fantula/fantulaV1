@@ -3,8 +3,9 @@
  * 查询支付宝订单状态
  * PC 端轮询用（Native Pay 扫码后检查是否付款）
  */
-import { getSupabaseClient, getSupabaseServiceClient, getCurrentUser } from '~/server/utils/supabase'
+import { getSupabaseClient, getCurrentUser } from '~/server/utils/supabase'
 import { getAlipayConfig, alipayRequest } from '~/server/utils/alipay'
+import { handleRechargeCallback } from '~/server/utils/recharge-handler'
 
 export default defineEventHandler(async (event) => {
     try {
@@ -62,48 +63,15 @@ export default defineEventHandler(async (event) => {
 
         console.log('[AlipayQuery] Status:', tradeStatus)
 
-        // 查到成功则更新本地订单（notify 也会处理，此处作为补充）
+        // 查到成功则通过统一处理器完成余额更新+通知（含幂等保护）
         if (isPaid && order.status !== 'paid') {
-            const supabaseService = getSupabaseServiceClient()
-
-            await supabaseService
-                .from('recharge_orders')
-                .update({
-                    status: 'paid',
-                    transaction_id: result.trade_no,
-                    paid_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('out_trade_no', out_trade_no)
-
-            const { data: profile } = await supabaseService
-                .from('profiles')
-                .select('balance')
-                .eq('id', user.id)
-                .single()
-
-            if (profile) {
-                const currentBalance = parseFloat(profile.balance) || 0
-                const bonus = parseFloat(order.bonus) || 0
-                const totalAmount = parseFloat(order.amount) + bonus
-                const newBalance = currentBalance + totalAmount
-
-                await supabaseService
-                    .from('profiles')
-                    .update({ balance: newBalance })
-                    .eq('id', user.id)
-
-                await supabaseService
-                    .from('wallet_transactions')
-                    .insert({
-                        user_id: user.id,
-                        type: '支付宝充值',
-                        amount: totalAmount,
-                        balance_after: newBalance,
-                        description: `支付宝充值 ${order.amount.toFixed(2)}点 赠送${bonus.toFixed(2)}点`,
-                        created_at: new Date().toISOString(),
-                    })
-            }
+            await handleRechargeCallback({
+                outTradeNo:    out_trade_no,
+                transactionId: result.trade_no,
+                payerOpenid:   undefined,
+                paidAt:        result.send_pay_date || new Date().toISOString(),
+                paySource:     'alipay',
+            })
         }
 
         return {

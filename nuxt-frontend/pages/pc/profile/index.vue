@@ -24,6 +24,7 @@ const userInfo = computed(() => {
       nickname: su.nickName || su.nickname || su.email?.split('@')[0] || '用户',
       avatar: su.avatar || '',
       email: su.email || '未绑定',
+      openId: su.openId || '',
       isGoogleBound: false,
       googleEmail: ''
     }
