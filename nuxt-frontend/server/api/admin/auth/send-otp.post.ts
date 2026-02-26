@@ -9,12 +9,13 @@ export default defineEventHandler(async (event) => {
         const { email } = body
 
         const adminClient = getAdminSupabaseClient()
+        const config = useRuntimeConfig()
 
-        // 1. Verify Admin User
+        // 1. Verify Admin User（邮箱统一转小写，避免大小写不匹配）
         const { data: adminData, error: fetchError } = await adminClient
             .from('admin_users')
             .select('id, status, auth_user_id')
-            .eq('email', email)
+            .eq('email', email.toLowerCase())
             .single()
 
         if (fetchError || !adminData) {
