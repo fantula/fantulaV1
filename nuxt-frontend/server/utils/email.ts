@@ -3,39 +3,86 @@ interface NotificationData {
     [key: string]: any
 }
 
+const BASE_WRAPPER = (title: string, content: string) => `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#F5F7FA;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;-webkit-font-smoothing:antialiased;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F7FA;padding:60px 20px;">
+    <tr>
+      <td align="center">
+        <table width="500" cellpadding="0" cellspacing="0" style="max-width:500px;width:100%;margin:0 auto;background-color:#FFFFFF;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.03);">
+          <tr><td style="height:4px;background:linear-gradient(90deg,#178fc6,#F97316);border-top-left-radius:8px;border-top-right-radius:8px;"></td></tr>
+          <tr>
+            <td align="center" style="padding:45px 40px 30px;border-bottom:1px solid #F1F5F9;">
+              <h1 style="margin:0;font-size:34px;font-weight:700;color:#1E293B;letter-spacing:2px;line-height:1.2;">凡图拉</h1>
+              <div style="margin-top:6px;font-size:12px;font-weight:600;color:#94A3B8;letter-spacing:6px;text-transform:uppercase;">${title}</div>
+            </td>
+          </tr>
+          ${content}
+        </table>
+        <table width="500" cellpadding="0" cellspacing="0" style="max-width:500px;width:100%;margin:0 auto;">
+          <tr>
+            <td align="center" style="padding:30px 20px;">
+              <p style="margin:0;font-size:12px;color:#CBD5E1;line-height:1.6;">
+                &copy; 2019-2026 凡图拉 | 云南凡图拉科技有限公司
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+
 // 硬编码邮件模板
 const EMAIL_TEMPLATES: Record<string, { subject: string; body: string }> = {
     recharge_success: {
-        subject: '您的钱包充值成功 - Fantula',
-        body: `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#333">
-  <h2 style="color:#409eff">充值成功通知</h2>
-  <p>您好，您的钱包已成功充值：</p>
-  <table style="width:100%;border-collapse:collapse;margin:16px 0">
-    <tr><td style="padding:8px;background:#f5f7fa;border-radius:4px">充值金额</td><td style="padding:8px;font-weight:bold">¥{{amount}}</td></tr>
-    <tr><td style="padding:8px">赠送金额</td><td style="padding:8px;color:#67c23a">+¥{{bonus}}</td></tr>
-    <tr><td style="padding:8px;background:#f5f7fa">账户余额</td><td style="padding:8px;font-weight:bold;color:#409eff">¥{{balance}}</td></tr>
-  </table>
-  <p style="color:#909399;font-size:13px">感谢您使用 Fantula，如有疑问请联系客服。</p>
-</body>
-</html>`
+        subject: '充值到账通知 - 凡图拉',
+        body: BASE_WRAPPER('充值到账通知', `
+          <tr>
+            <td style="padding:40px 40px 10px;">
+              <p style="margin:0 0 24px;font-size:15px;color:#64748B;line-height:1.6;">尊敬的用户，您好！</p>
+              <p style="margin:0 0 20px;font-size:16px;font-weight:600;color:#334155;">您的充值已成功到账：</p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0F7FF;border-radius:8px;padding:4px;">
+                <tr>
+                  <td style="padding:14px 20px;font-size:14px;color:#64748B;">充值金额：</td>
+                  <td style="padding:14px 20px;font-size:16px;font-weight:700;color:#DC2626;text-align:right;">¥{{amount}}</td>
+                </tr>
+                <tr>
+                  <td style="padding:14px 20px;font-size:14px;color:#64748B;">赠送金额：</td>
+                  <td style="padding:14px 20px;font-size:16px;font-weight:700;color:#16A34A;text-align:right;">¥{{bonus}}</td>
+                </tr>
+                <tr>
+                  <td style="padding:14px 20px;font-size:14px;color:#64748B;">当前余额：</td>
+                  <td style="padding:14px 20px;font-size:16px;font-weight:700;color:#1E293B;text-align:right;">¥{{balance}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 40px 45px;">
+              <p style="margin:0;font-size:13px;color:#94A3B8;line-height:1.6;">如有疑问，请联系客服。</p>
+            </td>
+          </tr>`)
     },
 
     account_welcome: {
-        subject: '欢迎加入 Fantula！',
-        body: `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#333">
-  <h2 style="color:#409eff">欢迎加入 Fantula 🎉</h2>
-  <p>Hi {{nickname}}，</p>
-  <p>您的账户已注册成功！Fantula 为您提供 Netflix、Spotify、YouTube Premium 等海外流媒体会员充值服务。</p>
-  <p>如有任何问题，欢迎联系我们的客服团队。</p>
-  <p style="color:#909399;font-size:13px">— Fantula 团队</p>
-</body>
-</html>`
+        subject: '欢迎加入凡图拉！',
+        body: BASE_WRAPPER('欢迎加入', `
+          <tr>
+            <td style="padding:40px 40px 45px;">
+              <p style="margin:0 0 16px;font-size:16px;font-weight:600;color:#334155;">Hi {{nickname}}，</p>
+              <p style="margin:0 0 16px;font-size:15px;color:#64748B;line-height:1.8;">
+                欢迎加入凡图拉！您的账户已注册成功。<br>
+                我们为您提供 Netflix、Spotify、YouTube Premium 等海外流媒体会员充值服务。
+              </p>
+              <p style="margin:0;font-size:13px;color:#94A3B8;line-height:1.6;">如有任何问题，欢迎联系客服团队。</p>
+            </td>
+          </tr>`)
     }
 }
 
