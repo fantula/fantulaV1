@@ -2,8 +2,9 @@
  * POST /api/wechat/query-order
  * 查询微信支付订单状态
  */
-import { getSupabaseClient, getSupabaseServiceClient, getCurrentUser } from '~/server/utils/supabase'
+import { getSupabaseClient, getCurrentUser } from '~/server/utils/supabase'
 import { getWechatPayConfig, wechatPayRequest } from '~/server/utils/wechat-pay'
+import { handleRechargeCallback } from '~/server/utils/recharge-handler'
 
 interface QueryOrderResponse {
     appid: string
@@ -92,53 +93,14 @@ export default defineEventHandler(async (event) => {
 
         console.log('[QueryOrder] Result:', result.trade_state)
 
-        // 如果查询到支付成功，更新本地订单状态
+        // 如果查询到支付成功，通过统一处理器更新订单（含余额、通知、幂等保护）
         if (result.trade_state === 'SUCCESS' && order.status !== 'paid') {
-            const supabaseService = getSupabaseServiceClient()
-
-            await supabaseService
-                .from('recharge_orders')
-                .update({
-                    status: 'paid',
-                    transaction_id: result.transaction_id,
-                    paid_at: result.success_time,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('out_trade_no', out_trade_no)
-
-            // 更新用户余额
-            const { data: profile } = await supabaseService
-                .from('profiles')
-                .select('balance')
-                .eq('id', user.id)
-                .single()
-
-            if (profile) {
-                const currentBalance = profile.balance || 0
-                const bonus = order.bonus || 0
-                const totalAmount = order.amount + bonus
-                const newBalance = currentBalance + totalAmount
-
-                await supabaseService
-                    .from('profiles')
-                    .update({
-                        balance: newBalance,
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq('id', user.id)
-
-                // 记录余额变动
-                await supabaseService
-                    .from('wallet_transactions')
-                    .insert({
-                        user_id: user.id,
-                        type: '微信充值',
-                        amount: totalAmount,
-                        balance_after: newBalance,
-                        description: `微信支付充值 ${order.amount.toFixed(2)}点 赠送${bonus.toFixed(2)}点`,
-                        created_at: new Date().toISOString(),
-                    })
-            }
+            await handleRechargeCallback({
+                outTradeNo: out_trade_no,
+                transactionId: result.transaction_id,
+                paySource: 'wechat',
+                paidAt: result.success_time,
+            })
         }
 
         return {

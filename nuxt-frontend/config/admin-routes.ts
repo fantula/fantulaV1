@@ -86,6 +86,4 @@ export const adminRoutes = {
 
     // 系统设置
     settings: () => adminRoute('backend-settings'),
-    settingsNotification: () => adminRoute('backend-settings/notification'),
-    settingsNotificationTemplate: (id: string) => adminRoute(`backend-settings/notification/template/${id}`),
 } as const
