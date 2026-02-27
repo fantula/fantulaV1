@@ -1,49 +1,61 @@
 
-
-interface EmailTemplate {
-    subject: string
-    body: string
-}
-
 interface NotificationData {
     [key: string]: any
 }
 
+// 硬编码邮件模板
+const EMAIL_TEMPLATES: Record<string, { subject: string; body: string }> = {
+    recharge_success: {
+        subject: '您的钱包充值成功 - Fantula',
+        body: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#333">
+  <h2 style="color:#409eff">充值成功通知</h2>
+  <p>您好，您的钱包已成功充值：</p>
+  <table style="width:100%;border-collapse:collapse;margin:16px 0">
+    <tr><td style="padding:8px;background:#f5f7fa;border-radius:4px">充值金额</td><td style="padding:8px;font-weight:bold">¥{{amount}}</td></tr>
+    <tr><td style="padding:8px">赠送金额</td><td style="padding:8px;color:#67c23a">+¥{{bonus}}</td></tr>
+    <tr><td style="padding:8px;background:#f5f7fa">账户余额</td><td style="padding:8px;font-weight:bold;color:#409eff">¥{{balance}}</td></tr>
+  </table>
+  <p style="color:#909399;font-size:13px">感谢您使用 Fantula，如有疑问请联系客服。</p>
+</body>
+</html>`
+    },
+
+    account_welcome: {
+        subject: '欢迎加入 Fantula！',
+        body: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#333">
+  <h2 style="color:#409eff">欢迎加入 Fantula 🎉</h2>
+  <p>Hi {{nickname}}，</p>
+  <p>您的账户已注册成功！Fantula 为您提供 Netflix、Spotify、YouTube Premium 等海外流媒体会员充值服务。</p>
+  <p>如有任何问题，欢迎联系我们的客服团队。</p>
+  <p style="color:#909399;font-size:13px">— Fantula 团队</p>
+</body>
+</html>`
+    }
+}
+
 /**
  * 发送邮件通知
- * @param eventType 通知类型 (如 order_paid)
+ * @param eventType 通知类型 (recharge_success / account_welcome)
  * @param to 收件人邮箱
  * @param data 模板变量数据
  */
 export async function sendNotification(eventType: string, to: string, data: NotificationData): Promise<{ success: boolean; message?: string }> {
     try {
-        const config = useRuntimeConfig()
-        const client = getSupabaseServiceClient()
-
-        // 1. 获取模板配置
-        const { data: template, error } = await client
-            .from('notification_templates')
-            .select('*')
-            .eq('event_type', eventType)
-            .single()
-
-        if (error || !template) {
-            console.error(`[Email] Template not found: ${eventType}`)
-            // 如果模板不存在，视为不需要发送，或者根据需求报错
-            // 这里返回 false 但不抛出异常，避免阻塞主流程
+        const template = EMAIL_TEMPLATES[eventType]
+        if (!template) {
+            console.log(`[Email] No template for event: ${eventType}`)
             return { success: false, message: '模板不存在' }
         }
 
-        if (!template.is_enabled) {
-            console.log(`[Email] Notification disabled: ${eventType}`)
-            return { success: true, message: '通知已禁用' }
-        }
+        const subject = renderTemplate(template.subject, data)
+        const html = renderTemplate(template.body, data)
 
-        // 2. 渲染模板
-        const subject = renderTemplate(template.subject_template, data)
-        const html = renderTemplate(template.body_template, data)
-
-        // 3. 发送邮件 (Resend)
         const resendApiKey = process.env.SUPABASE_AUTH_SMTP_PASS
         if (!resendApiKey) {
             console.error('[Email] Missing SUPABASE_AUTH_SMTP_PASS')
@@ -59,8 +71,8 @@ export async function sendNotification(eventType: string, to: string, data: Noti
             body: JSON.stringify({
                 from: 'Fantula <noreply@fantula.com>',
                 to: [to],
-                subject: subject,
-                html: html
+                subject,
+                html
             })
         })
 
@@ -81,7 +93,7 @@ export async function sendNotification(eventType: string, to: string, data: Noti
 }
 
 /**
- * 简单的模板渲染 (Mustache-like syntax {{key}})
+ * 简单模板渲染 {{key}}
  */
 function renderTemplate(template: string, data: NotificationData): string {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
