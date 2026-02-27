@@ -56,9 +56,9 @@ export async function sendNotification(eventType: string, to: string, data: Noti
         const subject = renderTemplate(template.subject, data)
         const html = renderTemplate(template.body, data)
 
-        const resendApiKey = process.env.SUPABASE_AUTH_SMTP_PASS
+        const resendApiKey = process.env.RESEND_API_KEY
         if (!resendApiKey) {
-            console.error('[Email] Missing SUPABASE_AUTH_SMTP_PASS')
+            console.error('[Email] Missing RESEND_API_KEY')
             return { success: false, message: '邮件服务未配置' }
         }
 
