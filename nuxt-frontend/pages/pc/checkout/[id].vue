@@ -19,7 +19,10 @@
       <div class="checkout-error" v-else-if="error">
         <div class="error-icon">⚠️</div>
         <p>{{ error }}</p>
-        <BaseButton themeId="secondary" @click="router.push(pcRoutes.home())">返回首页</BaseButton>
+        <div class="error-actions">
+          <BaseButton themeId="secondary" @click="loadPreOrders(preOrderIds)">重新加载</BaseButton>
+          <BaseButton themeId="secondary" @click="router.push(pcRoutes.home())">返回首页</BaseButton>
+        </div>
       </div>
 
       <!-- 正常结算 -->
@@ -378,19 +381,14 @@ const handlePaySuccessClose = () => {
   text-align: center;
   padding: 100px 0;
   color: var(--text-sub);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.glass-loader {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: var(--primary-blue);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 16px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.error-actions {
+  display: flex;
+  gap: 12px;
 }
 </style>

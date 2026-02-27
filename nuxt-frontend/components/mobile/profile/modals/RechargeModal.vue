@@ -499,8 +499,8 @@ declare const WeixinJSBridge: {
 .pay-btn:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
 
 .spinner {
-    width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff; border-radius: 50%;
+    width: 20px; height: 20px; border: 2px solid rgba(56, 189, 248, 0.15);
+    border-top-color: var(--spinner-color, #38BDF8); border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

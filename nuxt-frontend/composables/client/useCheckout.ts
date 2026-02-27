@@ -6,14 +6,10 @@ import { supabasePreOrderApi, type PreOrder } from '@/api/client/supabase'
 import { type UserCoupon } from '@/api/client/coupon'
 import { useNotify } from '@/composables/useNotify'
 
-// --- Global Loading ---
-import { useGlobalLoading } from '@/composables/useGlobalLoading'
-
 export function useCheckout() {
   const router = useRouter()
   const userStore = useUserStore()
   const { success, error: notifyError, warning } = useNotify()
-  const globalLoading = useGlobalLoading()
   // --- State ---
   const loading = ref(true)
   const error = ref('')
@@ -223,7 +219,6 @@ export function useCheckout() {
     }
 
     paying.value = true
-    globalLoading.show('正在支付...') // Show global loading
 
     try {
       const preOrder = preOrders.value[0]
@@ -238,21 +233,15 @@ export function useCheckout() {
         //   showBalanceModal.value = true
         // } else {
         notifyError(res.error || '支付失败')
-        globalLoading.hide() // Hide on error
         // }
         return
       }
 
-      globalLoading.success('支付成功') // Show success checkmark
-
-      // Delay slightly to let user see success state before modal
-      setTimeout(async () => {
-        if (payDismissed.value) return  // 用户已关弹窗，不再重新弹
-        lastOrderId.value = res.order_no || ''
-        lastOrderAmount.value = finalPayAmount.value
-        showPaySuccess.value = true
-        await userStore.fetchUserInfo()
-      }, 1000)
+      if (payDismissed.value) return  // 用户已关弹窗，不再重新弹
+      lastOrderId.value = res.order_no || ''
+      lastOrderAmount.value = finalPayAmount.value
+      showPaySuccess.value = true
+      await userStore.fetchUserInfo()
 
       // 异步发送购买成功微信通知（不阻塞支付流程）
       if (preOrder && res.order_no && userStore.user?.id) {
@@ -274,7 +263,6 @@ export function useCheckout() {
 
     } catch (e: any) {
       notifyError(e.message || '系统异常')
-      globalLoading.hide() // Hide on error
     } finally {
       paying.value = false
     }

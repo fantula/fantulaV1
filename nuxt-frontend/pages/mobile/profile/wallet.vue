@@ -43,14 +43,19 @@
             :list="displayList" 
             @load="loadMore"
         >
-             <div 
-                class="txn-item" 
-                v-for="(item, index) in displayList" 
+             <div
+                class="txn-item"
+                v-for="(item, index) in displayList"
                 :key="index"
             >
                 <div class="txn-left">
-                    <div class="txn-title">{{ item.description || '余额变动' }}</div>
-                    <div class="txn-time">{{ formatDate(item.createdAt) }}</div>
+                    <div class="txn-title">{{ getTxnDescription(item) }}</div>
+                    <div class="txn-time">
+                        {{ formatDate(item.created_at || item.createdAt) }}
+                        <span v-if="item.balance_after != null" class="txn-balance-after">
+                            · 余额 {{ Number(item.balance_after).toFixed(2) }} 点
+                        </span>
+                    </div>
                 </div>
                 <div class="txn-right" :class="getAmountClass(item.amount)">
                     {{ item.amount > 0 ? '+' : '' }}{{ Number(item.amount).toFixed(2) }}
@@ -166,6 +171,19 @@ const showTip = () => {
 
 const getAmountClass = (amt: number) => {
     return amt > 0 ? 'text-green' : 'text-white'
+}
+
+const getTxnDescription = (item: any): string => {
+    const desc = item.description
+    // Skip legacy/generic descriptions, fall back to type label
+    if (desc && desc !== '余额支付' && desc !== '余额变动') return desc
+    switch (item.type) {
+        case 'payment': return '购买商品'
+        case 'recharge': return '余额充值'
+        case '优惠券兑换': return '优惠券兑换'
+        case 'bonus': return '充值赠送'
+        default: return '余额变动'
+    }
 }
 
 // 处理支付宝 H5 支付回跳（alipay_order 参数）
@@ -317,7 +335,8 @@ watch(currentTab, () => {
 }
 .txn-item:last-child { border-bottom: none; }
 .txn-title { font-size: 14px; color: #CBD5E1; margin-bottom: 6px; font-weight: 400; }
-.txn-time { font-size: 12px; color: #475569; }
+.txn-time { font-size: 12px; color: #475569; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.txn-balance-after { color: #334155; }
 
 .txn-right { font-size: 16px; font-weight: 600; font-family: 'DIN Alternate', sans-serif; }
 .text-green { color: #10B981; }

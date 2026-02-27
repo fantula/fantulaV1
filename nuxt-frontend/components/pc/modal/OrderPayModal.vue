@@ -64,8 +64,8 @@
           </div>
         </div>
           <button class="btn-pay" @click="handlePay" :disabled="paying">
-            <span v-if="!paying">确认支付￥{{ Number(price).toFixed(2) }}</span>
-            <span v-else>支付中...</span>
+            <div v-if="paying" class="btn-spinner spinner-sm"></div>
+            <span v-else>确认支付 {{ Number(price).toFixed(2) }} 点</span>
           </button>
           <div class="pay-countdown">
             支付剩余时间：<span class="countdown">{{ countdownText }}</span>
@@ -478,6 +478,7 @@ function handleSuccessClose() {
   margin-bottom: 6px;
   box-shadow: 0 2px 8px rgba(33,150,243,0.10);
   transition: background 0.2s;
+  display: flex; align-items: center; justify-content: center;
 }
 .btn-pay:disabled {
   background: #b3c6e6;

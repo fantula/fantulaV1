@@ -3,7 +3,7 @@
     <Transition name="modal-fade">
       <div v-if="visible" class="modal-overlay" @click="$emit('close')">
         <div class="modal-content" @click.stop>
-          
+
           <div class="success-header">
             <div class="icon-circle">
                <el-icon class="check-icon"><Check /></el-icon>
@@ -14,7 +14,14 @@
           <div class="success-body">
              <div class="info-row">
                 <span class="label">订单编号</span>
-                <span class="val link">{{ orderNo }}</span>
+                <div class="val-row">
+                  <span class="val link">{{ orderNo }}</span>
+                  <el-icon
+                    class="copy-icon"
+                    :class="{ copied }"
+                    @click.stop="copyOrderNo"
+                  ><CopyDocument /></el-icon>
+                </div>
              </div>
              <div class="info-row">
                 <span class="label">支付金额</span>
@@ -34,27 +41,38 @@
 </template>
 
 <script setup lang="ts">
-import { Check } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { Check, CopyDocument } from '@element-plus/icons-vue'
 
-defineProps<{
+const props = defineProps<{
   visible: boolean
   orderNo: string
   amount: number | string
 }>()
 
 defineEmits(['close', 'viewOrder', 'goHome'])
+
+const copied = ref(false)
+
+const copyOrderNo = async () => {
+  try {
+    await navigator.clipboard.writeText(props.orderNo)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 1200)
+  } catch {}
+}
 </script>
 
 <style scoped>
 .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
     z-index: 3000; display: flex; align-items: center; justify-content: center;
-    padding: 30px; /* More global padding */
+    padding: 30px;
 }
 
 .modal-content {
-    background: rgba(15, 23, 42, 0.85); /* Slightly more transparent */
-    width: 100%; max-width: 280px; /* Smaller width as requested */
+    background: rgba(15, 23, 42, 0.85);
+    width: 100%; max-width: 280px;
     border-radius: 20px; padding: 24px;
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
@@ -71,7 +89,7 @@ defineEmits(['close', 'viewOrder', 'goHome'])
 
 .icon-circle {
     width: 60px; height: 60px; border-radius: 50%;
-    background: linear-gradient(135deg, #10B981, #059669); /* Green for success */
+    background: linear-gradient(135deg, #10B981, #059669);
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 12px;
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
@@ -82,7 +100,7 @@ defineEmits(['close', 'viewOrder', 'goHome'])
 
 .success-body {
     width: 100%; margin-bottom: 24px;
-    background: rgba(255,255,255,0.03); 
+    background: rgba(255,255,255,0.03);
     border-radius: 12px; padding: 12px 16px;
     border: 1px solid rgba(255,255,255,0.05);
 }
@@ -90,9 +108,16 @@ defineEmits(['close', 'viewOrder', 'goHome'])
 .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; }
 .label { color: #94A3B8; }
 .val { color: #E2E8F0; font-weight: 500; }
+.val-row { display: flex; align-items: center; gap: 6px; }
 .link { color: #38BDF8; font-family: monospace; }
 .amount { color: var(--active-orange); font-weight: 700; font-size: 18px; font-family: 'DIN Alternate'; }
 .unit { font-size: 12px; font-weight: normal; margin-left: 2px; }
+
+.copy-icon {
+    font-size: 14px; color: #64748B; cursor: pointer;
+    transition: color 0.2s;
+}
+.copy-icon:active, .copy-icon.copied { color: #38BDF8; }
 
 .modal-footer { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
