@@ -654,10 +654,10 @@ body {
 .spinner-mini,
 .spinner-premium,
 .btn-spinner {
-  border: 3px solid rgba(255, 255, 255, 0.15);
-  /* Universal faint ring, slightly thicker */
-  border-top-color: var(--color-brand-primary, #38BDF8);
-  /* Tech Blue Default */
+  border: 4px solid rgba(56, 189, 248, 0.25);
+  /* Universal faint ring */
+  border-top-color: var(--spinner-color, #38BDF8);
+  /* 荧光蓝 — 修改 --spinner-color 可全局生效 */
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   /* Speed boost to 0.6s */
@@ -716,4 +716,16 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Page-level data loading spinner — 32px center spinner for page skeleton areas.
+   Use: <div class="glass-loader"></div>
+   Defined globally so all pages (PC + Mobile) share the same implementation.
+   Change --spinner-color to update across the entire app. */
+.glass-loader {
+  width: 32px; height: 32px;
+  border: 3px solid rgba(56, 189, 248, 0.2);
+  border-top-color: var(--spinner-color, #38BDF8);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }

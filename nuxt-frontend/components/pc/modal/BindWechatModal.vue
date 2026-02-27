@@ -37,7 +37,7 @@
       <div v-else class="bind-state">
         <div class="qr-container">
            <div v-if="loading" class="qr-loading">
-             <div class="spinner"></div>
+             <div class="glass-loader"></div>
              <p>获取二维码...</p>
            </div>
            <div v-else-if="qrCodeUrl" class="qr-wrapper">
@@ -296,11 +296,7 @@ onUnmounted(() => {
 .qr-loading, .qr-error {
   display: flex; flex-direction: column; align-items: center; gap: 10px; color: #1E293B;
 }
-.spinner {
-  width: 30px; height: 30px; border: 3px solid #E2E8F0; border-top-color: #07C160;
-  border-radius: 50%; animation: spin 1s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+/* .spinner removed — using global .glass-loader from mobile.css (--spinner-color) */
 
 .qr-overlay {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;

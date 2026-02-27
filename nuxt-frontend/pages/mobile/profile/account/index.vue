@@ -188,22 +188,15 @@ const handleLogoutConfirm = async () => {
     }
 }
 
-const copyUID = () => {
+const copyUID = async () => {
     const uid = userStore.user?.uid || userStore.user?.id?.toString()
     if (!uid) return
-    
-    // Simple copy fallback
-    const textArea = document.createElement('textarea')
-    textArea.value = uid
-    document.body.appendChild(textArea)
-    textArea.select()
     try {
-        document.execCommand('copy')
+        await navigator.clipboard.writeText(uid)
         success('UID 已复制')
-    } catch (err) {
+    } catch {
         error('复制失败')
     }
-    document.body.removeChild(textArea)
 }
 
 const handleImageError = (e: Event) => {

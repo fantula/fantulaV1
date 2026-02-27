@@ -13,12 +13,9 @@
     :disabled="disabled || loading"
     @click="handleClick"
   >
-    <!-- Loading Spinner -->
-    <span v-if="loading" class="btn-spinner">
-      <svg viewBox="0 0 24 24" fill="none" class="spinner-icon">
-         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.25"></circle>
-         <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
+    <!-- Loading Spinner — CSS border animation, color from --spinner-color -->
+    <span v-if="loading" class="btn-spinner-wrap">
+      <div class="btn-spinner"></div>
     </span>
 
     <!-- Content -->
@@ -112,24 +109,13 @@ const handleClick = (e: MouseEvent) => {
   opacity: 0;
 }
 
-/* Loading Spinner */
-.btn-spinner {
+/* Loading Spinner — positioned wrapper; actual .btn-spinner style from global mobile.css */
+.btn-spinner-wrap {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
-  display: flex;
-}
-.spinner-icon {
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  display: flex; align-items: center; justify-content: center;
 }
 
 /* =============================================================================

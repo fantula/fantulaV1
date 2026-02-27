@@ -20,11 +20,19 @@
 
     <!-- Order List -->
     <div class="list-container">
-        
-        <MobileInfiniteList 
-            :loading="loading" 
-            :finished="finished" 
-            :list="displayList" 
+
+        <!-- Error State -->
+        <div v-if="loadError && displayList.length === 0" class="error-state">
+          <el-icon class="error-icon"><WarningFilled /></el-icon>
+          <p class="error-text">加载失败，请重试</p>
+          <button class="retry-btn" @click="retryLoad">重新加载</button>
+        </div>
+
+        <MobileInfiniteList
+            v-else
+            :loading="loading"
+            :finished="finished"
+            :list="displayList"
             @load="loadMore"
         >
             <template #empty>
@@ -121,9 +129,24 @@ const switchTab = (val: string) => {
     router.replace({ query: { ...route.query, tab: val } })
 }
 
+const loadError = ref(false)
+
+const retryLoad = async () => {
+    loadError.value = false
+    try {
+        await loadList()
+    } catch {
+        loadError.value = true
+    }
+}
+
 onMounted(async () => {
     if (route.query.tab) changeTab(route.query.tab as string)
-    await loadList()
+    try {
+        await loadList()
+    } catch {
+        loadError.value = true
+    }
 })
 
 // Interaction Logic
@@ -219,6 +242,18 @@ const handleConfirmDelete = async () => {
 
 /* List Container */
 .list-container { flex: 1; padding: 16px; }
+
+/* Error State */
+.error-state {
+    padding: 80px 0; display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.error-icon { font-size: 36px; color: #EF4444; }
+.error-text { font-size: 14px; color: #94A3B8; margin: 0; }
+.retry-btn {
+    padding: 8px 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05); color: #fff; font-size: 14px; cursor: pointer;
+}
+.retry-btn:active { background: rgba(255,255,255,0.1); }
 
 /* Empty & Loading */
 .empty-state {

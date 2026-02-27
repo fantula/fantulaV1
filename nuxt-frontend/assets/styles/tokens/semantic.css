@@ -35,6 +35,10 @@
     --color-danger: var(--red-500);
     --color-success: var(--green-500);
 
+    /* --- Spinner --- */
+    /* 荧光蓝 — 全站 spinner 颜色。改这一行即可全局生效 */
+    --spinner-color: var(--blue-400);
+
     /* --- Effects --- */
     --glass-blur-md: 12px;
     --glass-blur-lg: 20px;

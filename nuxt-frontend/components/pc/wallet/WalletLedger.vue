@@ -58,8 +58,11 @@
 
               <!-- Content -->
               <div class="stream-content">
-                <div class="stream-title">{{ item.description || item.type }}</div>
-                <div class="stream-date">{{ formatDate(item.created_at) }}</div>
+                <div class="stream-title">{{ getTxnDescription(item) }}</div>
+                <div class="stream-date">
+                    {{ formatDate(item.created_at) }}
+                    <span v-if="item.balance_after != null" class="stream-balance-after">· 余额 {{ Number(item.balance_after).toFixed(2) }} 点</span>
+                </div>
               </div>
 
               <!-- Amount -->
@@ -102,6 +105,18 @@ const getTypeClass = (amount: number) => {
 
 const formatAmount = (val: number) => {
   return Math.abs(Number(val)).toFixed(2)
+}
+
+const getTxnDescription = (item: any): string => {
+    const desc = item.description
+    if (desc && desc !== '余额支付' && desc !== '余额变动') return desc
+    switch (item.type) {
+        case 'payment': return '购买商品'
+        case 'recharge': return '余额充值'
+        case '优惠券兑换': return '优惠券兑换'
+        case 'bonus': return '充值赠送'
+        default: return '余额变动'
+    }
 }
 </script>
 
@@ -171,7 +186,8 @@ const formatAmount = (val: number) => {
 
 .stream-content { flex: 1; display: flex; flex-direction: column; gap: 4px; }
 .stream-title { font-size: 15px; font-weight: 500; color: #F1F5F9; }
-.stream-date { font-size: 12px; color: #64748B; font-family: 'Monaco', monospace; }
+.stream-date { font-size: 12px; color: #64748B; font-family: 'Monaco', monospace; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.stream-balance-after { color: #475569; }
 
 .stream-amount { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600; }
 .stream-amount.income { color: #10B981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }

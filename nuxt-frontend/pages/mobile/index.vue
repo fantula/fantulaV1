@@ -43,7 +43,13 @@
         <div v-if="(pending || goodsLoading) && currentGoods.length === 0" class="loading-state">
            <MobileProductCardSkeleton v-for="i in 6" :key="i" />
         </div>
-        
+
+        <div v-else-if="error && currentGoods.length === 0" class="error-state">
+          <el-icon class="error-icon"><WarningFilled /></el-icon>
+          <p class="error-text">加载失败，请重试</p>
+          <button class="retry-btn" @click="refresh()">重新加载</button>
+        </div>
+
         <div v-else-if="currentGoods.length === 0" class="empty-state bg-glass-card">
            <div class="empty-icon">📦</div>
            <p class="text-muted text-sm">暂无相关商品</p>
@@ -106,7 +112,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineAsyncComponent, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowUpBold } from '@element-plus/icons-vue'
+import { ArrowUpBold, WarningFilled } from '@element-plus/icons-vue'
 
 import { useUserStore } from '@/stores/client/user'
 import { mobileRoutes } from '@/config/client-routes'
@@ -133,18 +139,19 @@ const userStore = useUserStore()
 
 // Shared Logic from Composable
 // SSR: await ensures data is ready before rendering handling
-const { 
-  banners, 
-  categories, 
-  currentGoods, 
+const {
+  banners,
+  categories,
+  currentGoods,
   activeCategoryId,
   pending,
+  error,
   goodsLoading,
-  hasMore, 
+  hasMore,
   isLoadingMore,
   initData,
   refresh,
-  handleCategoryChange: _handleCategoryChange, 
+  handleCategoryChange: _handleCategoryChange,
   loadMore
 } = await useHomeData('home-data-mobile')
 
@@ -433,6 +440,18 @@ onUnmounted(() => {
 }
 
 /* Updated Loading/Empty States using Glass */
+.error-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 220px; gap: 12px;
+}
+.error-icon { font-size: 32px; color: #EF4444; }
+.error-text { font-size: 14px; color: #94A3B8; margin: 0; }
+.retry-btn {
+  padding: 8px 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05); color: #fff; font-size: 14px; cursor: pointer;
+}
+.retry-btn:active { background: rgba(255,255,255,0.1); }
+
 .empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   height: 200px;

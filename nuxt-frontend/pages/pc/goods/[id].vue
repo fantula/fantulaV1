@@ -136,13 +136,14 @@
                   加入购物车
                 </BaseButton>
 
-                <BaseButton 
+                <BaseButton
                   theme-id="secondary"
-                  :class="{ favorited: isFavorited }" 
+                  :class="{ favorited: isFavorited }"
                   @click="handleToggleFavorite($event)"
-                  :disabled="stockLoading || !hasStock || !hasSkus"
+                  :loading="favoriteLoading"
+                  :disabled="stockLoading || !hasStock || !hasSkus || favoriteLoading"
                 >
-                  <el-icon><Star v-if="!isFavorited" /><StarFilled v-else /></el-icon>
+                  <el-icon v-if="!favoriteLoading"><Star v-if="!isFavorited" /><StarFilled v-else /></el-icon>
                   {{ isFavorited ? '已收藏' : '收藏' }}
                 </BaseButton>
               </div>
@@ -238,6 +239,7 @@ const {
   buyNow,
   addToCart,
   isFavorited,
+  favoriteLoading,
   toggleFavorite,
   initClientState,
   goodsSeo

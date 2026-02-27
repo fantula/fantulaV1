@@ -2,7 +2,7 @@
   <div class="wechat-callback-page">
     <!-- Loading State -->
     <div v-if="state === 'loading'" class="callback-loading">
-      <div class="spinner-premium" style="border-top-color: #07C160;"></div>
+      <div class="spinner-premium"></div>
     </div>
 
     <!-- Need Bind Email -->

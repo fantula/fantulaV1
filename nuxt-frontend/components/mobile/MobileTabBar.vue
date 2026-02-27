@@ -10,7 +10,7 @@
       >
         <div class="icon-wrapper">
           <component :is="tab.icon" class="tab-icon" />
-          <div v-if="tab.badge && tab.badge > 0" class="badge">{{ tab.badge }}</div>
+          <div v-if="tab.badge && tab.badge > 0" class="badge">{{ tab.badge > 99 ? '99+' : tab.badge }}</div>
           <!-- Active Indicator Dot -->
           <transition name="scale">
              <div v-if="currentPath === tab.path" class="active-dot"></div>

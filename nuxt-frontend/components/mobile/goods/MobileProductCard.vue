@@ -2,7 +2,8 @@
   <div class="goods-card-row card-glass" @click="$emit('click')">
     <!-- Left: Image -->
     <div class="goods-thumb">
-      <img :src="goods.image || goods.coverImage" loading="lazy" decoding="async" />
+      <img v-if="!imgError" :src="goods.image || goods.coverImage" loading="lazy" decoding="async" @error="imgError = true" />
+      <div v-else class="img-fallback"><el-icon><Picture /></el-icon></div>
       <!-- Tag Overlay -->
       <div v-if="goods.badge_label && goods.badge_label !== '不展示'" 
            class="card-badge" 
@@ -47,7 +48,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { Picture } from '@element-plus/icons-vue'
 import type { Goods } from '@/types/api'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 
@@ -59,6 +61,9 @@ const props = defineProps<{
 defineEmits(['click'])
 
 const { formatPrice, formatSales } = useBizFormat()
+
+const imgError = ref(false)
+watch(() => props.goods.image, () => { imgError.value = false })
 
 // Helpers
 const tags = computed(() => {
@@ -121,6 +126,13 @@ const getBadgeClass = (label: string) => {
     font-size: 10px;
     color: #fff;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.img-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: #334155; font-size: 28px;
+  background: #1E293B;
 }
 
 .badge-hot { background: linear-gradient(135deg, var(--accent) 0%, #EA580C 100%); }
@@ -232,8 +244,8 @@ const getBadgeClass = (label: string) => {
 
 .btn-spinner {
   display: inline-block; width: 14px; height: 14px;
-  border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
-  border-top-color: #fff; animation: spin 1s ease-in-out infinite;
+  border: 2px solid rgba(56, 189, 248, 0.15); border-radius: 50%;
+  border-top-color: var(--spinner-color, #38BDF8); animation: spin 1s ease-in-out infinite;
   vertical-align: middle;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

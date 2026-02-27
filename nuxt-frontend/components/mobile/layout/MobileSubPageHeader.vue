@@ -26,7 +26,11 @@ const props = defineProps<{
 
 const router = useRouter()
 
+let _navigating = false
 const handleBack = () => {
+  if (_navigating) return
+  _navigating = true
+  setTimeout(() => { _navigating = false }, 500)
   if (props.backPath) {
     router.push(props.backPath)
   } else {

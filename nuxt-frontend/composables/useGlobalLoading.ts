@@ -1,11 +1,11 @@
 
 const visible = ref(false)
-const text = ref('Loading...')
+const text = ref('加载中...')
 const type = ref<'loading' | 'success' | 'error'>('loading')
 
 export function useGlobalLoading() {
 
-    const show = (loadingText = 'Loading...') => {
+    const show = (loadingText = '加载中...') => {
         visible.value = true
         text.value = loadingText
         type.value = 'loading'
@@ -13,10 +13,9 @@ export function useGlobalLoading() {
 
     const hide = () => {
         visible.value = false
-        // Reset after transition potentially, but for now simple
     }
 
-    const success = (successText = 'Success!', duration = 1500) => {
+    const success = (successText = '操作成功', duration = 1500) => {
         text.value = successText
         type.value = 'success'
         visible.value = true
@@ -25,7 +24,7 @@ export function useGlobalLoading() {
         }, duration)
     }
 
-    const error = (errorText = 'Error', duration = 2000) => {
+    const error = (errorText = '出现错误', duration = 2000) => {
         text.value = errorText
         type.value = 'error'
         visible.value = true

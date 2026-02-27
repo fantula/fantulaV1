@@ -454,10 +454,9 @@ const handleConfirmDelete = async () => {
 
 /* Empty/Loading */
 .loading-state, .empty-state {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #64748B; min-height: 400px;
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #64748B; min-height: 400px; gap: 20px;
 }
-.glass-loader { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #3B82F6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* .glass-loader — uses global class from mobile.css (--spinner-color) */
 .empty-icon-wrapper {
   width: 80px; height: 80px; background: rgba(255, 255, 255, 0.03); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
 }

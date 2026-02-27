@@ -1,13 +1,8 @@
 import { defineStore } from 'pinia'
 import type { User, LoginParams } from '@/types/api'
 import { authApi } from '@/api/client/auth'
-import { clientOrderApi as orderApi } from '@/api/client/order' // Use modern API
 import { favoriteApi } from '@/api/client/common'
 import { messageApi } from '@/api/client/message'
-import { useGlobalLoading } from '@/composables/useGlobalLoading'
-
-// ... (keep interface definitions) ...
-
 // 定义收藏商品类型
 interface FavoriteItem {
   id: number | string // Allow string | number for product ID
@@ -24,26 +19,10 @@ interface FavoriteItem {
   addTime: string
 }
 
-// 定义订单类型
-interface OrderItem {
-  id: string
-  title: string
-  amount: string
-  time: string
-  status: 'pending' | 'shipped' | 'completed' | 'expired' | 'cancelled'
-  statusText: string
-  statusClass: string
-  payType?: string
-  productImage?: string
-}
-
 /**
  * 用户状态管理
  */
 export const useUserStore = defineStore('user', () => {
-  // Global Loading
-  const { show: showLoading, hide: hideLoading, success: showSuccess } = useGlobalLoading()
-
   // 状态
   const user = ref<User | null>(null)
   const token = useCookie('token', { maxAge: 60 * 60 * 24 * 30 }) // 30 days persistence
@@ -57,12 +36,6 @@ export const useUserStore = defineStore('user', () => {
   const favorites = ref<FavoriteItem[]>([])
   const favoritesKey = 'user_favorites'
 
-  // ... (keep rest of state) ...
-  const orders = ref<OrderItem[]>([])
-  const ordersKey = 'user_orders'
-
-  // ... (keep defaultOrders) ...
-  // ... (keep defaultOrders) ...
   const transactions = ref<any[]>([])
 
   const fetchWalletData = async () => {
@@ -79,65 +52,6 @@ export const useUserStore = defineStore('user', () => {
       console.error('Fetch wallet data failed', e)
     }
   }
-
-  const defaultOrders: OrderItem[] = [
-    // ... (keep default orders content) ...
-    {
-      id: '2023062012340',
-      title: 'XXXXXXXXXXXXXXXXX',
-      amount: '¥899.00',
-      time: '2023-06-20 14:30',
-      status: 'pending',
-      statusText: '待支付',
-      statusClass: 'pending'
-    },
-    {
-      id: '2023061511122',
-      title: 'XXXXXXXXXXXXXXXXX',
-      amount: '¥3,599.00',
-      time: '2023-06-15 10:15',
-      status: 'shipped',
-      statusText: '已发货',
-      statusClass: 'shipped'
-    },
-    {
-      id: '2023052817450',
-      title: 'XXXXXXXXXXXXXXXXX',
-      amount: '¥2,499.00',
-      time: '2023-05-28 17:45',
-      status: 'expired',
-      statusText: '已过期',
-      statusClass: 'expired'
-    },
-    {
-      id: '2023052817451',
-      title: 'XXXXXXXXXXXXXXXXX',
-      amount: '¥2,499.00',
-      time: '2023-05-28 17:45',
-      status: 'completed',
-      statusText: '已完成',
-      statusClass: 'completed'
-    },
-    {
-      id: '2023052817452',
-      title: 'XXXXXXXXXXXXXXXXX',
-      amount: '¥2,499.00',
-      time: '2023-05-28 17:45',
-      status: 'completed',
-      statusText: '已完成',
-      statusClass: 'completed'
-    },
-    {
-      id: '2023052817453',
-      title: 'XXXXXXXXXXXXXXXXX',
-      amount: '¥2,499.00',
-      time: '2023-05-28 17:45',
-      status: 'completed',
-      statusText: '已完成',
-      statusClass: 'completed'
-    }
-  ]
-  // ... (keep rest of existing functions) ...
 
   // 收藏相关API实现
   const loadFavorites = async () => {
@@ -166,7 +80,6 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // ... (keep addToFavorites, removeFromFavorites, checkIsFavorite) ...
   const addToFavorites = async (item: Omit<FavoriteItem, 'addTime'>) => {
     if (!token.value) return { success: false, message: '未登录' }
     try {
@@ -207,136 +120,6 @@ export const useUserStore = defineStore('user', () => {
   }
 
 
-  // 从本地存储加载订单数据
-  const loadOrders = () => {
-    if (process.client) {
-      try {
-        // 从API获取订单数据
-        if (isLoggedIn.value) {
-          fetchOrdersFromAPI()
-        } else {
-          orders.value = [...defaultOrders]
-        }
-      } catch (error) {
-        console.error('加载订单数据失败:', error)
-        orders.value = [...defaultOrders]
-      }
-    }
-  }
-
-  // ✅ 新增：从API获取订单数据
-  const fetchOrdersFromAPI = async () => {
-    try {
-      if (!token.value) {
-        orders.value = [...defaultOrders]
-        return
-      }
-
-      const response = await orderApi.getOrderList({ limit: 50 })
-      if (response.success && response.data) {
-        // 转换API订单格式为前端格式
-        const apiOrders = response.data.map((order: any) => ({
-          id: order.order_no, // use order_no as id
-          title: order.product_snapshot?.product_name || '未知商品',
-          amount: `¥${order.total_amount?.toFixed(2) || '0.00'}`,
-          time: order.created_at, // ISO string
-          status: getOrderStatus(order.status),
-          statusText: getOrderStatusText(order.status),
-          statusClass: getOrderStatusClass(order.status),
-          payType: '未知',
-          productImage: order.product_snapshot?.image
-        }))
-
-        orders.value = [...apiOrders, ...defaultOrders]
-      } else {
-        orders.value = [...defaultOrders]
-      }
-    } catch (error) {
-      console.error('获取订单列表失败:', error)
-      orders.value = [...defaultOrders]
-    }
-  }
-
-  // ... (keep getOrderStatus helpers) ...
-  const getOrderStatus = (status: string | number): OrderItem['status'] => {
-    // Handle both number (legacy) and string (new) status
-    if (typeof status === 'number') {
-      switch (status) {
-        case 0: return 'pending'
-        case 1: return 'shipped'
-        case 2: return 'shipped'
-        case 3: return 'completed'
-        case 4: return 'completed'
-        case 5: return 'cancelled'
-        default: return 'expired'
-      }
-    }
-
-    // String status from new API
-    // 'pending' | 'pending_delivery' | 'active' | 'expired' | 'completed' | 'refunding' | 'refunded'
-    switch (status) {
-      case 'pending': return 'pending'
-      case 'pending_delivery': return 'shipped' // or pending?
-      case 'active': return 'completed' // active subscription is completed order
-      case 'completed': return 'completed'
-      case 'expired': return 'expired'
-      case 'refunding': return 'cancelled'
-      case 'refunded': return 'cancelled'
-      default: return 'expired'
-    }
-  }
-
-  const getOrderStatusText = (status: string | number): string => {
-    if (typeof status === 'number') {
-      switch (status) {
-        case 0: return '待支付'
-        case 1: return '已发货'
-        case 2: return '已发货'
-        case 3: return '已完成'
-        case 4: return '已完成'
-        case 5: return '已取消'
-        default: return '已过期'
-      }
-    }
-
-    switch (status) {
-      case 'pending': return '待支付'
-      case 'pending_delivery': return '待发货'
-      case 'active': return '使用中'
-      case 'completed': return '已完成'
-      case 'expired': return '已过期'
-      case 'refunding': return '退款中'
-      case 'refunded': return '已退款'
-      default: return '未知'
-    }
-  }
-
-  const getOrderStatusClass = (status: string | number): string => {
-    if (typeof status === 'number') {
-      switch (status) {
-        case 0: return 'pending'
-        case 1: return 'shipped'
-        case 2: return 'shipped'
-        case 3: return 'completed'
-        case 4: return 'completed'
-        case 5: return 'cancelled'
-        default: return 'expired'
-      }
-    }
-
-    switch (status) {
-      case 'pending': return 'pending'
-      case 'pending_delivery': return 'shipped'
-      case 'active': return 'completed'
-      case 'completed': return 'completed'
-      case 'expired': return 'expired'
-      case 'refunding': return 'cancelled'
-      case 'refunded': return 'cancelled'
-      default: return 'expired'
-    }
-  }
-
-  // ... (keep saveFavorites, saveOrders, addOrder, getOrders, getOrdersByStatus, clearOrders, getFavorites, clearFavorites) ...
   const saveFavorites = () => {
     if (process.client) {
       try {
@@ -345,78 +128,6 @@ export const useUserStore = defineStore('user', () => {
         console.error('保存收藏数据失败:', error)
       }
     }
-  }
-
-  const saveOrders = () => {
-    if (process.client) {
-      try {
-        // 过滤出新增的订单（不在默认订单中的）
-        const newOrders = orders.value.filter(order =>
-          !defaultOrders.some(defaultOrder => defaultOrder.id === order.id)
-        )
-        localStorage.setItem(ordersKey, JSON.stringify(newOrders))
-      } catch (error) {
-        console.error('保存订单数据失败:', error)
-      }
-    }
-  }
-
-  const addOrder = (orderData: {
-    orderId: string
-    title: string
-    amount: number | string
-    payType: string
-    productImage?: string
-  }) => {
-    const newOrder: OrderItem = {
-      id: orderData.orderId,
-      title: orderData.title,
-      amount: typeof orderData.amount === 'number' ? `¥${orderData.amount.toFixed(2)}` : orderData.amount,
-      time: new Date().toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
-      status: 'completed',
-      statusText: '已完成',
-      statusClass: 'completed',
-      payType: orderData.payType,
-      productImage: orderData.productImage
-    }
-
-    orders.value.unshift(newOrder)
-    saveOrders()
-
-    console.log('✅ 新订单已添加到列表顶部:', newOrder)
-    return { success: true, order: newOrder }
-  }
-
-  const getOrders = () => {
-    return orders.value
-  }
-
-  const getOrdersByStatus = (status?: string) => {
-    if (!status || status === '全部') {
-      return orders.value
-    }
-
-    const statusMap: Record<string, string> = {
-      '待支付': 'pending',
-      '待发货': 'shipped',
-      '已发货': 'shipped',
-      '已完成': 'completed',
-      '已过期': 'expired'
-    }
-
-    const targetStatus = statusMap[status] || status
-    return orders.value.filter(order => order.status === targetStatus)
-  }
-
-  const clearOrders = () => {
-    orders.value = [...defaultOrders]
-    saveOrders()
   }
 
   const getFavorites = () => {
@@ -523,7 +234,6 @@ export const useUserStore = defineStore('user', () => {
         localStorage.removeItem('wechat_openid') // 清除微信 OpenID 缓存
       }
       favorites.value = []
-      orders.value = [...defaultOrders]
       unreadMessageCount.value = 0
 
       // 清空购物车状态
@@ -616,7 +326,6 @@ export const useUserStore = defineStore('user', () => {
     }
 
     loadFavorites()
-    loadOrders()
     const cartStore = useCartStore()
     await cartStore.initCart()
 
@@ -680,7 +389,6 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('user_info', JSON.stringify(userInfo))
     }
     loadFavorites()
-    loadOrders()
     // 获取未读消息
     fetchUnreadMessageCount()
     const cartStore = useCartStore()
@@ -695,8 +403,7 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     loading: readonly(loading),
     favorites: readonly(favorites),
-    orders: readonly(orders),
-    unreadMessageCount: readonly(unreadMessageCount), // 导出未读消息数
+    unreadMessageCount: readonly(unreadMessageCount),
 
     // 方法
     login,
@@ -723,12 +430,5 @@ export const useUserStore = defineStore('user', () => {
     // 额度变动相关
     transactions: readonly(transactions),
     fetchWalletData,
-
-    // 订单相关方法
-    addOrder,
-    getOrders,
-    getOrdersByStatus,
-    clearOrders,
-    loadOrders
   }
 }) 

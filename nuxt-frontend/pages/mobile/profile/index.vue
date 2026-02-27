@@ -124,7 +124,8 @@ import {
   Ticket, Star, Headset, Bell, Monitor, RefreshRight, ShoppingCart
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/client/user'
-import { useCartStore } from '@/stores/client/cart' // Import Cart Store
+import { useCartStore } from '@/stores/client/cart'
+import { useOrderList } from '@/composables/client/useOrderList'
 import MobileMenuLink from '@/components/mobile/profile/MobileMenuLink.vue'
 import RechargeModal from '@/components/mobile/profile/modals/RechargeModal.vue'
 import MobileContactModal from '@/components/mobile/modal/MobileContactModal.vue'
@@ -138,6 +139,7 @@ definePageMeta({
 const router = useRouter()
 const userStore = useUserStore()
 const cartStore = useCartStore()
+const { orders: apiOrders, preOrders, loadList } = useOrderList()
 const showRecharge = ref(false)
 const showContactModal = ref(false)
 
@@ -153,10 +155,9 @@ const userInfo = computed(() => {
 })
 
 const orderCounts = computed(() => {
-    // Note: Adjust status strings to match backend ENUMs if needed
-    const pending = userStore.getOrdersByStatus('pending_payment').length
-    const paid = userStore.getOrdersByStatus('pending_delivery').length 
-    const refunding = userStore.getOrdersByStatus('refunding').length 
+    const pending = preOrders.value.length
+    const paid = apiOrders.value.filter(o => o.status === 'pending_delivery').length
+    const refunding = apiOrders.value.filter(o => ['refunding', 'refunded'].includes(o.status)).length
     return { pending, paid, refunding }
 })
 
@@ -183,7 +184,7 @@ onMounted(() => {
         router.push(mobileRoutes.home())
     } else {
         userStore.fetchUserInfo()
-        userStore.loadOrders() 
+        loadList()
         cartStore.loadCart()
     }
 })
