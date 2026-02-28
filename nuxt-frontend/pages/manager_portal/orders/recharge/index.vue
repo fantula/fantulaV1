@@ -4,6 +4,12 @@
 
     <AdminActionCard>
       <template #actions>
+        <el-select v-model="statusFilter" placeholder="状态筛选" clearable style="width: 140px; margin-right: 12px;" @change="loadList">
+          <el-option label="待发货" value="pending_delivery" />
+          <el-option label="使用中" value="active" />
+          <el-option label="已过期" value="expired" />
+          <el-option label="已完成" value="completed" />
+        </el-select>
         <el-button @click="loadList" :icon="Refresh">刷新</el-button>
       </template>
     </AdminActionCard>
@@ -246,7 +252,7 @@ const {
   total,
   page,
   pageSize,
-  DEFAULT_AVATAR,
+  statusFilter,
   loadList,
   handleCopy,
   formatSpec,

@@ -25,11 +25,24 @@
 
     <!-- Glass List -->
     <div class="ledger-stream">
-      
-      <BaseInfiniteList 
-        :loading="loading" 
+
+      <!-- 加载失败错误状态 -->
+      <div v-if="error && displayList.length === 0 && !loading" class="stream-error">
+        <div class="error-bubble">
+          <el-icon class="error-icon-inner"><Warning /></el-icon>
+        </div>
+        <span class="error-label">加载失败</span>
+        <span class="error-hint">网络异常，请重试</span>
+        <button class="reload-btn-ledger" @click="$emit('reload')">
+          <el-icon><RefreshRight /></el-icon> 重新加载
+        </button>
+      </div>
+
+      <BaseInfiniteList
+        v-else
+        :loading="loading"
         :finished="finished"
-        :error="error" 
+        :error="false"
         @load="$emit('loadMore')"
         :offset="100"
       >
@@ -80,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { Document, Top, Bottom } from '@element-plus/icons-vue'
+import { Document, Top, Bottom, Warning, RefreshRight } from '@element-plus/icons-vue'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 
@@ -92,7 +105,7 @@ const props = defineProps<{
   activeTab: 'all' | 'income' | 'expense'
 }>()
 
-const emit = defineEmits(['loadMore', 'switchTab'])
+const emit = defineEmits(['loadMore', 'switchTab', 'reload'])
 const { formatDate } = useBizFormat()
 
 const switchTab = (tab: 'all' | 'income' | 'expense') => {
@@ -204,6 +217,30 @@ const getTxnDescription = (item: any): string => {
   background: rgba(255,255,255,0.02);
   display: flex; align-items: center; justify-content: center;
   font-size: 32px; color: #334155; margin-bottom: 16px;
+}
+
+/* Error State */
+.stream-error {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 0; gap: 8px;
+}
+.error-bubble {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(239,68,68,0.08);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.error-icon-inner { font-size: 32px; color: #EF4444; }
+.error-label { font-size: 15px; font-weight: 600; color: #CBD5E1; }
+.error-hint { font-size: 12px; color: #64748B; margin-bottom: 4px; }
+.reload-btn-ledger {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 18px; background: transparent;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
+  color: #94A3B8; font-size: 13px; cursor: pointer; transition: all 0.25s;
+}
+.reload-btn-ledger:hover {
+  background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.35); color: #3B82F6;
 }
 
 /* Animations */

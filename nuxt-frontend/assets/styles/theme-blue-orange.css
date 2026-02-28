@@ -371,8 +371,8 @@ body::after {
 
 .page-slide-enter-from {
   opacity: 0;
-  transform: translateX(30px);
-  /* Horizontal slide from right */
+  transform: translateX(8px);
+  /* Subtle slide from right — 缩小偏移量避免 overflow 超出页面边界造成 logo 闪烁 */
 }
 
 .page-slide-enter-to {
@@ -394,15 +394,9 @@ body::after {
 
 .page-slide-leave-to {
   opacity: 0;
-  transform: translateX(-30px);
-  /* Horizontal slide to left */
+  transform: translateX(-8px);
+  /* Subtle slide to left — 同上，缩小偏移量 */
 }
-
-/* Profile section: 纯淡入淡出，避免 translateX 造成背景抖动 */
-.profile-fade-enter-active,
-.profile-fade-leave-active { transition: opacity 0.15s ease; }
-.profile-fade-enter-from,
-.profile-fade-leave-to { opacity: 0; }
 
 /* ========================================================================= */
 /* Global Modal "Spring Zoom" Animation                                      */
@@ -560,4 +554,17 @@ body::after {
       rgba(255, 255, 255, 0.08) 37%,
       rgba(255, 255, 255, 0.03) 63%) !important;
   background-size: 400% 100% !important;
+}
+
+/* =====================================================
+   Profile section page transition: 纯淡入淡出
+   避免 translateX 造成背景抖动
+   ===================================================== */
+.profile-fade-enter-active,
+.profile-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.profile-fade-enter-from,
+.profile-fade-leave-to {
+  opacity: 0;
 }

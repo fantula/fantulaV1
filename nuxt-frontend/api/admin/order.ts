@@ -89,9 +89,10 @@ export const adminOrderApi = {
         status?: string
         exclude_status?: string[] // 排除的状态列表
         keyword?: string // 搜索订单号
+        prioritySort?: boolean // 待发货优先排序（虚拟充值用）
     }): Promise<{ success: boolean; orders: AdminOrder[]; total: number; error?: string }> {
         const client = getSupabaseClient()
-        const { page = 1, pageSize = 20, order_type, status, exclude_status, keyword } = params
+        const { page = 1, pageSize = 20, order_type, status, exclude_status, keyword, prioritySort } = params
 
         let query = client
             .from('orders')
@@ -100,6 +101,12 @@ export const adminOrderApi = {
                 *,
                 profiles(id, uid, avatar, nickname)
             `, { count: 'exact' })
+
+        // 排序：prioritySort 时按状态优先（pending_delivery 字母序最大，排最前）
+        if (prioritySort) {
+            query = query.order('status', { ascending: false })
+        }
+        query = query
             .order('created_at', { ascending: false })
             .range((page - 1) * pageSize, page * pageSize - 1)
 

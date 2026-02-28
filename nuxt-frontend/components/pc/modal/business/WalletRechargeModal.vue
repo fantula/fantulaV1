@@ -132,14 +132,16 @@
             
             <div class="qrcode-wrapper">
               <img v-if="qrcodeDataUrl" :src="qrcodeDataUrl" alt="Payment QR Code" class="qrcode-img" />
-              <div v-if="paymentStatus === 'checking'" class="qrcode-overlay">
-                <div class="checking-spinner"></div>
-                <span>正在检查支付状态...</span>
-              </div>
               <div v-if="paymentStatus === 'success'" class="qrcode-overlay success">
                 <el-icon class="success-icon"><CircleCheck /></el-icon>
                 <span>支付成功!</span>
               </div>
+            </div>
+
+            <!-- 静默轮询状态指示 -->
+            <div class="polling-status" v-if="paymentStatus === 'pending'">
+              <span class="polling-dot"></span>
+              <span class="polling-text">监听支付状态中，请完成扫码...</span>
             </div>
             
             <div class="qrcode-info">
@@ -304,39 +306,32 @@ function startPolling() {
   
   pollTimer = setInterval(async () => {
     if (!currentOrderNo.value) return
-    
-    paymentStatus.value = 'checking'
-    
+
+    // 静默轮询：不修改 paymentStatus，避免遮挡二维码
     try {
       const res = await wechatPayApi.queryOrder(currentOrderNo.value)
-      console.log('[Polling] Response:', JSON.stringify(res))
-      
+
       if (res.success && res.data?.paid) {
         // 支付成功
         paymentStatus.value = 'success'
         stopPolling()
-        
+
         ElMessage.success('充值成功！')
-        
+
         // 刷新用户余额
         await userStore.fetchUserInfo()
-        
+
         // 延迟关闭
         setTimeout(() => {
           emits('success')
           emits('close')
         }, 1500)
-        
-        return
       }
-      
-      paymentStatus.value = 'pending'
-      
+
     } catch (err) {
-      console.error('Query order error:', err)
-      paymentStatus.value = 'pending'
+      // 静默失败，下次继续轮询
     }
-  }, 3000)  // 每3秒查询一次
+  }, 3000)  // 每3秒静默查询一次
 }
 
 function stopPolling() {
@@ -561,9 +556,25 @@ onUnmounted(() => {
 .qrcode-overlay.success { background: rgba(16, 185, 129, 0.1); color: #10B981; }
 .success-icon { font-size: 48px; color: #10B981; }
 
-.checking-spinner {
-  width: 32px; height: 32px; border: 3px solid #E2E8F0;
-  border-top-color: #F97316; border-radius: 50%; animation: spin 0.8s linear infinite;
+/* 静默轮询状态指示器 */
+.polling-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+  font-size: 12px;
+  color: #94A3B8;
+}
+.polling-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #22C55E;
+  animation: polling-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes polling-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 6px rgba(34, 197, 94, 0.6); }
 }
 
 .qrcode-info {

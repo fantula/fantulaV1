@@ -62,6 +62,9 @@
                         </div>
                         <div class="trigger-overlay" v-if="form.image">更换图片</div>
                       </div>
+                      <el-button v-if="form.image" size="small" type="danger" text style="margin-top:6px" @click="clearImage('image')">
+                        <el-icon><Delete /></el-icon> 删除图片
+                      </el-button>
                       <div class="form-tip">建议尺寸 800x800</div>
                     </el-form-item>
                 </el-col>
@@ -139,12 +142,17 @@
                    </div>
 
                    <div class="module-display">
-                      <div v-if="mod.type==='image'" class="module-image-trigger" @click="openImagePicker(idx)">
-                        <el-image v-if="mod.content" :src="mod.content" class="module-img-preview" fit="contain" />
-                        <div v-else class="image-placeholder">
-                          <el-icon><Picture /></el-icon>
-                          <span>点击选择图片</span>
+                      <div v-if="mod.type==='image'">
+                        <div class="module-image-trigger" @click="openImagePicker(idx)">
+                          <el-image v-if="mod.content" :src="mod.content" class="module-img-preview" fit="contain" />
+                          <div v-else class="image-placeholder">
+                            <el-icon><Picture /></el-icon>
+                            <span>点击选择图片</span>
+                          </div>
                         </div>
+                        <el-button v-if="mod.content" size="small" type="danger" text style="margin-top:6px" @click="clearImage(idx)">
+                          <el-icon><Delete /></el-icon> 清除图片
+                        </el-button>
                       </div>
                       <el-input 
                         v-else 
@@ -198,7 +206,8 @@ const {
     removeDetailModule,
     moveDetailModule,
     openImagePicker,
-    handleImageSelected
+    handleImageSelected,
+    clearImage
 } = useAdminProductForm()
 
 </script>

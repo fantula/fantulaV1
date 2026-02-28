@@ -174,6 +174,14 @@ export function useAdminProductForm() {
         }
     }
 
+    const clearImage = (target: 'image' | number) => {
+        if (target === 'image') {
+            form.image = ''
+        } else if (typeof target === 'number') {
+            form.detailModules[target].content = ''
+        }
+    }
+
     // Lifecycle
     onMounted(async () => {
         loadCategories()
@@ -202,6 +210,7 @@ export function useAdminProductForm() {
 
         // Images
         openImagePicker,
-        handleImageSelected
+        handleImageSelected,
+        clearImage
     }
 }

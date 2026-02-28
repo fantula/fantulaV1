@@ -5,9 +5,14 @@ import { mapSupabaseError } from '~/server/utils/error-mapper'
 
 export default defineEventHandler(async (event) => {
     try {
-        // 1. Initial Validation (determine type)
-        const baseBody = await validateBody(event, loginBaseSchema)
-        const { type } = baseBody
+        // 1. Read body once, then validate (避免 readBody 多次调用问题)
+        const rawBody = await readBody(event)
+
+        const baseResult = loginBaseSchema.safeParse(rawBody)
+        if (!baseResult.success) {
+            throw createError({ statusCode: 400, statusMessage: '参数格式错误' })
+        }
+        const { type } = baseResult.data
 
         const config = useRuntimeConfig()
         const supabaseUrl = config.public.supabaseUrl
@@ -22,13 +27,28 @@ export default defineEventHandler(async (event) => {
 
         // 2. Specific Validation & Auth
         if (type === 'password') {
-            const { email: e, password } = await validateBody(event, passwordLoginSchema)
-            email = e
+            const pwResult = passwordLoginSchema.safeParse(rawBody)
+            if (!pwResult.success) {
+                const errors = pwResult.error.flatten().fieldErrors
+                const firstKey = Object.keys(errors)[0]
+                const msg = firstKey && errors[firstKey as keyof typeof errors]?.[0] || '参数格式错误'
+                throw createError({ statusCode: 400, statusMessage: msg })
+            }
+            const { email: e, password } = pwResult.data
+            email = e.trim().toLowerCase()
             authResult = await authClient.auth.signInWithPassword({ email, password })
         } else {
-            const { email: e, code } = await validateBody(event, verifyOtpSchema)
-            email = e
-            authResult = await authClient.auth.verifyOtp({ email, token: code, type: 'email' })
+            const otpResult = verifyOtpSchema.safeParse(rawBody)
+            if (!otpResult.success) {
+                const errors = otpResult.error.flatten().fieldErrors
+                const firstKey = Object.keys(errors)[0]
+                const msg = firstKey && errors[firstKey as keyof typeof errors]?.[0] || '参数格式错误'
+                throw createError({ statusCode: 400, statusMessage: msg })
+            }
+            const { email: e, code } = otpResult.data
+            email = e.trim().toLowerCase()
+            const trimmedCode = code.trim()
+            authResult = await authClient.auth.verifyOtp({ email, token: trimmedCode, type: 'email' })
         }
 
         const { data, error } = authResult

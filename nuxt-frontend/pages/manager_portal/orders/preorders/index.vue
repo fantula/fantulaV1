@@ -36,19 +36,15 @@
       </el-table-column>
       <el-table-column label="用户" min-width="140">
         <template #default="{ row }">
-          <div class="user-cell">
-            <el-avatar :size="24" :src="row._profile?.avatar || DEFAULT_AVATAR" />
-            <span class="user-email">{{ row._profile?.nickname || row._profile?.uid || '未知用户' }}</span>
-          </div>
+          <AdminUserCell :user="row._profile" :uid="row._profile?.uid" />
         </template>
       </el-table-column>
       <el-table-column label="商品" min-width="180">
         <template #default="{ row }">
-          <div class="product-cell">
-             <!-- 注意：API返回的是 product_snapshot 对象 -->
-            <img v-if="row.product_snapshot?.image" :src="row.product_snapshot.image" class="product-thumb" />
-            <span>{{ row.product_snapshot?.product_name || '未知商品' }}</span>
-          </div>
+          <ProductThumbCell 
+            :image="row.product_snapshot?.image" 
+            :name="row.product_snapshot?.product_name || '未知商品'" 
+          />
         </template>
       </el-table-column>
       <el-table-column label="金额" width="100">
@@ -98,6 +94,8 @@ import { onMounted } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
 import PageTipHeader from '@/components/admin/base/PageTipHeader.vue'
 import AdminActionCard from '@/components/admin/base/AdminActionCard.vue'
+import AdminUserCell from '@/components/admin/base/AdminUserCell.vue'
+import ProductThumbCell from '@/components/admin/base/ProductThumbCell.vue'
 import { useAdminPreOrderList } from '@/composables/admin/useAdminPreOrderList'
 
 definePageMeta({
@@ -109,7 +107,6 @@ const {
   stats,
   statusFilter,
   selectedIds,
-  DEFAULT_AVATAR,
   loadList,
   handleBulkDelete,
   handleSelectionChange,
@@ -139,22 +136,7 @@ onMounted(() => {
 }
 .mono-text:hover { color: #60a5fa; }
 
-.user-cell { display: flex; align-items: center; gap: 8px; }
-.user-email { font-size: 13px; color: #cbd5e1; }
-
-.product-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.product-thumb {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  object-fit: cover;
-  background: #1e293b;
-}
+/* User/Product cells use shared components */
 
 .amount {
   font-weight: 600;

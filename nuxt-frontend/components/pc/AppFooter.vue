@@ -53,7 +53,8 @@
       </div>
       
       <div class="footer-bottom">
-        © 2019-2026 凡图拉 | 云南凡图拉科技有限公司 | 滇ICP备 2025060486号-1
+        © 2019-2026 凡图拉 | 云南凡图拉科技有限公司 |
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="icp-link">滇ICP备 2025060486号-1</a>
       </div>
     </div>
     
@@ -304,6 +305,14 @@ watch(() => userStore.isLoggedIn, (newValue) => {
   padding-bottom: 30px;
   border-top: 1px solid rgba(255,255,255,0.05);
   padding-top: 20px;
+}
+.icp-link {
+  color: #64748B;
+  text-decoration: none;
+}
+.icp-link:hover {
+  color: #94A3B8;
+  text-decoration: underline;
 }
 
 /* Mobile Adaptation Example for very small screens */

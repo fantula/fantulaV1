@@ -109,14 +109,14 @@
        <div class="section-group" v-if="instructionImages.length > 0 && order.status !== 'refunding'">
            <div class="section-header">使用说明</div>
            <div class="tutorial-gallery">
-               <div 
-                   v-for="(img, idx) in instructionImages" 
+               <div
+                   v-for="(img, idx) in instructionImages"
                    :key="idx"
-                   class="tutorial-box" 
-                   @click="previewImage(img)"
+                   class="tutorial-box"
+                   @click="openPreview(idx)"
                >
                   <NuxtImg :src="img" class="tutorial-img" loading="lazy" width="750" quality="80" format="webp" />
-                  <div class="zoom-hint" v-if="idx === 0"><el-icon><ZoomIn /></el-icon></div>
+                  <div class="zoom-hint"><el-icon><ZoomIn /></el-icon></div>
                </div>
            </div>
        </div>
@@ -144,6 +144,15 @@
     />
     
     <MobileContactModal v-model="showContactModal" />
+
+    <!-- 图片图库查看器 -->
+    <el-image-viewer
+      v-if="previewVisible"
+      :url-list="instructionImages"
+      :initial-index="previewIndex"
+      @close="previewVisible = false"
+      teleported
+    />
 
   </div>
 </template>
@@ -247,8 +256,11 @@ const handleAction = async (type: string) => {
     else if (type === 'cancel_refund') showCancelRefundSheet.value = true
 }
 
-const previewImage = (url: string) => {
-    window.open(url, '_blank')
+const previewVisible = ref(false)
+const previewIndex = ref(0)
+const openPreview = (index: number) => {
+    previewIndex.value = index
+    previewVisible.value = true
 }
 
 const onTicketSuccess = () => {

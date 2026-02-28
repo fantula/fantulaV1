@@ -682,6 +682,7 @@ const handleBack = () => {
   cursor: pointer;
   background: #fbfbfc;
   transition: all 0.3s;
+  position: relative;
 }
 .image-selector:hover { border-color: #409EFF; }
 .preview-img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }

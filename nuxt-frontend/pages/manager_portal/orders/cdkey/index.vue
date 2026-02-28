@@ -129,7 +129,7 @@ const {
   total,
   page,
   pageSize,
-  DEFAULT_AVATAR,
+  statusFilter,
   loadList,
   handleCopy,
   formatSpec,

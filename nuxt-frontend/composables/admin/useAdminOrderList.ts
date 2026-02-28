@@ -17,6 +17,7 @@ export function useAdminOrderList(orderType: 'virtual' | 'shared_account' | 'one
     const page = ref(1)
     const pageSize = ref(20)
     const selectedIds = ref<string[]>([])
+    const statusFilter = ref('')
 
     // 加载列表
     async function loadList() {
@@ -26,7 +27,9 @@ export function useAdminOrderList(orderType: 'virtual' | 'shared_account' | 'one
                 page: page.value,
                 pageSize: pageSize.value,
                 order_type: orderType,
-                exclude_status: ['refunding', 'refunded'] // 排除退款中和已退款的订单
+                exclude_status: ['refunding', 'refunded'], // 排除退款中和已退款的订单
+                status: statusFilter.value || undefined,
+                prioritySort: orderType === 'virtual', // 虚拟充值：待发货优先排序
             })
 
             if (!success) {
@@ -96,7 +99,7 @@ export function useAdminOrderList(orderType: 'virtual' | 'shared_account' | 'one
         page,
         pageSize,
         selectedIds,
-        DEFAULT_AVATAR,
+        statusFilter,
 
         // Actions
         loadList,
