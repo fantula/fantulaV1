@@ -177,9 +177,8 @@ import BaseModal from '@/components/shared/BaseModal.vue'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 
 definePageMeta({
-  layout: 'profile-pc',
-  ssr: false,
-  transition: { name: 'profile-fade', mode: 'out-in' }
+  layout: 'pc',
+  ssr: false
 })
 
 const router = useRouter()

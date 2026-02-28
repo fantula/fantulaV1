@@ -371,8 +371,8 @@ body::after {
 
 .page-slide-enter-from {
   opacity: 0;
-  transform: translateX(30px);
-  /* Horizontal slide from right */
+  transform: translateX(8px);
+  /* Subtle slide from right — 缩小偏移量避免 overflow 超出页面边界造成 logo 闪烁 */
 }
 
 .page-slide-enter-to {
@@ -394,8 +394,8 @@ body::after {
 
 .page-slide-leave-to {
   opacity: 0;
-  transform: translateX(-30px);
-  /* Horizontal slide to left */
+  transform: translateX(-8px);
+  /* Subtle slide to left — 同上，缩小偏移量 */
 }
 
 /* ========================================================================= */

@@ -36,8 +36,11 @@ const isDev = import.meta.dev
 /* 通用页面填充 - 确保页脚始终在底部 */
 .page-slot-wrapper {
   flex: 1;
+  min-height: calc(100vh - 60px); /* 防止 out-in 过渡时页面区域瞬间坍缩导致footer跳动 */
   display: flex;
   flex-direction: column;
+  /* ⚠️ 不要加 overflow: hidden — 会裁掉高度超过视口的页面内容（首页、商品列表），
+     导致浏览器级别的纵向滚动消失。Logo闪烁用缩小 translateX 解决。 */
 }
 
 /* slot 内的直接子元素也参与 flex 布局 */

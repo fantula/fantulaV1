@@ -58,7 +58,7 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
 
 <style scoped>
 .profile-page {
-  flex: 1; height: 0; display: flex; flex-direction: column; overflow: hidden; background: #0F172A;
+  flex: none; height: calc(100vh - 60px); display: flex; flex-direction: column; overflow: hidden; background: #0F172A;
 }
 
 .phantom-ambassador {
