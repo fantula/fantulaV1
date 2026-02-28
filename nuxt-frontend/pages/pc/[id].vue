@@ -379,6 +379,8 @@ import { useModalStore } from '@/stores/client/modal'
 
 const modal = useModalStore()
 const route = useRoute()
+const config = useRuntimeConfig()
+const siteUrl = (config.public.siteUrl as string) || 'https://www.fantula.com'
 
 // 获取文章ID
 const articleId = route.params.id
@@ -419,7 +421,7 @@ useHead({
     { property: 'og:description', content: currentArticle ? currentArticle.description : '凡图拉文章详情页面' },
     { property: 'og:type', content: 'article' },
     { property: 'og:image', content: currentArticle ? currentArticle.image : '/images/default-og.jpg' },
-    { property: 'og:url', content: `http://localhost:3000/article/${articleId}` },
+    { property: 'og:url', content: `${siteUrl}/article/${articleId}` },
     { property: 'article:published_time', content: currentArticle ? currentArticle.date : '' },
     { property: 'article:author', content: currentArticle ? currentArticle.author.name : '' },
     { property: 'article:section', content: currentArticle ? currentArticle.category : '' },
@@ -430,7 +432,7 @@ useHead({
     { name: 'twitter:image', content: currentArticle ? currentArticle.image : '/images/default-og.jpg' }
   ],
   link: [
-    { rel: 'canonical', href: `http://localhost:3000/article/${articleId}` }
+    { rel: 'canonical', href: `${siteUrl}/article/${articleId}` }
   ],
   script: currentArticle ? [
     {
@@ -452,12 +454,12 @@ useHead({
           "name": "凡图拉",
           "logo": {
             "@type": "ImageObject",
-            "url": "http://localhost:3000/images/shared/logo.png"
+            "url": "${siteUrl}/images/shared/logo.png"
           }
         },
         "mainEntityOfPage": {
           "@type": "WebPage",
-          "@id": `http://localhost:3000/article/${articleId}`
+          "@id": `${siteUrl}/article/${articleId}`
         }
       })
     }

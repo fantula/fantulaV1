@@ -17,6 +17,7 @@ export function useCheckout() {
   const paying = ref(false)
   const showPaySuccess = ref(false)
   const payDismissed = ref(false)      // 用户已关闭弹窗，禁止再弹
+  const isExpired = ref(false)        // 订单已超时
   const refreshingBalance = ref(false) // New
 
   // Settlement Data
@@ -86,7 +87,8 @@ export function useCheckout() {
   }
 
   const handleExpire = async () => {
-    error.value = '订单已过期，请重新下单'
+    isExpired.value = true
+    error.value = '订单已超时，请重新下单'
     if (preOrders.value.length > 0) {
       try {
         await supabasePreOrderApi.expirePreOrder(preOrders.value[0].id)
@@ -214,7 +216,7 @@ export function useCheckout() {
       // showBalanceModal.value = true // Removed
       // Should be handled by UI button state now
       warning('额度不足，请先充值')
-      router.push('/profile/recharge')
+      router.push('/pc/profile/wallet')
       return
     }
 
@@ -291,6 +293,7 @@ export function useCheckout() {
     // State
     loading,
     error,
+    isExpired,
     preOrders,
     paying,
     showPaySuccess,

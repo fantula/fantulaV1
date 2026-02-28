@@ -17,9 +17,13 @@
 
       <!-- 错误状态 -->
       <div class="checkout-error" v-else-if="error">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon">{{ isExpired ? '⏰' : '⚠️' }}</div>
         <p>{{ error }}</p>
-        <div class="error-actions">
+        <div class="error-actions" v-if="isExpired">
+          <BaseButton themeId="marketing-buy" @click="router.push('/pc/cart')">回到购物车，重新下单</BaseButton>
+          <BaseButton themeId="secondary" @click="router.push(pcRoutes.home())">返回首页</BaseButton>
+        </div>
+        <div class="error-actions" v-else>
           <BaseButton themeId="secondary" @click="loadPreOrders(preOrderIds)">重新加载</BaseButton>
           <BaseButton themeId="secondary" @click="router.push(pcRoutes.home())">返回首页</BaseButton>
         </div>
@@ -152,6 +156,7 @@ const {
   loading,
   error,
   preOrders,
+  isExpired,
   paying,
   showPaySuccess,
   

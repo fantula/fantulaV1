@@ -202,8 +202,9 @@ import ProductInfoCard from '@/components/pc/order/ProductInfoCard.vue'
 import type { FulfillmentField } from '@/types/order'
 
 definePageMeta({
-  layout: 'pc',
-  ssr: false
+  layout: 'profile-pc',
+  ssr: false,
+  transition: { name: 'profile-fade', mode: 'out-in' }
 })
 
 const route = useRoute()
