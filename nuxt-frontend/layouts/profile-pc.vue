@@ -1,9 +1,11 @@
 <template>
   <div class="app-wrapper">
     <AppHeader />
-    <!-- 页面内容 - flex:1 确保 footer 始终在底部 -->
-    <div class="page-slot-wrapper">
-      <slot />
+    <div class="profile-layout-body">
+      <SideNavigation />
+      <div class="profile-main">
+        <slot />
+      </div>
     </div>
     <AppFooter />
     <!-- 开发工具组件（仅开发环境） -->
@@ -21,8 +23,8 @@ import AppHeader from '@/components/pc/AppHeader.vue'
 import AppFooter from '@/components/pc/AppFooter.vue'
 import DevLoginTool from '@/components/pc/DevLoginTool.vue'
 import ParticleBackground from '@/components/pc/ParticleBackground.vue'
+import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
 
-// 只在开发环境显示开发工具
 const isDev = import.meta.dev
 </script>
 
@@ -33,17 +35,37 @@ const isDev = import.meta.dev
   flex-direction: column;
 }
 
-/* 通用页面填充 - 确保页脚始终在底部 */
-.page-slot-wrapper {
+.profile-layout-body {
   flex: 1;
+  min-height: 0;
   display: flex;
-  flex-direction: column;
-  overflow: hidden; /* 剪裁 page-slide 过渡动画，防止 translateX 内容溢出到 header 区域 */
+  align-items: flex-start;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 32px 24px;
+  gap: 24px;
+  align-self: stretch;
 }
 
-/* slot 内的直接子元素也参与 flex 布局 */
-.page-slot-wrapper :deep(> *) {
+.profile-main {
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  min-height: 500px;
+}
+
+/* Slot children participate in flex layout */
+.profile-main :deep(> *) {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }

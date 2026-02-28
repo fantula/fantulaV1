@@ -398,6 +398,12 @@ body::after {
   /* Horizontal slide to left */
 }
 
+/* Profile section: 纯淡入淡出，避免 translateX 造成背景抖动 */
+.profile-fade-enter-active,
+.profile-fade-leave-active { transition: opacity 0.15s ease; }
+.profile-fade-enter-from,
+.profile-fade-leave-to { opacity: 0; }
+
 /* ========================================================================= */
 /* Global Modal "Spring Zoom" Animation                                      */
 /* ========================================================================= */
