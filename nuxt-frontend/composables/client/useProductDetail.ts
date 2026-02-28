@@ -31,6 +31,11 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
     return !unref(overrideId) && !!goodsId.value && goodsId.value !== 'undefined'
   })
 
+  // PC 商品详情页 (无 overrideId) 使用 lazy:false —— SSR 等待 API 数据，
+  // 首屏 HTML 直接携带商品信息（含图片 URL），浏览器解析即开始拉图片，无额外 waterfall。
+  // 移动端 Sheet (有 overrideId) 保留 lazy:true —— 组件按需加载，不阻塞 SSR。
+  const isLazyFetch = overrideId !== undefined
+
   const { data: goodsResponse, error: fetchError, pending, refresh: fetchGoodsData } = useAsyncData(
     () => `goods-detail-${goodsId.value}`,
     async () => {
@@ -40,7 +45,7 @@ export const useProductDetail = (overrideId?: string | number | Ref<string | num
     {
       watch: [goodsId],
       immediate: shouldAutoFetch.value,
-      lazy: true
+      lazy: isLazyFetch
     }
   )
 

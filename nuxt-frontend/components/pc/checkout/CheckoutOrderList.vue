@@ -9,7 +9,7 @@
       <div class="order-body">
         <div class="product-thumb">
           <div class="sq-cover-img-container">
-            <img :src="order.product_snapshot?.image || '/images/shared/logo.png'" class="sq-cover-img" />
+            <img :src="order.product_snapshot?.image || '/images/shared/logo.png'" class="sq-cover-img" loading="lazy" decoding="async" />
           </div>
         </div>
         <div class="product-info">
