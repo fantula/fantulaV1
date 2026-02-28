@@ -1,0 +1,79 @@
+<template>
+  <div class="app-wrapper">
+    <AppHeader />
+    <div class="profile-layout-body">
+      <SideNavigation />
+      <div class="profile-main">
+        <slot />
+      </div>
+    </div>
+    <AppFooter />
+    <!-- 开发工具组件（仅开发环境） -->
+    <DevLoginTool v-if="isDev" />
+    <!-- 粒子背景 -->
+    <ClientOnly>
+      <ParticleBackground />
+    </ClientOnly>
+  </div>
+</template>
+
+<script setup lang="ts">
+import '@/assets/styles/pc.css'
+import AppHeader from '@/components/pc/AppHeader.vue'
+import AppFooter from '@/components/pc/AppFooter.vue'
+import DevLoginTool from '@/components/pc/DevLoginTool.vue'
+import ParticleBackground from '@/components/pc/ParticleBackground.vue'
+import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
+
+const isDev = import.meta.dev
+</script>
+
+<style scoped>
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-layout-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 32px 24px;
+  gap: 24px;
+  align-self: stretch;
+}
+
+.profile-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  min-height: 500px;
+}
+
+/* Slot children participate in flex layout */
+.profile-main :deep(> *) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Logic Guard: Prevent PC layout from painting on Mobile devices (SSR Flash Protection) */
+@media (max-width: 768px) {
+  .app-wrapper {
+    display: none !important;
+  }
+}
+</style>

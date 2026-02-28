@@ -555,3 +555,16 @@ body::after {
       rgba(255, 255, 255, 0.03) 63%) !important;
   background-size: 400% 100% !important;
 }
+
+/* =====================================================
+   Profile section page transition: 纯淡入淡出
+   避免 translateX 造成背景抖动
+   ===================================================== */
+.profile-fade-enter-active,
+.profile-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.profile-fade-enter-from,
+.profile-fade-leave-to {
+  opacity: 0;
+}

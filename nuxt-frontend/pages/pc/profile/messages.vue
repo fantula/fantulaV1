@@ -83,7 +83,9 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'pc'
+  layout: 'profile-pc',
+  ssr: false,
+  transition: { name: 'profile-fade', mode: 'out-in' }
 })
 
 import { ref, onMounted } from 'vue'
