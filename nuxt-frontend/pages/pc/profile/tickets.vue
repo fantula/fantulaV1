@@ -28,11 +28,24 @@
 
     <!-- Ticket List Container -->
     <div class="tickets-list-container">
-      
-      <BaseInfiniteList 
-        :loading="loading" 
+
+      <!-- 加载失败错误状态 -->
+      <div v-if="error && displayList.length === 0 && !loading" class="error-state">
+        <div class="error-icon-wrap">
+          <el-icon class="error-icon"><Warning /></el-icon>
+        </div>
+        <div class="error-text">工单加载失败</div>
+        <div class="error-desc">网络异常或服务繁忙，请稍后重试</div>
+        <button class="reload-btn" @click="retryLoad">
+          <el-icon><RefreshRight /></el-icon> 重新加载
+        </button>
+      </div>
+
+      <BaseInfiniteList
+        v-else
+        :loading="loading"
         :finished="finished"
-        :error="error" 
+        :error="false"
         @load="loadMore"
         :offset="150"
       >
@@ -129,15 +142,16 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'pc',
-  ssr: false
+  layout: 'profile-pc',
+  ssr: false,
+  transition: { name: 'profile-fade', mode: 'out-in' }
 })
 
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { ticketApi } from '@/api/client/ticket'
 import { useBizFormat } from '@/composables/common/useBizFormat'
 import { useInfiniteScroll } from '@/composables/client/useInfiniteScroll'
-import { Service, Delete } from '@element-plus/icons-vue'
+import { Service, Delete, Warning, RefreshRight } from '@element-plus/icons-vue'
 const TicketDetailModal = defineAsyncComponent(() => import('@/components/pc/modal/business/TicketDetailModal.vue'))
 import BaseConfirmModal from '@/components/pc/modal/base/BaseConfirmModal.vue'
 import BaseInfiniteList from '@/components/shared/BaseInfiniteList.vue'
@@ -185,6 +199,11 @@ const { displayList, loading, finished, error, loadMore, reset } = useInfiniteSc
     data: filteredTickets,
     pageSize: 10
 })
+
+const retryLoad = () => {
+  error.value = false
+  fetchTickets()
+}
 
 const fetchTickets = async () => {
   // Manual loading for initial fetch
@@ -515,4 +534,28 @@ const confirmDelete = async () => {
 /* Transitions */
 .list-move, .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
 .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(-20px); }
+
+/* Error State */
+.error-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 60px 0; gap: 8px;
+}
+.error-icon-wrap {
+  width: 80px; height: 80px;
+  background: rgba(239, 68, 68, 0.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.error-icon { font-size: 32px; color: #EF4444; }
+.error-text { font-size: 16px; font-weight: 600; color: #CBD5E1; }
+.error-desc { font-size: 13px; color: #64748B; margin-bottom: 8px; }
+.reload-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 20px; background: transparent;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
+  color: #94A3B8; font-size: 13px; cursor: pointer; transition: all 0.25s;
+}
+.reload-btn:hover {
+  background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.35); color: #3B82F6;
+}
 </style> 

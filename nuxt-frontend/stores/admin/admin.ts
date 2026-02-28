@@ -166,11 +166,12 @@ export const useAdminStore = defineStore('admin', () => {
         try {
             const authClient = getSupabaseClient()
 
-            // 调用服务端登录 API
+            // 调用服务端登录 API（15s 超时，防止 Supabase 网络抖动导致界面永久卡死）
             const result = await $fetch<{ success: boolean, session: any, adminInfo: any, error?: string }>('/api/admin/auth/login', {
                 method: 'POST',
-                body: { type: 'otp', email, code }
-            }).catch(err => ({ success: false, error: err.data?.statusMessage || err.message, session: null, adminInfo: null }))
+                body: { type: 'otp', email, code },
+                timeout: 15000
+            }).catch(err => ({ success: false, error: err.data?.statusMessage || err.message || '请求超时，请重试', session: null, adminInfo: null }))
 
             if (!result.success || !result.session) {
                 return { success: false, error: result.error || '登录失败' }

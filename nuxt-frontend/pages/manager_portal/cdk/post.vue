@@ -688,6 +688,7 @@ const handleBackNavigation = () => {
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   background: #fbfbfc;
+  position: relative;
 }
 .image-selector:hover { border-color: #409EFF; }
 .preview-img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }

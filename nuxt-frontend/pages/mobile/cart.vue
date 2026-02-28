@@ -102,6 +102,28 @@
           </button>
        </div>
     </div>
+
+    <!-- 删除确认弹窗 -->
+    <Teleport to="body">
+      <div v-if="showDeleteConfirm" class="modal-overlay" @click="showDeleteConfirm = false">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <el-icon class="warning-icon"><WarningFilled /></el-icon>
+            <span>确认删除</span>
+          </div>
+          <div class="modal-body">
+            确认删除选中的 {{ selectedIds.size }} 件商品吗？此操作不可撤销。
+          </div>
+          <div class="modal-footer">
+            <button class="modal-btn cancel" @click="showDeleteConfirm = false">我再想想</button>
+            <button class="modal-btn confirm" @click="confirmDelete" :disabled="deleteLoading">
+              <span v-if="deleteLoading">删除中...</span>
+              <span v-else>确认删除</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -109,7 +131,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
-  ShoppingCart, Check, Minus, Plus 
+  ShoppingCart, Check, Minus, Plus, WarningFilled
 } from '@element-plus/icons-vue'
 import { useCartStore } from '@/stores/client/cart'
 import { mobileRoutes } from '@/config/client-routes'
@@ -126,6 +148,8 @@ const { success, warning, error } = useNotify()
 const loading = ref(false)
 const checkoutLoading = ref(false)
 const isEditMode = ref(false)
+const showDeleteConfirm = ref(false)
+const deleteLoading = ref(false)
 const selectedIds = ref<Set<string>>(new Set())
 
 // Init
@@ -174,15 +198,27 @@ const updateQty = async (item: any, delta: number) => {
     await cartStore.updateQuantity(item.id, newQty)
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
     if (selectedIds.value.size === 0) return
-    
-    const ids = Array.from(selectedIds.value)
-    for (const id of ids) {
-        selectedIds.value.delete(id)
+    showDeleteConfirm.value = true
+}
+
+const confirmDelete = async () => {
+    deleteLoading.value = true
+    try {
+        const ids = Array.from(selectedIds.value)
+        for (const id of ids) {
+            await cartStore.removeFromCart(id)
+            selectedIds.value.delete(id)
+        }
+        showDeleteConfirm.value = false
+        success('删除成功')
+        if (cartStore.items.length === 0) isEditMode.value = false
+    } catch (e) {
+        error('删除失败，请重试')
+    } finally {
+        deleteLoading.value = false
     }
-    success('删除成功')
-    if (cartStore.items.length === 0) isEditMode.value = false
 }
 
 const handleCheckout = async () => {
@@ -390,4 +426,36 @@ const handleCheckout = async () => {
    background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);
    padding: 0 20px; height: 34px; border-radius: 100px; font-size: 13px; font-weight: 500;
 }
+
+/* Delete Confirm Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+  z-index: 2000; display: flex; align-items: center; justify-content: center;
+  padding: 30px; animation: fadeIn 0.2s ease;
+}
+.modal-content {
+  background: #1E293B; width: 100%; max-width: 300px;
+  border-radius: 20px; padding: 24px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  font-size: 16px; font-weight: 600; color: #fff;
+}
+.warning-icon { color: #F59E0B; font-size: 20px; }
+.modal-body { font-size: 14px; color: #94A3B8; line-height: 1.5; margin-bottom: 24px; }
+.modal-footer { display: flex; gap: 12px; }
+.modal-btn {
+  flex: 1; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+}
+.modal-btn.cancel { background: rgba(255,255,255,0.05); color: #94A3B8; }
+.modal-btn.confirm {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  color: #fff; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+.modal-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>

@@ -95,7 +95,7 @@ definePageMeta({
 const adminStore = useAdminStore()
 
 // --- State ---
-const loginMode = ref<'password' | 'otp'>('password')
+const loginMode = ref<'password' | 'otp'>('otp')
 const loading = ref(false)
 const sendingCode = ref(false)
 const countdown = ref(0)

@@ -30,22 +30,22 @@ const isDev = import.meta.dev
 
 <style scoped>
 .app-wrapper {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden; /* 锁定整体高度，防止切换时背景抖动 */
   display: flex;
   flex-direction: column;
 }
 
 .profile-layout-body {
   flex: 1;
-  min-height: 0;
+  min-height: 0; /* Flex shrink bug fix */
   display: flex;
-  align-items: flex-start;
+  align-items: stretch; /* 左右两栏同高，右侧面板撑满 */
   max-width: 1180px;
   margin: 0 auto;
   width: 100%;
   padding: 32px 24px;
   gap: 24px;
-  align-self: stretch;
 }
 
 .profile-main {
@@ -59,7 +59,6 @@ const isDev = import.meta.dev
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
-  min-height: 500px;
 }
 
 /* Slot children participate in flex layout */

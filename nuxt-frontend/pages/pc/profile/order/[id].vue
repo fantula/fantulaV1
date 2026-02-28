@@ -108,13 +108,20 @@
           </div>
         </div>
         <div class="tutorial-body">
-          <div 
-            v-for="(img, index) in instructionImages" 
-            :key="index" 
-            class="image-wrapper" 
-            @click="previewImage(img)"
+          <div
+            v-for="(img, index) in instructionImages"
+            :key="index"
+            class="image-wrapper"
           >
-             <img :src="img" loading="lazy" />
+             <el-image
+               :src="img"
+               :preview-src-list="instructionImages"
+               :initial-index="index"
+               preview-teleported
+               fit="contain"
+               loading="lazy"
+               class="tutorial-el-img"
+             />
              <div class="zoom-overlay">
                <div class="zoom-pill">
                   <el-icon><ZoomIn /></el-icon> 点击查看大图
@@ -195,8 +202,9 @@ import ProductInfoCard from '@/components/pc/order/ProductInfoCard.vue'
 import type { FulfillmentField } from '@/types/order'
 
 definePageMeta({
-  layout: 'pc',
-  ssr: false
+  layout: 'profile-pc',
+  ssr: false,
+  transition: { name: 'profile-fade', mode: 'out-in' }
 })
 
 const route = useRoute()
@@ -253,8 +261,7 @@ const pendingRefundReason = computed(() => pendingRefundRequest.value?.reason)
 const historyRef = ref<{ refresh: () => void } | null>(null)
 const handleFulfillmentSuccess = () => { historyRef.value?.refresh() }
 
-// Preview/Copy
-const previewImage = (url: string) => window.open(url, '_blank')
+// Copy
 const copyText = (text?: string) => {
   if(!text) return
   navigator.clipboard.writeText(text)
@@ -375,8 +382,9 @@ const onTicketSuccess = () => {
   border-color: rgba(59, 130, 246, 0.4);
 }
 
-.image-wrapper { width: 100%; display: flex; justify-content: center; background: #000; }
-.image-wrapper img { max-width: 100%; display: block; }
+.image-wrapper { width: 100%; display: flex; justify-content: center; background: #000; cursor: pointer; }
+.tutorial-el-img { width: 100%; display: block; }
+.tutorial-el-img :deep(img) { max-width: 100%; display: block; }
 
 .zoom-overlay {
   position: absolute; inset: 0; background: rgba(0,0,0,0.3);

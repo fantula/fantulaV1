@@ -20,6 +20,7 @@
           :activeTab="activeTab"
           @switchTab="switchTab"
           @loadMore="loadMore"
+          @reload="reloadWallet"
       />
     </div>
 
@@ -34,8 +35,9 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'pc',
-  ssr: false
+  layout: 'profile-pc',
+  ssr: false,
+  transition: { name: 'profile-fade', mode: 'out-in' }
 })
 
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
@@ -77,15 +79,25 @@ const { displayList, loading: listLoading, finished, error, loadMore, reset } = 
 
 const fetchWallet = async () => {
   loading.value = true
+  error.value = false
   try {
     const res = await authApi.getWalletData()
     if (res.success && res.data) {
         balance.value = res.data.balance || 0
         transactions.value = res.data.transactions || []
+    } else {
+        error.value = true
     }
+  } catch (e) {
+    if (import.meta.dev) console.error('Fetch wallet failed', e)
+    error.value = true
   } finally {
     loading.value = false
   }
+}
+
+const reloadWallet = () => {
+  fetchWallet()
 }
 
 // 处理支付宝回跳 - 轮询订单状态

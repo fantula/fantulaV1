@@ -3,7 +3,17 @@
     <AppHeader />
     <!-- 页面内容 - flex:1 确保 footer 始终在底部 -->
     <div class="page-slot-wrapper">
-      <slot />
+      <NuxtErrorBoundary>
+        <slot />
+        <template #error="{ error, clearError }">
+          <div class="layout-error-state">
+            <p class="layout-error-icon">⚠️</p>
+            <h3 class="layout-error-title">页面加载失败</h3>
+            <p class="layout-error-msg">{{ error?.message || '未知错误' }}</p>
+            <button class="layout-error-btn" @click="clearError()">重新加载</button>
+          </div>
+        </template>
+      </NuxtErrorBoundary>
     </div>
     <AppFooter />
     <!-- 开发工具组件（仅开发环境） -->
@@ -56,4 +66,30 @@ const isDev = import.meta.dev
     display: none !important;
   }
 }
+
+/* Global Error Boundary UI */
+.layout-error-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: #94A3B8;
+}
+.layout-error-icon { font-size: 48px; margin: 0; }
+.layout-error-title { font-size: 18px; font-weight: 600; color: #E2E8F0; margin: 0; }
+.layout-error-msg { font-size: 14px; color: #64748B; margin: 0; max-width: 400px; text-align: center; }
+.layout-error-btn {
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 100px;
+  color: #3B82F6;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.layout-error-btn:hover { background: rgba(59, 130, 246, 0.1); }
 </style>

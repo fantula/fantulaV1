@@ -5,7 +5,17 @@
 
     <!-- Main Content Area -->
     <main class="mobile-content">
-      <slot />
+      <NuxtErrorBoundary>
+        <slot />
+        <template #error="{ error, clearError }">
+          <div class="layout-error-state">
+            <p class="layout-error-icon">⚠️</p>
+            <p class="layout-error-title">页面加载失败</p>
+            <p class="layout-error-msg">{{ error?.message || '未知错误' }}</p>
+            <button class="layout-error-btn" @click="clearError()">重新加载</button>
+          </div>
+        </template>
+      </NuxtErrorBoundary>
     </main>
 
     <!-- Bottom Navigation -->
@@ -71,5 +81,30 @@ useHead({
   overflow: hidden; /* Pages manage their own scroll containers */
   position: relative;
   z-index: 1;
+}
+
+/* Global Error Boundary UI */
+.layout-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 24px;
+  color: #94A3B8;
+  min-height: 60vh;
+}
+.layout-error-icon { font-size: 48px; margin: 0; }
+.layout-error-title { font-size: 16px; font-weight: 600; color: #E2E8F0; margin: 0; }
+.layout-error-msg { font-size: 13px; color: #64748B; margin: 0; text-align: center; }
+.layout-error-btn {
+  margin-top: 8px;
+  padding: 10px 28px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 100px;
+  color: #60A5FA;
+  font-size: 14px;
+  cursor: pointer;
 }
 </style>
