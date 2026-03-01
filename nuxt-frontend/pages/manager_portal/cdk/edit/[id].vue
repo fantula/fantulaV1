@@ -48,40 +48,60 @@
             <el-divider content-position="left">商品关联</el-divider>
             
             <el-row :gutter="20">
-              <el-col :span="8">
+              <el-col :span="12">
                 <el-form-item label="商品分类">
                   <el-select v-model="selectedCategoryId" placeholder="请选择分类" filterable @change="handleCategoryChange" style="width: 100%">
                     <el-option v-for="cat in categories" :key="cat.id" :label="cat.name" :value="cat.id" />
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="8">
+              <el-col :span="12">
                 <el-form-item label="选择商品">
                   <el-select v-model="selectedProductId" placeholder="请选择商品" filterable @change="handleProductChange" :disabled="!selectedCategoryId" style="width: 100%">
                     <el-option v-for="prod in filteredProducts" :key="prod.id" :label="prod.product_name" :value="prod.id" />
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="8">
-                <el-form-item label="关联 SKU (可多选)">
-                  <el-select 
-                    v-model="selectedSkuIds" 
-                    multiple
-                    placeholder="选择 SKU" 
-                    filterable 
-                    :loading="loadingSkus"
-                    :disabled="!selectedProductId"
-                    style="width: 100%"
-                  >
-                    <el-option v-for="sku in skuOptions" :key="sku.id" :label="sku.label" :value="sku.id" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
             </el-row>
-            
-            <el-alert 
-              v-if="selectedSkuIds.length === 0 && skuOptions.length > 0" 
-              type="warning" 
+
+            <!-- SKU 规格选择面板 -->
+            <div v-if="selectedProductId" class="sku-panel">
+              <div class="sku-panel-header">
+                <span class="sku-panel-title">
+                  关联规格
+                  <span class="sku-count">{{ selectedSkuIds.length }} / {{ skuOptions.length }} 已选</span>
+                </span>
+                <el-button link type="primary" size="small" @click="toggleAllSkus">
+                  {{ allSkusSelected ? '取消全选' : '全选所有规格' }}
+                </el-button>
+              </div>
+              <div v-if="loadingSkus" style="padding: 16px 0">
+                <el-skeleton :rows="1" animated />
+              </div>
+              <div v-else-if="skuOptions.length === 0" class="sku-empty">该商品暂无可用规格</div>
+              <div v-else class="sku-grid">
+                <div
+                  v-for="sku in skuOptions"
+                  :key="sku.id"
+                  class="sku-item"
+                  :class="{ selected: selectedSkuIds.includes(sku.id) }"
+                  @click="toggleSku(sku.id)"
+                >
+                  <el-checkbox :model-value="selectedSkuIds.includes(sku.id)" @change="toggleSku(sku.id)" @click.stop />
+                  <div class="sku-info">
+                    <span class="sku-label">{{ sku.label }}</span>
+                    <span v-if="sku.price" class="sku-price">¥{{ sku.price }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else-if="selectedCategoryId" class="sku-panel-hint">
+              请先选择商品以查看可绑定规格
+            </div>
+
+            <el-alert
+              v-if="selectedSkuIds.length === 0 && skuOptions.length > 0"
+              type="warning"
               :closable="false"
               style="margin-top: 8px"
             >
@@ -252,7 +272,7 @@ const imagePickerVisible = ref(false)
 
 // SKU Selection State
 const selectedSkuIds = ref<string[]>([])
-const skuOptions = ref<{ id: string; label: string }[]>([])
+const skuOptions = ref<{ id: string; label: string; price?: number }[]>([])
 const loadingSkus = ref(false)
 
 // 商品选择状态 (编辑时可切换商品)
@@ -410,7 +430,7 @@ const loadSkuOptions = async (productId: string) => {
       }
       skuOptions.value = filteredSkus.map((sku: any) => {
         const specValues = Object.values(sku.spec_combination || {}).join(' ')
-        return { id: sku.id, label: specValues || '默认规格' }
+        return { id: sku.id, label: specValues || '默认规格', price: sku.price }
       })
     }
   } finally {
@@ -432,6 +452,22 @@ const handleProductChange = async (productId: string) => {
   if (productId) {
     await loadSkuOptions(productId)
   }
+}
+
+// SKU 全选 / 单选
+const allSkusSelected = computed(() =>
+  skuOptions.value.length > 0 && skuOptions.value.every(s => selectedSkuIds.value.includes(s.id))
+)
+
+const toggleSku = (skuId: string) => {
+  const idx = selectedSkuIds.value.indexOf(skuId)
+  if (idx >= 0) selectedSkuIds.value.splice(idx, 1)
+  else selectedSkuIds.value.push(skuId)
+}
+
+const toggleAllSkus = () => {
+  if (allSkusSelected.value) selectedSkuIds.value = []
+  else selectedSkuIds.value = skuOptions.value.map(s => s.id)
 }
 
 // Virtual type helpers
@@ -672,6 +708,98 @@ const handleBack = () => {
 .field-row, .kv-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
 .separator { color: #dcdfe6; }
 .add-attr-btn { width: 100%; border-style: dashed; }
+
+/* SKU Panel */
+.sku-panel {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 4px;
+}
+
+.sku-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sku-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.sku-count {
+  font-size: 12px;
+  color: #909399;
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.sku-empty {
+  text-align: center;
+  padding: 16px;
+  color: #909399;
+  font-size: 13px;
+}
+
+.sku-panel-hint {
+  font-size: 12px;
+  color: #909399;
+  padding: 6px 2px;
+  margin-top: 4px;
+}
+
+.sku-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+.sku-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e4e7ed;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.sku-item:hover {
+  border-color: #409EFF;
+}
+
+.sku-item.selected {
+  border-color: #409EFF;
+  background: #ecf5ff;
+}
+
+.sku-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sku-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #303133;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sku-price {
+  font-size: 12px;
+  color: #f56c6c;
+  font-weight: 600;
+}
 
 /* Image Selector */
 .image-selector {
