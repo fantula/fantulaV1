@@ -1,10 +1,15 @@
 <template>
   <div class="app-wrapper">
     <AppHeader />
-    <div class="profile-layout-body">
-      <SideNavigation />
-      <div class="profile-main">
-        <slot />
+    <div class="profile-workspace">
+      <!-- 问候横幅：晚上好，旅行者 -->
+      <ProfileHeader />
+      <!-- 双栏：侧边栏 + 内容 -->
+      <div class="profile-columns">
+        <SideNavigation />
+        <div class="profile-main">
+          <slot />
+        </div>
       </div>
     </div>
     <!-- 开发工具组件（仅开发环境） -->
@@ -22,6 +27,7 @@ import AppHeader from '@/components/pc/AppHeader.vue'
 import DevLoginTool from '@/components/pc/DevLoginTool.vue'
 import ParticleBackground from '@/components/pc/ParticleBackground.vue'
 import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
+import ProfileHeader from '@/components/pc/profile/ProfileHeader.vue'
 import { pcRoutes } from '@/config/client-routes'
 import { useUserStore } from '@/stores/client/user'
 
@@ -59,15 +65,25 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
   flex-direction: column;
 }
 
-.profile-layout-body {
+/* 外层纵向容器：问候横幅 + 双栏 */
+.profile-workspace {
   flex: 1;
-  min-height: 0; /* Flex shrink bug fix */
+  min-height: 0;
   display: flex;
-  align-items: stretch; /* 左右两栏同高，右侧面板撑满 */
+  flex-direction: column;
   max-width: 1180px;
   margin: 0 auto;
   width: 100%;
-  padding: 32px 24px;
+  padding: 24px 24px 24px;
+  gap: 16px; /* 问候横幅与双栏之间的间距 */
+}
+
+/* 内层横向容器：侧边栏 + 内容 */
+.profile-columns {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
   gap: 24px;
 }
 
