@@ -7,7 +7,6 @@
         <slot />
       </div>
     </div>
-    <AppFooter />
     <!-- 开发工具组件（仅开发环境） -->
     <DevLoginTool v-if="isDev" />
     <!-- 粒子背景 -->
@@ -20,7 +19,6 @@
 <script setup lang="ts">
 import '@/assets/styles/pc.css'
 import AppHeader from '@/components/pc/AppHeader.vue'
-import AppFooter from '@/components/pc/AppFooter.vue'
 import DevLoginTool from '@/components/pc/DevLoginTool.vue'
 import ParticleBackground from '@/components/pc/ParticleBackground.vue'
 import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
