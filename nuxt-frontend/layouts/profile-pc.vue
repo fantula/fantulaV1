@@ -22,8 +22,33 @@ import AppHeader from '@/components/pc/AppHeader.vue'
 import DevLoginTool from '@/components/pc/DevLoginTool.vue'
 import ParticleBackground from '@/components/pc/ParticleBackground.vue'
 import SideNavigation from '@/components/pc/profile/SideNavigation.vue'
+import { pcRoutes } from '@/config/client-routes'
+import { useUserStore } from '@/stores/client/user'
 
 const isDev = import.meta.dev
+
+// 认证守卫：未登录跳回首页（替代已删除的 profile.vue 中的 auth 逻辑）
+const userStore = useUserStore()
+const router = useRouter()
+
+onMounted(async () => {
+  if (!userStore.isLoggedIn) {
+    await userStore.init()
+  }
+  if (!userStore.isLoggedIn) {
+    router.push(pcRoutes.home())
+    return
+  }
+  if (!userStore.user) {
+    userStore.fetchUserInfo()
+  }
+})
+
+watch(() => userStore.isLoggedIn, (loggedIn) => {
+  if (!loggedIn) {
+    router.push(pcRoutes.home())
+  }
+})
 </script>
 
 <style scoped>
