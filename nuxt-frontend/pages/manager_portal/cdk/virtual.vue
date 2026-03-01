@@ -26,10 +26,8 @@
             <div class="card-icon">🔋</div>
             <div class="card-title">
               <div class="title-top">
-                <span class="resource-name" v-if="res.product_snapshot?.product_name">{{ res.product_snapshot.product_name }}</span>
-                <span class="resource-name" v-else>虚拟充值资源</span>
+                <span class="resource-name">{{ res.account_data?.label || res.product_snapshot?.product_name || '虚拟充值资源' }}</span>
                 <el-tag :type="(getStatusType(res.status) as any)" size="small" effect="plain">{{ getStatusLabel(res.status) }}</el-tag>
-                <el-tag v-if="res.account_data?.label" type="warning" size="small" effect="light" class="card-custom-label">{{ res.account_data.label }}</el-tag>
               </div>
               <div class="fields-display" v-if="getFields(res).length > 0">
                 <el-tag v-for="f in getFields(res)" :key="f" size="small" type="info" effect="plain" class="field-tag">{{ f }}</el-tag>
@@ -486,8 +484,8 @@ const openBindDialog = (cdkId: string) => {
   bindSkuSelection.value = []
   const res = resources.value.find(r => r.id === cdkId)
   currentBindings.value = res ? [...res.sku_mappings] : []
-  // Default: expand all groups
-  expandedGroups.value = new Set(currentBindings.value.map(b => b.product_id || b.product_name || 'unknown'))
+  // Default: all collapsed
+  expandedGroups.value = new Set()
   bindVisible.value = true
 }
 
@@ -513,7 +511,7 @@ const handleBatchBind = async () => {
 
 const handleUnbind = async (mappingId: string) => {
   try {
-    await ElMessageBox.confirm('确定解除此 SKU 绑定？', '确认', { type: 'warning' })
+    await ElMessageBox.confirm('确定解除此 SKU 绑定？', '确认', { type: 'warning', zIndex: 2200 })
     const res = await adminCdkApi.removeVirtualCdkSkuMapping(mappingId)
     if (res.success) {
       ElMessage.success('已解绑')
@@ -530,7 +528,7 @@ const handleUnbindProduct = async (group: { product_id: string; product_name: st
     await ElMessageBox.confirm(
       `确定解绑「${group.product_name}」下全部 ${group.skus.length} 个规格？`,
       '批量解绑确认',
-      { type: 'warning', confirmButtonText: '全部解绑', cancelButtonText: '取消' }
+      { type: 'warning', confirmButtonText: '全部解绑', cancelButtonText: '取消', zIndex: 2200 }
     )
     for (const sku of group.skus) {
       await adminCdkApi.removeVirtualCdkSkuMapping(sku.mapping_id)
