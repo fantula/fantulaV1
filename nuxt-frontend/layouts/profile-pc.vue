@@ -8,8 +8,16 @@
       <div class="profile-columns">
         <SideNavigation />
         <div class="profile-main">
+          <!-- 大使背景图：右侧虚幻装饰 -->
+          <div class="phantom-ambassador" aria-hidden="true"></div>
           <slot />
         </div>
+      </div>
+      <!-- 底部版权细条 -->
+      <div class="profile-bottom-bar">
+        <span>© 2019–2026 凡图拉 | 云南凡图拉科技有限公司</span>
+        <span class="bottom-divider">·</span>
+        <span>滇ICP备 2025060486号-1</span>
       </div>
     </div>
     <!-- 开发工具组件（仅开发环境） -->
@@ -88,6 +96,7 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
 }
 
 .profile-main {
+  position: relative; /* 让 phantom-ambassador 绝对定位在此内 */
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -100,12 +109,48 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
   border-radius: 20px;
 }
 
-/* Slot children participate in flex layout */
-.profile-main :deep(> *) {
+/* 右侧虚幻大使背景图 */
+.phantom-ambassador {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: auto;
+  aspect-ratio: 3 / 4;
+  background-image: url('/images/theme/ambassador.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: right center;
+  opacity: 0.2;
+  mask-image: linear-gradient(to right, transparent 5%, black 60%);
+  -webkit-mask-image: linear-gradient(to right, transparent 5%, black 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Slot children sit above ambassador image */
+.profile-main :deep(> *:not(.phantom-ambassador)) {
+  position: relative;
+  z-index: 1;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* 底部版权细条 */
+.profile-bottom-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.3px;
+}
+
+.bottom-divider {
+  opacity: 0.4;
 }
 
 /* Logic Guard: Prevent PC layout from painting on Mobile devices (SSR Flash Protection) */
