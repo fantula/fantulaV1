@@ -194,10 +194,10 @@ const handleConfirmLogout = async () => {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 32px; /* Relaxed gap between sections */
-  padding: 32px 24px 48px;
+  gap: 24px; /* Relaxed gap between sections */
+  padding: 24px 24px 32px;
   height: 100%;
-  overflow-y: auto;
+  overflow-y: hidden; /* 固定展示，不允许内部滚动 */
   z-index: 50; /* High priority access */
   
   /* Obsidian Glass (Deepened) */

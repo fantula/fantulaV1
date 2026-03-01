@@ -82,8 +82,13 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
   max-width: 1180px;
   margin: 0 auto;
   width: 100%;
-  padding: 24px 24px 24px;
-  gap: 16px; /* 问候横幅与双栏之间的间距 */
+  padding: 16px 24px 0;
+  gap: 8px; /* 问候横幅与双栏之间的间距 */
+}
+
+/* ProfileHeader 组件内置 margin-bottom: 24px，在此覆盖压缩 */
+.profile-workspace :deep(.horizon-header) {
+  margin-bottom: 0;
 }
 
 /* 内层横向容器：侧边栏 + 内容 */
@@ -143,8 +148,8 @@ watch(() => userStore.isLoggedIn, (loggedIn) => {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 10px 0;
-  font-size: 12px;
+  padding: 6px 0;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.25);
   letter-spacing: 0.3px;
 }
